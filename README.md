@@ -1,2 +1,2 @@
 # OpenGeodeWeb-Back
-Python framework for web microservices
+OpenSource Python framework for web microservices
