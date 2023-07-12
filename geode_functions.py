@@ -144,6 +144,22 @@ def get_builder(geode_object, data):
     return geode_objects.objects_list()[geode_object]["builder"](data)
 
 
+def load(file_path):
+    return geode_objects.objects_list()[geode_object]["load"](file_path)
+
+
+def save(data, geode_object, id, filename):
+    geode_objects.objects_list()[geode_object]["save"](
+        data, os.path.join(UPLOAD_FOLDER, filename)
+    )
+
+
+def save_viewable(data, geode_object, id):
+    geode_objects.objects_list()[geode_object]["save_viewable"](
+        data, os.path.join(UPLOAD_FOLDER, id)
+    )
+
+
 def get_geographic_coordinate_systems(geode_object):
     if is_3D(geode_object):
         return og_gs.GeographicCoordinateSystem3D.geographic_coordinate_systems()
@@ -206,6 +222,7 @@ def create_coordinate_system(
     geode_object, data, name, input_coordinate_points, output_coordinate_points
 ):
     builder = get_builder(geode_object, data)
+
     input_coordiante_system = get_coordinate_system(
         geode_object, input_coordinate_points
     )
