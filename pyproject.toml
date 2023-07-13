@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "OpenGeodeWeb-Back"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
   { name="Geode-solutions", email="contact@geode-solutions.com" },
 ]
