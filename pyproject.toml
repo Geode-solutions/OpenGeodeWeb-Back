@@ -1,0 +1,23 @@
+[build-system]
+requires = ["OpenGeode-core", "OpenGeode-IO", "OpenGeode-Geosciences", "OpenGeode-GeosciencesIO", "Geode-Viewables", "hatchling"]
+build-backend = "hatchling.build"
+
+
+[project]
+name = "OpenGeodeWeb-Back"
+version = "0.0.1"
+authors = [
+  { name="Geode-solutions", email="contact@geode-solutions.com" },
+]
+description = "Open source library of python functions and OpenGeode wrappers"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Geode-solutions/OpenGeodeWeb-Back"
+"Bug Tracker" = "https://github.com/Geode-solutions/OpenGeodeWeb-Back/issues"
