@@ -14,13 +14,9 @@ jobs:
       run: |
         python3 -m pip install --upgrade build
         python3 -m build
-        ls
-        ls dist
-    - name: Publish on PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
+    - name: Python Semantic Release
+      uses: relekang/python-semantic-release@master
       with:
-        skip-existing: true
-        verbose: true
-        user: __token__
-        password: ${{ secrets.PYPI_TOKEN }}
-        packages-dir: "dist"
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        repository_username: __token__
+        repository_password: ${{ secrets.PYPI_TOKEN }}

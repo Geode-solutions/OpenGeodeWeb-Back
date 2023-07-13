@@ -1,5 +1,5 @@
 [build-system]
-requires = ["OpenGeode-core", "OpenGeode-IO", "OpenGeode-Geosciences", "OpenGeode-GeosciencesIO", "Geode-Viewables", "hatchling"]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 
@@ -17,7 +17,16 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+dynamic = ["dependencies"]
 
 [project.urls]
 "Homepage" = "https://github.com/Geode-solutions/OpenGeodeWeb-Back"
 "Bug Tracker" = "https://github.com/Geode-solutions/OpenGeodeWeb-Back/issues"
+
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.semantic_release]
+version_variable = "pyproject.toml:version"
+version_source = "tag"
