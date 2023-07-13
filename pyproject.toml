@@ -30,10 +30,5 @@ dependencies = {file = ["requirements.txt"]}
 [tool.semantic_release.branches]
 version_variable = "pyproject.toml:version"
 version_source = "tag"
-branch = "master"
-
-[tool.semantic_release.branches]
-version_variable = "pyproject.toml:version"
-version_source = "tag"
 branch = "next"
 prerelease_tag = "rc"
