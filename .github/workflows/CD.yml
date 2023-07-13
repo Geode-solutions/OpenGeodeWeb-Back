@@ -11,7 +11,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
     - name: Build
-      run: python -m build
+      run: |
+        python3 -m pip install --upgrade build
+        python3 -m build
     - name: Publish on PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
