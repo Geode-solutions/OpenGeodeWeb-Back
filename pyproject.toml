@@ -26,8 +26,3 @@ dynamic = ["dependencies"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
-
-[tool.semantic_release]
-version_variable = "pyproject.toml:version"
-branch = "next"
-prerelease_tag = "rc"
