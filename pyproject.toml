@@ -25,11 +25,11 @@ classifiers = [
 where = ["src"]
 namespaces = false
 
-
+dynamic = ["dependencies", "version"]
 
 [tool.setuptools.dynamic]
+version = {attr = "package.__version__"}
 dependencies = {file = ["requirements.txt"]}
-dynamic = ["version"]
 
 [tool.semantic_release]
 version_variable = "pyproject.toml:version"
