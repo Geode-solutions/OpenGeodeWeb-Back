@@ -29,6 +29,7 @@ namespaces = false
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
+dynamic = ["version"]
 
 [tool.semantic_release]
 version_variable = "pyproject.toml:version"
