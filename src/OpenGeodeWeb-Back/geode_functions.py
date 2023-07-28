@@ -148,16 +148,27 @@ def load(file_path):
     return geode_objects.objects_list()[geode_object]["load"](file_path)
 
 
-def save(data, geode_object, id, filename):
+def save(data, geode_object, folder, filename):
     geode_objects.objects_list()[geode_object]["save"](
-        data, os.path.join(UPLOAD_FOLDER, filename)
+        data, os.path.join(folder, filename)
     )
 
 
-def save_viewable(data, geode_object, id):
+def save_viewable(data, geode_object, folder, id):
     geode_objects.objects_list()[geode_object]["save_viewable"](
-        data, os.path.join(UPLOAD_FOLDER, id)
+        data, os.path.join(folder, id)
     )
+
+
+def get_form_variables(form, variables_array):
+    variables_dict = {}
+
+    for variable in variables_array:
+        if form.get(variable) is None:
+            flask.abort(400, f"No {variable} sent")
+        else:
+            variables_dict[variable] = form.get(variable)
+    return variables_dict
 
 
 def get_geographic_coordinate_systems(geode_object):
