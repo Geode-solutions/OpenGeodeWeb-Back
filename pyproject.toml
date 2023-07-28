@@ -26,12 +26,16 @@ classifiers = [
 where = ["src"]
 namespaces = false
 
-
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 
-[tool.semantic_release]
+[tool.semantic_release.branches.master]
 version_variable = "pyproject.toml:version"
 version_source = "commit"
-branch = "next"
+prerelease = false
+
+[tool.semantic_release.branches.next]
+version_variable = "pyproject.toml:version"
+version_source = "commit"
 prerelease_tag = "rc"
+prerelease = true
