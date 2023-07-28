@@ -1,11 +1,11 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
 
 
 [project]
 name = "OpenGeodeWeb-Back"
-version = "0.0.2"
+dynamic = ["version"]
 authors = [
   { name="Geode-solutions", email="contact@geode-solutions.com" },
 ]
@@ -22,3 +22,18 @@ dynamic = ["dependencies"]
 [project.urls]
 "Homepage" = "https://github.com/Geode-solutions/OpenGeodeWeb-Back"
 "Bug Tracker" = "https://github.com/Geode-solutions/OpenGeodeWeb-Back/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = false
+
+
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.semantic_release]
+version_variable = "pyproject.toml:version"
+version_source = "commit"
+branch = "next"
+prerelease_tag = "rc"
