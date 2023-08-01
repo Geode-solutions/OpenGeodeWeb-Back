@@ -1,13 +1,17 @@
+# Standard library imports
 import base64
-import geode_objects
 import os
-import pkg_resources
-import werkzeug
-import flask
 import uuid
 
+# Third party imports
+import flask
 import opengeode_geosciences as og_gs
 import opengeode as og
+import pkg_resources
+import werkzeug
+
+# Local application imports
+from .geode_objects import objects_list
 
 
 def list_objects_input_extensions(
