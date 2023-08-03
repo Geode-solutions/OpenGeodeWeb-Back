@@ -1,6 +1,7 @@
 # Standard library imports
 import base64
 import os
+import time
 import uuid
 
 # Third party imports
@@ -14,29 +15,31 @@ import werkzeug
 from .geode_objects import objects_list
 
 
-def list_objects_input_extensions(
-    is_viewable: bool = True,
-    geode_object: str = "",
-):
+def list_all_input_extensions(crs=False):
     """
     Purpose:
         Function that returns a list of all input extensions
+    Args:
+        crs -- Tells the function if we want the geode_objects that have a crs
     Returns:
         An ordered list of input file extensions
     """
-    return_list = []
-    objects_list = geode_objects.objects_list()
+    List = []
+    geode_object_dict = objects_list()
 
-    for object_ in objects_list.values():
-        if object_["is_viewable"] == is_viewable or geode_object == object_:
-            values = object_["input"]
-            for value in values:
-                list_creators = value.list_creators()
-                for creator in list_creators:
-                    if creator not in return_list:
-                        return_list.append(creator)
-    return_list.sort()
-    return return_list
+    for geode_object in geode_object_dict.values():
+        values = geode_object["input"]
+
+        # if crs == True:
+        #     if "crs" not in geode_object:
+        #         continue
+        for value in values:
+            list_creators = value.list_creators()
+            for creator in list_creators:
+                if creator not in List:
+                    List.append(creator)
+    List.sort()
+    return List
 
 
 def list_objects(extension: str, is_viewable: bool = True):
@@ -49,15 +52,15 @@ def list_objects(extension: str, is_viewable: bool = True):
         An ordered list of object's names
     """
     return_list = []
-    objects_list = geode_objects.objects_list()
+    geode_object_dict = objects_list()
 
-    for object_, values in objects_list.items():
-        if values["is_viewable"] == is_viewable:
-            list_values = values["input"]
-            for value in list_values:
-                if value.has_creator(extension):
-                    if object_ not in return_list:
-                        return_list.append(object_)
+    for object_, values in geode_object_dict.items():
+        # if values["is_viewable"] == is_viewable:
+        list_values = values["input"]
+        for value in list_values:
+            if value.has_creator(extension):
+                if object_ not in return_list:
+                    return_list.append(object_)
     return_list.sort()
     return return_list
 
@@ -72,9 +75,9 @@ def list_output_file_extensions(object: str):
         An ordered list of file extensions
     """
     List = []
-    objects_list = geode_objects.objects_list()
+    geode_object_dict = objects_list()
 
-    values = objects_list[object]["output"]
+    values = geode_object_dict[object]["output"]
     for value in values:
         list_creators = value.list_creators()
         for creator in list_creators:
@@ -107,22 +110,39 @@ def upload_file(file: str, file_name: str, upload_folder: str, file_size: int):
     f.close()
 
     final_size = os.path.getsize(file_path)
-    return int(file_size) == int(final_size)
+    uploaded_file = int(file_size) == int(final_size)
+    if not uploaded_file:
+        flask.abort(500, "File not uploaded")
 
 
-def create_lock_file():
-    LOCK_FOLDER = flask.current_app.config["LOCK_FOLDER"]
-    if not os.path.exists(LOCK_FOLDER):
-        os.mkdir(LOCK_FOLDER)
-    flask.g.UUID = uuid.uuid4()
-    file_path = f"{LOCK_FOLDER}/{str(flask.g.UUID)}.txt"
-    f = open(file_path, "a")
+def create_lock_file(
+    folder_absolute_path,
+):
+    if not os.path.exists(folder_absolute_path):
+        os.mkdir(folder_absolute_path)
+    id = uuid.uuid4()
+    file_absolute_path = f"{folder_absolute_path}/{str(id)}.txt"
+    f = open(file_absolute_path, "a")
+    f.close()
+    flask.g.UUID = id
+
+
+def create_time_file(folder_absolute_path):
+    if not os.path.exists(folder_absolute_path):
+        os.mkdir(folder_absolute_path)
+    file_path = f"{folder_absolute_path}/time.txt"
+    if not os.path.isfile(file_path):
+        f = open(file_path, "w")
+        f.close()
+
+    f = open(folder_absolute_path + "/time.txt", "w")
+    f.write(str(time.time()))
     f.close()
 
 
-def remove_lock_file():
-    LOCK_FOLDER = flask.current_app.config["LOCK_FOLDER"]
-    os.remove(f"{LOCK_FOLDER}/{str(flask.g.UUID)}.txt")
+def remove_lock_file(folder_absolute_path):
+    id = flask.g.UUID
+    os.remove(f"{folder_absolute_path}/{str(id)}.txt")
 
 
 def set_interval(func, sec):
@@ -137,30 +157,30 @@ def set_interval(func, sec):
 
 
 def is_model(geode_object):
-    return geode_objects.objects_list()[geode_object]["is_model"]
+    return objects_list()[geode_object]["is_model"]
 
 
 def is_3D(geode_object):
-    return geode_objects.objects_list()[geode_object]["is_3D"]
+    return objects_list()[geode_object]["is_3D"]
 
 
 def get_builder(geode_object, data):
-    return geode_objects.objects_list()[geode_object]["builder"](data)
+    return objects_list()[geode_object]["builder"](data)
 
 
-def load(file_path):
-    return geode_objects.objects_list()[geode_object]["load"](file_path)
+def load(geode_object, file_absolute_path):
+    return objects_list()[geode_object]["load"](file_absolute_path)
 
 
-def save(data, geode_object, folder, filename):
-    geode_objects.objects_list()[geode_object]["save"](
-        data, os.path.join(folder, filename)
+def save(data, geode_object, folder_absolute_path, filename):
+    objects_list()[geode_object]["save"](
+        data, os.path.join(folder_absolute_path, filename)
     )
 
 
-def save_viewable(data, geode_object, folder, id):
-    geode_objects.objects_list()[geode_object]["save_viewable"](
-        data, os.path.join(folder, id)
+def save_viewable(data, geode_object, folder_absolute_path, id):
+    objects_list()[geode_object]["save_viewable"](
+        data, os.path.join(folder_absolute_path, id)
     )
 
 
@@ -220,7 +240,7 @@ def get_coordinate_system(geode_object, coordinate_system):
 def assign_geographic_coordinate_system_info(geode_object, data, input_crs):
     builder = get_builder(geode_object, data)
     info = get_geographic_coordinate_systems_info(geode_object, input_crs)
-    geode_objects.objects_list()[geode_object]["crs"]["assign"](
+    objects_list()[geode_object]["crs"]["assign"](
         data, builder, input_crs["name"], info
     )
 
@@ -228,7 +248,7 @@ def assign_geographic_coordinate_system_info(geode_object, data, input_crs):
 def convert_geographic_coordinate_system_info(geode_object, data, output_crs):
     builder = get_builder(geode_object, data)
     info = get_geographic_coordinate_systems_info(geode_object, output_crs)
-    geode_objects.objects_list()[geode_object]["crs"]["convert"](
+    objects_list()[geode_object]["crs"]["convert"](
         data, builder, output_crs["name"], info
     )
 
@@ -244,6 +264,6 @@ def create_coordinate_system(
     output_coordiante_system = get_coordinate_system(
         geode_object, output_coordinate_points
     )
-    geode_objects.objects_list()[geode_object]["crs"]["create"](
+    objects_list()[geode_object]["crs"]["create"](
         data, builder, name, input_coordiante_system, output_coordiante_system
     )
