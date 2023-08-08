@@ -2,6 +2,7 @@
 import base64
 import os
 import time
+import threading
 import uuid
 
 # Third party imports
@@ -166,6 +167,10 @@ def is_3D(geode_object):
 
 def get_builder(geode_object, data):
     return objects_list()[geode_object]["builder"](data)
+
+
+def get_inspector(geode_object, data):
+    return objects_list()[geode_object]["inspector"](data)
 
 
 def load(geode_object, file_absolute_path):
