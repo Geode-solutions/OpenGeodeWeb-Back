@@ -16,31 +16,42 @@ import werkzeug
 from .geode_objects import objects_list
 
 
-def list_all_input_extensions(crs=False):
+def list_input_extensions(
+    keys: list = [],
+    geode_object: str = "",
+):
     """
     Purpose:
         Function that returns a list of all input extensions
     Args:
-        crs -- Tells the function if we want the geode_objects that have a crs
+        keys -- Tells the function if we want the geode_objects that have a crs
+        geode_object -- The name of the geode_object
     Returns:
         An ordered list of input file extensions
     """
-    List = []
+    extensions_list = []
     geode_object_dict = objects_list()
 
     for geode_object in geode_object_dict.values():
+        if keys:
+            for key in keys:
+                if key in geode_object:
+                    if type(geode_object[key]) == bool and geode_object[key] == True:
+                        continue
+                    else:
+                        continue
+                else:
+                    continue
+
         values = geode_object["input"]
 
-        # if crs == True:
-        #     if "crs" not in geode_object:
-        #         continue
         for value in values:
             list_creators = value.list_creators()
             for creator in list_creators:
-                if creator not in List:
-                    List.append(creator)
-    List.sort()
-    return List
+                if creator not in extensions_list:
+                    extensions_list.append(creator)
+    extensions_list.sort()
+    return extensions_list
 
 
 def list_objects(extension: str, is_viewable: bool = True):
@@ -177,16 +188,39 @@ def load(geode_object, file_absolute_path):
     return objects_list()[geode_object]["load"](file_absolute_path)
 
 
-def save(data, geode_object, folder_absolute_path, filename):
+def save(geode_object, data, folder_absolute_path, filename):
     objects_list()[geode_object]["save"](
         data, os.path.join(folder_absolute_path, filename)
     )
 
 
-def save_viewable(data, geode_object, folder_absolute_path, id):
+def save_viewable(geode_object, data, folder_absolute_path, id):
     objects_list()[geode_object]["save_viewable"](
         data, os.path.join(folder_absolute_path, id)
     )
+
+
+def assign_crs(geode_object, data, crs_name, info):
+    builder = get_builder(geode_object, data)
+    objects_list()[geode_object]["crs"]["assign"](data, builder, crs_name, info)
+
+
+def convert_crs(geode_object, data, crs_name, info):
+    builder = get_builder(geode_object, data)
+    objects_list()[geode_object]["crs"]["convert"](data, builder, crs_name, info)
+
+
+def create_crs(
+    geode_object, data, name, input_coordiante_system, output_coordiante_system
+):
+    builder = get_builder(geode_object, data)
+    objects_list()[geode_object]["crs"]["create"](
+        data, builder, name, input_coordiante_system, output_coordiante_system
+    )
+
+
+def get_extension_from_filename(filename):
+    return os.path.splitext(filename)[1][1:]
 
 
 def get_form_variables(form, variables_array):
@@ -243,19 +277,13 @@ def get_coordinate_system(geode_object, coordinate_system):
 
 
 def assign_geographic_coordinate_system_info(geode_object, data, input_crs):
-    builder = get_builder(geode_object, data)
     info = get_geographic_coordinate_systems_info(geode_object, input_crs)
-    objects_list()[geode_object]["crs"]["assign"](
-        data, builder, input_crs["name"], info
-    )
+    assign_crs(geode_object, data, input_crs["name"], info)
 
 
 def convert_geographic_coordinate_system_info(geode_object, data, output_crs):
-    builder = get_builder(geode_object, data)
     info = get_geographic_coordinate_systems_info(geode_object, output_crs)
-    objects_list()[geode_object]["crs"]["convert"](
-        data, builder, output_crs["name"], info
-    )
+    convert_crs(geode_object, data, output_crs["name"], info)
 
 
 def create_coordinate_system(
@@ -269,6 +297,6 @@ def create_coordinate_system(
     output_coordiante_system = get_coordinate_system(
         geode_object, output_coordinate_points
     )
-    objects_list()[geode_object]["crs"]["create"](
-        data, builder, name, input_coordiante_system, output_coordiante_system
+    create_crs(
+        geode_object, data, name, input_coordiante_system, output_coordiante_system
     )
