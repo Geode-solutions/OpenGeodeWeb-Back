@@ -184,7 +184,7 @@ def save(data, geode_object, folder_absolute_path, filename):
 
 
 def save_viewable(data, geode_object, folder_absolute_path, id):
-    objects_list()[geode_object]["save_viewable"](
+    return objects_list()[geode_object]["save_viewable"](
         data, os.path.join(folder_absolute_path, id)
     )
 
