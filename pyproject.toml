@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "OpenGeodeWeb-Back"
+version = "0.0.16"
+authors = [
+  { name="Geode-solutions", email="contact@geode-solutions.com" },
+]
+description = "OpenGeodeWeb-Back is an open source framework that proposes handy python functions and wrappers for the OpenGeode ecosystem"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "geode-viewables>=2.0.3",
+    "opengeode-core>=14.4.1",
+    "opengeode-geosciences>=7.1.1",
+    "opengeode-geosciencesio>=4.1.6",
+    "opengeode-inspector>=3.0.7",
+    "opengeode-io>=6.0.10",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Geode-solutions/OpenGeodeWeb-Back"
+"Bug Tracker" = "https://github.com/Geode-solutions/OpenGeodeWeb-Back/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = false
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.semantic_release]
+version_variable = "pyproject.toml:version"
+
+[tool.semantic_release.branches.master]
+match = "master"
+
+[tool.semantic_release.branches.next]
+match = "next"
+prerelease_tag = "rc"
+prerelease = true
