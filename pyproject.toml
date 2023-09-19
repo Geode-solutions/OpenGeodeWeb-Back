@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "OpenGeodeWeb-Back"
-version = "0.0.16"
+version = "0.0.0-semantically-released"
 authors = [
   { name="Geode-solutions", email="contact@geode-solutions.com" },
 ]
@@ -16,14 +16,6 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-]
-dependencies = [
-    "geode-viewables>=2.0.3",
-    "opengeode-core>=14.4.1",
-    "opengeode-geosciences>=7.1.1",
-    "opengeode-geosciencesio>=4.1.6",
-    "opengeode-inspector>=3.0.7",
-    "opengeode-io>=6.0.10",
 ]
 
 [project.urls]
