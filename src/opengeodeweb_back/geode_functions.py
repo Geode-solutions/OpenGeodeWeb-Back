@@ -25,7 +25,7 @@ def get_geode_object_output(geode_object: str):
 
 
 def load(geode_object: str, file_absolute_path: str):
-    objects_list()[geode_object]["load"](file_absolute_path)
+    return objects_list()[geode_object]["load"](file_absolute_path)
 
 
 def save(geode_object: str, data, folder_absolute_path: str, filename: str):
@@ -78,7 +78,7 @@ def get_inspector(geode_object: str, data):
 
 
 def save_viewable(geode_object: str, data, folder_absolute_path: str, id: str):
-    objects_list()[geode_object]["save_viewable"](
+    return objects_list()[geode_object]["save_viewable"](
         data, os.path.join(folder_absolute_path, id)
     )
 

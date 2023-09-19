@@ -53,27 +53,32 @@ def test_get_geode_object_input_extensions():
             assert type(extension) is str
 
 
-# def test_load():
-#     for geode_object, value in geode_objects.objects_list().items():
-#         input_extensions = geode_functions.get_geode_object_input_extensions(
-#             geode_object
-#         )
+def test_load():
+    for geode_object, value in geode_objects.objects_list().items():
+        input_extensions = geode_functions.get_geode_object_input_extensions(
+            geode_object
+        )
 
-#         output_extensions = geode_functions.get_geode_object_output_extensions(
-#             geode_object
-#         )
-#         for input_extension in input_extensions:
-#             data = geode_functions.load(
-#                 geode_object,
-#                 os.path.join(
-#                     os.path.abspath("./tests/data"), f"test.{input_extension}"
-#                 ),
-#             )
+        output_extensions = geode_functions.get_geode_object_output_extensions(
+            geode_object
+        )
+        for input_extension in input_extensions:
+            data = geode_functions.load(
+                geode_object,
+                os.path.join(
+                    os.path.abspath("./tests/data"), f"test.{input_extension}"
+                ),
+            )
 
-#             for output_extension in output_extensions:
-#                 geode_functions.save(
-#                     geode_object,
-#                     data,
-#                     os.path.abspath("./output"),
-#                     f"test.{output_extension}",
-#                 )
+            for output_extension in output_extensions:
+                file_path = os.path.abspath(f"./output/test.{output_extension}")
+
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+                    print(f"{file_path} deleted.")
+                geode_functions.save(
+                    geode_object,
+                    data,
+                    os.path.abspath("./output"),
+                    f"test.{output_extension}",
+                )
