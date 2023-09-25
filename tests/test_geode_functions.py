@@ -1,4 +1,4 @@
-from .srcimport import geode_functions
+from .src import geode_functions
 
 
 def test_is_model():
