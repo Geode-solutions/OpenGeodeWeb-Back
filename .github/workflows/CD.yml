@@ -12,16 +12,18 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+        token: ${{ secrets.TOKEN }}
     - name: Python Semantic Release
       uses: python-semantic-release/python-semantic-release@master
+      id: semantic-release
       with:
         github_token: ${{ secrets.TOKEN }}
     - name: Build
       run: |
-        cat pyproject.toml
         python3 -m pip install --upgrade build
         python3 -m build
     - name: Upload
+      if: steps.semantic-release.outputs.released == 'true'
       run: |
         python3 -m pip install twine
         python3 -m twine upload --repository pypi dist/* -u __token__ -p ${{ secrets.PYPI_TOKEN }} 

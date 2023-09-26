@@ -2,6 +2,17 @@
 
 
 
+## v1.1.0-rc.3 (2023-09-26)
+
+### Fix
+
+* fix(CD): update TOKEN ([`49b37c4`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/49b37c483e33b2e4c2412da0e0eb6b7aaee96a1c))
+
+### Unknown
+
+* actions/checkout TOKEN ([`111c578`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/111c578cbd786079ad3e2494a49caa192a815f23))
+
+
 ## v1.1.0-rc.2 (2023-09-26)
 
 ### Feature
