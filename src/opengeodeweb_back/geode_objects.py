@@ -24,6 +24,7 @@ def objects_list():
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_brep,
             "inspector": og_inspector.BRepInspector,
+            "missing_files": og.check_brep_missing_files,
         },
         "CrossSection": {
             "input": [og_gs.CrossSectionInputFactory],
@@ -41,6 +42,7 @@ def objects_list():
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_cross_section,
             "inspector": og_inspector.SectionInspector,
+            "missing_files": og.check_cross_section_missing_files,
         },
         "EdgedCurve2D": {
             "input": [og.EdgedCurveInputFactory2D],
@@ -58,6 +60,7 @@ def objects_list():
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_edged_curve2D,
             "inspector": og_inspector.EdgedCurveInspector2D,
+            "missing_files": og.check_edged_curve_missing_files2D,
         },
         "EdgedCurve3D": {
             "input": [og.EdgedCurveInputFactory3D],
@@ -75,6 +78,7 @@ def objects_list():
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_edged_curve3D,
             "inspector": og_inspector.EdgedCurveInspector3D,
+            "missing_files": og.check_edged_curve_missing_files3D,
         },
         "Graph": {
             "input": [og.GraphInputFactory],
@@ -85,6 +89,7 @@ def objects_list():
             "is_model": False,
             "is_3D": False,
             "is_viewable": True,
+            "missing_files": og.check_graph_missing_files,
         },
         "HybridSolid3D": {
             "input": [og.HybridSolidInputFactory3D],
@@ -102,6 +107,7 @@ def objects_list():
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_hybrid_solid3D,
             "inspector": og_inspector.SolidMeshInspector3D,
+            "missing_files": og.check_hybrid_solid_missing_files3D,
         },
         "PointSet2D": {
             "input": [og.PointSetInputFactory2D],
@@ -119,6 +125,7 @@ def objects_list():
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_point_set2D,
             "inspector": og_inspector.PointSetInspector2D,
+            "missing_files": og.check_point_set_missing_files2D,
         },
         "PointSet3D": {
             "input": [og.PointSetInputFactory3D],
@@ -136,6 +143,7 @@ def objects_list():
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_point_set3D,
             "inspector": og_inspector.PointSetInspector3D,
+            "missing_files": og.check_point_set_missing_files3D,
         },
         "PolygonalSurface2D": {
             "input": [og.PolygonalSurfaceInputFactory2D],
@@ -153,6 +161,7 @@ def objects_list():
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_polygonal_surface2D,
             "inspector": og_inspector.SurfaceMeshInspector2D,
+            "missing_files": og.check_polygonal_surface_missing_files2D,
         },
         "PolygonalSurface3D": {
             "input": [og.PolygonalSurfaceInputFactory3D],
@@ -170,6 +179,7 @@ def objects_list():
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_polygonal_surface3D,
             "inspector": og_inspector.SurfaceMeshInspector3D,
+            "missing_files": og.check_polygonal_surface_missing_files3D,
         },
         "PolyhedralSolid3D": {
             "input": [og.PolyhedralSolidInputFactory3D],
@@ -187,6 +197,7 @@ def objects_list():
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_polyhedral_solid3D,
             "inspector": og_inspector.SolidMeshInspector3D,
+            "missing_files": og.check_polyhedral_solid_missing_files3D,
         },
         "RasterImage2D": {
             "input": [og.RasterImageInputFactory2D],
@@ -197,6 +208,7 @@ def objects_list():
             "is_3D": False,
             "is_viewable": False,
             "save_viewable": g_v.save_viewable_raster_image2D,
+            "missing_files": og.check_raster_image_missing_files,
         },
         "RasterImage3D": {
             "input": [og.RasterImageInputFactory3D],
@@ -207,6 +219,7 @@ def objects_list():
             "is_3D": False,
             "is_viewable": False,
             "save_viewable": g_v.save_viewable_raster_image3D,
+            "missing_files": og.check_raster_image_missing_files,
         },
         "RegularGrid2D": {
             "input": [og.RegularGridInputFactory2D],
@@ -223,6 +236,7 @@ def objects_list():
             "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_regular_grid2D,
+            "missing_files": og.check_regular_grid_missing_files2D,
         },
         "RegularGrid3D": {
             "input": [og.RegularGridInputFactory3D],
@@ -239,6 +253,7 @@ def objects_list():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_regular_grid3D,
+            "missing_files": og.check_regular_grid_missing_files3D,
         },
         "Section": {
             "input": [og.SectionInputFactory],
@@ -256,6 +271,7 @@ def objects_list():
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_section,
             "inspector": og_inspector.SectionInspector,
+            "missing_files": og.check_section_missing_files,
         },
         "StructuralModel": {
             "input": [og_gs.StructuralModelInputFactory],
@@ -273,6 +289,7 @@ def objects_list():
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_structural_model,
             "inspector": og_inspector.BRepInspector,
+            "missing_files": og.check_brep_missing_files,
         },
         "TetrahedralSolid3D": {
             "input": [og.TetrahedralSolidInputFactory3D],
@@ -290,6 +307,7 @@ def objects_list():
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_tetrahedral_solid3D,
             "inspector": og_inspector.SolidMeshInspector3D,
+            "missing_files": og.check_tetrahedral_solid_missing_files3D,
         },
         "TriangulatedSurface2D": {
             "input": [og.TriangulatedSurfaceInputFactory2D],
@@ -307,6 +325,7 @@ def objects_list():
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_triangulated_surface2D,
             "inspector": og_inspector.TriangulatedSurfaceInspector2D,
+            "missing_files": og.check_triangulated_surface_missing_files2D,
         },
         "TriangulatedSurface3D": {
             "input": [og.TriangulatedSurfaceInputFactory3D],
@@ -324,6 +343,7 @@ def objects_list():
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_triangulated_surface3D,
             "inspector": og_inspector.TriangulatedSurfaceInspector3D,
+            "missing_files": og.check_triangulated_surface_missing_files3D,
         },
         "VertexSet": {
             "input": [og.VertexSetInputFactory],
@@ -334,5 +354,6 @@ def objects_list():
             "is_model": True,
             "is_3D": False,
             "is_viewable": False,
+            "missing_files": og.check_vertex_set_missing_files,
         },
     }
