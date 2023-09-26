@@ -36,11 +36,7 @@ env = "GH_TOKEN"
 
 [tool.semantic_release.branches.master]
 match = "master"
-version_source = "commit"
-prerelease = false
 
 [tool.semantic_release.branches.next]
 match = "next"
-version_source = "commit"
-prerelease_tag = "rc"
 prerelease = true
