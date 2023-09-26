@@ -14,10 +14,10 @@ jobs:
       run: |
         python3 -m pip install --upgrade build
         python3 -m build
-    # - name: Python Semantic Release
-    #   uses: python-semantic-release/python-semantic-release@master
-    #   with:
-    #     github_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Python Semantic Release
+      uses: python-semantic-release/python-semantic-release@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: Upload
       run: |
         python3 -m pip install twine
