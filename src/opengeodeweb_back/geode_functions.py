@@ -83,6 +83,10 @@ def get_inspector(geode_object: str, data):
     return objects_list()[geode_object]["inspector"](data)
 
 
+def missing_files(geode_object: str, data):
+    return objects_list()[geode_object]["missing_files"](data)
+
+
 def get_geode_object_input_extensions(geode_object: str):
     inputs_list = []
     geode_object_inputs = get_input(geode_object)
