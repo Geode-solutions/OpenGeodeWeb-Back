@@ -36,6 +36,3 @@ prerelease = false
 
 [tool.semantic_release.branches.next]
 match = "next"
-version_source = "commit"
-prerelease_tag = "rc"
-prerelease = true
