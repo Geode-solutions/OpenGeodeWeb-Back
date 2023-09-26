@@ -2,15 +2,15 @@ import os
 from src.opengeodeweb_back import geode_functions, geode_objects
 
 
-def test_get_geode_object_input():
+def test_get_input():
     for geode_object, value in geode_objects.objects_list().items():
-        geode_object_input = geode_functions.get_geode_object_input(geode_object)
+        geode_object_input = geode_functions.get_input(geode_object)
         assert type(geode_object_input) is list
 
 
-def test_get_geode_object_output():
+def test_get_output():
     for geode_object, value in geode_objects.objects_list().items():
-        geode_object_input = geode_functions.get_geode_object_output(geode_object)
+        geode_object_input = geode_functions.get_output(geode_object)
         assert type(geode_object_input) is list
 
 

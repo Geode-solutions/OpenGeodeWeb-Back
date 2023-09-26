@@ -16,11 +16,11 @@ import werkzeug
 from .geode_objects import objects_list
 
 
-def get_geode_object_input(geode_object: str):
+def get_input(geode_object: str):
     return objects_list()[geode_object]["input"]
 
 
-def get_geode_object_output(geode_object: str):
+def get_output(geode_object: str):
     return objects_list()[geode_object]["output"]
 
 
@@ -85,7 +85,7 @@ def save_viewable(geode_object: str, data, folder_absolute_path: str, id: str):
 
 def get_geode_object_input_extensions(geode_object: str):
     inputs_list = []
-    geode_object_inputs = get_geode_object_input(geode_object)
+    geode_object_inputs = get_input(geode_object)
 
     for input in geode_object_inputs:
         list_creators = input.list_creators()
@@ -97,7 +97,7 @@ def get_geode_object_input_extensions(geode_object: str):
 
 def get_geode_object_output_extensions(geode_object: str):
     output_list = []
-    geode_object_outputs = get_geode_object_output(geode_object)
+    geode_object_outputs = get_output(geode_object)
 
     for output in geode_object_outputs:
         list_creators = output.list_creators()
