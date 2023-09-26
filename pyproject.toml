@@ -27,17 +27,16 @@ where = ["src"]
 namespaces = false
 
 [tool.setuptools.dynamic]
+version_variable = "pyproject.toml:version"
 dependencies = {file = ["requirements.txt"]}
 
 [tool.semantic_release.branches.master]
 match = "master"
-version_variable = "pyproject.toml:version"
 version_source = "commit"
 prerelease = false
 
 [tool.semantic_release.branches.next]
 match = "next"
-version_variable = "pyproject.toml:version"
 version_source = "commit"
 prerelease_tag = "rc"
 prerelease = true
