@@ -2,6 +2,15 @@
 
 
 
+## v1.1.0 (2023-09-26)
+
+### Unknown
+
+* Merge pull request #5 from Geode-solutions/next
+
+actions/checkout TOKEN ([`18cf8eb`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/18cf8ebde3170a729cfbcf2edbf08410022efdd0))
+
+
 ## v1.1.0-rc.3 (2023-09-26)
 
 ### Fix
@@ -11,6 +20,10 @@
 ### Unknown
 
 * actions/checkout TOKEN ([`111c578`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/111c578cbd786079ad3e2494a49caa192a815f23))
+
+* Merge pull request #4 from Geode-solutions/next
+
+switch to global TOKEN ([`e29dc4b`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/e29dc4b88176cdac16f84e3ebea2fcbd127c1a26))
 
 
 ## v1.1.0-rc.2 (2023-09-26)
@@ -22,6 +35,10 @@
 ### Unknown
 
 * switch to global TOKEN ([`6b85410`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/6b85410562d0b20a3a945c5e87d8366dcbffbd50))
+
+* Merge pull request #3 from Geode-solutions/next
+
+Next ([`9e13b42`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/9e13b42548e205167abef6235bc801c39c56c0e0))
 
 * Merge pull request #2 from Geode-solutions/feature_add_functions
 
@@ -87,6 +104,10 @@ add functions ([`e207aa8`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/
 * test ([`771d5cf`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/771d5cff3351d71b5397eba4aade624e6fa4c5dd))
 
 * test semantic release ([`c5411ed`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c5411ed1e9d933730f7f8afc9aaf07b8a331e62f))
+
+* Merge pull request #1 from Geode-solutions/next
+
+Next ([`bf82296`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/bf82296b29900bad27acfe776c8fc402bf93ac49))
 
 * update ([`b8751ab`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b8751abf6193691d9c40e16f9517c514e5c404ba))
 
@@ -230,6 +251,8 @@ BREAKING CHANGE: chnage function parameters order ([`e20bfa0`](https://github.co
 * Add geode_objects.py
 Add requirements
 Add branch protection ([`ebfa532`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/ebfa53208b9382ae6e7e57e623a558eab67083a3))
+
+* Add geode_objects.py ([`63e9bfa`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/63e9bfab9b6bdc252316400ecfe0625dd122b752))
 
 * Update README.md ([`d131ccf`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/d131ccf3a856e084d7d7f5a80be9082d611db2fd))
 
