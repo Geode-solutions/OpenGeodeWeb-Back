@@ -9,12 +9,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Python Semantic Release
+      uses: python-semantic-release/python-semantic-release@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: Build
       run: |
+        cat pyproject.toml
         python3 -m pip install --upgrade build
         python3 -m build
-    - name: Upload
-      run: |
-        python3 -m pip install twine
-        python3 -m twine upload --repository pypi dist/* -u __token__ -p ${{ secrets.PYPI_TOKEN }} 
+    # - name: Upload
+    #   run: |
+    #     python3 -m pip install twine
+        # python3 -m twine upload --repository pypi dist/* -u __token__ -p ${{ secrets.PYPI_TOKEN }} 
