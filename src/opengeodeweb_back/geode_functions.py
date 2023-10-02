@@ -115,7 +115,6 @@ def list_input_extensions(
         Function that returns a list of all input extensions
     Args:
         keys -- Tells the function if we want the geode_objects that have a crs
-        geode_object -- The name of the geode_object
     Returns:
         An ordered list of input file extensions
     """
@@ -124,8 +123,9 @@ def list_input_extensions(
     for geode_object, value in objects_list().items():
         if keys:
             for key in keys:
-                if key in geode_object:
-                    if type(geode_object[key]) == bool and geode_object[key] == True:
+                if key in value.keys():
+                    print(geode_object)
+                    if type(value[key]) == bool and value[key] == True:
                         continue
                     else:
                         continue
