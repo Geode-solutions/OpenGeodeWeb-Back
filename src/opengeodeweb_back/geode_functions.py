@@ -152,7 +152,7 @@ def list_geode_objects(extension: str, keys: list = []):
     geode_objects_list = []
 
     for geode_object, value in objects_list().items():
-        geode_object_inputs = get_geode_object_input(geode_object)
+        geode_object_inputs = get_input(geode_object)
         for input in geode_object_inputs:
             if input.has_creator(extension):
                 if geode_object not in geode_objects_list:
@@ -231,7 +231,7 @@ def set_interval(func, sec):
 
 
 def get_extension_from_filename(filename):
-    return os.path.splitext(filename)[1][1:]
+    return os.path.splitext(filename)[1]
 
 
 def get_form_variables(form, variables_array):
