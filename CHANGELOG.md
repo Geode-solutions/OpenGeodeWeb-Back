@@ -2,6 +2,21 @@
 
 
 
+## v1.1.0-rc.4 (2023-10-02)
+
+### Fix
+
+* fix(list_input_extensions):
+
+fix geode_object key extractor ([`5021d28`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/5021d2800a981c597a2c6e60a0be7a9b41dcd03e))
+
+### Unknown
+
+* Merge pull request #6 from Geode-solutions/fix_list_input_extensions
+
+fix(list_input_extensions): ([`18be4af`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/18be4af65fabbe203a3a7496b82b808f964d4672))
+
+
 ## v1.1.0-rc.3 (2023-09-26)
 
 ### Fix
