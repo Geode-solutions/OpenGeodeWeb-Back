@@ -3,15 +3,15 @@ import os
 from src.opengeodeweb_back import geode_functions, geode_objects
 
 
-def test_get_input():
+def test_get_input_factory():
     for geode_object, value in geode_objects.objects_list().items():
-        geode_object_input = geode_functions.get_input(geode_object)
+        geode_object_input = geode_functions.get_input_factory(geode_object)
         assert type(geode_object_input) is list
 
 
-def test_get_output():
+def test_get_output_factory():
     for geode_object, value in geode_objects.objects_list().items():
-        geode_object_input = geode_functions.get_output(geode_object)
+        geode_object_input = geode_functions.get_output_factory(geode_object)
         assert type(geode_object_input) is list
 
 
@@ -67,6 +67,8 @@ def test_list_geode_objects():
     for geode_object, value in geode_objects.objects_list().items():
         for input_extension in input_extensions:
             for keys in keys_array:
+                print(f"{input_extension=}")
+                print(f"{keys=}")
                 geode_objects_list = geode_functions.list_geode_objects(
                     input_extension, keys
                 )
