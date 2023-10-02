@@ -2,6 +2,29 @@
 
 
 
+## v1.1.0-rc.5 (2023-10-02)
+
+### Feature
+
+* feat(tests): add tests
+
+Add tests for function that don&#39;t require data ([`5f32897`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/5f328973d36762f4875822015aec60f86b472259))
+
+### Unknown
+
+* Merge pull request #7 from Geode-solutions/feature_add_unit_tests
+
+Feature add unit tests ([`cd9e017`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/cd9e0173a41d2878d514ef66502de4e67de7cd9c))
+
+* remove unused test file ([`e686ccd`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/e686ccdbb69a635ff6886c3020a58c66d4c4b0ea))
+
+* Merge branch &#39;next&#39; into feature_add_unit_tests ([`74e9b55`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/74e9b55425b94c7133721abe3457d47f35dca79c))
+
+* pr comments ([`c687131`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c68713191f931d4857f025665012d77d2c27949b))
+
+* pull from next ([`c9ec6ff`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c9ec6ff14c99ff549954481b781718c9728e9027))
+
+
 ## v1.1.0-rc.4 (2023-10-02)
 
 ### Fix
@@ -37,6 +60,10 @@ fix(list_input_extensions): ([`18be4af`](https://github.com/Geode-solutions/Open
 ### Unknown
 
 * switch to global TOKEN ([`6b85410`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/6b85410562d0b20a3a945c5e87d8366dcbffbd50))
+
+* modify functions ([`2cf65bf`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/2cf65bfa71ba24f9bf4419c4a3d9991ad1d1e826))
+
+* load return ([`b4c373b`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b4c373b9a53e5c35ac213f1ba10e37a79ff0a835))
 
 * Merge pull request #2 from Geode-solutions/feature_add_functions
 
@@ -94,6 +121,8 @@ Feature add functions ([`9ad7436`](https://github.com/Geode-solutions/OpenGeodeW
 
 * test ([`732ed43`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/732ed4347878665239e301c432d16a1d5088e1c7))
 
+* remove test files &amp; add later ([`6c1ea78`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/6c1ea78953c81dafb54a4fb68c9b818d3be66e23))
+
 * add requirements.txt
 add functions ([`e207aa8`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/e207aa8b04c7501f3a880d3a0a0d3b6e5a0ae05b))
 
@@ -102,6 +131,8 @@ add functions ([`e207aa8`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/
 * test ([`771d5cf`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/771d5cff3351d71b5397eba4aade624e6fa4c5dd))
 
 * test semantic release ([`c5411ed`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c5411ed1e9d933730f7f8afc9aaf07b8a331e62f))
+
+* load return ([`9115aa2`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/9115aa2cce85a292944119682d57637ca55e15cc))
 
 * update ([`b8751ab`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b8751abf6193691d9c40e16f9517c514e5c404ba))
 
@@ -129,6 +160,26 @@ add functions ([`e207aa8`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/
 ### Unknown
 
 * test semantic release ([`b886b70`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b886b7084aaf97750c42bff9fb3fe22f2ed5e0d6))
+
+* add files ([`80b2f88`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/80b2f88f7eee275e86304540d53f6da0dffeacaa))
+
+* add files ([`1db89bf`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/1db89bf892efef66b01eed43aea60da787ffe871))
+
+* add files ([`f892fe9`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/f892fe91753763147023cc9ffb32c34d4a6a57f3))
+
+* lfs ([`056f7ba`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/056f7ba993c93d72d0ecdd6c68ab15e2683096c7))
+
+* add more ([`bb923dd`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/bb923dd51c3be0b65dddf3c15e9dcd2310012c7e))
+
+* add more ([`7be620c`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/7be620ca9d262cbb92bfb0608d544981448581bd))
+
+* add more ([`7002df3`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/7002df3e2aaac96deede9f27dce5050f69ba605f))
+
+* add one file ([`f41de02`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/f41de0225f189bc4347947c3c37af5967e2778cf))
+
+* add tests ([`dc868dd`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/dc868dd60a6a7fb4ee519b8ba61218222a19d894))
+
+* add geode_functions back ([`6a51d53`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/6a51d534b29d1b0cd543e682db2df3a082794309))
 
 * Added return to save_viewable ([`e3f863a`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/e3f863a2ab777f732f4199b46afabc9f0c6b4747))
 
