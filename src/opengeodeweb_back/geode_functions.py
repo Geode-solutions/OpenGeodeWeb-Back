@@ -29,7 +29,7 @@ def load(geode_object: str, file_absolute_path: str):
 
 
 def save(geode_object: str, data, folder_absolute_path: str, filename: str):
-    objects_list()[geode_object]["save"](
+    return objects_list()[geode_object]["save"](
         data, os.path.join(folder_absolute_path, filename)
     )
 
@@ -86,7 +86,6 @@ def save_viewable(geode_object: str, data, folder_absolute_path: str, id: str):
 def get_geode_object_input_extensions(geode_object: str):
     inputs_list = []
     geode_object_inputs = get_input_factory(geode_object)
-
     for input in geode_object_inputs:
         list_creators = input.list_creators()
         inputs_list = inputs_list + list_creators
@@ -115,7 +114,6 @@ def list_input_extensions(
         Function that returns a list of all input extensions
     Args:
         keys -- Tells the function if we want the geode_objects that have a crs
-        geode_object -- The name of the geode_object
     Returns:
         An ordered list of input file extensions
     """
