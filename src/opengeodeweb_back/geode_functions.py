@@ -229,7 +229,7 @@ def set_interval(func, sec):
 
 
 def get_extension_from_filename(filename):
-    return os.path.splitext(filename)[1]
+    return os.path.splitext(filename)[1][1:]
 
 
 def get_form_variables(form, variables_array):
