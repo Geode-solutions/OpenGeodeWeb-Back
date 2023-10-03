@@ -2,6 +2,25 @@
 
 
 
+## v1.2.1 (2023-10-03)
+
+### Fix
+
+* fix(get_extension_from_filename):
+
+return extension without dot ([`f517129`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/f517129640e1b69a2e0f2ce814581d8e91ca3d1f))
+
+### Unknown
+
+* Merge pull request #11 from Geode-solutions/next
+
+Next ([`6ccf725`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/6ccf72592f37c8e4a81cbd0c8073cab59a902110))
+
+* Merge pull request #10 from Geode-solutions/fix_get_extension_from_filename
+
+fix(get_extension_from_filename): ([`48ed2d6`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/48ed2d6864907408e68a50dc09210c33e7d715d5))
+
+
 ## v1.2.0 (2023-10-02)
 
 ### Unknown
