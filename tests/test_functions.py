@@ -1,4 +1,3 @@
-import fnmatch
 import os
 from src.opengeodeweb_back import geode_functions, geode_objects
 
@@ -92,4 +91,5 @@ def test_get_extension_from_filename():
     extension = geode_functions.get_extension_from_filename("test.toto")
     print(extension)
     assert type(extension) is str
-    assert fnmatch.fnmatch(extension, ".*")
+    print()
+    assert extension.count(".") == 0
