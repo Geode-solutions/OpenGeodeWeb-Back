@@ -48,7 +48,7 @@ def convert_crs(geode_object: str, data, crs_name: str, info):
     objects_list()[geode_object]["crs"]["convert"](data, builder, crs_name, info)
 
 
-def create_coordinate_system(
+def create_crs(
     geode_object: str,
     data,
     name: str,
@@ -297,8 +297,6 @@ def convert_geographic_coordinate_system_info(geode_object: str, data, output_cr
 def create_coordinate_system(
     geode_object: str, data, name, input_coordinate_points, output_coordinate_points
 ):
-    builder = create_builder(geode_object, data)
-
     input_coordiante_system = get_coordinate_system(
         geode_object, input_coordinate_points
     )
