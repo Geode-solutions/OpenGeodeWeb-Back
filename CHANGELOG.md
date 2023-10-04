@@ -2,6 +2,23 @@
 
 
 
+## v1.2.1-rc.2 (2023-10-04)
+
+### Fix
+
+* fix(create_crs): fix function name closes #13 ([`a03ca5e`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/a03ca5e9310cb47612d05134712bb985bddd5632))
+
+* fix(create_crs): fix function name ([`10b08ae`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/10b08ae8fe4463ce4aa1ff4ebe9673dcdd3230a3))
+
+### Unknown
+
+* Merge pull request #14 from Geode-solutions/fix_create_crs
+
+Fix create crs ([`b1aedb4`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b1aedb4ca7b70d661e25346a13723282dd06a0c5))
+
+* Merge branch &#39;fix_create_crs&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into fix_create_crs ([`5d71740`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/5d717409e89c9ef937378b539f2f408e58bb9761))
+
+
 ## v1.2.1-rc.1 (2023-10-03)
 
 ### Fix
