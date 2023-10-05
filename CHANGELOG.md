@@ -2,6 +2,19 @@
 
 
 
+## v1.2.1-rc.3 (2023-10-05)
+
+### Fix
+
+* fix(VertexSet): is_model ([`6fc0d4a`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/6fc0d4a874fe9ac8850c51dc156259d225673cef))
+
+### Unknown
+
+* Merge pull request #18 from Geode-solutions/fix_vertexset_model
+
+fix(VertexSet): is_model ([`15206ef`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/15206eff603898767b77ad57080b89e81459da8a))
+
+
 ## v1.2.1-rc.2 (2023-10-04)
 
 ### Fix
