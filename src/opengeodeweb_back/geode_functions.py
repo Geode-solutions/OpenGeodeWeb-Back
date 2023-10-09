@@ -16,12 +16,12 @@ import werkzeug
 from .geode_objects import objects_list
 
 
-def get_input(geode_object: str):
-    return objects_list()[geode_object]["input"]
+def get_input_factory(geode_object: str):
+    return objects_list()[geode_object]["input_factory"]
 
 
-def get_output(geode_object: str):
-    return objects_list()[geode_object]["output"]
+def get_output_factory(geode_object: str):
+    return objects_list()[geode_object]["output_factory"]
 
 
 def load(geode_object: str, file_absolute_path: str):
@@ -34,28 +34,28 @@ def save(geode_object: str, data, folder_absolute_path: str, filename: str):
     )
 
 
-def get_builder(geode_object: str, data):
+def create_builder(geode_object: str, data):
     return objects_list()[geode_object]["builder"](data)
 
 
 def assign_crs(geode_object: str, data, crs_name: str, info):
-    builder = get_builder(geode_object, data)
+    builder = create_builder(geode_object, data)
     objects_list()[geode_object]["crs"]["assign"](data, builder, crs_name, info)
 
 
 def convert_crs(geode_object: str, data, crs_name: str, info):
-    builder = get_builder(geode_object, data)
+    builder = create_builder(geode_object, data)
     objects_list()[geode_object]["crs"]["convert"](data, builder, crs_name, info)
 
 
-def create_coordinate_system(
+def create_crs(
     geode_object: str,
     data,
     name: str,
     input_coordiante_system,
     output_coordiante_system,
 ):
-    builder = get_builder(geode_object, data)
+    builder = create_builder(geode_object, data)
     objects_list()[geode_object]["crs"]["create"](
         data, builder, name, input_coordiante_system, output_coordiante_system
     )
@@ -73,14 +73,14 @@ def is_viewable(geode_object: str):
     return objects_list()[geode_object]["is_viewable"]
 
 
+def get_inspector(geode_object: str, data):
+    return objects_list()[geode_object]["inspector"](data)
+
+
 def save_viewable(geode_object: str, data, folder_absolute_path: str, id: str):
     return objects_list()[geode_object]["save_viewable"](
         data, os.path.join(folder_absolute_path, id)
     )
-
-
-def get_inspector(geode_object: str, data):
-    return objects_list()[geode_object]["inspector"](data)
 
 
 def missing_files(geode_object: str, data):
@@ -89,8 +89,7 @@ def missing_files(geode_object: str, data):
 
 def get_geode_object_input_extensions(geode_object: str):
     inputs_list = []
-    geode_object_inputs = get_input(geode_object)
-
+    geode_object_inputs = get_input_factory(geode_object)
     for input in geode_object_inputs:
         list_creators = input.list_creators()
         inputs_list = inputs_list + list_creators
@@ -101,7 +100,7 @@ def get_geode_object_input_extensions(geode_object: str):
 
 def get_geode_object_output_extensions(geode_object: str):
     output_list = []
-    geode_object_outputs = get_output(geode_object)
+    geode_object_outputs = get_output_factory(geode_object)
 
     for output in geode_object_outputs:
         list_creators = output.list_creators()
@@ -119,7 +118,6 @@ def list_input_extensions(
         Function that returns a list of all input extensions
     Args:
         keys -- Tells the function if we want the geode_objects that have a crs
-        geode_object -- The name of the geode_object
     Returns:
         An ordered list of input file extensions
     """
@@ -128,16 +126,16 @@ def list_input_extensions(
     for geode_object, value in objects_list().items():
         if keys:
             for key in keys:
-                if key in geode_object:
-                    if type(geode_object[key]) == bool and geode_object[key] == True:
-                        continue
+                if key in value:
+                    if type(value[key]) == bool and value[key] == True:
+                        pass
                     else:
                         continue
                 else:
                     continue
 
-        geode_object_list_inputs = get_geode_object_input_extensions(geode_object)
-        extensions_list = extensions_list + geode_object_list_inputs
+        geode_object_input_extensions = get_geode_object_input_extensions(geode_object)
+        extensions_list = extensions_list + geode_object_input_extensions
 
     extensions_list = list(set(extensions_list))
     extensions_list.sort()
@@ -156,8 +154,8 @@ def list_geode_objects(extension: str, keys: list = []):
     geode_objects_list = []
 
     for geode_object, value in objects_list().items():
-        geode_object_inputs = get_geode_object_input(geode_object)
-        for input in geode_object_inputs:
+        input_factory = get_input_factory(geode_object)
+        for input in input_factory:
             if input.has_creator(extension):
                 if geode_object not in geode_objects_list:
                     geode_objects_list.append(geode_object)
@@ -303,8 +301,6 @@ def convert_geographic_coordinate_system_info(geode_object: str, data, output_cr
 def create_coordinate_system(
     geode_object: str, data, name, input_coordinate_points, output_coordinate_points
 ):
-    builder = get_builder(geode_object, data)
-
     input_coordiante_system = get_coordinate_system(
         geode_object, input_coordinate_points
     )
