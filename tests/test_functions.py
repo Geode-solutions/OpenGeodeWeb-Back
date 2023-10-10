@@ -1,5 +1,6 @@
 import os
 import base64
+import uuid
 from src.opengeodeweb_back import geode_functions, geode_objects
 
 
@@ -33,19 +34,45 @@ def test_missing_files():
 
 def test_load():
     for geode_object, value in geode_objects.objects_list().items():
-        extensions = geode_functions.get_geode_object_input_extensions(geode_object)
-        for extension in extensions:
-            if extension != "obj":
+        input_extensions = geode_functions.get_geode_object_input_extensions(
+            geode_object
+        )
+        for input_extension in input_extensions:
+            if input_extension != "obj" and input_extension != "grdecl":
                 missing_files = geode_functions.missing_files(
-                    geode_object, f"test.{extension}"
+                    geode_object, f"tests/data/test.{input_extension}"
                 )
                 has_missing_files = missing_files.has_missing_files()
                 if has_missing_files:
                     mandatory_files = missing_files.mandatory_files
-                    print(f"{mandatory_files}")
+                    print(f"{mandatory_files=}")
                     additional_files = missing_files.additional_files
-                file_apsolute_path = os.path.abspath(f"./data/test.{extension}")
+                file_apsolute_path = os.path.abspath(
+                    f"tests/data/test.{input_extension}"
+                )
                 data = geode_functions.load(geode_object, file_apsolute_path)
+                output_extensions = geode_functions.get_geode_object_output_extensions(
+                    geode_object
+                )
+
+                for output_extension in output_extensions:
+                    if output_extension != "ml":
+                        uu_id = str(uuid.uuid4()).replace("-", "")
+                        geode_functions.save(
+                            geode_object,
+                            data,
+                            os.path.abspath(f"output"),
+                            f"{uu_id}.{output_extension}",
+                        )
+
+                        if "save_viewable" in value:
+                            uu_id = str(uuid.uuid4()).replace("-", "")
+                            geode_functions.save_viewable(
+                                geode_object,
+                                data,
+                                os.path.abspath(f"output"),
+                                uu_id,
+                            )
 
 
 def test_is_model():
