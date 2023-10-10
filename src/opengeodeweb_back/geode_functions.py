@@ -83,8 +83,8 @@ def save_viewable(geode_object: str, data, folder_absolute_path: str, id: str):
     )
 
 
-def missing_files(geode_object: str, data):
-    return objects_list()[geode_object]["missing_files"](data)
+def missing_files(geode_object: str, filename):
+    return objects_list()[geode_object]["missing_files"](filename)
 
 
 def get_geode_object_input_extensions(geode_object: str):

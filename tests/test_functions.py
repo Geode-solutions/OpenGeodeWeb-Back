@@ -1,4 +1,5 @@
 import os
+import base64
 from src.opengeodeweb_back import geode_functions, geode_objects
 
 
@@ -12,6 +13,39 @@ def test_get_output_factory():
     for geode_object, value in geode_objects.objects_list().items():
         geode_object_input = geode_functions.get_output_factory(geode_object)
         assert type(geode_object_input) is list
+
+
+def test_missing_files():
+    for geode_object, value in geode_objects.objects_list().items():
+        extensions = geode_functions.get_geode_object_input_extensions(geode_object)
+        for extension in extensions:
+            if extension != "obj":
+                missing_files = geode_functions.missing_files(
+                    geode_object, f"test.{extension}"
+                )
+                has_missing_files = missing_files.has_missing_files()
+                assert type(has_missing_files) is bool
+                mandatory_files = missing_files.mandatory_files
+                assert type(mandatory_files) is list
+                additional_files = missing_files.additional_files
+                assert type(additional_files) is list
+
+
+def test_load():
+    for geode_object, value in geode_objects.objects_list().items():
+        extensions = geode_functions.get_geode_object_input_extensions(geode_object)
+        for extension in extensions:
+            if extension != "obj":
+                missing_files = geode_functions.missing_files(
+                    geode_object, f"test.{extension}"
+                )
+                has_missing_files = missing_files.has_missing_files()
+                if has_missing_files:
+                    mandatory_files = missing_files.mandatory_files
+                    print(f"{mandatory_files}")
+                    additional_files = missing_files.additional_files
+                file_apsolute_path = os.path.abspath(f"./data/test.{extension}")
+                data = geode_functions.load(geode_object, file_apsolute_path)
 
 
 def test_is_model():
