@@ -24,8 +24,8 @@ def get_output_factory(geode_object: str):
     return objects_list()[geode_object]["output_factory"]
 
 
-def missing_files(geode_object: str, filename: str):
-    return objects_list()[geode_object]["missing_files"](filename)
+def missing_files(geode_object: str, file_absolute_path: str):
+    return objects_list()[geode_object]["missing_files"](file_absolute_path)
 
 
 def has_missing_files(missing_files):

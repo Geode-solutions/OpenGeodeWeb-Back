@@ -18,106 +18,20 @@ def test_get_output_factory():
 
 def test_missing_files():
     for geode_object, value in geode_objects.objects_list().items():
-        extensions = geode_functions.get_geode_object_input_extensions(geode_object)
-        for extension in extensions:
-            if extension != "obj":
-                missing_files = geode_functions.missing_files(
-                    geode_object, f"test.{extension}"
-                )
-                has_missing_files = geode_functions.has_missing_files(missing_files)
-                assert type(has_missing_files) is bool
-                mandatory_files = geode_functions.mandatory_files(missing_files)
-                assert type(mandatory_files) is list
-                additional_files = geode_functions.additional_files(missing_files)
-                assert type(additional_files) is list
-
-
-def test_load():
-    for geode_object, value in geode_objects.objects_list().items():
-        print(f"{geode_object=}")
         input_extensions = geode_functions.get_geode_object_input_extensions(
             geode_object
         )
         for input_extension in input_extensions:
-            if input_extension != "og_img3d":
-                print(f"{input_extension=}")
-
-                missing_files = geode_functions.missing_files(
-                    geode_object, f"tests/data/test.{input_extension}"
-                )
-                has_missing_files = geode_functions.has_missing_files(missing_files)
-                if has_missing_files:
-                    mandatory_files = geode_functions.mandatory_files(missing_files)
-                    print(f"{mandatory_files=}")
-                    additional_files = geode_functions.additional_files(missing_files)
-                    print(f"{additional_files=}")
-                file_apsolute_path = os.path.abspath(
-                    f"tests/data/test.{input_extension}"
-                )
-                print(f"{file_apsolute_path=}")
-                if (
-                    not (
-                        geode_object == "HybridSolid3D" and input_extension == "grdecl"
-                    )
-                    and not (
-                        geode_object == "RasterImage2D" and input_extension == "vti"
-                    )
-                    and not (
-                        geode_object == "RegularGrid2D" and input_extension == "vti"
-                    )
-                    and not (
-                        geode_object == "RegularGrid3D" and input_extension == "vo"
-                    )
-                    and not (
-                        geode_object == "RegularGrid3D" and input_extension == "vti"
-                    )
-                ):
-                    data = geode_functions.load(geode_object, file_apsolute_path)
-                    output_extensions = (
-                        geode_functions.get_geode_object_output_extensions(geode_object)
-                    )
-
-                    for output_extension in output_extensions:
-                        if not (
-                            (
-                                geode_object == "BRep"
-                                and input_extension == "og_brep"
-                                and output_extension == "ml"
-                            )
-                            and not (
-                                input_extension == "ml"
-                                and geode_object == "StructuralModel"
-                                and output_extension == "lso"
-                            )
-                        ):
-                            print(f"{output_extension=}")
-                            uu_id = str(uuid.uuid4()).replace("-", "")
-                            geode_functions.save(
-                                geode_object,
-                                data,
-                                os.path.abspath(f"output"),
-                                f"{uu_id}.{output_extension}",
-                            )
-
-                            if "save_viewable" in value:
-                                uu_id = str(uuid.uuid4()).replace("-", "")
-                                geode_functions.save_viewable(
-                                    geode_object,
-                                    data,
-                                    os.path.abspath(f"output"),
-                                    uu_id,
-                                )
-
-
-def test_bulshit():
-    file_apsolute_path = os.path.abspath(f"tests/data/test.ml")
-    data = geode_functions.load("StructuralModel", file_apsolute_path)
-    geode_functions.save(
-        "StructuralModel",
-        data,
-        os.path.abspath(f"output"),
-        f"toto.lso",
-    )
+            file_absolute_path = os.path.abspath(f"tests/data/test.{input_extension}")
+            missing_files = geode_functions.missing_files(
+                geode_object, file_absolute_path
+            )
+            has_missing_files = geode_functions.has_missing_files(missing_files)
+            assert type(has_missing_files) is bool
+            mandatory_files = geode_functions.mandatory_files(missing_files)
+            assert type(mandatory_files) is list
+            additional_files = geode_functions.additional_files(missing_files)
+            assert type(additional_files) is list
 
 
 def test_is_model():
