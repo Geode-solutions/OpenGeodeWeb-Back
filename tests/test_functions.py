@@ -1,6 +1,4 @@
 import os
-import base64
-import uuid
 from src.opengeodeweb_back import geode_functions, geode_objects
 
 
