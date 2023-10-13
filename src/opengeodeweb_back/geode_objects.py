@@ -337,7 +337,7 @@ def objects_list():
             "load": og.load_vertex_set,
             "save": og.save_vertex_set,
             "builder": og.VertexSetBuilder.create,
-            "is_model": True,
+            "is_model": False,
             "is_3D": False,
             "is_viewable": False,
         },
