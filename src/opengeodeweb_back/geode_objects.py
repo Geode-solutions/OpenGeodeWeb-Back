@@ -11,6 +11,7 @@ def objects_list():
         "BRep": {
             "input_factory": [og.BRepInputFactory],
             "output_factory": [og.BRepOutputFactory],
+            "missing_files": og.check_brep_missing_files,
             "load": og.load_brep,
             "save": og.save_brep,
             "builder": og.BRepBuilder,
@@ -31,6 +32,7 @@ def objects_list():
                 og.SectionOutputFactory,
                 og_gs.CrossSectionOutputFactory,
             ],
+            "missing_files": og_gs.check_cross_section_missing_files,
             "load": og_gs.load_cross_section,
             "save": og_gs.save_cross_section,
             "builder": og_gs.CrossSectionBuilder,
@@ -48,6 +50,7 @@ def objects_list():
         "EdgedCurve2D": {
             "input_factory": [og.EdgedCurveInputFactory2D],
             "output_factory": [og.EdgedCurveOutputFactory2D],
+            "missing_files": og.check_edged_curve_missing_files2D,
             "load": og.load_edged_curve2D,
             "save": og.save_edged_curve2D,
             "builder": og.EdgedCurveBuilder2D.create,
@@ -65,6 +68,7 @@ def objects_list():
         "EdgedCurve3D": {
             "input_factory": [og.EdgedCurveInputFactory3D],
             "output_factory": [og.EdgedCurveOutputFactory3D],
+            "missing_files": og.check_edged_curve_missing_files3D,
             "load": og.load_edged_curve3D,
             "save": og.save_edged_curve3D,
             "builder": og.EdgedCurveBuilder3D.create,
@@ -82,6 +86,7 @@ def objects_list():
         "Graph": {
             "input_factory": [og.GraphInputFactory],
             "output_factory": [og.GraphOutputFactory],
+            "missing_files": og.check_graph_missing_files,
             "load": og.load_graph,
             "save": og.save_graph,
             "builder": og.GraphBuilder.create,
@@ -92,6 +97,7 @@ def objects_list():
         "HybridSolid3D": {
             "input_factory": [og.HybridSolidInputFactory3D],
             "output_factory": [og.HybridSolidOutputFactory3D],
+            "missing_files": og.check_hybrid_solid_missing_files3D,
             "load": og.load_hybrid_solid3D,
             "save": og.save_hybrid_solid3D,
             "builder": og.HybridSolidBuilder3D.create,
@@ -109,6 +115,7 @@ def objects_list():
         "PointSet2D": {
             "input_factory": [og.PointSetInputFactory2D],
             "output_factory": [og.PointSetOutputFactory2D],
+            "missing_files": og.check_point_set_missing_files2D,
             "load": og.load_point_set2D,
             "save": og.save_point_set2D,
             "builder": og.PointSetBuilder2D.create,
@@ -126,6 +133,7 @@ def objects_list():
         "PointSet3D": {
             "input_factory": [og.PointSetInputFactory3D],
             "output_factory": [og.PointSetOutputFactory3D],
+            "missing_files": og.check_point_set_missing_files3D,
             "load": og.load_point_set3D,
             "save": og.save_point_set3D,
             "builder": og.PointSetBuilder3D.create,
@@ -143,6 +151,7 @@ def objects_list():
         "PolygonalSurface2D": {
             "input_factory": [og.PolygonalSurfaceInputFactory2D],
             "output_factory": [og.PolygonalSurfaceOutputFactory2D],
+            "missing_files": og.check_polygonal_surface_missing_files2D,
             "load": og.load_polygonal_surface2D,
             "save": og.save_polygonal_surface2D,
             "builder": og.PolygonalSurfaceBuilder2D.create,
@@ -160,6 +169,7 @@ def objects_list():
         "PolygonalSurface3D": {
             "input_factory": [og.PolygonalSurfaceInputFactory3D],
             "output_factory": [og.PolygonalSurfaceOutputFactory3D],
+            "missing_files": og.check_polygonal_surface_missing_files3D,
             "load": og.load_polygonal_surface3D,
             "save": og.save_polygonal_surface3D,
             "builder": og.PolygonalSurfaceBuilder3D.create,
@@ -177,6 +187,7 @@ def objects_list():
         "PolyhedralSolid3D": {
             "input_factory": [og.PolyhedralSolidInputFactory3D],
             "output_factory": [og.PolyhedralSolidOutputFactory3D],
+            "missing_files": og.check_polyhedral_solid_missing_files3D,
             "load": og.load_polyhedral_solid3D,
             "save": og.save_polyhedral_solid3D,
             "builder": og.PolyhedralSolidBuilder3D.create,
@@ -194,6 +205,7 @@ def objects_list():
         "RasterImage2D": {
             "input_factory": [og.RasterImageInputFactory2D],
             "output_factory": [og.RasterImageOutputFactory2D],
+            "missing_files": og.check_raster_image_missing_files2D,
             "load": og.load_raster_image2D,
             "save": og.save_raster_image2D,
             "is_model": False,
@@ -204,6 +216,7 @@ def objects_list():
         "RasterImage3D": {
             "input_factory": [og.RasterImageInputFactory3D],
             "output_factory": [og.RasterImageOutputFactory3D],
+            "missing_files": og.check_raster_image_missing_files3D,
             "load": og.load_raster_image3D,
             "save": og.save_raster_image3D,
             "is_model": False,
@@ -214,6 +227,7 @@ def objects_list():
         "RegularGrid2D": {
             "input_factory": [og.RegularGridInputFactory2D],
             "output_factory": [og.RegularGridOutputFactory2D],
+            "missing_files": og.check_regular_grid_missing_files2D,
             "load": og.load_regular_grid2D,
             "save": og.save_regular_grid2D,
             "builder": og.RegularGridBuilder2D.create,
@@ -230,6 +244,7 @@ def objects_list():
         "RegularGrid3D": {
             "input_factory": [og.RegularGridInputFactory3D],
             "output_factory": [og.RegularGridOutputFactory3D],
+            "missing_files": og.check_regular_grid_missing_files3D,
             "load": og.load_regular_grid3D,
             "save": og.save_regular_grid3D,
             "builder": og.RegularGridBuilder3D.create,
@@ -246,6 +261,7 @@ def objects_list():
         "Section": {
             "input_factory": [og.SectionInputFactory],
             "output_factory": [og.SectionOutputFactory],
+            "missing_files": og.check_section_missing_files,
             "load": og.load_section,
             "save": og.save_section,
             "builder": og.SectionBuilder,
@@ -266,6 +282,7 @@ def objects_list():
                 og.BRepOutputFactory,
                 og_gs.StructuralModelOutputFactory,
             ],
+            "missing_files": og_gs.check_structural_model_missing_files,
             "load": og_gs.load_structural_model,
             "save": og_gs.save_structural_model,
             "builder": og_gs.StructuralModelBuilder,
@@ -284,6 +301,7 @@ def objects_list():
             "input_factory": [og.TetrahedralSolidInputFactory3D],
             "output_factory": [og.TetrahedralSolidOutputFactory3D],
             "load": og.load_tetrahedral_solid3D,
+            "missing_files": og.check_tetrahedral_solid_missing_files3D,
             "save": og.save_tetrahedral_solid3D,
             "builder": og.TetrahedralSolidBuilder3D.create,
             "crs": {
@@ -300,6 +318,7 @@ def objects_list():
         "TriangulatedSurface2D": {
             "input_factory": [og.TriangulatedSurfaceInputFactory2D],
             "output_factory": [og.TriangulatedSurfaceOutputFactory2D],
+            "missing_files": og.check_triangulated_surface_missing_files2D,
             "load": og.load_triangulated_surface2D,
             "save": og.save_triangulated_surface2D,
             "builder": og.TriangulatedSurfaceBuilder2D.create,
@@ -317,6 +336,7 @@ def objects_list():
         "TriangulatedSurface3D": {
             "input_factory": [og.TriangulatedSurfaceInputFactory3D],
             "output_factory": [og.TriangulatedSurfaceOutputFactory3D],
+            "missing_files": og.check_triangulated_surface_missing_files3D,
             "load": og.load_triangulated_surface3D,
             "save": og.save_triangulated_surface3D,
             "builder": og.TriangulatedSurfaceBuilder3D.create,
@@ -334,6 +354,7 @@ def objects_list():
         "VertexSet": {
             "input_factory": [og.VertexSetInputFactory],
             "output_factory": [og.VertexSetOutputFactory],
+            "missing_files": og.check_vertex_set_missing_files,
             "load": og.load_vertex_set,
             "save": og.save_vertex_set,
             "builder": og.VertexSetBuilder.create,

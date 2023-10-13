@@ -24,6 +24,10 @@ def get_output_factory(geode_object: str):
     return objects_list()[geode_object]["output_factory"]
 
 
+def missing_files(geode_object: str, file_absolute_path: str):
+    return objects_list()[geode_object]["missing_files"](file_absolute_path)
+
+
 def load(geode_object: str, file_absolute_path: str):
     return objects_list()[geode_object]["load"](file_absolute_path)
 

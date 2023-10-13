@@ -14,6 +14,24 @@ def test_get_output_factory():
         assert type(geode_object_input) is list
 
 
+def test_missing_files():
+    for geode_object, value in geode_objects.objects_list().items():
+        input_extensions = geode_functions.get_geode_object_input_extensions(
+            geode_object
+        )
+        for input_extension in input_extensions:
+            file_absolute_path = os.path.abspath(f"tests/data/test.{input_extension}")
+            missing_files = geode_functions.missing_files(
+                geode_object, file_absolute_path
+            )
+            has_missing_files = missing_files.has_missing_files()
+            assert type(has_missing_files) is bool
+            mandatory_files = missing_files.mandatory_files
+            assert type(mandatory_files) is list
+            additional_files = missing_files.additional_files
+            assert type(additional_files) is list
+
+
 def test_is_model():
     for geode_object, value in geode_objects.objects_list().items():
         is_model = geode_functions.is_model(geode_object)
