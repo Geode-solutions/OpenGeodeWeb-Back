@@ -28,18 +28,6 @@ def missing_files(geode_object: str, file_absolute_path: str):
     return objects_list()[geode_object]["missing_files"](file_absolute_path)
 
 
-def has_missing_files(missing_files):
-    return missing_files.has_missing_files()
-
-
-def mandatory_files(missing_files):
-    return missing_files.mandatory_files
-
-
-def additional_files(missing_files):
-    return missing_files.additional_files
-
-
 def load(geode_object: str, file_absolute_path: str):
     return objects_list()[geode_object]["load"](file_absolute_path)
 

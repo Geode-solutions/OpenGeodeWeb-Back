@@ -24,11 +24,11 @@ def test_missing_files():
             missing_files = geode_functions.missing_files(
                 geode_object, file_absolute_path
             )
-            has_missing_files = geode_functions.has_missing_files(missing_files)
+            has_missing_files = missing_files.has_missing_files()
             assert type(has_missing_files) is bool
-            mandatory_files = geode_functions.mandatory_files(missing_files)
+            mandatory_files = missing_files.mandatory_files
             assert type(mandatory_files) is list
-            additional_files = geode_functions.additional_files(missing_files)
+            additional_files = missing_files.additional_files
             assert type(additional_files) is list
 
 
