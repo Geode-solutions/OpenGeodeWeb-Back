@@ -71,7 +71,7 @@ def test_get_geode_object_output_extensions():
 
 
 def test_list_input_extensions():
-    keys_array = [["crs"], ["inspector"]]
+    keys_array = ["crs", "inspector"]
     for geode_object, value in geode_objects.objects_list().items():
         for keys in keys_array:
             input_extensions = geode_functions.list_input_extensions(keys)
@@ -79,7 +79,28 @@ def test_list_input_extensions():
 
 
 def test_list_geode_objects():
-    keys_array = [["crs"], ["inspector"]]
+    test_list = [
+        {
+            "keys_array": ["crs"],
+            "invalid_geode_objects": [
+                "Graph",
+                "RasterImage2D",
+                "RasterImage3D",
+                "VertexSet",
+            ],
+        },
+        {
+            "keys_array": ["inspector"],
+            "invalid_geode_objects": [
+                "Graph",
+                "RasterImage2D",
+                "RasterImage3D",
+                "RasterImage2D",
+                "RasterImage3D",
+                "VertexSet",
+            ],
+        },
+    ]
     input_extensions = geode_functions.list_input_extensions()
     for geode_object, value in geode_objects.objects_list().items():
         for input_extension in input_extensions:
@@ -90,6 +111,8 @@ def test_list_geode_objects():
                     input_extension, keys
                 )
                 assert type(geode_objects_list) is list
+                for invalid_geode_object in invalid_geode_objects:
+                    assert invalid_geode_object not in geode_objects_list
 
 
 def test_get_versions():
