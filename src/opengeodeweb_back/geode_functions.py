@@ -110,23 +110,15 @@ def get_geode_object_output_extensions(geode_object: str):
     return output_list
 
 
-def list_input_extensions(keys: list = []):
+def list_input_extensions(key: str = None):
     extensions_list = []
     for geode_object, value in objects_list().items():
-        if keys:
-            for key in keys:
-                if key in value:
-                    if type(value[key]) == bool:
-                        if value[key] == True:
-                            extensions_list += get_geode_object_input_extensions(
-                                geode_object
-                            )
-                    else:
-                        extensions_list += get_geode_object_input_extensions(
-                            geode_object
-                        )
-                else:
-                    continue
+        if key != None and key in value:
+            if type(value[key]) == bool:
+                if value[key] == True:
+                    extensions_list += get_geode_object_input_extensions(geode_object)
+            else:
+                extensions_list += get_geode_object_input_extensions(geode_object)
         else:
             extensions_list += get_geode_object_input_extensions(geode_object)
 
@@ -139,30 +131,24 @@ def has_creator(input_factories, extension: str):
     for input in input_factories:
         if input.has_creator(extension):
             return True
+    return False
 
 
-def list_geode_objects(extension: str, keys: list = []):
+def list_geode_objects(extension: str, key: str = None):
     geode_objects_list = []
     for geode_object, value in objects_list().items():
         geode_object_input_factory = get_input_factory(geode_object)
-        if keys:
-            for key in keys:
-                if key in value:
-                    if type(value[key]) == bool:
-                        if value[key] == True:
-                            if has_creator(geode_object_input_factory, extension):
-                                print(f"{geode_object=}")
-                                geode_objects_list.append(geode_object)
-                    else:
+        if key != None:
+            if key in value:
+                if type(value[key]) == bool:
+                    if value[key] == True:
                         if has_creator(geode_object_input_factory, extension):
-                            print(f"{geode_object=}")
                             geode_objects_list.append(geode_object)
-                else:
-                    continue
-        else:
-            if has_creator(geode_object_input_factory, extension):
-                print(f"{geode_object=}")
-                geode_objects_list.append(geode_object)
+                elif has_creator(geode_object_input_factory, extension):
+                    geode_objects_list.append(geode_object)
+        elif has_creator(geode_object_input_factory, extension):
+            geode_objects_list.append(geode_object)
+
     geode_objects_list.sort()
     return geode_objects_list
 
