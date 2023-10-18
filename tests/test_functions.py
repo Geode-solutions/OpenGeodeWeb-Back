@@ -101,18 +101,22 @@ def test_list_geode_objects():
             ],
         },
     ]
-    input_extensions = geode_functions.list_input_extensions()
-    for geode_object, value in geode_objects.objects_list().items():
-        for input_extension in input_extensions:
-            for keys in keys_array:
-                print(f"{input_extension=}")
-                print(f"{keys=}")
-                geode_objects_list = geode_functions.list_geode_objects(
-                    input_extension, keys
-                )
-                assert type(geode_objects_list) is list
-                for invalid_geode_object in invalid_geode_objects:
-                    assert invalid_geode_object not in geode_objects_list
+    for test in test_list:
+        keys_array = test["keys_array"]
+        invalid_geode_objects = test["invalid_geode_objects"]
+
+        input_extensions = geode_functions.list_input_extensions(keys_array)
+        for geode_object, value in geode_objects.objects_list().items():
+            for input_extension in input_extensions:
+                for keys in keys_array:
+                    print(f"{input_extension=}")
+                    print(f"{keys=}")
+                    geode_objects_list = geode_functions.list_geode_objects(
+                        input_extension, keys
+                    )
+                    assert type(geode_objects_list) is list
+                    for invalid_geode_object in invalid_geode_objects:
+                        assert invalid_geode_object not in geode_objects_list
 
 
 def test_get_versions():
