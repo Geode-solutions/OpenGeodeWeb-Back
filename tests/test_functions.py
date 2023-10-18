@@ -71,7 +71,7 @@ def test_get_geode_object_output_extensions():
 
 
 def test_list_input_extensions():
-    keys_array = ["crs", "inspector"]
+    keys_array = ["crs", "inspector", None]
     for geode_object, value in geode_objects.objects_list().items():
         for keys in keys_array:
             input_extensions = geode_functions.list_input_extensions(keys)
@@ -100,6 +100,10 @@ def test_list_geode_objects():
                 "VertexSet",
             ],
         },
+        {
+            "key": None,
+            "invalid_geode_objects": [],
+        },
     ]
     for test in test_list:
         key = test["key"]
@@ -108,14 +112,17 @@ def test_list_geode_objects():
         input_extensions = geode_functions.list_input_extensions(key)
         for geode_object, value in geode_objects.objects_list().items():
             for input_extension in input_extensions:
-                print(f"{input_extension=}")
-                print(f"{key=}")
                 geode_objects_list = geode_functions.list_geode_objects(
                     input_extension, key
                 )
                 assert type(geode_objects_list) is list
-                for invalid_geode_object in invalid_geode_objects:
-                    assert invalid_geode_object not in geode_objects_list
+
+                if key != None:
+                    assert len(geode_objects_list) > 0
+                    for invalid_geode_object in invalid_geode_objects:
+                        assert invalid_geode_object not in geode_objects_list
+                else:
+                    assert len(geode_objects_list) >= 1
 
 
 def test_get_versions():
@@ -133,7 +140,5 @@ def test_get_versions():
 
 def test_get_extension_from_filename():
     extension = geode_functions.get_extension_from_filename("test.toto")
-    print(extension)
     assert type(extension) is str
-    print()
     assert extension.count(".") == 0

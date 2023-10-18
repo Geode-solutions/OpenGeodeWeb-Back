@@ -113,12 +113,15 @@ def get_geode_object_output_extensions(geode_object: str):
 def list_input_extensions(key: str = None):
     extensions_list = []
     for geode_object, value in objects_list().items():
-        if key != None and key in value:
-            if type(value[key]) == bool:
-                if value[key] == True:
+        if key != None:
+            if key in value:
+                if type(value[key]) == bool:
+                    if value[key] == True:
+                        extensions_list += get_geode_object_input_extensions(
+                            geode_object
+                        )
+                else:
                     extensions_list += get_geode_object_input_extensions(geode_object)
-            else:
-                extensions_list += get_geode_object_input_extensions(geode_object)
         else:
             extensions_list += get_geode_object_input_extensions(geode_object)
 
@@ -127,8 +130,9 @@ def list_input_extensions(key: str = None):
     return extensions_list
 
 
-def has_creator(input_factories, extension: str):
-    for input in input_factories:
+def has_creator(geode_object: str, extension: str):
+    geode_object_input_factory = get_input_factory(geode_object)
+    for input in geode_object_input_factory:
         if input.has_creator(extension):
             return True
     return False
@@ -137,17 +141,17 @@ def has_creator(input_factories, extension: str):
 def list_geode_objects(extension: str, key: str = None):
     geode_objects_list = []
     for geode_object, value in objects_list().items():
-        geode_object_input_factory = get_input_factory(geode_object)
         if key != None:
             if key in value:
                 if type(value[key]) == bool:
                     if value[key] == True:
-                        if has_creator(geode_object_input_factory, extension):
+                        if has_creator(geode_object, extension):
                             geode_objects_list.append(geode_object)
-                elif has_creator(geode_object_input_factory, extension):
+                elif has_creator(geode_object, extension):
                     geode_objects_list.append(geode_object)
-        elif has_creator(geode_object_input_factory, extension):
-            geode_objects_list.append(geode_object)
+        else:
+            if has_creator(geode_object, extension):
+                geode_objects_list.append(geode_object)
 
     geode_objects_list.sort()
     return geode_objects_list
