@@ -2,6 +2,25 @@
 
 
 
+## v1.3.0-rc.2 (2023-10-18)
+
+### Fix
+
+* fix(functions): fix typos &amp; tests ([`965cc08`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/965cc08265ffe337d6e9d0ae9162b55921d74dcf))
+
+* fix(functions): refactor functions ([`7a56a81`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/7a56a8120189d8267ff7dcb42444d8e4a508e582))
+
+* fix(functions): update unit tests ([`a9fc257`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/a9fc2571d173ac6e843390e2bda9fc58660ea41f))
+
+* fix(functions): fix functions based on key input ([`1e29bf4`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/1e29bf419ba56f52cef869dca368719c06595d46))
+
+### Unknown
+
+* Merge pull request #25 from Geode-solutions/fix_functions
+
+Fix functions ([`276b992`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/276b9928fe46fddb412a289364da76d18081db28))
+
+
 ## v1.3.0-rc.1 (2023-10-13)
 
 ### Feature
