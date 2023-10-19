@@ -21,7 +21,13 @@ def get_input_factory(geode_object: str):
 
 
 def get_output_factory(geode_object: str):
-    return objects_list()[geode_object]["output_factory"]
+    output_factory = objects_list()[geode_object]["output_factory"]
+    if "parent" in objects_list()[geode_object].keys():
+        parent = objects_list()[geode_object]["parent"]
+        parent_output_factory = get_output_factory(parent)
+        return [output_factory, parent_output_factory]
+    else:
+        return [output_factory]
 
 
 def missing_files(geode_object: str, file_absolute_path: str):

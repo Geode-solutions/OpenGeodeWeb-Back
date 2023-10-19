@@ -29,9 +29,7 @@ def objects_list():
         "CrossSection": {
             "parent": "Section",
             "input_factory": og_gs.CrossSectionInputFactory,
-            "output_factory": 
-                og_gs.CrossSectionOutputFactory,
-            ,
+            "output_factory": og_gs.CrossSectionOutputFactory,
             "missing_files": og_gs.check_cross_section_missing_files,
             "load": og_gs.load_cross_section,
             "save": og_gs.save_cross_section,
@@ -279,9 +277,7 @@ def objects_list():
         "StructuralModel": {
             "parent": "BRep",
             "input_factory": og_gs.StructuralModelInputFactory,
-            "output_factory": 
-                og_gs.StructuralModelOutputFactory,
-            ,
+            "output_factory": og_gs.StructuralModelOutputFactory,
             "missing_files": og_gs.check_structural_model_missing_files,
             "load": og_gs.load_structural_model,
             "save": og_gs.save_structural_model,
