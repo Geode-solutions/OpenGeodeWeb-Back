@@ -110,55 +110,49 @@ def get_geode_object_output_extensions(geode_object: str):
     return output_list
 
 
-def list_input_extensions(
-    keys: list = [],
-):
-    """
-    Purpose:
-        Function that returns a list of all input extensions
-    Args:
-        keys -- Tells the function if we want the geode_objects that have a crs
-    Returns:
-        An ordered list of input file extensions
-    """
+def list_input_extensions(key: str = None):
     extensions_list = []
-
     for geode_object, value in objects_list().items():
-        if keys:
-            for key in keys:
-                if key in value:
-                    if type(value[key]) == bool and value[key] == True:
-                        pass
-                    else:
-                        continue
+        if key != None:
+            if key in value:
+                if type(value[key]) == bool:
+                    if value[key] == True:
+                        extensions_list += get_geode_object_input_extensions(
+                            geode_object
+                        )
                 else:
-                    continue
-
-        geode_object_input_extensions = get_geode_object_input_extensions(geode_object)
-        extensions_list = extensions_list + geode_object_input_extensions
+                    extensions_list += get_geode_object_input_extensions(geode_object)
+        else:
+            extensions_list += get_geode_object_input_extensions(geode_object)
 
     extensions_list = list(set(extensions_list))
     extensions_list.sort()
     return extensions_list
 
 
-def list_geode_objects(extension: str, keys: list = []):
-    """
-    Purpose:
-        Function that returns a list of objects that can handle a file, given his extension
-    Args:
-        extension -- The extension of the file
-    Returns:
-        An ordered list of object's names
-    """
-    geode_objects_list = []
+def has_creator(geode_object: str, extension: str):
+    geode_object_input_factory = get_input_factory(geode_object)
+    for input in geode_object_input_factory:
+        if input.has_creator(extension):
+            return True
+    return False
 
+
+def list_geode_objects(extension: str, key: str = None):
+    geode_objects_list = []
     for geode_object, value in objects_list().items():
-        input_factory = get_input_factory(geode_object)
-        for input in input_factory:
-            if input.has_creator(extension):
-                if geode_object not in geode_objects_list:
+        if key != None:
+            if key in value:
+                if type(value[key]) == bool:
+                    if value[key] == True:
+                        if has_creator(geode_object, extension):
+                            geode_objects_list.append(geode_object)
+                elif has_creator(geode_object, extension):
                     geode_objects_list.append(geode_object)
+        else:
+            if has_creator(geode_object, extension):
+                geode_objects_list.append(geode_object)
+
     geode_objects_list.sort()
     return geode_objects_list
 
