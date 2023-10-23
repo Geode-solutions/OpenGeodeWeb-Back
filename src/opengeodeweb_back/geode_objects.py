@@ -6,7 +6,7 @@ import opengeode_geosciencesio as og_gs_io
 import geode_viewables as g_v
 
 
-def objects_list():
+def geode_objects_dict():
     return {
         "BRep": {
             "input_factory": og.BRepInputFactory,
