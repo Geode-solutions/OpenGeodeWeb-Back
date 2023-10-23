@@ -72,16 +72,16 @@ def test_geode_object_input_extensions():
     for geode_object, value in geode_objects.geode_objects_dict().items():
         input_extensions = geode_functions.geode_object_input_extensions(geode_object)
         assert type(input_extensions) is list
-        for extension in input_extensions:
-            assert type(extension) is str
+        for input_extension in input_extensions:
+            assert type(input_extension) is str
 
 
 def test_geode_object_output_extensions():
     for geode_object, value in geode_objects.geode_objects_dict().items():
         output_extensions = geode_functions.geode_object_output_extensions(geode_object)
         assert type(output_extensions) is list
-        for extension in output_extensions:
-            assert type(extension) is str
+        for output_extension in output_extensions:
+            assert type(output_extension) is str
 
 
 def test_list_input_extensions():
@@ -139,6 +139,19 @@ def test_list_geode_objects():
                     assert len(geode_objects_list) >= 1
 
 
+def test_geode_objects_output_extensions():
+    for geode_object, value in geode_objects.geode_objects_dict().items():
+        geode_objects_and_output_extensions_list = (
+            geode_functions.geode_objects_output_extensions(geode_object)
+        )
+        print(f"{geode_objects_and_output_extensions_list=}")
+        assert type(geode_objects_and_output_extensions_list) is list
+        for (
+            geode_object_and_output_extensions
+        ) in geode_objects_and_output_extensions_list:
+            assert type(geode_object_and_output_extensions) is dict
+
+
 def test_versions():
     list_packages = [
         "OpenGeode-core",
@@ -146,13 +159,13 @@ def test_versions():
         "OpenGeode-Geosciences",
         "OpenGeode-GeosciencesIO",
     ]
-    versions = geode_functions.get_versions(list_packages)
+    versions = geode_functions.versions(list_packages)
     assert type(versions) is list
     for version in versions:
         assert type(version) is dict
 
 
 def test_extension_from_filename():
-    extension = geode_functions.get_extension_from_filename("test.toto")
+    extension = geode_functions.extension_from_filename("test.toto")
     assert type(extension) is str
     assert extension.count(".") == 0

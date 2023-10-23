@@ -103,20 +103,6 @@ def geode_object_output_extensions(geode_object: str):
     return geode_object_output_list_creators
 
 
-def test_gejzbvzr(geode_object: str):
-    lidjs = []
-    geode_object_dict = {}
-    geode_object_dict["geode_object"] = geode_object
-    geode_object_dict["output_extensions"] = geode_object_output_extensions(
-        geode_object
-    )
-    if "parent" in geode_object_value(geode_object).keys():
-        parent_key = geode_object_value(geode_object)["parent"]
-        parent_output_extensions = geode_object_output_extensions(parent_key)
-
-    return lidjs
-
-
 def list_input_extensions(key: str = None):
     extensions_list = []
     for geode_object, value in geode_objects_dict().items():
@@ -136,11 +122,7 @@ def list_input_extensions(key: str = None):
 
 
 def has_creator(geode_object: str, extension: str):
-    geode_object_input_factory = input_factory(geode_object)
-    for input in geode_object_input_factory:
-        if input.has_creator(extension):
-            return True
-    return False
+    return input_factory(geode_object).has_creator(extension)
 
 
 def list_geode_objects(extension: str, key: str = None):
@@ -162,13 +144,30 @@ def list_geode_objects(extension: str, key: str = None):
     return geode_objects_list
 
 
+def geode_objects_output_extensions(geode_object: str):
+    return_list = []
+    geode_object_dict = {}
+    geode_object_dict["geode_object"] = geode_object
+    geode_object_dict["output_extensions"] = geode_object_output_extensions(
+        geode_object
+    )
+
+    return_list.append(geode_object_dict)
+
+    if "parent" in geode_object_value(geode_object).keys():
+        parent_key = geode_object_value(geode_object)["parent"]
+        return_list += geode_objects_output_extensions(parent_key)
+
+    return return_list
+
+
 def versions(list_packages: list):
     list_with_versions = []
     for package in list_packages:
         list_with_versions.append(
             {
                 "package": package,
-                "version": pkg_resources.distribution(package).version,
+                "version": pkg_resources.get_distribution(package).version,
             }
         )
     return list_with_versions
