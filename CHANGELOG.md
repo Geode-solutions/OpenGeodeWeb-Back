@@ -2,6 +2,19 @@
 
 
 
+## v1.3.0-rc.3 (2023-10-25)
+
+### Fix
+
+* fix(dependencies): update to stable ecosystem ([`50ffeac`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/50ffeac5f4bb3e8cb5e925774086a3518f87a001))
+
+### Unknown
+
+* Merge pull request #27 from Geode-solutions/fix_update_dependencies
+
+fix(dependencies): update to stable ecosystem ([`c1a3583`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c1a35834a6dcbe1b041ba60f42b6a06af8433842))
+
+
 ## v1.3.0-rc.2 (2023-10-18)
 
 ### Fix
