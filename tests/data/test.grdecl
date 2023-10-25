@@ -1,0 +1,29 @@
+
+dimens
+50 1 100 /
+
+equals
+tops 800 4* 1 1 /
+/
+
+equals
+dx    100   /
+dy    1000  /
+dz    4     /
+poro  0.3   /
+permx 500.0 /
+/
+
+copy
+permx permy /
+permx permz /
+/
+
+multiply
+permz 0.1 /
+/
+
+dpcf
+0.8 1 /
+
+
