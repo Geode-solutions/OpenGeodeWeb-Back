@@ -2,7 +2,26 @@
 
 
 
+## v1.3.0 (2023-10-25)
+
+### Unknown
+
+* Merge pull request #28 from Geode-solutions/next
+
+Next ([`b8d6cdf`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b8d6cdffdfc07b810b64fc3fc01c3413bebe2176))
+
+* Merge branch &#39;master&#39; into next ([`a3dd757`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/a3dd757571a2c2605eff6e6b37cc05edb92e844b))
+
+* Merge pull request #26 from Geode-solutions/feat_geode_object_class_heritage
+
+Feat geode object class heritage ([`30348ac`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/30348acb32c30c70dd55b4e5ce75943b9be7fb8e))
+
+
 ## v1.3.0-rc.3 (2023-10-25)
+
+### Feature
+
+* feat(output_factory): update get_output_factory ([`f4b6941`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/f4b6941f99985a9082cc5f573c2934de2a188853))
 
 ### Fix
 
@@ -10,9 +29,18 @@
 
 ### Unknown
 
+* Merge branch &#39;next&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into feat_geode_object_class_heritage ([`447e2ef`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/447e2ef519aafb189605a3c051da5a611f4e499c))
+
 * Merge pull request #27 from Geode-solutions/fix_update_dependencies
 
 fix(dependencies): update to stable ecosystem ([`c1a3583`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c1a35834a6dcbe1b041ba60f42b6a06af8433842))
+
+* feat(functions) : fix typos and update tests ([`cd851f6`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/cd851f6394675a67979d5d9624a5904739f16582))
+
+* feat(functions) : rename functions
+code cleanup ([`c189111`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c189111dabf1ca85f9a1811f9fc20e845c9cb9b5))
+
+* Merge branch &#39;next&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into feat_geode_object_class_heritage ([`a83014e`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/a83014ea2d4e1b1f6609c99657e4fc582093c0b2))
 
 
 ## v1.3.0-rc.2 (2023-10-18)
@@ -33,14 +61,10 @@ fix(dependencies): update to stable ecosystem ([`c1a3583`](https://github.com/Ge
 
 Fix functions ([`276b992`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/276b9928fe46fddb412a289364da76d18081db28))
 
+* feat(geode_objects) : add parent key ([`c821d2e`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c821d2e6797bdcc4190584e00c854f4c96a89fcf))
+
 
 ## v1.3.0-rc.1 (2023-10-13)
-
-### Feature
-
-* feat(tests): add new test files ([`9da556d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/9da556d1a8daef5423f219679c6c787d47756f5d))
-
-* feat(functions): add missing files functions ([`d58a876`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/d58a8762e9a4b9200605b2085f387ae2ff54e67d))
 
 ### Unknown
 
@@ -59,6 +83,21 @@ Feat missing files ([`49c4f98`](https://github.com/Geode-solutions/OpenGeodeWeb-
 * file_absolute_path &amp; update tests ([`3a8a005`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/3a8a00597a45c1e6ac42fce87c3f736839805808))
 
 * save ([`468381e`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/468381ee93f892d92f299154dbfc964c0d92d341))
+
+
+## v1.2.2 (2023-10-13)
+
+### Feature
+
+* feat(tests): add new test files ([`9da556d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/9da556d1a8daef5423f219679c6c787d47756f5d))
+
+* feat(functions): add missing files functions ([`d58a876`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/d58a8762e9a4b9200605b2085f387ae2ff54e67d))
+
+### Unknown
+
+* Merge pull request #20 from Geode-solutions/next
+
+Next ([`669bc41`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/669bc41575162b1a4a7af9ef369cf94f9f16a146))
 
 * Merge branch &#39;master&#39; into next ([`fbc08e5`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/fbc08e5228855957ef14cca771f672cdb0149ce7))
 
