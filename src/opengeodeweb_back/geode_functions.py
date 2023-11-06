@@ -234,14 +234,15 @@ def extension_from_filename(filename):
     return os.path.splitext(filename)[1][1:]
 
 
-def form_variables(form, variables_array):
-    variables_dict = {}
+def validate_request(request, variables_array):
+    json_data = request.get_json(force=True, silent=True)
+
+    if json_data is None:
+        flask.abort(400, f"No json sent")
+
     for variable in variables_array:
-        if form.get(variable) is None:
+        if variable not in json_data.keys():
             flask.abort(400, f"No {variable} sent")
-        else:
-            variables_dict[variable] = form.get(variable)
-    return variables_dict
 
 
 def geographic_coordinate_systems(geode_object: str):

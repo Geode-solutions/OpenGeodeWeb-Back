@@ -2,13 +2,17 @@
 
 
 
-## v1.3.1 (2023-11-02)
+## v1.4.0-rc.1 (2023-11-06)
+
+### Feature
+
+* feat(functions): validate_request function ([`124c2f1`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/124c2f1b13f2a4e0fbfa7ca2054b3aede3fed368))
 
 ### Unknown
 
-* Merge pull request #30 from Geode-solutions/next
+* Merge pull request #31 from Geode-solutions/feat_validate_request
 
-Next ([`54858fb`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/54858fb2ffd30de465f92a2e91f945f713c6b6db))
+feat(functions): validate_request function ([`8a55224`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/8a5522405c1b432592835cbe3b4b0f42e6334c71))
 
 * Merge branch &#39;master&#39; into next ([`2a328b1`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/2a328b118581b6ff6db09ee6c616977e1497bfea))
 
