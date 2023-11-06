@@ -2,6 +2,21 @@
 
 
 
+## v1.4.0-rc.1 (2023-11-06)
+
+### Feature
+
+* feat(functions): validate_request function ([`124c2f1`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/124c2f1b13f2a4e0fbfa7ca2054b3aede3fed368))
+
+### Unknown
+
+* Merge pull request #31 from Geode-solutions/feat_validate_request
+
+feat(functions): validate_request function ([`8a55224`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/8a5522405c1b432592835cbe3b4b0f42e6334c71))
+
+* Merge branch &#39;master&#39; into next ([`2a328b1`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/2a328b118581b6ff6db09ee6c616977e1497bfea))
+
+
 ## v1.3.0-rc.4 (2023-10-31)
 
 ### Fix
@@ -13,6 +28,15 @@
 * Merge pull request #29 from Geode-solutions/fix_update_ecosystem
 
 fix(dependencies): update ecosystem ([`ed1daaa`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/ed1daaaeaa2cef3b76aee18cd3a332b9fbc7efb1))
+
+
+## v1.3.0 (2023-10-25)
+
+### Unknown
+
+* Merge pull request #28 from Geode-solutions/next
+
+Next ([`b8d6cdf`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b8d6cdffdfc07b810b64fc3fc01c3413bebe2176))
 
 * Merge branch &#39;master&#39; into next ([`a3dd757`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/a3dd757571a2c2605eff6e6b37cc05edb92e844b))
 
