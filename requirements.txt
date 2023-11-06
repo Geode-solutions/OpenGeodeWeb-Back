@@ -4,11 +4,11 @@
 #
 #    pip-compile --resolver=backtracking requirements.in
 #
-geode-common==29.0.0
+geode-common==29.0.1
     # via geode-viewables
-geode-viewables==2.1.2
+geode-viewables==2.1.3
     # via -r requirements.in
-opengeode-core==14.9.1
+opengeode-core==14.9.3
     # via
     #   -r requirements.in
     #   geode-common
