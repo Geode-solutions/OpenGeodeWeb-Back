@@ -11,6 +11,8 @@ import opengeode_geosciences as og_gs
 import opengeode as og
 import pkg_resources
 import werkzeug
+from jsonschema import validate
+from jsonschema.exceptions import ValidationError
 
 # Local application imports
 from .geode_objects import geode_objects_dict
@@ -234,13 +236,20 @@ def extension_from_filename(filename):
     return os.path.splitext(filename)[1][1:]
 
 
-def validate_request(request, variables_array):
+def validate_request(request, schema):
     json_data = request.get_json(force=True, silent=True)
 
     if json_data is None:
-        flask.abort(400, f"No json sent")
+        json_data = {}
 
-    for variable in variables_array:
+    try:
+        print(f"{schema=}", flush=True)
+        validate(instance=json_data, schema=schema)
+    except ValidationError as e:
+        flask.abort(400, f"Validation error: {e.message}")
+
+    required_keys = schema.get("required", [])
+    for variable in required_keys:
         if variable not in json_data.keys():
             flask.abort(400, f"No {variable} sent")
 
