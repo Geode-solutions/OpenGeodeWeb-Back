@@ -243,15 +243,9 @@ def validate_request(request, schema):
         json_data = {}
 
     try:
-        print(f"{schema=}", flush=True)
         validate(instance=json_data, schema=schema)
     except ValidationError as e:
         flask.abort(400, f"Validation error: {e.message}")
-
-    required_keys = schema.get("required", [])
-    for variable in required_keys:
-        if variable not in json_data.keys():
-            flask.abort(400, f"No {variable} sent")
 
 
 def geographic_coordinate_systems(geode_object: str):
