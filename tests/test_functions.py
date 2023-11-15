@@ -50,6 +50,46 @@ def test_missing_files():
             assert type(additional_files) is list
 
 
+def test_load():
+    for geode_object, value in geode_objects.geode_objects_dict().items():
+        print(f"{geode_object=}")
+        input_extensions = geode_functions.geode_object_input_extensions(geode_object)
+        missing_files = geode_functions.missing_files(
+            geode_object, f"tests/data/test.{input_extension}"
+        )
+        has_missing_files = missing_files.has_missing_files()
+        if has_missing_files:
+            mandatory_files = geode_functions.mandatory_files(missing_files)
+            print(f"{mandatory_files=}")
+            additional_files = geode_functions.additional_files(missing_files)
+            print(f"{additional_files=}")
+        file_apsolute_path = os.path.abspath(f"tests/data/test.{input_extension}")
+
+        data = geode_functions.load(geode_object, file_apsolute_path)
+        output_extensions = geode_functions.get_geode_object_output_extensions(
+            geode_object
+        )
+
+        for output_extension in output_extensions:
+            print(f"{output_extension=}")
+            uu_id = str(uuid.uuid4()).replace("-", "")
+            geode_functions.save(
+                geode_object,
+                data,
+                os.path.abspath(f"output"),
+                f"{uu_id}.{output_extension}",
+            )
+
+            if "save_viewable" in value:
+                uu_id = str(uuid.uuid4()).replace("-", "")
+                geode_functions.save_viewable(
+                    geode_object,
+                    data,
+                    os.path.abspath(f"output"),
+                    uu_id,
+                )
+
+
 def test_is_model():
     for geode_object, value in geode_objects.geode_objects_dict().items():
         is_model = geode_functions.is_model(geode_object)
