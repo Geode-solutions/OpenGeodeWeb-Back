@@ -36,6 +36,10 @@ def load(geode_object: str, file_absolute_path: str):
     return geode_object_value(geode_object)["load"](file_absolute_path)
 
 
+def is_saveable(geode_object: str, data, filename: str):
+    return geode_object_value(geode_object)["is_saveable"](data, filename)
+
+
 def save(geode_object: str, data, folder_absolute_path: str, filename: str):
     return geode_object_value(geode_object)["save"](
         data, os.path.join(folder_absolute_path, filename)
