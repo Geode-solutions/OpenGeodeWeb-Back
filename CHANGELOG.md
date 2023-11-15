@@ -2,17 +2,61 @@
 
 
 
+## v2.0.0-rc.1 (2023-11-15)
+
+### Breaking
+
+* feat(validate_request):
+add json schema into function
+
+BREAKING CHANGE: Arguments changement(array to json schema) ([`2128439`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/21284396212fa6b689f778cf83a015cc5ff42a11))
+
+### Unknown
+
+* Merge pull request #36 from Geode-solutions/json_back
+
+feat(validate_request):
+add json schema into function
+
+BREAKING CHANGE: Arguments changement(array to json schema) ([`06829f5`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/06829f5620a3c3d5ea24ebed51e64e94ad84b0b2))
+
+* remove useless lines ([`ebbe0e8`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/ebbe0e850b45c703d1af157f3136274ae2711202))
+
+* Json Back - Upgrade ([`c11c23d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c11c23d0c30f0ac25f89d3f28dce41dbde0fa6bd))
+
+* Merge branch &#39;master&#39; into next ([`444ee71`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/444ee71993fcbe87cf7f518ee71aa96dc261f708))
+
+* Merge pull request #32 from Geode-solutions/fix_save_viewable_vtm
+
+fix(save_vtm): update requirements ([`9b999e9`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/9b999e9fd363cd24336b8213f03b61cb63c7d789))
+
+
 ## v1.4.0-rc.1 (2023-11-06)
 
 ### Feature
 
 * feat(functions): validate_request function ([`124c2f1`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/124c2f1b13f2a4e0fbfa7ca2054b3aede3fed368))
 
+### Fix
+
+* fix(save_vtm): update requirements ([`526adb2`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/526adb20e61c4e7fbfc39233f5ad9f511182d133))
+
 ### Unknown
 
 * Merge pull request #31 from Geode-solutions/feat_validate_request
 
 feat(functions): validate_request function ([`8a55224`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/8a5522405c1b432592835cbe3b4b0f42e6334c71))
+
+* update requirements ([`5aae971`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/5aae971d544732b49f922f460761157e4d9e1d39))
+
+
+## v1.3.1 (2023-11-02)
+
+### Unknown
+
+* Merge pull request #30 from Geode-solutions/next
+
+Next ([`54858fb`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/54858fb2ffd30de465f92a2e91f945f713c6b6db))
 
 * Merge branch &#39;master&#39; into next ([`2a328b1`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/2a328b118581b6ff6db09ee6c616977e1497bfea))
 
