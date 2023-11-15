@@ -4,3 +4,6 @@ OpenGeode-Inspector
 OpenGeode-Geosciences
 OpenGeode-GeosciencesIO
 Geode-Viewables
+jsonschema
+flask[async]
+werkzeug
