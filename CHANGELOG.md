@@ -2,6 +2,17 @@
 
 
 
+## v2.1.0-rc.1 (2023-11-15)
+
+### Feature
+
+* feat(github_workflows): merge from master to next ([`a93888c`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/a93888c5c87d1a9b6a64401e9eb55d1bb7015d18))
+
+### Unknown
+
+* Merge pull request #38 from Geode-solutions/feat_merge_master_to_next ([`a164e0f`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/a164e0f925d22d0d9cfe3f59f34f1fb7d9e8cf74))
+
+
 ## v2.0.0 (2023-11-15)
 
 ### Unknown
