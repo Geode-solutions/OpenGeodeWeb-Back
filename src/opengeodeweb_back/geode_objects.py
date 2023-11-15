@@ -13,6 +13,7 @@ def geode_objects_dict():
             "output_factory": og.BRepOutputFactory,
             "missing_files": og.check_brep_missing_files,
             "load": og.load_brep,
+            "is_saveable": og.is_brep_saveable,
             "save": og.save_brep,
             "builder": og.BRepBuilder,
             "crs": {
@@ -32,6 +33,7 @@ def geode_objects_dict():
             "output_factory": og_gs.CrossSectionOutputFactory,
             "missing_files": og_gs.check_cross_section_missing_files,
             "load": og_gs.load_cross_section,
+            "is_saveable": og.is_section_saveable,
             "save": og_gs.save_cross_section,
             "builder": og_gs.CrossSectionBuilder,
             "crs": {
@@ -50,6 +52,7 @@ def geode_objects_dict():
             "output_factory": og.EdgedCurveOutputFactory2D,
             "missing_files": og.check_edged_curve_missing_files2D,
             "load": og.load_edged_curve2D,
+            "is_saveable": og.is_edged_curve_saveable2D,
             "save": og.save_edged_curve2D,
             "builder": og.EdgedCurveBuilder2D.create,
             "crs": {
@@ -68,6 +71,7 @@ def geode_objects_dict():
             "output_factory": og.EdgedCurveOutputFactory3D,
             "missing_files": og.check_edged_curve_missing_files3D,
             "load": og.load_edged_curve3D,
+            "is_saveable": og.is_edged_curve_saveable3D,
             "save": og.save_edged_curve3D,
             "builder": og.EdgedCurveBuilder3D.create,
             "crs": {
@@ -86,6 +90,7 @@ def geode_objects_dict():
             "output_factory": og.GraphOutputFactory,
             "missing_files": og.check_graph_missing_files,
             "load": og.load_graph,
+            "is_saveable": og.is_graph_saveable,
             "save": og.save_graph,
             "builder": og.GraphBuilder.create,
             "is_model": False,
@@ -97,6 +102,7 @@ def geode_objects_dict():
             "output_factory": og.HybridSolidOutputFactory3D,
             "missing_files": og.check_hybrid_solid_missing_files3D,
             "load": og.load_hybrid_solid3D,
+            "is_saveable": og.is_hybrid_solid_saveable3D,
             "save": og.save_hybrid_solid3D,
             "builder": og.HybridSolidBuilder3D.create,
             "crs": {
@@ -115,6 +121,7 @@ def geode_objects_dict():
             "output_factory": og.PointSetOutputFactory2D,
             "missing_files": og.check_point_set_missing_files2D,
             "load": og.load_point_set2D,
+            "is_saveable": og.is_point_set_saveable2D,
             "save": og.save_point_set2D,
             "builder": og.PointSetBuilder2D.create,
             "crs": {
@@ -133,6 +140,7 @@ def geode_objects_dict():
             "output_factory": og.PointSetOutputFactory3D,
             "missing_files": og.check_point_set_missing_files3D,
             "load": og.load_point_set3D,
+            "is_saveable": og.is_point_set_saveable3D,
             "save": og.save_point_set3D,
             "builder": og.PointSetBuilder3D.create,
             "crs": {
@@ -151,6 +159,7 @@ def geode_objects_dict():
             "output_factory": og.PolygonalSurfaceOutputFactory2D,
             "missing_files": og.check_polygonal_surface_missing_files2D,
             "load": og.load_polygonal_surface2D,
+            "is_saveable": og.is_polygonal_surface_saveable2D,
             "save": og.save_polygonal_surface2D,
             "builder": og.PolygonalSurfaceBuilder2D.create,
             "crs": {
@@ -169,6 +178,7 @@ def geode_objects_dict():
             "output_factory": og.PolygonalSurfaceOutputFactory3D,
             "missing_files": og.check_polygonal_surface_missing_files3D,
             "load": og.load_polygonal_surface3D,
+            "is_saveable": og.is_polygonal_surface_saveable3D,
             "save": og.save_polygonal_surface3D,
             "builder": og.PolygonalSurfaceBuilder3D.create,
             "crs": {
@@ -187,6 +197,7 @@ def geode_objects_dict():
             "output_factory": og.PolyhedralSolidOutputFactory3D,
             "missing_files": og.check_polyhedral_solid_missing_files3D,
             "load": og.load_polyhedral_solid3D,
+            "is_saveable": og.is_polyhedral_solid_saveable3D,
             "save": og.save_polyhedral_solid3D,
             "builder": og.PolyhedralSolidBuilder3D.create,
             "crs": {
@@ -205,6 +216,7 @@ def geode_objects_dict():
             "output_factory": og.RasterImageOutputFactory2D,
             "missing_files": og.check_raster_image_missing_files2D,
             "load": og.load_raster_image2D,
+            "is_saveable": og.is_raster_image_saveable2D,
             "save": og.save_raster_image2D,
             "is_model": False,
             "is_3D": False,
@@ -216,6 +228,7 @@ def geode_objects_dict():
             "output_factory": og.RasterImageOutputFactory3D,
             "missing_files": og.check_raster_image_missing_files3D,
             "load": og.load_raster_image3D,
+            "is_saveable": og.is_raster_image_saveable3D,
             "save": og.save_raster_image3D,
             "is_model": False,
             "is_3D": False,
@@ -227,6 +240,7 @@ def geode_objects_dict():
             "output_factory": og.RegularGridOutputFactory2D,
             "missing_files": og.check_regular_grid_missing_files2D,
             "load": og.load_regular_grid2D,
+            "is_saveable": og.is_regular_grid_saveable2D,
             "save": og.save_regular_grid2D,
             "builder": og.RegularGridBuilder2D.create,
             "crs": {
@@ -244,6 +258,7 @@ def geode_objects_dict():
             "output_factory": og.RegularGridOutputFactory3D,
             "missing_files": og.check_regular_grid_missing_files3D,
             "load": og.load_regular_grid3D,
+            "is_saveable": og.is_regular_grid_saveable3D,
             "save": og.save_regular_grid3D,
             "builder": og.RegularGridBuilder3D.create,
             "crs": {
@@ -261,6 +276,7 @@ def geode_objects_dict():
             "output_factory": og.SectionOutputFactory,
             "missing_files": og.check_section_missing_files,
             "load": og.load_section,
+            "is_saveable": og.is_section_saveable,
             "save": og.save_section,
             "builder": og.SectionBuilder,
             "crs": {
@@ -280,6 +296,7 @@ def geode_objects_dict():
             "output_factory": og_gs.StructuralModelOutputFactory,
             "missing_files": og_gs.check_structural_model_missing_files,
             "load": og_gs.load_structural_model,
+            "is_saveable": og_gs.is_structural_model_saveable,
             "save": og_gs.save_structural_model,
             "builder": og_gs.StructuralModelBuilder,
             "crs": {
@@ -296,8 +313,9 @@ def geode_objects_dict():
         "TetrahedralSolid3D": {
             "input_factory": og.TetrahedralSolidInputFactory3D,
             "output_factory": og.TetrahedralSolidOutputFactory3D,
-            "load": og.load_tetrahedral_solid3D,
             "missing_files": og.check_tetrahedral_solid_missing_files3D,
+            "load": og.load_tetrahedral_solid3D,
+            "is_saveable": og_gs.is_tetrahedral_solid_saveable3D,
             "save": og.save_tetrahedral_solid3D,
             "builder": og.TetrahedralSolidBuilder3D.create,
             "crs": {
@@ -316,6 +334,7 @@ def geode_objects_dict():
             "output_factory": og.TriangulatedSurfaceOutputFactory2D,
             "missing_files": og.check_triangulated_surface_missing_files2D,
             "load": og.load_triangulated_surface2D,
+            "is_saveable": og.is_triangulated_surface_saveable2D,
             "save": og.save_triangulated_surface2D,
             "builder": og.TriangulatedSurfaceBuilder2D.create,
             "crs": {
@@ -334,6 +353,7 @@ def geode_objects_dict():
             "output_factory": og.TriangulatedSurfaceOutputFactory3D,
             "missing_files": og.check_triangulated_surface_missing_files3D,
             "load": og.load_triangulated_surface3D,
+            "is_saveable": og_gs.is_triangulated_surface_saveable3D,
             "save": og.save_triangulated_surface3D,
             "builder": og.TriangulatedSurfaceBuilder3D.create,
             "crs": {
@@ -352,6 +372,7 @@ def geode_objects_dict():
             "output_factory": og.VertexSetOutputFactory,
             "missing_files": og.check_vertex_set_missing_files,
             "load": og.load_vertex_set,
+            "is_saveable": og.is_vertex_set_saveable,
             "save": og.save_vertex_set,
             "builder": og.VertexSetBuilder.create,
             "is_model": False,
