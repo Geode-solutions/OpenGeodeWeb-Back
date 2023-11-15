@@ -1,14 +1,27 @@
 # CHANGELOG
 
 
+## v2.0.0-rc.1 (2023-11-15)
 
-## v1.4.0 (2023-11-06)
+### Breaking
+
+* feat(validate_request):
+add json schema into function
+
+BREAKING CHANGE: Arguments changement(array to json schema) ([`2128439`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/21284396212fa6b689f778cf83a015cc5ff42a11))
 
 ### Unknown
 
-* Merge pull request #35 from Geode-solutions/next
+* Merge pull request #36 from Geode-solutions/json_back
 
-Next ([`27292fb`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/27292fb38827ee698610b95b8f962e6bb41da958))
+feat(validate_request):
+add json schema into function
+
+BREAKING CHANGE: Arguments changement(array to json schema) ([`06829f5`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/06829f5620a3c3d5ea24ebed51e64e94ad84b0b2))
+
+* remove useless lines ([`ebbe0e8`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/ebbe0e850b45c703d1af157f3136274ae2711202))
+
+* Json Back - Upgrade ([`c11c23d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c11c23d0c30f0ac25f89d3f28dce41dbde0fa6bd))
 
 * Merge branch &#39;master&#39; into next ([`444ee71`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/444ee71993fcbe87cf7f518ee71aa96dc261f708))
 
