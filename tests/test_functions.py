@@ -70,56 +70,52 @@ def test_load():
         print(f"\n{geode_object=}")
         input_extensions = geode_functions.geode_object_input_extensions(geode_object)
         for input_extension in input_extensions:
-            if input_extension not in ["grdecl", "og_img3d", "vti", "vo"]:
-                print(f"\t{input_extension=}")
-                missing_files = geode_functions.missing_files(
-                    geode_object, f"tests/data/test.{input_extension}"
-                )
-                has_missing_files = missing_files.has_missing_files()
-                if has_missing_files:
-                    mandatory_files = missing_files.mandatory_files
-                    print(f"\t\t{mandatory_files=}")
-                    additional_files = missing_files.additional_files
-                    print(f"\t\t{additional_files=}")
-                file_apsolute_path = os.path.abspath(
-                    f"tests/data/test.{input_extension}"
+            # if input_extension not in ["grdecl", "og_img3d", "vti"]:
+            print(f"\t{input_extension=}")
+            missing_files = geode_functions.missing_files(
+                geode_object, f"tests/data/test.{input_extension}"
+            )
+            has_missing_files = missing_files.has_missing_files()
+            if has_missing_files:
+                mandatory_files = missing_files.mandatory_files
+                print(f"\t\t{mandatory_files=}")
+                additional_files = missing_files.additional_files
+                print(f"\t\t{additional_files=}")
+            file_apsolute_path = os.path.abspath(f"tests/data/test.{input_extension}")
+
+            data = geode_functions.load(geode_object, file_apsolute_path)
+            geode_functions.geode_objects_output_extensions(geode_object)
+            for (
+                geode_object_and_output_extensions
+            ) in geode_functions.geode_objects_output_extensions(geode_object):
+                output_geode_object = geode_object_and_output_extensions["geode_object"]
+                print(f"\t\t{output_geode_object=}")
+                output_extensions = geode_functions.geode_object_output_extensions(
+                    geode_object
                 )
 
-                data = geode_functions.load(geode_object, file_apsolute_path)
-                geode_functions.geode_objects_output_extensions(geode_object)
-                for (
-                    geode_object_and_output_extensions
-                ) in geode_functions.geode_objects_output_extensions(geode_object):
-                    output_geode_object = geode_object_and_output_extensions[
-                        "geode_object"
-                    ]
-                    print(f"\t\t{output_geode_object=}")
-                    output_extensions = geode_functions.geode_object_output_extensions(
-                        geode_object
-                    )
+                for output_extension in output_extensions:
+                    print(f"\t\t\t{output_extension=}")
+                    uu_id = str(uuid.uuid4()).replace("-", "")
+                    filename = f"{uu_id}.{output_extension}"
+                    if geode_functions.is_saveable(geode_object, data, filename):
+                        file_path = geode_functions.save(
+                            geode_object,
+                            data,
+                            os.path.abspath(f"output"),
+                            f"{uu_id}.{output_extension}",
+                        )
 
-                    for output_extension in output_extensions:
-                        print(f"\t\t\t{output_extension=}")
-                        uu_id = str(uuid.uuid4()).replace("-", "")
-                        filename = f"{uu_id}.{output_extension}"
-                        if geode_functions.is_saveable(geode_object, data, filename):
-                            file_path = geode_functions.save(
+                        if "save_viewable" in value:
+                            uu_id = str(uuid.uuid4()).replace("-", "")
+                            viewable_file_path = geode_functions.save_viewable(
                                 geode_object,
                                 data,
                                 os.path.abspath(f"output"),
-                                f"{uu_id}.{output_extension}",
+                                uu_id,
                             )
 
-                            if "save_viewable" in value:
-                                uu_id = str(uuid.uuid4()).replace("-", "")
-                                viewable_file_path = geode_functions.save_viewable(
-                                    geode_object,
-                                    data,
-                                    os.path.abspath(f"output"),
-                                    uu_id,
-                                )
-
-                                os.remove(viewable_file_path)
+                            os.remove(viewable_file_path)
 
 
 def test_is_model():
