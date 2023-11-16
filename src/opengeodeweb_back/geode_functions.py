@@ -177,22 +177,6 @@ def versions(list_packages: list):
     return list_with_versions
 
 
-def upload_file(file: str, file_name: str, upload_folder: str, file_size: int):
-    if not os.path.exists(upload_folder):
-        os.mkdir(upload_folder)
-    file_decoded = base64.b64decode(file.split(",")[-1])
-    secure_file_name = werkzeug.utils.secure_filename(file_name)
-    file_path = os.path.join(upload_folder, secure_file_name)
-    f = open(file_path, "wb")
-    f.write(file_decoded)
-    f.close()
-
-    final_size = os.path.getsize(file_path)
-    uploaded_file = int(file_size) == int(final_size)
-    if not uploaded_file:
-        flask.abort(500, "File not uploaded")
-
-
 def create_lock_file(
     folder_absolute_path,
 ):
