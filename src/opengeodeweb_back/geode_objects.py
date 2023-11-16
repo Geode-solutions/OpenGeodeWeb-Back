@@ -33,7 +33,7 @@ def geode_objects_dict():
             "output_factory": og_gs.CrossSectionOutputFactory,
             "missing_files": og_gs.check_cross_section_missing_files,
             "load": og_gs.load_cross_section,
-            "is_saveable": og.is_section_saveable,
+            "is_saveable": og_gs.is_cross_section_saveable,
             "save": og_gs.save_cross_section,
             "builder": og_gs.CrossSectionBuilder,
             "crs": {
@@ -315,7 +315,7 @@ def geode_objects_dict():
             "output_factory": og.TetrahedralSolidOutputFactory3D,
             "missing_files": og.check_tetrahedral_solid_missing_files3D,
             "load": og.load_tetrahedral_solid3D,
-            "is_saveable": og_gs.is_tetrahedral_solid_saveable3D,
+            "is_saveable": og.is_tetrahedral_solid_saveable3D,
             "save": og.save_tetrahedral_solid3D,
             "builder": og.TetrahedralSolidBuilder3D.create,
             "crs": {
@@ -353,7 +353,7 @@ def geode_objects_dict():
             "output_factory": og.TriangulatedSurfaceOutputFactory3D,
             "missing_files": og.check_triangulated_surface_missing_files3D,
             "load": og.load_triangulated_surface3D,
-            "is_saveable": og_gs.is_triangulated_surface_saveable3D,
+            "is_saveable": og.is_triangulated_surface_saveable3D,
             "save": og.save_triangulated_surface3D,
             "builder": og.TriangulatedSurfaceBuilder3D.create,
             "crs": {
