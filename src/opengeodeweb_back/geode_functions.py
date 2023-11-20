@@ -148,20 +148,27 @@ def list_geode_objects(extension: str, key: str = None):
     return geode_objects_list
 
 
-def geode_objects_output_extensions(geode_object: str):
+def geode_objects_output_extensions(geode_object: str, data):
     return_list = []
     geode_object_dict = {}
     geode_object_dict["geode_object"] = geode_object
-    geode_object_dict["output_extensions"] = geode_object_output_extensions(
-        geode_object
-    )
+
+    output = geode_object_output_extensions(geode_object)
+
+    extension_saveable_array = []
+    for output_extension in output:
+        bool_is_saveable = is_saveable(geode_object, data, f"test.{output_extension}")
+        extension_saveable_array.append(
+            {"extension": output_extension, "is_saveable": bool_is_saveable}
+        )
+
+    geode_object_dict["outputs"] = extension_saveable_array
 
     return_list.append(geode_object_dict)
 
     if "parent" in geode_object_value(geode_object).keys():
         parent_key = geode_object_value(geode_object)["parent"]
-        return_list += geode_objects_output_extensions(parent_key)
-
+        return_list += geode_objects_output_extensions(parent_key, data)
     return return_list
 
 
