@@ -4,11 +4,11 @@
 #
 #    pip-compile --pre --resolver=backtracking requirements.in
 #
-geode-common==30.0.0rc6
+geode-common==30.0.0rc7
     # via geode-viewables
 geode-viewables==2.1.4rc1
     # via -r requirements.in
-opengeode-core==14.9.4rc7
+opengeode-core==14.9.4rc8
     # via
     #   -r requirements.in
     #   geode-common
@@ -23,13 +23,13 @@ opengeode-geosciences==7.2.2rc4
     #   geode-viewables
     #   opengeode-geosciencesio
     #   opengeode-inspector
-opengeode-geosciencesio==4.5.1
+opengeode-geosciencesio==4.5.2rc1
     # via
     #   -r requirements.in
     #   opengeode-inspector
-opengeode-inspector==4.0.0
+opengeode-inspector==4.0.1rc1
     # via -r requirements.in
-opengeode-io==6.2.1
+opengeode-io==6.2.2rc1
     # via
     #   -r requirements.in
     #   geode-viewables
