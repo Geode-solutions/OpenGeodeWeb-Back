@@ -2,6 +2,47 @@
 
 
 
+## v2.1.0-rc.2 (2023-11-21)
+
+### Feature
+
+* feat(output_extensions): return is_saveable key
+
+BREAMING CHANGE: geode_objects_output_extensions needs data input ([`61edda6`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/61edda6c84429079bad3bf3f76a52f929fa3a1d7))
+
+### Fix
+
+* fix(CrossSection): is_saveable method ([`10c4f5c`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/10c4f5ca760c90aad57e6355d21d01957a4bebf8))
+
+### Unknown
+
+* Merge pull request #40 from Geode-solutions/feat/is_saveable ([`f98db5f`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/f98db5ff8627c7bd8e438c90d0729f77b2ead6fd))
+
+* Merge branch &#39;next&#39; into feat/is_saveable ([`2971bae`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/2971baed310ec13866a2554029ca41f23f933f81))
+
+* Merge branch &#39;feat/is_saveable&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into feat/is_saveable ([`4fcbce2`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/4fcbce29885f6d31752f14109b6ff3034d612e8d))
+
+* update unit tests ([`d54ca8e`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/d54ca8e6f7de3a250ba76ef34b589506372cd60a))
+
+* update unit tests ([`41fe232`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/41fe23236f440fc97a7030d5f82a087fc77e6942))
+
+* update requirements ([`007cc5a`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/007cc5aa8f4d66a3d387f3e73e0141665e747f0e))
+
+* add tests files ([`c6eeae5`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c6eeae5c9812f17e509e1734e9395c2176595722))
+
+* update tests ([`464eae3`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/464eae31527fe651c4f224327d8c25a3c08c92bf))
+
+* update e2e tests ([`07decc6`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/07decc683244d3eb2431f74138afcf539c539235))
+
+* gitignore ([`b122a9a`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b122a9acaa403bfb6683c7598d1452cafb6ae904))
+
+* remove upload_file method ([`d0fe9ab`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/d0fe9ab031d370729702ca9ee1b03da9e2e7a4ff))
+
+* update requirements ([`e48c31c`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/e48c31c1217b3f156e4263ab81c9b00dbb8218de))
+
+* add load test ([`37dabd1`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/37dabd1c4b8f8837e07449ff854a3c0029caf3c2))
+
+
 ## v2.1.0-rc.1 (2023-11-15)
 
 ### Feature
@@ -35,12 +76,16 @@ BREAKING CHANGE: Arguments changement(array to json schema) ([`2128439`](https:/
 
 ### Unknown
 
+* feat(geode_functions) : is_saveable function ([`a4c070c`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/a4c070c38ac92a941b92982f841b60f5ae5fddfc))
+
 * Merge pull request #36 from Geode-solutions/json_back
 
 feat(validate_request):
 add json schema into function
 
 BREAKING CHANGE: Arguments changement(array to json schema) ([`06829f5`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/06829f5620a3c3d5ea24ebed51e64e94ad84b0b2))
+
+* feat(geode_objects_dict) : is_saveable key ([`8fc9cf1`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/8fc9cf1288056f1106ab57e4ba52db8bf3ad092c))
 
 * remove useless lines ([`ebbe0e8`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/ebbe0e850b45c703d1af157f3136274ae2711202))
 
