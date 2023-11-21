@@ -38,6 +38,10 @@ def load(geode_object: str, file_absolute_path: str):
     return geode_object_value(geode_object)["load"](file_absolute_path)
 
 
+def is_saveable(geode_object: str, data, filename: str):
+    return geode_object_value(geode_object)["is_saveable"](data, filename)
+
+
 def save(geode_object: str, data, folder_absolute_path: str, filename: str):
     return geode_object_value(geode_object)["save"](
         data, os.path.join(folder_absolute_path, filename)
@@ -146,20 +150,27 @@ def list_geode_objects(extension: str, key: str = None):
     return geode_objects_list
 
 
-def geode_objects_output_extensions(geode_object: str):
+def geode_objects_output_extensions(geode_object: str, data):
     return_list = []
     geode_object_dict = {}
     geode_object_dict["geode_object"] = geode_object
-    geode_object_dict["output_extensions"] = geode_object_output_extensions(
-        geode_object
-    )
+
+    output = geode_object_output_extensions(geode_object)
+
+    extension_saveable_array = []
+    for output_extension in output:
+        bool_is_saveable = is_saveable(geode_object, data, f"test.{output_extension}")
+        extension_saveable_array.append(
+            {"extension": output_extension, "is_saveable": bool_is_saveable}
+        )
+
+    geode_object_dict["outputs"] = extension_saveable_array
 
     return_list.append(geode_object_dict)
 
     if "parent" in geode_object_value(geode_object).keys():
         parent_key = geode_object_value(geode_object)["parent"]
-        return_list += geode_objects_output_extensions(parent_key)
-
+        return_list += geode_objects_output_extensions(parent_key, data)
     return return_list
 
 
@@ -173,22 +184,6 @@ def versions(list_packages: list):
             }
         )
     return list_with_versions
-
-
-def upload_file(file: str, file_name: str, upload_folder: str, file_size: int):
-    if not os.path.exists(upload_folder):
-        os.mkdir(upload_folder)
-    file_decoded = base64.b64decode(file.split(",")[-1])
-    secure_file_name = werkzeug.utils.secure_filename(file_name)
-    file_path = os.path.join(upload_folder, secure_file_name)
-    f = open(file_path, "wb")
-    f.write(file_decoded)
-    f.close()
-
-    final_size = os.path.getsize(file_path)
-    uploaded_file = int(file_size) == int(final_size)
-    if not uploaded_file:
-        flask.abort(500, "File not uploaded")
 
 
 def create_lock_file(
