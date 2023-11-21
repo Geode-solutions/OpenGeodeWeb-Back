@@ -2,6 +2,23 @@
 
 
 
+## v3.0.0-rc.1 (2023-11-21)
+
+### Breaking
+
+* fix(dependencies): update
+
+BREAKING CHANGE: geode_objects_output_extensions takes data as input ([`f9d3441`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/f9d3441f0b99887c664768ee4423a661abbe4a31))
+
+### Unknown
+
+* Merge branch &#39;next&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into next ([`cf1f9c4`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/cf1f9c4f397e966cbac0aea94aa0ebffe8826917))
+
+* pull from master
+
+BREAKING CHANGE: geode_objects_output_extensions takes data as input ([`bbb13b1`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/bbb13b1364f925e6991ca1710a42e69bfc1c96b1))
+
+
 ## v2.1.0-rc.2 (2023-11-21)
 
 ### Feature
