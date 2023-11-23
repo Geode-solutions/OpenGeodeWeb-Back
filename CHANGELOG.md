@@ -2,6 +2,19 @@
 
 
 
+## v3.0.0-rc.2 (2023-11-23)
+
+### Fix
+
+* fix(dependencies): dynamic dependencies ([`0107914`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/0107914913f5fe2dd6600e6f026de8a651339150))
+
+### Unknown
+
+* Merge pull request #41 from Geode-solutions/fix/update_dependencies
+
+fix(dependencies): dynamic dependencies ([`940c6c8`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/940c6c8a2d35f29bfa0b1b850a9c147703535e21))
+
+
 ## v3.0.0-rc.1 (2023-11-21)
 
 ### Breaking
