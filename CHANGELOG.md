@@ -2,6 +2,19 @@
 
 
 
+## v3.0.0-rc.3 (2023-11-29)
+
+### Fix
+
+* fix(dependencies): pin stable deps ([`b0cba78`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b0cba78ae1cdcb0444fff7280da3b3ce18d419af))
+
+### Unknown
+
+* Merge pull request #42 from Geode-solutions/fix/update_dependencies
+
+fix(dependencies): pin stable deps ([`51597a5`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/51597a53b02184beb4cc285f9bbded5918831b43))
+
+
 ## v3.0.0-rc.2 (2023-11-23)
 
 ### Fix
