@@ -151,27 +151,20 @@ def list_geode_objects(extension: str, key: str = None):
 
 
 def geode_objects_output_extensions(geode_object: str, data):
-    return_list = []
-    geode_object_dict = {}
-    geode_object_dict["geode_object"] = geode_object
-
-    output = geode_object_output_extensions(geode_object)
-
-    extension_saveable_array = []
-    for output_extension in output:
+    geode_objects_output_extensions_dict = {}
+    output_extensions = geode_object_output_extensions(geode_object)
+    extensions_dict = {}
+    for output_extension in output_extensions:
         bool_is_saveable = is_saveable(geode_object, data, f"test.{output_extension}")
-        extension_saveable_array.append(
-            {"extension": output_extension, "is_saveable": bool_is_saveable}
-        )
-
-    geode_object_dict["outputs"] = extension_saveable_array
-
-    return_list.append(geode_object_dict)
+        extensions_dict[output_extension] = {"is_saveable": bool_is_saveable}
+    geode_objects_output_extensions_dict[geode_object] = extensions_dict
 
     if "parent" in geode_object_value(geode_object).keys():
-        parent_key = geode_object_value(geode_object)["parent"]
-        return_list += geode_objects_output_extensions(parent_key, data)
-    return return_list
+        parent_geode_object = geode_object_value(geode_object)["parent"]
+        geode_objects_output_extensions_dict.update(
+            geode_objects_output_extensions(parent_geode_object, data)
+        )
+    return geode_objects_output_extensions_dict
 
 
 def versions(list_packages: list):
@@ -303,3 +296,28 @@ def create_coordinate_system(
     create_crs(
         geode_object, data, name, input_coordiante_system, output_coordiante_system
     )
+
+
+def send_file(upload_folder, saved_files, new_file_name):
+    if len(saved_files) == 1:
+        mimetype = "application/octet-binary"
+    else:
+        mimetype = "application/zip"
+        new_file_name = strict_file_name + ".zip"
+        with zipfile.ZipFile(os.path.join(upload_folder, new_file_name), "w") as zipObj:
+            for saved_file_path in saved_files:
+                zipObj.write(
+                    saved_file_path,
+                    os.path.basename(saved_file_path),
+                )
+
+    response = flask.send_from_directory(
+        directory=upload_folder,
+        path=new_file_name,
+        as_attachment=True,
+        mimetype=mimetype,
+    )
+    response.headers["new-file-name"] = new_file_name
+    response.headers["Access-Control-Expose-Headers"] = "new-file-name"
+
+    return response
