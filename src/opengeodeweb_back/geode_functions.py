@@ -34,6 +34,10 @@ def missing_files(geode_object: str, file_absolute_path: str):
     return geode_object_value(geode_object)["missing_files"](file_absolute_path)
 
 
+def is_loadable(geode_object: str, file_absolute_path: str):
+    return geode_object_value(geode_object)["is_loadable"](file_absolute_path)
+
+
 def load(geode_object: str, file_absolute_path: str):
     return geode_object_value(geode_object)["load"](file_absolute_path)
 
