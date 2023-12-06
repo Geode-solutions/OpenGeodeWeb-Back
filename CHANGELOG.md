@@ -2,6 +2,21 @@
 
 
 
+## v3.0.0-rc.5 (2023-12-06)
+
+### Fix
+
+* fix(deps): update geode dependencies ([`516ba41`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/516ba41443107ad6368972f3215f1d00ea33fe9c))
+
+### Unknown
+
+* Merge pull request #44 from Geode-solutions/chore/update_geode_ecosystem
+
+fix(deps): update geode dependencies ([`0805aff`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/0805aff80f8aed936a6c3d26695df0d912536545))
+
+* remove --pre ([`8596dbf`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/8596dbfb61b3bf25cd47dfc496929c326e4c6fb4))
+
+
 ## v3.0.0-rc.4 (2023-12-04)
 
 ### Fix
