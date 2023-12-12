@@ -2,6 +2,21 @@
 
 
 
+## v3.0.0-rc.6 (2023-12-12)
+
+### Breaking
+
+* feat(functions): add send_file function
+
+BREAKING CHANGE: geode_objects_output_extensions returns a dict ([`1948edd`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/1948eddad186904c4aecc63ed0ecbfa6780fa1b7))
+
+### Unknown
+
+* Merge pull request #45 from Geode-solutions/feat/is_saveable
+
+feat(functions): add send_file function ([`b1d53a4`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b1d53a4ab280b74fb4e39a318d26ccd309f7dc68))
+
+
 ## v3.0.0-rc.5 (2023-12-06)
 
 ### Fix
