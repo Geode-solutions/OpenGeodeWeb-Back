@@ -2,6 +2,19 @@
 
 
 
+## v3.0.0-rc.8 (2023-12-13)
+
+### Feature
+
+* feat(dependencies): add geode dependencies ([`4ac294f`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/4ac294fa6f83d084a0ee54f62ac1d3614ffe7fd9))
+
+### Unknown
+
+* Merge pull request #48 from Geode-solutions/feat/add_geode_dependencies
+
+feat(dependencies): add geode dependencies ([`eeb1ad7`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/eeb1ad7278b5f45c38af79ef27398e8d70d89df3))
+
+
 ## v3.0.0-rc.7 (2023-12-13)
 
 ### Fix
