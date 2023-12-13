@@ -4,6 +4,11 @@ OpenGeode-Inspector
 OpenGeode-Geosciences
 OpenGeode-GeosciencesIO
 Geode-Viewables
+geode-numerics
+geode-simplex
+geode-explicit
+geode-implicit
+geode-common
 jsonschema
 flask[async]
 werkzeug
