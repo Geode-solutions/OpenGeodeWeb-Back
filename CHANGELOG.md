@@ -2,6 +2,25 @@
 
 
 
+## v3.0.0-rc.7 (2023-12-13)
+
+### Fix
+
+* fix(unit_tests): fix unit tests ([`96fc19e`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/96fc19e7f35282bc5f1dc27c85da079ec2181126))
+
+### Unknown
+
+* Merge pull request #47 from Geode-solutions/feat/is_saveable
+
+Feat/is saveable ([`1636622`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/163662276ccccd09fbc698862b90ebb15ca6b065))
+
+* remove flush=True ([`6b6d7f3`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/6b6d7f316e4f1708af31eeee54e8d179eebfb9af))
+
+* update requirements ([`32c62e6`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/32c62e6685504a6bb4d48240550007eb18b88433))
+
+* Merge branch &#39;master&#39; into next ([`6fed8e3`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/6fed8e39bf38b64791936ff86deb5c8b3fb08d2d))
+
+
 ## v3.0.0-rc.6 (2023-12-12)
 
 ### Breaking
@@ -129,6 +148,13 @@ BREAMING CHANGE: geode_objects_output_extensions needs data input ([`61edda6`](h
 * update requirements ([`e48c31c`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/e48c31c1217b3f156e4263ab81c9b00dbb8218de))
 
 * add load test ([`37dabd1`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/37dabd1c4b8f8837e07449ff854a3c0029caf3c2))
+
+
+## v2.1.0 (2023-11-15)
+
+### Unknown
+
+* Merge pull request #39 from Geode-solutions/next ([`d4845b7`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/d4845b77b51b6b13f49472d7c14a803a7c52421e))
 
 
 ## v2.1.0-rc.1 (2023-11-15)
