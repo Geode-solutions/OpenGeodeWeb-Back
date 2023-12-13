@@ -1,0 +1,16 @@
+{
+  "$id": "/tools/allowed_objects",
+  "route": "/allowed_objects",
+  "methods": ["POST"],
+  "type": "object",
+  "properties": {
+    "filename": {
+      "type": "string"
+    },
+    "key": {
+      "type": ["string", "null"]
+    }
+  },
+  "required": ["filename", "key"],
+  "additionalProperties": false
+}

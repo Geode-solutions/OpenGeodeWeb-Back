@@ -1,0 +1,17 @@
+{
+  "$id": "/tools/geographic_coordinate_systems",
+  "route": "/geographic_coordinate_systems",
+  "methods": [
+    "POST"
+  ],
+  "type": "object",
+  "properties": {
+    "input_geode_object": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "input_geode_object"
+  ],
+  "additionalProperties": false
+}
