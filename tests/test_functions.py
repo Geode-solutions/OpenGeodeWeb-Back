@@ -84,43 +84,45 @@ def test_load():
                 )
                 if is_loadable:
                     data = geode_functions.load(geode_object, file_apsolute_path)
-                    for (
-                        geode_object_and_output_extensions
-                    ) in geode_functions.geode_objects_output_extensions(
-                        geode_object, data
-                    ):
-                        output_geode_object = geode_object_and_output_extensions[
-                            "geode_object"
-                        ]
-                        print(f"\t\t{output_geode_object=}")
-                        output_extensions = (
-                            geode_functions.geode_object_output_extensions(geode_object)
+                    if "save_viewable" in value:
+                        uu_id = str(uuid.uuid4()).replace("-", "")
+                        viewable_file_path = geode_functions.save_viewable(
+                            geode_object,
+                            data,
+                            os.path.abspath(f"/output"),
+                            uu_id,
                         )
-
-                        for output_extension in output_extensions:
+                        os.remove(viewable_file_path)
+                    geode_objects_and_output_extensions = (
+                        geode_functions.geode_objects_output_extensions(
+                            geode_object, data
+                        )
+                    )
+                    assert type(geode_objects_and_output_extensions) is dict
+                    for (
+                        output_geode_object,
+                        output_geode_object_value,
+                    ) in geode_objects_and_output_extensions.items():
+                        print(f"\t\t{output_geode_object=}")
+                        for (
+                            output_extension,
+                            output_extension_value,
+                        ) in output_geode_object_value.items():
                             print(f"\t\t\t{output_extension=}")
                             uu_id = str(uuid.uuid4()).replace("-", "")
                             filename = f"{uu_id}.{output_extension}"
                             if geode_functions.is_saveable(
-                                geode_object, data, filename
+                                output_geode_object, data, filename
                             ):
                                 saved_files = geode_functions.save(
-                                    geode_object,
+                                    output_geode_object,
                                     data,
-                                    os.path.abspath(f"output"),
-                                    f"{uu_id}.{output_extension}",
+                                    os.path.abspath(f"/output"),
+                                    filename,
                                 )
-
-                                if "save_viewable" in value:
-                                    uu_id = str(uuid.uuid4()).replace("-", "")
-                                    viewable_file_path = geode_functions.save_viewable(
-                                        geode_object,
-                                        data,
-                                        os.path.abspath(f"output"),
-                                        uu_id,
-                                    )
-
-                                    os.remove(viewable_file_path)
+                                assert type(saved_files) is list
+                                for saved_file in saved_files:
+                                    os.remove(saved_file)
 
 
 def test_is_model():
@@ -151,10 +153,39 @@ def test_geode_object_input_extensions():
 
 def test_geode_object_output_extensions():
     for geode_object, value in geode_objects.geode_objects_dict().items():
-        output_extensions = geode_functions.geode_object_output_extensions(geode_object)
-        assert type(output_extensions) is list
-        for output_extension in output_extensions:
-            assert type(output_extension) is str
+        print(f"\n{geode_object=}")
+        input_extensions = geode_functions.geode_object_input_extensions(geode_object)
+        for input_extension in input_extensions:
+            if geode_object != "RegularGrid3D" and input_extension != "vti":
+                print(f"\t{input_extension=}")
+                missing_files = geode_functions.missing_files(
+                    geode_object, f"tests/data/test.{input_extension}"
+                )
+                has_missing_files = missing_files.has_missing_files()
+                if has_missing_files:
+                    mandatory_files = missing_files.mandatory_files
+                    print(f"\t\t{mandatory_files=}")
+                    additional_files = missing_files.additional_files
+                    print(f"\t\t{additional_files=}")
+                file_apsolute_path = os.path.abspath(
+                    f"tests/data/test.{input_extension}"
+                )
+
+                data = geode_functions.load(geode_object, file_apsolute_path)
+                geode_objets_and_output_extensions = (
+                    geode_functions.geode_objects_output_extensions(geode_object, data)
+                )
+                assert type(geode_objets_and_output_extensions) is dict
+                for (
+                    output_geode_object,
+                    output_geode_object_value,
+                ) in geode_objets_and_output_extensions.items():
+                    for (
+                        output_extension,
+                        output_extension_value,
+                    ) in output_geode_object_value.items():
+                        assert type(output_extension) is str
+                        assert type(output_extension_value["is_saveable"]) is bool
 
 
 def test_list_input_extensions():
@@ -180,8 +211,6 @@ def test_list_geode_objects():
             "key": "inspector",
             "invalid_geode_objects": [
                 "Graph",
-                "RasterImage2D",
-                "RasterImage3D",
                 "RasterImage2D",
                 "RasterImage3D",
                 "VertexSet",
@@ -216,34 +245,23 @@ def test_geode_objects_output_extensions():
     for geode_object, value in geode_objects.geode_objects_dict().items():
         input_extensions = geode_functions.geode_object_input_extensions(geode_object)
         for input_extension in input_extensions:
-            if input_extension not in ["og_img3d", "vti"]:
+            if geode_object != "RegularGrid3D" and input_extension != "vti":
                 data = geode_functions.load(
                     geode_object, f"tests/data/test.{input_extension}"
                 )
                 geode_objects_and_output_extensions = (
-                    geode_functions.geode_objects_and_output_extensions(
-                        geode_object, data
-                    )
+                    geode_functions.geode_objects_output_extensions(geode_object, data)
                 )
-                print(f"{geode_objects_and_output_extensions=}")
                 assert type(geode_objects_and_output_extensions) is dict
                 for (
-                    geode_object_and_output_extensions
-                ) in geode_objects_and_output_extensions.values():
-                    print(f"{geode_object_and_output_extensions=}")
-                    assert type(geode_object_and_output_extensions) is dict
-                    assert "geode_object" in geode_object_and_output_extensions
-                    assert (
-                        type(geode_object_and_output_extensions["geode_object"]) is str
-                    )
-                    assert "outputs" in geode_object_and_output_extensions
-                    assert type(geode_object_and_output_extensions["outputs"]) is list
-                    outputs = geode_object_and_output_extensions["outputs"]
-                    for output in outputs:
-                        assert "extension" in output
-                        assert type(output["extension"]) is str
-                        assert "is_saveable" in output
-                        assert type(output["is_saveable"]) is bool
+                    output_geode_object,
+                    output_geode_object_value,
+                ) in geode_objects_and_output_extensions.items():
+                    for (
+                        output_extension,
+                        output_extension_value,
+                    ) in output_geode_object_value.items():
+                        assert type(output_extension_value["is_saveable"]) is bool
 
 
 def test_versions():
