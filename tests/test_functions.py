@@ -53,20 +53,20 @@ def test_missing_files():
 
 def test_load():
     for geode_object, value in geode_objects.geode_objects_dict().items():
-        print(f"\n{geode_object=}", flush=True)
+        print(f"\n{geode_object=}")
         input_extensions = geode_functions.geode_object_input_extensions(geode_object)
         for input_extension in input_extensions:
             if geode_object != "RegularGrid3D" and input_extension != "vti":
-                print(f"\t{input_extension=}", flush=True)
+                print(f"\t{input_extension=}")
                 missing_files = geode_functions.missing_files(
                     geode_object, f"tests/data/test.{input_extension}"
                 )
                 has_missing_files = missing_files.has_missing_files()
                 if has_missing_files:
                     mandatory_files = missing_files.mandatory_files
-                    print(f"\t\t{mandatory_files=}", flush=True)
+                    print(f"\t\t{mandatory_files=}")
                     additional_files = missing_files.additional_files
-                    print(f"\t\t{additional_files=}", flush=True)
+                    print(f"\t\t{additional_files=}")
                 file_apsolute_path = os.path.abspath(
                     f"tests/data/test.{input_extension}"
                 )
@@ -90,12 +90,12 @@ def test_load():
                     output_geode_object,
                     output_geode_object_value,
                 ) in geode_objects_and_output_extensions.items():
-                    print(f"\t\t{output_geode_object=}", flush=True)
+                    print(f"\t\t{output_geode_object=}")
                     for (
                         output_extension,
                         output_extension_value,
                     ) in output_geode_object_value.items():
-                        print(f"\t\t\t{output_extension=}", flush=True)
+                        print(f"\t\t\t{output_extension=}")
                         uu_id = str(uuid.uuid4()).replace("-", "")
                         filename = f"{uu_id}.{output_extension}"
                         if geode_functions.is_saveable(
