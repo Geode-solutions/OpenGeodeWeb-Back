@@ -18,7 +18,7 @@ colorama==0.4.6
     # via click
 flask[async]==3.0.0
     # via -r requirements.in
-geode-common==30.0.3
+geode-common==30.0.4
     # via geode-viewables
 geode-viewables==2.1.7
     # via -r requirements.in
@@ -50,19 +50,15 @@ opengeode-geosciences==7.3.2
     #   -r requirements.in
     #   geode-viewables
     #   opengeode-geosciencesio
-    #   opengeode-inspector
 opengeode-geosciencesio==4.5.4
-    # via
-    #   -r requirements.in
-    #   opengeode-inspector
-opengeode-inspector==4.0.3
+    # via -r requirements.in
+opengeode-inspector==4.0.4
     # via -r requirements.in
 opengeode-io==6.2.4
     # via
     #   -r requirements.in
     #   geode-viewables
-    #   opengeode-inspector
-referencing==0.31.1
+referencing==0.32.0
     # via
     #   jsonschema
     #   jsonschema-specifications
@@ -70,7 +66,7 @@ rpds-py==0.13.2
     # via
     #   jsonschema
     #   referencing
-typing-extensions==4.8.0
+typing-extensions==4.9.0
     # via asgiref
 werkzeug==3.0.1
     # via
