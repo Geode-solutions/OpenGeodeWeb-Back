@@ -48,12 +48,9 @@ def upload_file():
     UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
     if not os.path.exists(UPLOAD_FOLDER):
         os.mkdir(UPLOAD_FOLDER)
-    files = flask.request.files.getlist("content")
-
-    for file in files:
-        filename = werkzeug.utils.secure_filename(os.path.basename(file.filename))
-        print(f"{filename=}")
-        file.save(os.path.join(UPLOAD_FOLDER, filename))
+    file = flask.request.files["file"]
+    filename = werkzeug.utils.secure_filename(os.path.basename(file.filename))
+    file.save(os.path.join(UPLOAD_FOLDER, filename))
     return flask.make_response({"message": "File uploaded"}, 201)
 
 

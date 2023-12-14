@@ -42,7 +42,7 @@ def test_allowed_objects(client):
 def test_upload_file(client):
     response = client.put(
         f"/upload_file",
-        data={"content": FileStorage(open("./tests/corbi.og_brep", "rb"))},
+        data={"file": FileStorage(open("./tests/corbi.og_brep", "rb"))},
     )
 
     assert response.status_code == 201
