@@ -228,17 +228,20 @@ def test_list_geode_objects():
         input_extensions = geode_functions.list_input_extensions(key)
         for geode_object, value in geode_objects.geode_objects_dict().items():
             for input_extension in input_extensions:
-                geode_objects_list = geode_functions.list_geode_objects(
-                    input_extension, key
+                file_apsolute_path = os.path.abspath(
+                    f"tests/data/test.{input_extension}"
                 )
-                assert type(geode_objects_list) is list
+                return_dict = geode_functions.list_geode_objects(
+                    file_apsolute_path, key
+                )
+                assert type(return_dict) is dict
 
                 if key != None:
-                    assert len(geode_objects_list) > 0
+                    assert len(return_dict.keys()) > 0
                     for invalid_geode_object in invalid_geode_objects:
-                        assert invalid_geode_object not in geode_objects_list
+                        assert invalid_geode_object not in return_dict.keys()
                 else:
-                    assert len(geode_objects_list) >= 1
+                    assert len(return_dict.keys()) >= 1
 
 
 def test_geode_objects_output_extensions():
