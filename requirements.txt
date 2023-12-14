@@ -17,6 +17,10 @@ click==8.1.7
 colorama==0.4.6
     # via click
 flask[async]==3.0.0
+    # via
+    #   -r requirements.in
+    #   flask-cors
+flask-cors==4.0.0
     # via -r requirements.in
 geode-background==7.4.8
     # via
