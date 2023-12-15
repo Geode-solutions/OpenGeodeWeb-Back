@@ -2,6 +2,25 @@
 
 
 
+## v3.0.0-rc.10 (2023-12-15)
+
+### Fix
+
+* fix(dependencies): update ecosystem ([`cbed29d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/cbed29dbf0e195f23ef89f7798a155d2c33a56fe))
+
+### Unknown
+
+* Merge pull request #52 from Geode-solutions/chore/update_ecosystem
+
+fix(dependencies): update ecosystem ([`eabfe89`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/eabfe89d98db21f0087f1ca4569ff695e05c9f99))
+
+* Merge pull request #51 from Geode-solutions/revert-49-feat/is_loadable
+
+Revert &#34;Feat/is loadable&#34; ([`d0f03a7`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/d0f03a788c892ea80431d3aff3dadf7f3755240f))
+
+* Revert &#34;Feat/is loadable&#34; ([`2aab775`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/2aab7755049c33843cc120618f1a94e32a3429f3))
+
+
 ## v3.0.0-rc.9 (2023-12-15)
 
 ### Feature
