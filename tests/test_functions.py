@@ -1,4 +1,5 @@
 import os
+import uuid
 from src.opengeodeweb_back import geode_functions, geode_objects
 
 
@@ -50,6 +51,67 @@ def test_missing_files():
             assert type(additional_files) is list
 
 
+def test_load():
+    for geode_object, value in geode_objects.geode_objects_dict().items():
+        print(f"\n{geode_object=}")
+        input_extensions = geode_functions.geode_object_input_extensions(geode_object)
+        for input_extension in input_extensions:
+            if geode_object != "RegularGrid3D" and input_extension != "vti":
+                print(f"\t{input_extension=}")
+                missing_files = geode_functions.missing_files(
+                    geode_object, f"tests/data/test.{input_extension}"
+                )
+                has_missing_files = missing_files.has_missing_files()
+                if has_missing_files:
+                    mandatory_files = missing_files.mandatory_files
+                    print(f"\t\t{mandatory_files=}")
+                    additional_files = missing_files.additional_files
+                    print(f"\t\t{additional_files=}")
+                file_apsolute_path = os.path.abspath(
+                    f"tests/data/test.{input_extension}"
+                )
+
+                data = geode_functions.load(geode_object, file_apsolute_path)
+
+                if "save_viewable" in value:
+                    uu_id = str(uuid.uuid4()).replace("-", "")
+                    viewable_file_path = geode_functions.save_viewable(
+                        geode_object,
+                        data,
+                        os.path.abspath(f"/output"),
+                        uu_id,
+                    )
+                    os.remove(viewable_file_path)
+                geode_objects_and_output_extensions = (
+                    geode_functions.geode_objects_output_extensions(geode_object, data)
+                )
+                assert type(geode_objects_and_output_extensions) is dict
+                for (
+                    output_geode_object,
+                    output_geode_object_value,
+                ) in geode_objects_and_output_extensions.items():
+                    print(f"\t\t{output_geode_object=}")
+                    for (
+                        output_extension,
+                        output_extension_value,
+                    ) in output_geode_object_value.items():
+                        print(f"\t\t\t{output_extension=}")
+                        uu_id = str(uuid.uuid4()).replace("-", "")
+                        filename = f"{uu_id}.{output_extension}"
+                        if geode_functions.is_saveable(
+                            output_geode_object, data, filename
+                        ):
+                            saved_files = geode_functions.save(
+                                output_geode_object,
+                                data,
+                                os.path.abspath(f"/output"),
+                                filename,
+                            )
+                            assert type(saved_files) is list
+                            for saved_file in saved_files:
+                                os.remove(saved_file)
+
+
 def test_is_model():
     for geode_object, value in geode_objects.geode_objects_dict().items():
         is_model = geode_functions.is_model(geode_object)
@@ -78,10 +140,39 @@ def test_geode_object_input_extensions():
 
 def test_geode_object_output_extensions():
     for geode_object, value in geode_objects.geode_objects_dict().items():
-        output_extensions = geode_functions.geode_object_output_extensions(geode_object)
-        assert type(output_extensions) is list
-        for output_extension in output_extensions:
-            assert type(output_extension) is str
+        print(f"\n{geode_object=}")
+        input_extensions = geode_functions.geode_object_input_extensions(geode_object)
+        for input_extension in input_extensions:
+            if geode_object != "RegularGrid3D" and input_extension != "vti":
+                print(f"\t{input_extension=}")
+                missing_files = geode_functions.missing_files(
+                    geode_object, f"tests/data/test.{input_extension}"
+                )
+                has_missing_files = missing_files.has_missing_files()
+                if has_missing_files:
+                    mandatory_files = missing_files.mandatory_files
+                    print(f"\t\t{mandatory_files=}")
+                    additional_files = missing_files.additional_files
+                    print(f"\t\t{additional_files=}")
+                file_apsolute_path = os.path.abspath(
+                    f"tests/data/test.{input_extension}"
+                )
+
+                data = geode_functions.load(geode_object, file_apsolute_path)
+                geode_objets_and_output_extensions = (
+                    geode_functions.geode_objects_output_extensions(geode_object, data)
+                )
+                assert type(geode_objets_and_output_extensions) is dict
+                for (
+                    output_geode_object,
+                    output_geode_object_value,
+                ) in geode_objets_and_output_extensions.items():
+                    for (
+                        output_extension,
+                        output_extension_value,
+                    ) in output_geode_object_value.items():
+                        assert type(output_extension) is str
+                        assert type(output_extension_value["is_saveable"]) is bool
 
 
 def test_list_input_extensions():
@@ -107,8 +198,6 @@ def test_list_geode_objects():
             "key": "inspector",
             "invalid_geode_objects": [
                 "Graph",
-                "RasterImage2D",
-                "RasterImage3D",
                 "RasterImage2D",
                 "RasterImage3D",
                 "VertexSet",
@@ -141,15 +230,25 @@ def test_list_geode_objects():
 
 def test_geode_objects_output_extensions():
     for geode_object, value in geode_objects.geode_objects_dict().items():
-        geode_objects_and_output_extensions_list = (
-            geode_functions.geode_objects_output_extensions(geode_object)
-        )
-        print(f"{geode_objects_and_output_extensions_list=}")
-        assert type(geode_objects_and_output_extensions_list) is list
-        for (
-            geode_object_and_output_extensions
-        ) in geode_objects_and_output_extensions_list:
-            assert type(geode_object_and_output_extensions) is dict
+        input_extensions = geode_functions.geode_object_input_extensions(geode_object)
+        for input_extension in input_extensions:
+            if geode_object != "RegularGrid3D" and input_extension != "vti":
+                data = geode_functions.load(
+                    geode_object, f"tests/data/test.{input_extension}"
+                )
+                geode_objects_and_output_extensions = (
+                    geode_functions.geode_objects_output_extensions(geode_object, data)
+                )
+                assert type(geode_objects_and_output_extensions) is dict
+                for (
+                    output_geode_object,
+                    output_geode_object_value,
+                ) in geode_objects_and_output_extensions.items():
+                    for (
+                        output_extension,
+                        output_extension_value,
+                    ) in output_geode_object_value.items():
+                        assert type(output_extension_value["is_saveable"]) is bool
 
 
 def test_versions():

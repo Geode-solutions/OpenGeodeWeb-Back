@@ -38,6 +38,10 @@ def load(geode_object: str, file_absolute_path: str):
     return geode_object_value(geode_object)["load"](file_absolute_path)
 
 
+def is_saveable(geode_object: str, data, filename: str):
+    return geode_object_value(geode_object)["is_saveable"](data, filename)
+
+
 def save(geode_object: str, data, folder_absolute_path: str, filename: str):
     return geode_object_value(geode_object)["save"](
         data, os.path.join(folder_absolute_path, filename)
@@ -146,21 +150,21 @@ def list_geode_objects(extension: str, key: str = None):
     return geode_objects_list
 
 
-def geode_objects_output_extensions(geode_object: str):
-    return_list = []
-    geode_object_dict = {}
-    geode_object_dict["geode_object"] = geode_object
-    geode_object_dict["output_extensions"] = geode_object_output_extensions(
-        geode_object
-    )
-
-    return_list.append(geode_object_dict)
+def geode_objects_output_extensions(geode_object: str, data):
+    geode_objects_output_extensions_dict = {}
+    output_extensions = geode_object_output_extensions(geode_object)
+    extensions_dict = {}
+    for output_extension in output_extensions:
+        bool_is_saveable = is_saveable(geode_object, data, f"test.{output_extension}")
+        extensions_dict[output_extension] = {"is_saveable": bool_is_saveable}
+    geode_objects_output_extensions_dict[geode_object] = extensions_dict
 
     if "parent" in geode_object_value(geode_object).keys():
-        parent_key = geode_object_value(geode_object)["parent"]
-        return_list += geode_objects_output_extensions(parent_key)
-
-    return return_list
+        parent_geode_object = geode_object_value(geode_object)["parent"]
+        geode_objects_output_extensions_dict.update(
+            geode_objects_output_extensions(parent_geode_object, data)
+        )
+    return geode_objects_output_extensions_dict
 
 
 def versions(list_packages: list):
@@ -173,22 +177,6 @@ def versions(list_packages: list):
             }
         )
     return list_with_versions
-
-
-def upload_file(file: str, file_name: str, upload_folder: str, file_size: int):
-    if not os.path.exists(upload_folder):
-        os.mkdir(upload_folder)
-    file_decoded = base64.b64decode(file.split(",")[-1])
-    secure_file_name = werkzeug.utils.secure_filename(file_name)
-    file_path = os.path.join(upload_folder, secure_file_name)
-    f = open(file_path, "wb")
-    f.write(file_decoded)
-    f.close()
-
-    final_size = os.path.getsize(file_path)
-    uploaded_file = int(file_size) == int(final_size)
-    if not uploaded_file:
-        flask.abort(500, "File not uploaded")
 
 
 def create_lock_file(
@@ -308,3 +296,28 @@ def create_coordinate_system(
     create_crs(
         geode_object, data, name, input_coordiante_system, output_coordiante_system
     )
+
+
+def send_file(upload_folder, saved_files, new_file_name):
+    if len(saved_files) == 1:
+        mimetype = "application/octet-binary"
+    else:
+        mimetype = "application/zip"
+        new_file_name = strict_file_name + ".zip"
+        with zipfile.ZipFile(os.path.join(upload_folder, new_file_name), "w") as zipObj:
+            for saved_file_path in saved_files:
+                zipObj.write(
+                    saved_file_path,
+                    os.path.basename(saved_file_path),
+                )
+
+    response = flask.send_from_directory(
+        directory=upload_folder,
+        path=new_file_name,
+        as_attachment=True,
+        mimetype=mimetype,
+    )
+    response.headers["new-file-name"] = new_file_name
+    response.headers["Access-Control-Expose-Headers"] = "new-file-name"
+
+    return response
