@@ -2,6 +2,31 @@
 
 
 
+## v3.0.0-rc.9 (2023-12-15)
+
+### Feature
+
+* feat(tests): strenghten unit tests 2 ([`9c9ab87`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/9c9ab87bbef54c6524bb26f57d60d8d644c0f8b1))
+
+* feat(tests): strenghten unit tests ([`03b0a00`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/03b0a0055b39a0ceaf3863a7f9a9be1314fa6d06))
+
+* feat(list_geode_objects): test is_loadable
+
+BREAKING CHANGE : arg extension -&gt; file_absolute_path ([`4af7868`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/4af78686c761c1abba86a02df39fc9a75e40e151))
+
+### Unknown
+
+* Merge pull request #49 from Geode-solutions/feat/is_loadable
+
+Feat/is loadable ([`3ee5c1e`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/3ee5c1e3a44d5e9b151564603e89dacb4eff3112))
+
+* update requirements ([`9066879`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/9066879e7b037794bbded4184fdb29765261ebc7))
+
+* Merge branch &#39;next&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into feat/is_loadable ([`2de6600`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/2de66004cc3acf735017f7aa41d985af9871bad3))
+
+* update tests &amp; deps ([`4fc793c`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/4fc793cdc1f791f30266706bfc05493f0ef87978))
+
+
 ## v3.0.0-rc.8 (2023-12-13)
 
 ### Feature
@@ -42,11 +67,17 @@ Feat/is saveable ([`1636622`](https://github.com/Geode-solutions/OpenGeodeWeb-Ba
 
 BREAKING CHANGE: geode_objects_output_extensions returns a dict ([`1948edd`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/1948eddad186904c4aecc63ed0ecbfa6780fa1b7))
 
+### Feature
+
+* feat(geode_functions): is_loadable key &amp; function ([`27ef421`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/27ef421b945da827c7d65705e6149b2052ce4378))
+
 ### Unknown
 
 * Merge pull request #45 from Geode-solutions/feat/is_saveable
 
 feat(functions): add send_file function ([`b1d53a4`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b1d53a4ab280b74fb4e39a318d26ccd309f7dc68))
+
+* update unit tests ([`78fefe1`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/78fefe13186b96c6e15be6f61441d69a62b15e0a))
 
 
 ## v3.0.0-rc.5 (2023-12-06)
