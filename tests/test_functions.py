@@ -174,6 +174,7 @@ def test_geode_object_output_extensions():
                         output_extension_value,
                     ) in output_geode_object_value.items():
                         assert type(output_extension) is str
+                        assert type(output_extension_value) is dict
                         assert type(output_extension_value["is_saveable"]) is bool
 
 
@@ -237,7 +238,7 @@ def test_list_geode_objects():
                             input_extension,
                             input_extension_value,
                         ) in input_extension_dict.items():
-                            assert type(input_extension_value["is_saveable"]) is bool
+                            assert type(input_extension_value) is bool
 
 
 def test_geode_objects_output_extensions():
@@ -259,6 +260,7 @@ def test_geode_objects_output_extensions():
                         output_extension,
                         output_extension_value,
                     ) in output_geode_object_value.items():
+                        assert type(output_extension_value) is dict
                         assert type(output_extension_value["is_saveable"]) is bool
 
 
