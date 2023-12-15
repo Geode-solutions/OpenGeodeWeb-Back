@@ -156,7 +156,6 @@ def list_geode_objects(
                         return_dict[geode_object] = {"is_loadable": file_is_loadable}
             else:
                 return_dict[geode_object] = {"is_loadable": file_is_loadable}
-
     return return_dict
 
 
