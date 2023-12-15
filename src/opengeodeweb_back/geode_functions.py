@@ -34,6 +34,10 @@ def missing_files(geode_object: str, file_absolute_path: str):
     return geode_object_value(geode_object)["missing_files"](file_absolute_path)
 
 
+def is_loadable(geode_object: str, file_absolute_path: str):
+    return geode_object_value(geode_object)["is_loadable"](file_absolute_path)
+
+
 def load(geode_object: str, file_absolute_path: str):
     return geode_object_value(geode_object)["load"](file_absolute_path)
 
@@ -131,23 +135,28 @@ def has_creator(geode_object: str, extension: str):
     return input_factory(geode_object).has_creator(extension)
 
 
-def list_geode_objects(extension: str, key: str = None):
-    geode_objects_list = []
-    for geode_object, value in geode_objects_dict().items():
-        if key != None:
-            if key in value:
-                if type(value[key]) == bool:
-                    if value[key] == True:
-                        if has_creator(geode_object, extension):
-                            geode_objects_list.append(geode_object)
-                elif has_creator(geode_object, extension):
-                    geode_objects_list.append(geode_object)
-        else:
-            if has_creator(geode_object, extension):
-                geode_objects_list.append(geode_object)
+def list_geode_objects(
+    file_absolute_path: str,
+    key: str = None,
+):
+    return_dict = {}
+    file_extension = extension_from_filename(os.path.basename(file_absolute_path))
 
-    geode_objects_list.sort()
-    return geode_objects_list
+    for geode_object, value in geode_objects_dict().items():
+        if has_creator(geode_object, file_extension):
+            file_is_loadable = is_loadable(geode_object, file_absolute_path)
+            if key != None:
+                if key in value:
+                    if type(value[key]) == bool:
+                        if value[key] == True:
+                            return_dict[geode_object] = {
+                                "is_loadable": file_is_loadable
+                            }
+                    else:
+                        return_dict[geode_object] = {"is_loadable": file_is_loadable}
+            else:
+                return_dict[geode_object] = {"is_loadable": file_is_loadable}
+    return return_dict
 
 
 def geode_objects_output_extensions(geode_object: str, data):
