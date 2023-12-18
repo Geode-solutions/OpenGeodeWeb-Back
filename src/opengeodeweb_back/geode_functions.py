@@ -113,18 +113,26 @@ def geode_object_output_extensions(geode_object: str):
     return geode_object_output_list_creators
 
 
-def list_input_extensions(key: str = None):
-    extensions_list = []
+def filter_geode_objects(key: str = None):
+    geode_objects_filtered_list = []
     for geode_object, value in geode_objects_dict().items():
         if key != None and key != "":
             if key in value:
                 if type(value[key]) == bool:
-                    if value[key] == True:
-                        extensions_list += geode_object_input_extensions(geode_object)
+                    geode_objects_filtered_list.append(geode_object)
                 else:
-                    extensions_list += geode_object_input_extensions(geode_object)
+                    geode_objects_filtered_list.append(geode_object)
         else:
-            extensions_list += geode_object_input_extensions(geode_object)
+            geode_objects_filtered_list.append(geode_object)
+    geode_objects_filtered_list.sort()
+    return geode_objects_filtered_list
+
+
+def list_input_extensions(key: str = None):
+    extensions_list = []
+    geode_objects_filtered_list = filter_geode_objects(key)
+    for geode_object in geode_objects_filtered_list:
+        extensions_list += geode_object_input_extensions(geode_object)
 
     extensions_list = list(set(extensions_list))
     extensions_list.sort()
@@ -141,21 +149,12 @@ def list_geode_objects(
 ):
     return_dict = {}
     file_extension = extension_from_filename(os.path.basename(file_absolute_path))
+    geode_objects_filtered_list = filter_geode_objects(key)
 
-    for geode_object, value in geode_objects_dict().items():
+    for geode_object in geode_objects_filtered_list:
         if has_creator(geode_object, file_extension):
             file_is_loadable = is_loadable(geode_object, file_absolute_path)
-            if key != None and key != "":
-                if key in value:
-                    if type(value[key]) == bool:
-                        if value[key] == True:
-                            return_dict[geode_object] = {
-                                "is_loadable": file_is_loadable
-                            }
-                    else:
-                        return_dict[geode_object] = {"is_loadable": file_is_loadable}
-            else:
-                return_dict[geode_object] = {"is_loadable": file_is_loadable}
+            return_dict[geode_object] = {"is_loadable": file_is_loadable}
     return return_dict
 
 

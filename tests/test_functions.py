@@ -177,6 +177,16 @@ def test_geode_object_output_extensions():
                         assert type(output_extension_value["is_saveable"]) is bool
 
 
+def test_filter_geode_objects():
+    filters_list = ["", "crs", "inspector", None]
+
+    for filter in filters_list:
+        geode_objects_filtered_list = geode_functions.filter_geode_objects(filter)
+        assert type(geode_objects_filtered_list) is list
+        for geode_object in geode_objects_filtered_list:
+            assert type(geode_object) is str
+
+
 def test_list_input_extensions():
     keys_array = ["crs", "inspector", None]
     for geode_object, value in geode_objects.geode_objects_dict().items():
