@@ -2,6 +2,27 @@
 
 
 
+## v3.0.0-rc.11 (2023-12-18)
+
+### Feature
+
+* feat(functions): filter_geode_objects ([`d224d8f`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/d224d8f99b79abeee8fa49640c6b52a0395c7eb5))
+
+* feat(list_geode_objects): test is_loadable
+
+BREAKING CHANGE : arg extension -&gt; file_absolute_path ([`241f60d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/241f60d7a3b49661a31f7bbd3f816215881ba9a1))
+
+### Unknown
+
+* Merge pull request #55 from Geode-solutions/feat/is_loadable
+
+Feat/is loadable ([`7cc9d3b`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/7cc9d3b640c88e105d3c4967df1a6aa7f5f24a5b))
+
+* Merge branch &#39;next&#39; into feat/is_loadable ([`1c1574d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/1c1574de89b61efe1bea04ddf2f2ee964a471de4))
+
+* Empty commit test ([`7ecca76`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/7ecca76f8257db3cc7c475926d99893012de2439))
+
+
 ## v3.0.0-rc.10 (2023-12-15)
 
 ### Fix
