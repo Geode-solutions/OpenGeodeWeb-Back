@@ -2,6 +2,13 @@
 
 
 
+## v3.0.0-rc.12 (2023-12-19)
+
+### Fix
+
+* fix(workflows): refs/heads/master ([`a39a402`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/a39a4022e01c5ee8583565e9f901ec939381a86e))
+
+
 ## v3.0.0-rc.11 (2023-12-18)
 
 ### Feature
