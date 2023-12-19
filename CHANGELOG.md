@@ -2,6 +2,17 @@
 
 
 
+## v3.1.0 (2023-12-19)
+
+### Unknown
+
+* Merge pull request #56 from Geode-solutions/next
+
+Next ([`645008b`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/645008ba5c8c74cefb0923ff8cf8c2647e4dfec1))
+
+* Merge branch &#39;master&#39; into next ([`4b640c3`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/4b640c31c59205d744ef3d19ae647277b91f9413))
+
+
 ## v3.0.0-rc.12 (2023-12-19)
 
 ### Fix
@@ -28,6 +39,15 @@ Feat/is loadable ([`7cc9d3b`](https://github.com/Geode-solutions/OpenGeodeWeb-Ba
 * Merge branch &#39;next&#39; into feat/is_loadable ([`1c1574d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/1c1574de89b61efe1bea04ddf2f2ee964a471de4))
 
 * Empty commit test ([`7ecca76`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/7ecca76f8257db3cc7c475926d99893012de2439))
+
+
+## v3.0.0 (2023-12-15)
+
+### Unknown
+
+* Merge pull request #53 from Geode-solutions/next
+
+Next ([`f8b8784`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/f8b8784e0dccae63e66f1da0b306d5e6386069ce))
 
 
 ## v3.0.0-rc.10 (2023-12-15)
