@@ -26,6 +26,9 @@ classifiers = [
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 
+[tool.setuptools.package-data]
+'src' = ['src/*.json']
+
 [tool.semantic_release]
 version_toml = [
     "pyproject.toml:project.version",
