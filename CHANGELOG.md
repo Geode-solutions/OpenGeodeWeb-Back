@@ -2,6 +2,19 @@
 
 
 
+## v3.2.0-rc.10 (2023-12-20)
+
+### Fix
+
+* fix(Package): update pyproject.toml ([`8982a04`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/8982a0450dc3324f229cc039eaa2bd655675675a))
+
+* fix(Package): remove MANIFEST.in &amp; namespace ([`f7981cb`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/f7981cb860cf244c0e0606c3cb60621bc5d34c35))
+
+### Unknown
+
+* Merge branch &#39;next&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into next ([`ccab4e0`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/ccab4e0ce355e723efea351ec742aaa3363cac27))
+
+
 ## v3.2.0-rc.9 (2023-12-20)
 
 ### Fix
