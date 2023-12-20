@@ -10,5 +10,6 @@ geode-explicit
 geode-implicit
 geode-common
 jsonschema
-flask[async]
+Flask[async]
+Flask-Cors
 werkzeug

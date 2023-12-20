@@ -1,0 +1,15 @@
+{
+    "$id": "/tools/upload_file",
+    "route": "/upload_file",
+    "methods": [
+        "OPTIONS",
+        "PUT"
+    ],
+    "type": "object",
+    "properties": {
+        "filename": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false
+}

@@ -1,0 +1,16 @@
+{
+  "$id": "/tools/missing_files",
+  "route": "/missing_files",
+  "methods": ["POST"],
+  "type": "object",
+  "properties": {
+    "input_geode_object": {
+      "type": "string"
+    },
+    "filename": {
+      "type": "string"
+    }
+  },
+  "required": ["input_geode_object", "filename"],
+  "additionalProperties": false
+}
