@@ -83,7 +83,7 @@ def test_load():
                     viewable_file_path = geode_functions.save_viewable(
                         geode_object,
                         data,
-                        os.path.abspath(f"/output"),
+                        os.path.abspath(f"./output"),
                         uu_id,
                     )
                     os.remove(viewable_file_path)
@@ -109,7 +109,7 @@ def test_load():
                             saved_files = geode_functions.save(
                                 output_geode_object,
                                 data,
-                                os.path.abspath(f"/output"),
+                                os.path.abspath(f"./output"),
                                 filename,
                             )
                             assert type(saved_files) is list

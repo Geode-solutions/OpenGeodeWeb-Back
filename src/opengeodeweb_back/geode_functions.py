@@ -1,16 +1,15 @@
 # Standard library imports
-import base64
 import os
 import time
 import threading
 import uuid
+import zipfile
 
 # Third party imports
 import flask
 import opengeode_geosciences as og_gs
 import opengeode as og
 import pkg_resources
-import werkzeug
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
@@ -311,7 +310,7 @@ def send_file(upload_folder, saved_files, new_file_name):
         mimetype = "application/octet-binary"
     else:
         mimetype = "application/zip"
-        new_file_name = strict_file_name + ".zip"
+        new_file_name = os.path.splitext(new_file_name)[0] + ".zip"
         with zipfile.ZipFile(os.path.join(upload_folder, new_file_name), "w") as zipObj:
             for saved_file_path in saved_files:
                 zipObj.write(
