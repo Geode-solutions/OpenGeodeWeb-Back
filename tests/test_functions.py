@@ -51,28 +51,33 @@ def test_missing_files():
             assert type(additional_files) is list
 
 
+def test_is_loadable():
+    for geode_object, value in geode_objects.geode_objects_dict().items():
+        input_extensions = geode_functions.geode_object_input_extensions(geode_object)
+        for input_extension in input_extensions:
+            file_absolute_path = os.path.abspath(f"tests/data/test.{input_extension}")
+            is_loadable = geode_functions.is_loadable(geode_object, file_absolute_path)
+            assert type(is_loadable) is bool
+
+
 def test_load():
     for geode_object, value in geode_objects.geode_objects_dict().items():
         print(f"\n{geode_object=}")
         input_extensions = geode_functions.geode_object_input_extensions(geode_object)
         for input_extension in input_extensions:
-            if geode_object != "RegularGrid3D" and input_extension != "vti":
-                print(f"\t{input_extension=}")
-                missing_files = geode_functions.missing_files(
-                    geode_object, f"tests/data/test.{input_extension}"
-                )
-                has_missing_files = missing_files.has_missing_files()
-                if has_missing_files:
-                    mandatory_files = missing_files.mandatory_files
-                    print(f"\t\t{mandatory_files=}")
-                    additional_files = missing_files.additional_files
-                    print(f"\t\t{additional_files=}")
-                file_apsolute_path = os.path.abspath(
-                    f"tests/data/test.{input_extension}"
-                )
-
+            print(f"\t{input_extension=}")
+            missing_files = geode_functions.missing_files(
+                geode_object, f"tests/data/test.{input_extension}"
+            )
+            has_missing_files = missing_files.has_missing_files()
+            if has_missing_files:
+                mandatory_files = missing_files.mandatory_files
+                print(f"\t\t{mandatory_files=}")
+                additional_files = missing_files.additional_files
+                print(f"\t\t{additional_files=}")
+            file_apsolute_path = os.path.abspath(f"tests/data/test.{input_extension}")
+            if geode_functions.is_loadable(geode_object, file_apsolute_path):
                 data = geode_functions.load(geode_object, file_apsolute_path)
-
                 if "save_viewable" in value:
                     uu_id = str(uuid.uuid4()).replace("-", "")
                     viewable_file_path = geode_functions.save_viewable(
@@ -143,22 +148,19 @@ def test_geode_object_output_extensions():
         print(f"\n{geode_object=}")
         input_extensions = geode_functions.geode_object_input_extensions(geode_object)
         for input_extension in input_extensions:
-            if geode_object != "RegularGrid3D" and input_extension != "vti":
-                print(f"\t{input_extension=}")
-                missing_files = geode_functions.missing_files(
-                    geode_object, f"tests/data/test.{input_extension}"
-                )
-                has_missing_files = missing_files.has_missing_files()
-                if has_missing_files:
-                    mandatory_files = missing_files.mandatory_files
-                    print(f"\t\t{mandatory_files=}")
-                    additional_files = missing_files.additional_files
-                    print(f"\t\t{additional_files=}")
-                file_apsolute_path = os.path.abspath(
-                    f"tests/data/test.{input_extension}"
-                )
-
-                data = geode_functions.load(geode_object, file_apsolute_path)
+            print(f"\t{input_extension=}")
+            missing_files = geode_functions.missing_files(
+                geode_object, f"tests/data/test.{input_extension}"
+            )
+            has_missing_files = missing_files.has_missing_files()
+            if has_missing_files:
+                mandatory_files = missing_files.mandatory_files
+                print(f"\t\t{mandatory_files=}")
+                additional_files = missing_files.additional_files
+                print(f"\t\t{additional_files=}")
+            file_absolute_path = os.path.abspath(f"tests/data/test.{input_extension}")
+            if geode_functions.is_loadable(geode_object, file_absolute_path):
+                data = geode_functions.load(geode_object, file_absolute_path)
                 geode_objets_and_output_extensions = (
                     geode_functions.geode_objects_output_extensions(geode_object, data)
                 )
@@ -173,6 +175,16 @@ def test_geode_object_output_extensions():
                     ) in output_geode_object_value.items():
                         assert type(output_extension) is str
                         assert type(output_extension_value["is_saveable"]) is bool
+
+
+def test_filter_geode_objects():
+    filters_list = ["", "crs", "inspector", None]
+
+    for filter in filters_list:
+        geode_objects_filtered_list = geode_functions.filter_geode_objects(filter)
+        assert type(geode_objects_filtered_list) is list
+        for geode_object in geode_objects_filtered_list:
+            assert type(geode_object) is str
 
 
 def test_list_input_extensions():
@@ -215,27 +227,36 @@ def test_list_geode_objects():
         input_extensions = geode_functions.list_input_extensions(key)
         for geode_object, value in geode_objects.geode_objects_dict().items():
             for input_extension in input_extensions:
-                geode_objects_list = geode_functions.list_geode_objects(
-                    input_extension, key
+                file_absolute_path = os.path.abspath(
+                    f"tests/data/test.{input_extension}"
                 )
-                assert type(geode_objects_list) is list
+                return_dict = geode_functions.list_geode_objects(
+                    file_absolute_path, key
+                )
+                assert type(return_dict) is dict
 
                 if key != None:
-                    assert len(geode_objects_list) > 0
+                    assert len(return_dict.keys()) > 0
                     for invalid_geode_object in invalid_geode_objects:
-                        assert invalid_geode_object not in geode_objects_list
+                        assert invalid_geode_object not in return_dict.keys()
                 else:
-                    assert len(geode_objects_list) >= 1
+                    assert len(return_dict.keys()) >= 1
+                    for input_geode_object, input_extension_dict in return_dict.items():
+                        assert type(input_extension_dict) is dict
+                        for (
+                            input_extension,
+                            input_extension_value,
+                        ) in input_extension_dict.items():
+                            assert type(input_extension_value) is bool
 
 
 def test_geode_objects_output_extensions():
     for geode_object, value in geode_objects.geode_objects_dict().items():
         input_extensions = geode_functions.geode_object_input_extensions(geode_object)
         for input_extension in input_extensions:
-            if geode_object != "RegularGrid3D" and input_extension != "vti":
-                data = geode_functions.load(
-                    geode_object, f"tests/data/test.{input_extension}"
-                )
+            file_absolute_path = f"tests/data/test.{input_extension}"
+            if geode_functions.is_loadable(geode_object, file_absolute_path):
+                data = geode_functions.load(geode_object, file_absolute_path)
                 geode_objects_and_output_extensions = (
                     geode_functions.geode_objects_output_extensions(geode_object, data)
                 )
