@@ -2,6 +2,31 @@
 
 
 
+## v3.2.0-rc.1 (2023-12-20)
+
+### Fix
+
+* fix(tests): update failing tests ([`e70acfe`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/e70acfeda21f2fffc61700f83f34ca7f81829ae0))
+
+### Unknown
+
+* Merge pull request #50 from Geode-solutions/feat/blueprint_routes
+
+Feat/blueprint_routes ([`925db1b`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/925db1b0f6f09011625bdc8a095723008e12ff14))
+
+* update gitignore ([`51c765e`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/51c765e88767aaec216da2f6b67e0016e7fa63bd))
+
+* Merge branch &#39;feat/blueprint_routes&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into feat/blueprint_routes ([`95be868`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/95be868f13b6dae9dee5d0d5d400f4ca7e5c534d))
+
+* is_loadable ([`bfc6ba5`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/bfc6ba58dc9f4f12e8d58898036faf3f465ff181))
+
+* pull from website-back ([`fd33bc9`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/fd33bc9502f48ebfe7aa5e8a4ab8815b87a3ddb8))
+
+* Merge branch &#39;master&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into feat/blueprint_routes ([`57ca416`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/57ca41631eb06eb84c612ae5c47c76467e1af809))
+
+*  ([`945e092`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/945e092d88f82c6aa18d99caeb2661ac8135ee76))
+
+
 ## v3.1.0 (2023-12-19)
 
 ### Unknown
@@ -81,6 +106,17 @@ Revert &#34;Feat/is loadable&#34; ([`d0f03a7`](https://github.com/Geode-solution
 
 BREAKING CHANGE : arg extension -&gt; file_absolute_path ([`4af7868`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/4af78686c761c1abba86a02df39fc9a75e40e151))
 
+* feat(dependencies): ass flask-cors ([`35e5c30`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/35e5c30455d117e99325a21722b3fe82ce054df9))
+
+* feat(routes): add tests ([`28df816`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/28df816d3c3c1e9456dac092ea94da63d45c43f5))
+
+* feat(routes): add new blueprint with refactored routes ([`210ec38`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/210ec3876283d8aa2c8408fa4b7a5dab6a41894d))
+
+* feat(flask): add flask app &amp; config
+edit pytest config ([`15ad3cf`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/15ad3cfe42dcad747acdf470aae9d102a9e2c90d))
+
+* feat(routes): add schemas ([`3afc79f`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/3afc79f6c82960163cbc18c771cfbb3b55e24e0c))
+
 ### Unknown
 
 * Merge pull request #49 from Geode-solutions/feat/is_loadable
@@ -88,6 +124,15 @@ BREAKING CHANGE : arg extension -&gt; file_absolute_path ([`4af7868`](https://gi
 Feat/is loadable ([`3ee5c1e`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/3ee5c1e3a44d5e9b151564603e89dacb4eff3112))
 
 * update requirements ([`9066879`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/9066879e7b037794bbded4184fdb29765261ebc7))
+
+* integrate upload_file changes
+route now takes each file one by one ([`2b2807f`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/2b2807febceda5a8268533a3ed20e2da10f29cd2))
+
+* tests ([`3129fe8`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/3129fe83af3ef605ec4ca5ee974eb9897df6f247))
+
+* move data ([`e8fba7c`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/e8fba7c8e87fd62050029b1af7eb0dc612ab47af))
+
+* update dependencies ([`6bfba1d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/6bfba1dd22ee4f9c98c74b2b8d18653e246d66d8))
 
 * Merge branch &#39;next&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into feat/is_loadable ([`2de6600`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/2de66004cc3acf735017f7aa41d985af9871bad3))
 
