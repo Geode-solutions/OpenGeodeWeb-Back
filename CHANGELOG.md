@@ -2,6 +2,13 @@
 
 
 
+## v3.2.0-rc.6 (2023-12-20)
+
+### Fix
+
+* fix(Package): include schemas folder ([`3197598`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/3197598f4904e6778d634654ab16848ae53c5aa4))
+
+
 ## v3.2.0-rc.5 (2023-12-20)
 
 ### Fix
