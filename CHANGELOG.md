@@ -2,6 +2,19 @@
 
 
 
+## v3.2.0-rc.3 (2023-12-20)
+
+### Fix
+
+* fix(Package): include json ([`d6c5e15`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/d6c5e15f77f0a6bcb279d84d23afa0bf9fc72d75))
+
+### Unknown
+
+* Merge pull request #58 from Geode-solutions/include-json
+
+fix(Package): include json ([`94d1d6d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/94d1d6d86a50d1df751b841176cba9b4fe8ba525))
+
+
 ## v3.2.0-rc.2 (2023-12-20)
 
 ### Fix
