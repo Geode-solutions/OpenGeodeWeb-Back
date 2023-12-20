@@ -171,7 +171,7 @@ def test_geode_object_output_extensions():
                         output_extension,
                         output_extension_value,
                     ) in output_geode_object_value.items():
-                        # assert type(output_extension) is str
+                        assert type(output_extension) is str
                         assert type(output_extension_value["is_saveable"]) is bool
 
 
