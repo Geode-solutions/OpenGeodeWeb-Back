@@ -2,37 +2,36 @@ name: CD
 
 on:
   push:
-    branches: [ master, next ] 
+    branches: [master, next]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        token: ${{ secrets.TOKEN }}
-    - name: Python Semantic Release
-      uses: python-semantic-release/python-semantic-release@master
-      id: semantic-release
-      with:
-        github_token: ${{ secrets.TOKEN }}
-    - name: Build
-      run: |
-        python3 -m pip install --upgrade build
-        python3 -m build
-    - name: Upload
-      if: steps.semantic-release.outputs.released == 'true'
-      run: |
-        python3 -m pip install twine
-        python3 -m twine upload --repository pypi dist/* -u __token__ -p ${{ secrets.PYPI_TOKEN }}
-    - name: Merge master -> next
-      if: github.ref == 'ref/head/master'
-      uses: devmasx/merge-branch@master
-      with:
-        type: now
-        from_branch: master
-        target_branch: next
-        github_token: ${{ github.token }}
-
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.TOKEN }}
+      - name: Python Semantic Release
+        uses: python-semantic-release/python-semantic-release@master
+        id: semantic-release
+        with:
+          github_token: ${{ secrets.TOKEN }}
+      - name: Build
+        run: |
+          python3 -m pip install --upgrade build
+          python3 -m build
+      - name: Upload
+        if: steps.semantic-release.outputs.released == 'true'
+        run: |
+          python3 -m pip install twine
+          python3 -m twine upload --repository pypi dist/* -u __token__ -p ${{ secrets.PYPI_TOKEN }}
+      - name: Merge master -> next
+        if: github.ref == 'refs/heads/master'
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: master
+          target_branch: next
+          github_token: ${{ github.token }}

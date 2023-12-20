@@ -2,6 +2,98 @@
 
 
 
+## v3.1.0 (2023-12-19)
+
+### Unknown
+
+* Merge pull request #56 from Geode-solutions/next
+
+Next ([`645008b`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/645008ba5c8c74cefb0923ff8cf8c2647e4dfec1))
+
+* Merge branch &#39;master&#39; into next ([`4b640c3`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/4b640c31c59205d744ef3d19ae647277b91f9413))
+
+
+## v3.0.0-rc.12 (2023-12-19)
+
+### Fix
+
+* fix(workflows): refs/heads/master ([`a39a402`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/a39a4022e01c5ee8583565e9f901ec939381a86e))
+
+
+## v3.0.0-rc.11 (2023-12-18)
+
+### Feature
+
+* feat(functions): filter_geode_objects ([`d224d8f`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/d224d8f99b79abeee8fa49640c6b52a0395c7eb5))
+
+* feat(list_geode_objects): test is_loadable
+
+BREAKING CHANGE : arg extension -&gt; file_absolute_path ([`241f60d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/241f60d7a3b49661a31f7bbd3f816215881ba9a1))
+
+### Unknown
+
+* Merge pull request #55 from Geode-solutions/feat/is_loadable
+
+Feat/is loadable ([`7cc9d3b`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/7cc9d3b640c88e105d3c4967df1a6aa7f5f24a5b))
+
+* Merge branch &#39;next&#39; into feat/is_loadable ([`1c1574d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/1c1574de89b61efe1bea04ddf2f2ee964a471de4))
+
+* Empty commit test ([`7ecca76`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/7ecca76f8257db3cc7c475926d99893012de2439))
+
+
+## v3.0.0 (2023-12-15)
+
+### Unknown
+
+* Merge pull request #53 from Geode-solutions/next
+
+Next ([`f8b8784`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/f8b8784e0dccae63e66f1da0b306d5e6386069ce))
+
+
+## v3.0.0-rc.10 (2023-12-15)
+
+### Fix
+
+* fix(dependencies): update ecosystem ([`cbed29d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/cbed29dbf0e195f23ef89f7798a155d2c33a56fe))
+
+### Unknown
+
+* Merge pull request #52 from Geode-solutions/chore/update_ecosystem
+
+fix(dependencies): update ecosystem ([`eabfe89`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/eabfe89d98db21f0087f1ca4569ff695e05c9f99))
+
+* Merge pull request #51 from Geode-solutions/revert-49-feat/is_loadable
+
+Revert &#34;Feat/is loadable&#34; ([`d0f03a7`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/d0f03a788c892ea80431d3aff3dadf7f3755240f))
+
+* Revert &#34;Feat/is loadable&#34; ([`2aab775`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/2aab7755049c33843cc120618f1a94e32a3429f3))
+
+
+## v3.0.0-rc.9 (2023-12-15)
+
+### Feature
+
+* feat(tests): strenghten unit tests 2 ([`9c9ab87`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/9c9ab87bbef54c6524bb26f57d60d8d644c0f8b1))
+
+* feat(tests): strenghten unit tests ([`03b0a00`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/03b0a0055b39a0ceaf3863a7f9a9be1314fa6d06))
+
+* feat(list_geode_objects): test is_loadable
+
+BREAKING CHANGE : arg extension -&gt; file_absolute_path ([`4af7868`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/4af78686c761c1abba86a02df39fc9a75e40e151))
+
+### Unknown
+
+* Merge pull request #49 from Geode-solutions/feat/is_loadable
+
+Feat/is loadable ([`3ee5c1e`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/3ee5c1e3a44d5e9b151564603e89dacb4eff3112))
+
+* update requirements ([`9066879`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/9066879e7b037794bbded4184fdb29765261ebc7))
+
+* Merge branch &#39;next&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into feat/is_loadable ([`2de6600`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/2de66004cc3acf735017f7aa41d985af9871bad3))
+
+* update tests &amp; deps ([`4fc793c`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/4fc793cdc1f791f30266706bfc05493f0ef87978))
+
+
 ## v3.0.0-rc.8 (2023-12-13)
 
 ### Feature
@@ -42,11 +134,17 @@ Feat/is saveable ([`1636622`](https://github.com/Geode-solutions/OpenGeodeWeb-Ba
 
 BREAKING CHANGE: geode_objects_output_extensions returns a dict ([`1948edd`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/1948eddad186904c4aecc63ed0ecbfa6780fa1b7))
 
+### Feature
+
+* feat(geode_functions): is_loadable key &amp; function ([`27ef421`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/27ef421b945da827c7d65705e6149b2052ce4378))
+
 ### Unknown
 
 * Merge pull request #45 from Geode-solutions/feat/is_saveable
 
 feat(functions): add send_file function ([`b1d53a4`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b1d53a4ab280b74fb4e39a318d26ccd309f7dc68))
+
+* update unit tests ([`78fefe1`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/78fefe13186b96c6e15be6f61441d69a62b15e0a))
 
 
 ## v3.0.0-rc.5 (2023-12-06)
