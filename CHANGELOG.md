@@ -2,6 +2,13 @@
 
 
 
+## v3.2.0-rc.5 (2023-12-20)
+
+### Fix
+
+* fix(Package): MANIFEST.in ([`4dfafaf`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/4dfafafbdca4e01a74384a5ca94fc07064a672e2))
+
+
 ## v3.2.0-rc.4 (2023-12-20)
 
 ### Fix
