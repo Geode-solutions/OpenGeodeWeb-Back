@@ -27,7 +27,7 @@ classifiers = [
 dependencies = {file = ["requirements.txt"]}
 
 [tool.setuptools]
-packages = ["schemas"]
+packages = ["src\opengeodeweb_back\routes\schemas"]
 include-package-data = true
 
 [tool.setuptools.package-data]
