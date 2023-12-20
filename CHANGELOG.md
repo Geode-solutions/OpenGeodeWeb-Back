@@ -2,6 +2,13 @@
 
 
 
+## v3.2.0-rc.8 (2023-12-20)
+
+### Fix
+
+* fix(Package): revert pyproject.toml ([`982b1a7`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/982b1a78ae352037e3002c31883b38178f297c75))
+
+
 ## v3.2.0-rc.7 (2023-12-20)
 
 ### Fix
