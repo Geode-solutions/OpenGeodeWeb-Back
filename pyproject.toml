@@ -31,7 +31,7 @@ namespaces = false
 where = ["src"]
 
 [tool.setuptools.package-data]
-"opengeodeweb_back" = ["*.json"]
+"opengeodeweb_back.routes.schemas" = ["*.json"]
 
 [tool.semantic_release]
 version_toml = [
