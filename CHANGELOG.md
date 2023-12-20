@@ -2,6 +2,17 @@
 
 
 
+## v3.2.0-rc.9 (2023-12-20)
+
+### Fix
+
+* fix(Package): test MANIFEST.in ([`0d36b17`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/0d36b175db851ff5a9b8bee96ca1329d3e0c38fc))
+
+### Unknown
+
+* Merge branch &#39;next&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into next ([`2ee5caf`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/2ee5cafb5288faebfb7698f90c7d86481d7bc728))
+
+
 ## v3.2.0-rc.8 (2023-12-20)
 
 ### Fix
