@@ -26,8 +26,12 @@ classifiers = [
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 
+[tool.setuptools]
+packages = ["schemas"]
+include-package-data = true
+
 [tool.setuptools.package-data]
-'src' = ['src/*.json']
+'schemas' = ['src/*.json']
 
 [tool.semantic_release]
 version_toml = [
