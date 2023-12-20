@@ -26,7 +26,7 @@ def test_allowed_objects(client):
     response = client.post(route, json=get_full_data())
     assert response.status_code == 200
     allowed_objects = response.json["allowed_objects"]
-    assert type(allowed_objects) is list
+    assert type(allowed_objects) is dict
     for allowed_object in allowed_objects:
         assert type(allowed_object) is str
 
