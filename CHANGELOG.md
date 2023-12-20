@@ -2,6 +2,19 @@
 
 
 
+## v3.2.0-rc.2 (2023-12-20)
+
+### Fix
+
+* fix(json files): explicitly export json files ([`678269e`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/678269e9a5fcf9d8737bc00438f38f07d3811807))
+
+### Unknown
+
+* Merge pull request #57 from Geode-solutions/fix/json_imports
+
+fix(json files): explicitly export json files ([`9b754cd`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/9b754cd76ce74758f037d9f52ad94eeb44094810))
+
+
 ## v3.2.0-rc.1 (2023-12-20)
 
 ### Fix
