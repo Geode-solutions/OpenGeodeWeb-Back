@@ -2,6 +2,21 @@
 
 
 
+## v3.2.0-rc.4 (2023-12-20)
+
+### Fix
+
+* fix(Package): upload json ([`9b78361`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/9b78361f66fc5a43e01daa6424af0bf8d42ddebc))
+
+### Unknown
+
+* test ([`98e3457`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/98e3457c3f1f2c33499169bb777220562ebd8fb6))
+
+* fix path ([`3d1076b`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/3d1076b0334f71ceda7fe03ef3f6171da585bdf5))
+
+* test folder path ([`f357f18`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/f357f188375048f6e4a18a9df02bbb0bd396eafe))
+
+
 ## v3.2.0-rc.3 (2023-12-20)
 
 ### Fix
