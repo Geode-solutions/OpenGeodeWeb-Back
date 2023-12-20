@@ -2,6 +2,14 @@
 
 
 
+## v3.2.0-rc.7 (2023-12-20)
+
+### Fix
+
+* fix(Package): test namespace
+remove MANIFEST.in ([`798ec45`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/798ec450719f3cf3defa151a00beaffd177adf7d))
+
+
 ## v3.2.0-rc.6 (2023-12-20)
 
 ### Fix
