@@ -2,6 +2,15 @@
 
 
 
+## v3.2.0 (2023-12-20)
+
+### Unknown
+
+* Merge pull request #59 from Geode-solutions/next
+
+Next ([`a14034e`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/a14034e41ffb8aab171332c9cd957bff45e03e44))
+
+
 ## v3.2.0-rc.10 (2023-12-20)
 
 ### Fix
