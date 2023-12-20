@@ -1,16 +1,15 @@
 # Standard library imports
-import base64
 import os
 import time
 import threading
 import uuid
+import zipfile
 
 # Third party imports
 import flask
 import opengeode_geosciences as og_gs
 import opengeode as og
 import pkg_resources
-import werkzeug
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
@@ -32,6 +31,10 @@ def output_factory(geode_object: str):
 
 def missing_files(geode_object: str, file_absolute_path: str):
     return geode_object_value(geode_object)["missing_files"](file_absolute_path)
+
+
+def is_loadable(geode_object: str, file_absolute_path: str):
+    return geode_object_value(geode_object)["is_loadable"](file_absolute_path)
 
 
 def load(geode_object: str, file_absolute_path: str):
@@ -109,18 +112,26 @@ def geode_object_output_extensions(geode_object: str):
     return geode_object_output_list_creators
 
 
-def list_input_extensions(key: str = None):
-    extensions_list = []
+def filter_geode_objects(key: str = None):
+    geode_objects_filtered_list = []
     for geode_object, value in geode_objects_dict().items():
-        if key != None:
+        if key != None and key != "":
             if key in value:
                 if type(value[key]) == bool:
-                    if value[key] == True:
-                        extensions_list += geode_object_input_extensions(geode_object)
+                    geode_objects_filtered_list.append(geode_object)
                 else:
-                    extensions_list += geode_object_input_extensions(geode_object)
+                    geode_objects_filtered_list.append(geode_object)
         else:
-            extensions_list += geode_object_input_extensions(geode_object)
+            geode_objects_filtered_list.append(geode_object)
+    geode_objects_filtered_list.sort()
+    return geode_objects_filtered_list
+
+
+def list_input_extensions(key: str = None):
+    extensions_list = []
+    geode_objects_filtered_list = filter_geode_objects(key)
+    for geode_object in geode_objects_filtered_list:
+        extensions_list += geode_object_input_extensions(geode_object)
 
     extensions_list = list(set(extensions_list))
     extensions_list.sort()
@@ -131,23 +142,19 @@ def has_creator(geode_object: str, extension: str):
     return input_factory(geode_object).has_creator(extension)
 
 
-def list_geode_objects(extension: str, key: str = None):
-    geode_objects_list = []
-    for geode_object, value in geode_objects_dict().items():
-        if key != None:
-            if key in value:
-                if type(value[key]) == bool:
-                    if value[key] == True:
-                        if has_creator(geode_object, extension):
-                            geode_objects_list.append(geode_object)
-                elif has_creator(geode_object, extension):
-                    geode_objects_list.append(geode_object)
-        else:
-            if has_creator(geode_object, extension):
-                geode_objects_list.append(geode_object)
+def list_geode_objects(
+    file_absolute_path: str,
+    key: str = None,
+):
+    return_dict = {}
+    file_extension = extension_from_filename(os.path.basename(file_absolute_path))
+    geode_objects_filtered_list = filter_geode_objects(key)
 
-    geode_objects_list.sort()
-    return geode_objects_list
+    for geode_object in geode_objects_filtered_list:
+        if has_creator(geode_object, file_extension):
+            file_is_loadable = is_loadable(geode_object, file_absolute_path)
+            return_dict[geode_object] = {"is_loadable": file_is_loadable}
+    return return_dict
 
 
 def geode_objects_output_extensions(geode_object: str, data):
@@ -303,7 +310,7 @@ def send_file(upload_folder, saved_files, new_file_name):
         mimetype = "application/octet-binary"
     else:
         mimetype = "application/zip"
-        new_file_name = strict_file_name + ".zip"
+        new_file_name = os.path.splitext(new_file_name)[0] + ".zip"
         with zipfile.ZipFile(os.path.join(upload_folder, new_file_name), "w") as zipObj:
             for saved_file_path in saved_files:
                 zipObj.write(
