@@ -27,7 +27,6 @@ classifiers = [
 dependencies = {file = ["requirements.txt"]}
 
 [tool.setuptools.packages.find]
-namespaces = false
 where = ["src"]
 
 [tool.setuptools.package-data]
