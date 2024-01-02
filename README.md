@@ -1,4 +1,3 @@
-
 <h1 align="center">OpenGeodeWeb-Back<sup><i>by Geode-solutions</i></sup></h1>
 <h3 align="center">OpenSource Python framework based on OpenGeode</h3>
 
@@ -22,12 +21,12 @@
 
 OpenGeodeWeb-Back is an open source framework that proposes handy python functions and wrappers for the OpenGeode ecosystem
 
-
 ## Changelog
+
 Detailed changes for each release are documented in the [release notes](https://github.com/Geode-solutions/OpenGeodeWeb-Back/releases).
 
-
 ## License
+
 [MIT](https://opensource.org/licenses/MIT)
 
-Copyright (c) 2019 - 2023, Geode-solutions
+Copyright (c) 2019 - 2024, Geode-solutions
