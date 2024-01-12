@@ -162,6 +162,8 @@ def geode_objects_dict():
                 "convert": og_gs.convert_point_set_coordinate_reference_system2D,
                 "create": og.create_point_set_coordinate_system2D,
             },
+            "is_model": False,
+            "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_point_set2D,
             "inspector": og_inspector.PointSetInspector2D,
