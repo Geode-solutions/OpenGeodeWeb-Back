@@ -132,7 +132,7 @@ def geode_objects_dict():
             "save": og.save_light_regular_grid2D,
             "is_model": False,
             "is_3D": False,
-            "is_viewable": False,
+            "is_viewable": True,
             "save_viewable": g_v.save_viewable_light_regular_grid2D,
         },
         "LightRegularGrid3D": {
@@ -145,7 +145,7 @@ def geode_objects_dict():
             "save": og.save_light_regular_grid3D,
             "is_model": False,
             "is_3D": True,
-            "is_viewable": False,
+            "is_viewable": True,
             "save_viewable": g_v.save_viewable_light_regular_grid3D,
         },
         "PointSet2D": {
