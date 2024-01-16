@@ -38,7 +38,7 @@ jobs:
             rm -f -- schemas.json
             npm run json
             jq -c '.version = "steps.semantic-release.outputs.version"' package.json > tmp.$$.json && mv tmp.$$.json package.json
-        - run: npm publish
+            npm publish
           env:
             NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Merge master -> next
