@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const glob = require("glob");
 
-const directoryPath = path.join(__dirname, "src/opengeodeweb_back");
+const directoryPath = path.join(__dirname, "src/opengeodeweb_back/routes");
 
 function return_json_schema(directoryPath, folder_path) {
   const folders = fs
@@ -47,7 +47,7 @@ function return_json_schema(directoryPath, folder_path) {
   return folders_schemas;
 }
 
-const jsonDataStructure = return_json_schema(directoryPath, "ogw_back");
+const jsonDataStructure = return_json_schema(directoryPath, "opengeodeweb_back");
 console.log("jsonDataStructure", jsonDataStructure);
 const outputFile = path.join("./", "schemas.json");
 fs.writeFileSync(outputFile, JSON.stringify(jsonDataStructure, null, 2));
