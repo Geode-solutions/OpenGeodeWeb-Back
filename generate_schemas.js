@@ -49,7 +49,7 @@ function return_json_schema(directoryPath, folder_path) {
 
 const jsonDataStructure = return_json_schema(directoryPath, "ogw_back");
 console.log("jsonDataStructure", jsonDataStructure);
-const outputFile = path.join(directoryPath, "schemas.json");
+const outputFile = path.join("./", "schemas.json");
 fs.writeFileSync(outputFile, JSON.stringify(jsonDataStructure, null, 2));
 
 console.log("Fichier JSON créé avec succès :", outputFile);

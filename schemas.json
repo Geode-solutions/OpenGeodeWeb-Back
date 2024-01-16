@@ -1,0 +1,122 @@
+{
+  "routes": {
+    "upload_file": {
+      "$id": "ogw_back/routes/upload_file",
+      "route": "/upload_file",
+      "methods": [
+        "OPTIONS",
+        "PUT"
+      ],
+      "type": "object",
+      "properties": {
+        "filename": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "missing_files": {
+      "$id": "ogw_back/routes/missing_files",
+      "route": "/missing_files",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "input_geode_object": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "input_geode_object",
+        "filename"
+      ],
+      "additionalProperties": false
+    },
+    "geographic_coordinate_systems": {
+      "$id": "ogw_back/routes/geographic_coordinate_systems",
+      "route": "/geographic_coordinate_systems",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "input_geode_object": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "input_geode_object"
+      ],
+      "additionalProperties": false
+    },
+    "geode_objects_and_output_extensions": {
+      "$id": "ogw_back/routes/geode_objects_and_output_extensions",
+      "route": "/geode_objects_and_output_extensions",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "input_geode_object": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "input_geode_object",
+        "filename"
+      ],
+      "additionalProperties": false
+    },
+    "allowed_objects": {
+      "$id": "ogw_back/routes/allowed_objects",
+      "route": "/allowed_objects",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "filename": {
+          "type": "string"
+        },
+        "key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "filename",
+        "key"
+      ],
+      "additionalProperties": false
+    },
+    "allowed_files": {
+      "$id": "ogw_back/routes/allowed_files",
+      "route": "/allowed_files",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "key"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
