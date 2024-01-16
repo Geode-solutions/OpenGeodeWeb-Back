@@ -27,12 +27,13 @@ jobs:
         run: |
           python3 -m pip install twine
           python3 -m twine upload --repository pypi dist/* -u __token__ -p ${{ secrets.PYPI_TOKEN }}
-      - name: Upload NPM
-        if: steps.semantic-release.outputs.released == 'true'
+      - name: Setup NODE
         uses: actions/setup-node@v3
         with:
           node-version: "20.x"
           registry-url: "https://registry.npmjs.org"
+      - name: Upload NPM
+        if: steps.semantic-release.outputs.released == 'true'
         run: |
           npm ci
           rm -f -- schemas.json
