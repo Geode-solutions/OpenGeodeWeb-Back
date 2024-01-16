@@ -7,7 +7,7 @@
         "glob": "^10.3.10"
     },
     "exports": "./schemas.json",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "",
     "main": "generate_schemas.js",
     "repository": {
@@ -27,5 +27,7 @@
     "publishConfig": {
         "access": "public"
     },
-    "files": []
+    "files": [
+        "schemas.json"
+    ]
 }
