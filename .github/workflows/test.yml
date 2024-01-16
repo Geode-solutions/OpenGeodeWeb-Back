@@ -15,6 +15,7 @@ jobs:
       - run: |
           rm -f -- schemas.json
           npm run json
+          jq -c '.version = "0.0.4"' package.json > tmp.$$.json && mv tmp.$$.json package.json
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
