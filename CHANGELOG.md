@@ -2,6 +2,47 @@
 
 
 
+## v3.3.0-rc.1 (2024-01-17)
+
+### Chore
+
+* chore(licence): happy new year 2024 ([`da50872`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/da50872cdacaf45eb3560d8c60af23306402e01b))
+
+### Feature
+
+* feat(geode_objects): Add LightRegularGrid 2 &amp; 3D ([`be319e4`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/be319e4bbcf09d3fe9fe271e8cced2c81d23557f))
+
+### Unknown
+
+* Merge pull request #62 from Geode-solutions/feat/LightRegularGrid
+
+Feat/LightRegularGrid ([`8d129aa`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/8d129aa386fbf6e6a7162637b9b975c6ab22c4ae))
+
+* upgrade dependencies, tests passing ([`cc9a25d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/cc9a25ddd158dbcf9f3e61af66aced5064a9eee2))
+
+* &#34;is_viewable&#34;: True ([`b6a20e5`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b6a20e54147ed8307d95ab50ee21974d9805e1d2))
+
+* fix PointSet2D keys ([`2c7fee0`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/2c7fee0cb0e2210ef00d678aacf95e94661fbf4f))
+
+* add back PointSet2D ([`ad304a9`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/ad304a91119f3ca963944cd2d425e25f3b52a99f))
+
+* add test data ([`e647f36`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/e647f36546150dd8502174420cb4423cb44ac296))
+
+* update dependencies ([`8f2f92f`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/8f2f92f1c64a8c32438cca48d25066bf9870f63b))
+
+*  ([`b8358b2`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b8358b2516bf2ab5626ac3ba5ac796948c17b7f2))
+
+* Merge pull request #61 from Geode-solutions/next
+
+Next ([`e6deea0`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/e6deea04cb41dc3cc444bfbd78b3cbbb45c50091))
+
+* Merge pull request #60 from Geode-solutions/chore/update_licence
+
+chore(licence): happy new year 2024 ([`3969dda`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/3969dda9f1abc737c6f56bcc93999f18aa93ec12))
+
+*  ([`3368611`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/3368611b58a85683a769cae58b0cc0d51d178cee))
+
+
 ## v3.2.0 (2023-12-20)
 
 ### Unknown
