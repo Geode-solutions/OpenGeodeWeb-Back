@@ -2,6 +2,17 @@
 
 
 
+## v3.3.0-rc.8 (2024-01-18)
+
+### Fix
+
+* fix(GH action): log directoryPath ([`10f1eae`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/10f1eae68802d89dd6f6c7441f52a2b904778fc7))
+
+### Unknown
+
+* Merge branch &#39;next&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into next ([`1d25412`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/1d25412394b71c5ddb513871aded5ad8b3246b97))
+
+
 ## v3.3.0-rc.7 (2024-01-18)
 
 ### Fix
