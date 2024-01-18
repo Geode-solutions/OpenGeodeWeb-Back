@@ -1,31 +1,31 @@
 {
-    "name": "@geode/opengeodeweb-back",
-    "scripts": {
-        "json": "node generate_schemas.js"
-    },
-    "dependencies": {
-        "glob": "^10.3.10"
-    },
-    "exports": "./schemas.json",
-    "version": "0.0.0-semantically-released",
-    "description": "",
-    "main": "generate_schemas.js",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/Geode-solutions/OpenGeodeWeb-Back.git"
-    },
-    "author": {
-        "name": "Geode-solutions",
-        "email": "contact@geode-solutions.com",
-        "url": "https://geode-solutions.com/"
-    },
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/Geode-solutions/OpenGeodeWeb-Back/issues"
-    },
-    "homepage": "https://github.com/Geode-solutions/OpenGeodeWeb-Back",
-    "publishConfig": {
-        "access": "public"
-    },
-    "files": []
+  "name": "@geode/opengeodeweb-back",
+  "scripts": {
+    "json": "node generate_schemas.js"
+  },
+  "dependencies": {
+    "glob": "^10.3.10"
+  },
+  "exports": "./schemas.json",
+  "version": "0.0.0-semantically-released",
+  "description": "",
+  "main": "generate_schemas.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Geode-solutions/OpenGeodeWeb-Back.git"
+  },
+  "author": {
+    "name": "Geode-solutions",
+    "email": "contact@geode-solutions.com",
+    "url": "https://geode-solutions.com/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Geode-solutions/OpenGeodeWeb-Back/issues"
+  },
+  "homepage": "https://github.com/Geode-solutions/OpenGeodeWeb-Back",
+  "publishConfig": {
+    "access": "public"
+  },
+  "directory": "./src/opengeodeweb_back"
 }
