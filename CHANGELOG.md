@@ -2,6 +2,17 @@
 
 
 
+## v3.3.0-rc.3 (2024-01-18)
+
+### Feature
+
+* feat(test): test commit ([`778ced1`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/778ced16359c2584fae7f3873683d926428e50dc))
+
+### Unknown
+
+* Merge branch &#39;next&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into next ([`c37620c`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c37620cf81bdc01d47ea53433777902dc1d1289c))
+
+
 ## v3.3.0-rc.2 (2024-01-18)
 
 ### Feature
