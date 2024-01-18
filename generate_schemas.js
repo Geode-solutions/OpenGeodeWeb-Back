@@ -21,6 +21,7 @@ const [directoryPath, project_name] = findDirectoryPath("src/");
 const outputFile = path.join(process.cwd(), "schemas.json");
 
 function return_json_schema(directoryPath, folder_path, project_name) {
+  console.log("directoryPath", directoryPath);
   const folders = fs
     .readdirSync(path.normalize(directoryPath), { withFileTypes: true })
     .filter((folder) => folder.isDirectory())
