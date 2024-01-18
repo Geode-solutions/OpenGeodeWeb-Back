@@ -2,6 +2,13 @@
 
 
 
+## v3.3.0-rc.9 (2024-01-18)
+
+### Fix
+
+* fix(Actions): update working directory ([`3d59b58`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/3d59b586b9730a5f144b19885aeeca656dfe0488))
+
+
 ## v3.3.0-rc.8 (2024-01-18)
 
 ### Fix
