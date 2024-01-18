@@ -2,6 +2,13 @@
 
 
 
+## v3.3.0-rc.7 (2024-01-18)
+
+### Fix
+
+* fix(GH action): explicit directory ([`43d510b`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/43d510b9639d5db438e2f4a1535fb735ef84dae0))
+
+
 ## v3.3.0-rc.6 (2024-01-18)
 
 ### Feature
