@@ -1,10 +1,26 @@
 const fs = require("fs");
 const path = require("path");
 const glob = require("glob");
+const process = require("process");
 
-const directoryPath = path.join(__dirname, "src/opengeodeweb_back/routes");
+const findDirectoryPath = (targetDirectoryName) => {
+  const pathToCheck = path.join(process.cwd(), targetDirectoryName);
+  const folders = fs
+    .readdirSync(pathToCheck, { withFileTypes: true })
+    .filter((folder) => folder.isDirectory())
+    .map((folder) => ({
+      name: folder.name,
+      path: path.join(pathToCheck, folder.name),
+    }));
+  const routesDirectory = path.join(folders[0].path, "routes");
+  return [routesDirectory, folders[0].name];
+};
 
-function return_json_schema(directoryPath, folder_path) {
+const [directoryPath, project_name] = findDirectoryPath("src/");
+
+const outputFile = path.join(process.cwd(), "schemas.json");
+
+function return_json_schema(directoryPath, folder_path, project_name) {
   const folders = fs
     .readdirSync(directoryPath, { withFileTypes: true })
     .filter((folder) => folder.isDirectory())
@@ -21,9 +37,11 @@ function return_json_schema(directoryPath, folder_path) {
         try {
           const fileContent = fs.readFileSync(filePath, "utf8");
           var jsonData = JSON.parse(fileContent);
-          var filename = filePath.replace(/^.*[\\/]/, "").replace(".json", "");
+          var filename = filePath
+            .replace(/^.*[\\/]/, "")
+            .replace(/\.[^/.]+$/, "");
           var route = jsonData["route"];
-          jsonData["$id"] = folder_path + route;
+          jsonData["$id"] = project_name + folder_path + route;
           schemas[filename] = jsonData;
         } catch (error) {
           console.error(
@@ -34,22 +52,29 @@ function return_json_schema(directoryPath, folder_path) {
       });
       folders_schemas = Object.keys(schemas).reduce((acc, key) => {
         const currentSchema = schemas[key];
-        const modifiedSchema = { $id: currentSchema["$id"], ...currentSchema };
+        const modifiedSchema = {
+          $id: path.join(folder_path, currentSchema["$id"]),
+          ...currentSchema,
+        };
         acc[key] = modifiedSchema;
         return acc;
       }, folders_schemas);
     } else {
       var new_folder_path = folder_path + "/" + folder.name;
-      var test = return_json_schema(folder.path, new_folder_path);
+      var test = return_json_schema(folder.path, new_folder_path, project_name);
       folders_schemas[folder.name] = test;
     }
   });
   return folders_schemas;
 }
 
-const jsonDataStructure = return_json_schema(directoryPath, "opengeodeweb_back");
-console.log("jsonDataStructure", jsonDataStructure);
-const outputFile = path.join("./", "schemas.json");
-fs.writeFileSync(outputFile, JSON.stringify(jsonDataStructure, null, 2));
+if (fs.existsSync(outputFile)) {
+  fs.unlinkSync(outputFile);
+}
+
+const finalJson = {};
+finalJson[project_name] = return_json_schema(directoryPath, "", project_name);
+
+fs.writeFileSync(outputFile, JSON.stringify(finalJson, null, 2));
 
 console.log("Fichier JSON créé avec succès :", outputFile);

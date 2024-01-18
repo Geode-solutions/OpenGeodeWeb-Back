@@ -31,7 +31,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "20.x"
-          registry-url: "https://registry.npmjs.org"
       - name: Upload NPM
         if: steps.semantic-release.outputs.released == 'true'
         run: |
