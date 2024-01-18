@@ -2,6 +2,23 @@
 
 
 
+## v3.3.0-rc.2 (2024-01-18)
+
+### Feature
+
+* feat(test): test commit ([`5c258e7`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/5c258e7aafee1842c77ef93035085d56834f6300))
+
+### Unknown
+
+* Merge pull request #63 from Geode-solutions/feat/schemas
+
+Feat/schemas ([`bf4274f`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/bf4274fdca8480ee6b85ed4186a4cb29170e28cd))
+
+* Merge branch &#39;next&#39; into feat/schemas ([`51189d6`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/51189d65fa6c25a8aa5600ed4b9267be77ff86fe))
+
+* update pr ([`62f0a15`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/62f0a15e880719482056675c9c30f0db17148ab3))
+
+
 ## v3.3.0-rc.1 (2024-01-17)
 
 ### Chore
@@ -9,6 +26,9 @@
 * chore(licence): happy new year 2024 ([`da50872`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/da50872cdacaf45eb3560d8c60af23306402e01b))
 
 ### Feature
+
+* feat(CD): dynamic version from semantic release
+change starting directory ([`8772780`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/877278047943d442ab7cd45c60ef81bb7b9d4f5c))
 
 * feat(geode_objects): Add LightRegularGrid 2 &amp; 3D ([`be319e4`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/be319e4bbcf09d3fe9fe271e8cced2c81d23557f))
 
@@ -19,6 +39,34 @@
 Feat/LightRegularGrid ([`8d129aa`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/8d129aa386fbf6e6a7162637b9b975c6ab22c4ae))
 
 * upgrade dependencies, tests passing ([`cc9a25d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/cc9a25ddd158dbcf9f3e61af66aced5064a9eee2))
+
+* fix ([`fe53dc6`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/fe53dc6627b5008d054384718866122c3704d9a3))
+
+* indentation ([`418ab72`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/418ab72f7f6b79046ed308336d691650c4a30dc0))
+
+* test run ([`f6bd84a`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/f6bd84ae44d84eeaf9c278b38753d3694771f0dc))
+
+* test ([`9967c01`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/9967c0192cabdd563deb84f2936f63e9d5047abb))
+
+* test ([`cc56c36`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/cc56c369cb30b25fbd30ea5f64e9b834b62885da))
+
+* fix CD ([`69713e1`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/69713e1248abba4d253f225edf8956990a8b030a))
+
+* test dynamic version ([`b43474c`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b43474cc8e2848d8d99f4d19f668202282e9fa5a))
+
+* test ([`66e0232`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/66e023227169f32e9732ff0ff49b1d31a4a4e480))
+
+* version 0.0.2 ([`9ea179d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/9ea179d152e3a6d08781341afcc66b0cb036951f))
+
+* test ([`6e2ce52`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/6e2ce528132646b4fda49aad2fd956e4e85ad52e))
+
+* test ([`3d991b5`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/3d991b59244650db90b66f3d22ccf5d885a7bc2a))
+
+* test npm setup ([`4883f3f`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/4883f3f8ac385897fe4e7d390b5b2fe2a112ac85))
+
+* package.json ([`20a3579`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/20a35794862f8884395d4fe24e1ba531aeb9b441))
+
+* generate_schemas.js ([`a2b2c82`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/a2b2c82b6c057bea3593f2f759067030f6a19ea7))
 
 * &#34;is_viewable&#34;: True ([`b6a20e5`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b6a20e54147ed8307d95ab50ee21974d9805e1d2))
 
