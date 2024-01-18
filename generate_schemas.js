@@ -12,6 +12,7 @@ const findDirectoryPath = (targetDirectoryName) => {
       name: folder.name,
       path: path.join(pathToCheck, folder.name),
     }));
+  console.log(folders)
   const routesDirectory = path.join(folders[0].path, "routes");
   return [routesDirectory, folders[0].name];
 };
