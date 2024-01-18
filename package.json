@@ -27,7 +27,5 @@
     "publishConfig": {
         "access": "public"
     },
-    "files": [
-        "schemas.json"
-    ]
+    "files": []
 }
