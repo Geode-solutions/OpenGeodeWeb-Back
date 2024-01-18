@@ -2,6 +2,13 @@
 
 
 
+## v3.3.0-rc.6 (2024-01-18)
+
+### Feature
+
+* feat(GH action): test path.normalize ([`f4cbe47`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/f4cbe47e3dc84ff7e47a276abd6d28580af34406))
+
+
 ## v3.3.0-rc.5 (2024-01-18)
 
 ### Feature
