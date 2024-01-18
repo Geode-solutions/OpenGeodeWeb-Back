@@ -22,7 +22,7 @@ const outputFile = path.join(process.cwd(), "schemas.json");
 
 function return_json_schema(directoryPath, folder_path, project_name) {
   const folders = fs
-    .readdirSync(directoryPath, { withFileTypes: true })
+    .readdirSync(path.normalize(directoryPath), { withFileTypes: true })
     .filter((folder) => folder.isDirectory())
     .map((folder) => ({
       name: folder.name,
