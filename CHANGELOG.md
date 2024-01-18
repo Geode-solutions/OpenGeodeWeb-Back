@@ -2,6 +2,17 @@
 
 
 
+## v3.3.0-rc.4 (2024-01-18)
+
+### Feature
+
+* feat(test): test npm i ([`5f40b93`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/5f40b93bb704b8a360477b81f16cad3c830b4f07))
+
+### Unknown
+
+* Merge branch &#39;next&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into next ([`74d430a`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/74d430a30805ff54c051105d1d783631398e6125))
+
+
 ## v3.3.0-rc.3 (2024-01-18)
 
 ### Feature
