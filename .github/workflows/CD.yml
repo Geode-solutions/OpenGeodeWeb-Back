@@ -22,11 +22,25 @@ jobs:
         run: |
           python3 -m pip install --upgrade build
           python3 -m build
-      - name: Upload
+      - name: Upload PYPI
         if: steps.semantic-release.outputs.released == 'true'
         run: |
           python3 -m pip install twine
           python3 -m twine upload --repository pypi dist/* -u __token__ -p ${{ secrets.PYPI_TOKEN }}
+      - name: Setup NODE
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.x"
+      - name: Upload NPM
+        if: steps.semantic-release.outputs.released == 'true'
+        run: |
+          npm ci
+          rm -f -- schemas.json
+          npm run json
+          jq -c '.version = "steps.semantic-release.outputs.version"' package.json > tmp.$$.json && mv tmp.$$.json package.json
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Merge master -> next
         if: github.ref == 'refs/heads/master'
         uses: devmasx/merge-branch@master
