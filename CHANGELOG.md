@@ -2,6 +2,13 @@
 
 
 
+## v3.3.0-rc.10 (2024-01-18)
+
+### Fix
+
+* fix(Actions): test folders ([`88f0b30`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/88f0b3063d850e8f37214e4750b7eee734469251))
+
+
 ## v3.3.0-rc.9 (2024-01-18)
 
 ### Fix
