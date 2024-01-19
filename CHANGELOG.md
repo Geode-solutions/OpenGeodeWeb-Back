@@ -2,6 +2,17 @@
 
 
 
+## v3.3.0-rc.17 (2024-01-19)
+
+### Feature
+
+* feat(cd): test jq version ([`4b9a59f`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/4b9a59ff2baa0112e1037f3eb4aaaf0d91cd9ffa))
+
+### Unknown
+
+* Merge branch &#39;next&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into next ([`8b3930b`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/8b3930b58d3d69bd5b3cec6b34cc67d9049fda36))
+
+
 ## v3.3.0-rc.16 (2024-01-19)
 
 ### Feature
