@@ -27,5 +27,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "directory": "./src/opengeodeweb_back"
+  "files": [
+    "schemas.json"
+  ]
 }
