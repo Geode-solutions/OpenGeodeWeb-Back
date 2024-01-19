@@ -2,6 +2,13 @@
 
 
 
+## v3.3.0-rc.16 (2024-01-19)
+
+### Feature
+
+* feat(cd): test jq ([`a258939`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/a258939df816fc2050e88232d6b6f775d415b03e))
+
+
 ## v3.3.0-rc.15 (2024-01-19)
 
 ### Fix
