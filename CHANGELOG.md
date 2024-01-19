@@ -2,6 +2,17 @@
 
 
 
+## v3.3.0-rc.12 (2024-01-19)
+
+### Fix
+
+* fix(cd): cd update ([`960653d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/960653d1d8e1e7835a7ae146ae71ffd174bd7b96))
+
+### Unknown
+
+* Merge branch &#39;next&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into next ([`96b8247`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/96b8247df147e08dd50de986cedc0296598cc53f))
+
+
 ## v3.3.0-rc.11 (2024-01-19)
 
 ### Feature
