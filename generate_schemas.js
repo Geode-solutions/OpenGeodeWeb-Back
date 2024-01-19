@@ -4,9 +4,7 @@ const glob = require("glob");
 const process = require("process");
 
 const findDirectoryPath = (targetDirectoryName) => {
-  console.log("targetDirectoryName", targetDirectoryName);
   const pathToCheck = path.join(process.cwd(), targetDirectoryName);
-  console.log("pathToCheck", process.cwd(), pathToCheck);
   const folders = fs
     .readdirSync(pathToCheck, { withFileTypes: true })
     .filter(
@@ -16,7 +14,6 @@ const findDirectoryPath = (targetDirectoryName) => {
       name: folder.name,
       path: path.join(pathToCheck, folder.name),
     }));
-  console.log("folders", folders);
   const routesDirectory = path.join(folders[0].path, "routes");
   return [routesDirectory, folders[0].name];
 };
@@ -27,7 +24,7 @@ const outputFile = path.join(process.cwd(), "schemas.json");
 
 function return_json_schema(directoryPath, folder_path, project_name) {
   const folders = fs
-    .readdirSync(directoryPath, { withFileTypes: true })
+    .readdirSync(path.normalize(directoryPath), { withFileTypes: true })
     .filter((folder) => folder.isDirectory())
     .map((folder) => ({
       name: folder.name,

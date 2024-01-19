@@ -34,8 +34,9 @@ jobs:
       - name: Upload NPM
         if: steps.semantic-release.outputs.released == 'true'
         run: |
+          pwd
+          cd ${{ github.workspace }}
           npm i
-          rm -f -- schemas.json
           npm run json
           jq -c '.version = "steps.semantic-release.outputs.version"' package.json > tmp.$$.json && mv tmp.$$.json package.json
           npm publish

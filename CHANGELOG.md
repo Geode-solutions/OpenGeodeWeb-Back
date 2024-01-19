@@ -2,6 +2,56 @@
 
 
 
+## v3.3.0-rc.10 (2024-01-18)
+
+### Fix
+
+* fix(Actions): test folders ([`88f0b30`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/88f0b3063d850e8f37214e4750b7eee734469251))
+
+
+## v3.3.0-rc.9 (2024-01-18)
+
+### Fix
+
+* fix(Actions): update working directory ([`3d59b58`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/3d59b586b9730a5f144b19885aeeca656dfe0488))
+
+
+## v3.3.0-rc.8 (2024-01-18)
+
+### Fix
+
+* fix(GH action): log directoryPath ([`10f1eae`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/10f1eae68802d89dd6f6c7441f52a2b904778fc7))
+
+### Unknown
+
+* Merge branch &#39;next&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into next ([`1d25412`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/1d25412394b71c5ddb513871aded5ad8b3246b97))
+
+
+## v3.3.0-rc.7 (2024-01-18)
+
+### Fix
+
+* fix(GH action): explicit directory ([`43d510b`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/43d510b9639d5db438e2f4a1535fb735ef84dae0))
+
+
+## v3.3.0-rc.6 (2024-01-18)
+
+### Feature
+
+* feat(GH action): test path.normalize ([`f4cbe47`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/f4cbe47e3dc84ff7e47a276abd6d28580af34406))
+
+
+## v3.3.0-rc.5 (2024-01-18)
+
+### Feature
+
+* feat(test): test npm i glob ([`368c1da`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/368c1da000bc0d0373b8c129dcf7b25b36930191))
+
+### Unknown
+
+* Merge branch &#39;next&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into next ([`c68c775`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c68c775b4eb1e3bd475368fcdb0936db64efda83))
+
+
 ## v3.3.0-rc.4 (2024-01-18)
 
 ### Feature
