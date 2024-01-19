@@ -38,7 +38,7 @@ jobs:
           cd ${{ github.workspace }}
           npm i
           npm run json
-          jq -c '.version = "steps.semantic-release.outputs.version"' package.json > tmp.$$.json && mv tmp.$$.json package.json
+          jq -c '.version = steps.semantic-release.outputs.version' package.json > tmp.$$.json && mv tmp.$$.json package.json
           npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
