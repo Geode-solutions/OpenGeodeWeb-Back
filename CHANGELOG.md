@@ -2,6 +2,15 @@
 
 
 
+## v3.3.0-rc.11 (2024-01-19)
+
+### Feature
+
+* feat(test): test update script ([`c2c3b39`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c2c3b395cc0ac976daeddf2a4ec63e5313d505a8))
+
+* feat(test): test update script ([`e19d592`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/e19d592ef8b5ba3d77cee33e3862a71d523ee6a7))
+
+
 ## v3.3.0-rc.10 (2024-01-18)
 
 ### Fix
