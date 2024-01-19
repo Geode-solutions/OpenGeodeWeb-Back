@@ -2,6 +2,17 @@
 
 
 
+## v3.3.0-rc.18 (2024-01-19)
+
+### Feature
+
+* feat(cd): files ([`cf598ad`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/cf598ad51c23d22124e5d09d68bde8669893f9a1))
+
+### Unknown
+
+* Merge branch &#39;next&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into next ([`6261840`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/6261840cfc63936c342f71514b37c61db8493ddf))
+
+
 ## v3.3.0-rc.17 (2024-01-19)
 
 ### Feature
