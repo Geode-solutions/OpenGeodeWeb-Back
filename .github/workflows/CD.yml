@@ -39,7 +39,7 @@ jobs:
           cd ${{ github.workspace }}
           npm i
           npm run json
-          jq '.cpu="${{steps.semantic-release.outputs.version}}"' package.json > temp && mv temp package.json
+          jq '.version="${{steps.semantic-release.outputs.version}}"' package.json > temp && mv temp package.json
           cat package.json
           npm publish
         env:
