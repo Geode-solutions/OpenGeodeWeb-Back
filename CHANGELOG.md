@@ -2,6 +2,13 @@
 
 
 
+## v3.3.0-rc.13 (2024-01-19)
+
+### Fix
+
+* fix(cd): registry-url ([`b48992d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b48992d0a3bb877960a9e55454d1ba25b760f4ff))
+
+
 ## v3.3.0-rc.12 (2024-01-19)
 
 ### Fix
