@@ -2,6 +2,17 @@
 
 
 
+## v3.3.0-rc.15 (2024-01-19)
+
+### Fix
+
+* fix(cd): test jq2 ([`1941e83`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/1941e831934c5b586585ff0807f9a0e64ea9848a))
+
+### Unknown
+
+* Merge branch &#39;next&#39; of https://github.com/Geode-solutions/OpenGeodeWeb-Back into next ([`5c20eec`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/5c20eec8cbfe958e12f2162c144d7b505bd6c860))
+
+
 ## v3.3.0-rc.14 (2024-01-19)
 
 ### Fix
