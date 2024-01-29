@@ -1,4 +1,5 @@
 """ Flask configuration """
+
 import os
 
 

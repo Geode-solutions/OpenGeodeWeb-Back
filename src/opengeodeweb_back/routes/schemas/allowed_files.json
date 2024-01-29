@@ -1,20 +1,12 @@
 {
-  "$id": "/allowed_files",
   "route": "/allowed_files",
-  "methods": [
-    "POST"
-  ],
+  "methods": ["POST"],
   "type": "object",
   "properties": {
     "key": {
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": ["string", "null"]
     }
   },
-  "required": [
-    "key"
-  ],
+  "required": ["key"],
   "additionalProperties": false
 }
