@@ -1,5 +1,4 @@
 {
-  "$id": "/tools/allowed_objects",
   "route": "/allowed_objects",
   "methods": ["POST"],
   "type": "object",
