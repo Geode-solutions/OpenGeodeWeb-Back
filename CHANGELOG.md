@@ -2,6 +2,23 @@
 
 
 
+## v3.3.0-rc.19 (2024-01-29)
+
+### Fix
+
+* fix(ecosystem): update dependencies ([`e93ddd4`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/e93ddd4e828c6695a0a005bc6f1ccf9a41a24219))
+
+### Unknown
+
+* Merge pull request #64 from Geode-solutions/fix/update_ecosystem
+
+Fix/update ecosystem ([`7d31dab`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/7d31dab73fdfc3db1160498f19dc06cc69c7d078))
+
+* Apply prepare changes ([`5733a4d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/5733a4daf26ea0b7e6a95d1dce0028dd32ed6654))
+
+* remode $id from schemas ([`e43b92d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/e43b92d3cd724d155725a702229a7af1dec357ac))
+
+
 ## v3.3.0-rc.18 (2024-01-19)
 
 ### Feature
