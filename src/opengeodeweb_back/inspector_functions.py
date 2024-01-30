@@ -13,9 +13,9 @@ def json_return(Result_list: list):
     for result in Result_list:
         json_temp = {
             "value": result.value,
-            "children": result.children
-            if result.is_leaf
-            else json_return(result.children),
+            "children": (
+                result.children if result.is_leaf else json_return(result.children)
+            ),
             "is_leaf": result.is_leaf,
             "route": result.route,
             "sentence": result.sentence if result.sentence != None else result.route,
