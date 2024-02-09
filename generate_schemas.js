@@ -78,5 +78,3 @@ const finalJson = {};
 finalJson[project_name] = return_json_schema(directoryPath, "", project_name);
 
 fs.writeFileSync(outputFile, JSON.stringify(finalJson, null, 2));
-
-console.log("Fichier JSON créé avec succès :", outputFile);
