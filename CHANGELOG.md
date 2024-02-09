@@ -2,6 +2,25 @@
 
 
 
+## v3.3.2-rc.1 (2024-02-09)
+
+### Fix
+
+* fix(export): export schemas in package.json ([`3fbeee0`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/3fbeee01dd1161684b869525ebf8c553af3db392))
+
+### Unknown
+
+* Merge pull request #69 from Geode-solutions/import_schemas_json
+
+Import schemas json ([`76ae8ae`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/76ae8aebc83ea10a89b1be8226572b7f5289b436))
+
+* packages.json
+
+Co-authored-by: Julien Champagnol &lt;JulienChampagnol@users.noreply.github.com&gt; ([`f16b7da`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/f16b7daea7510bc2b4d7541abae59f74c96bdbef))
+
+*  ([`4a563e0`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/4a563e0be51610944f5f4266ad74161976e143bf))
+
+
 ## v3.3.1 (2024-01-31)
 
 ### Unknown

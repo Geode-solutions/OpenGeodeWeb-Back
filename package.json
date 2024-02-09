@@ -6,7 +6,12 @@
   "dependencies": {
     "glob": "^10.3.10"
   },
-  "exports": "./schemas.json",
+  "exports": {
+    "./schemas.json": {
+      "import": "./schemas.json",
+      "require": "./schemas.json"
+    }
+  },
   "version": "0.0.0-semantically-released",
   "description": "",
   "main": "generate_schemas.js",
