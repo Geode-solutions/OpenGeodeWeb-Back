@@ -6,10 +6,10 @@
     "filename": {
       "type": "string"
     },
-    "key": {
+    "supported_feature": {
       "type": ["string", "null"]
     }
   },
-  "required": ["filename", "key"],
+  "required": ["filename", "supported_feature"],
   "additionalProperties": false
 }
