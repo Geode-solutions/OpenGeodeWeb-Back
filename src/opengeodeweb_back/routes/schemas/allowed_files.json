@@ -3,10 +3,10 @@
   "methods": ["POST"],
   "type": "object",
   "properties": {
-    "key": {
+    "filter_key": {
       "type": ["string", "null"]
     }
   },
-  "required": ["key"],
+  "required": ["filter_key"],
   "additionalProperties": false
 }

@@ -5,7 +5,7 @@ from werkzeug.datastructures import FileStorage
 
 def test_allowed_files(client):
     route = f"/allowed_files"
-    response = client.post(route, json={"key": None})
+    response = client.post(route, json={"filter_key": None})
     assert response.status_code == 200
     extensions = response.json["extensions"]
     assert type(extensions) is list
@@ -19,7 +19,7 @@ def test_allowed_objects(client):
     def get_full_data():
         return {
             "filename": "corbi.og_brep",
-            "key": None,
+            "filter_key": None,
         }
 
     # Normal test with filename 'corbi.og_brep'
