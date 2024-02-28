@@ -2,6 +2,29 @@
 
 
 
+## v4.0.0-rc.1 (2024-02-28)
+
+### Breaking
+
+* refactor(key): switch to filter_key
+
+BREAKING CHANGE: changes api ([`29898c3`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/29898c373db23a5c9c18f0ef5f5ddec9b78b512d))
+
+### Refactor
+
+* refactor(key): switch to supported_feature ([`b78fc6c`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b78fc6c224cf86849649c9095e9acde5f6badaf9))
+
+* refactor(key): switch to filter_key ([`1aaeab2`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/1aaeab299092dc7bf3c6a33d927045edcf8cbdc4))
+
+### Unknown
+
+* Merge pull request #71 from Geode-solutions/refactor/key
+
+refactor(key): switch to filter_key ([`0243dbc`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/0243dbc1d9a56c03b8f8c470c1c5193b3c201f8c))
+
+*  ([`913eb34`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/913eb345c5f72273bc7aa3ae6e015168d4a2f22c))
+
+
 ## v3.3.2 (2024-02-09)
 
 ### Unknown
