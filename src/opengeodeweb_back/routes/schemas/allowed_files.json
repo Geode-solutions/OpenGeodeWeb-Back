@@ -3,10 +3,10 @@
   "methods": ["POST"],
   "type": "object",
   "properties": {
-    "key": {
+    "supported_feature": {
       "type": ["string", "null"]
     }
   },
-  "required": ["key"],
+  "required": ["supported_feature"],
   "additionalProperties": false
 }

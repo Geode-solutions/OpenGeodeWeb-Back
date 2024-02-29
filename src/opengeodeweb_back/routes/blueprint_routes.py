@@ -28,7 +28,9 @@ with open(
 )
 def allowed_files():
     geode_functions.validate_request(flask.request, allowed_files_json)
-    extensions = geode_functions.list_input_extensions(flask.request.json["key"])
+    extensions = geode_functions.list_input_extensions(
+        flask.request.json["supported_feature"]
+    )
     return {"status": 200, "extensions": extensions}
 
 
@@ -75,7 +77,7 @@ def allowed_objects():
     geode_functions.validate_request(flask.request, allowed_objects_json)
     file_absolute_path = os.path.join(UPLOAD_FOLDER, flask.request.json["filename"])
     allowed_objects = geode_functions.list_geode_objects(
-        file_absolute_path, flask.request.json["key"]
+        file_absolute_path, flask.request.json["supported_feature"]
     )
     return flask.make_response({"allowed_objects": allowed_objects}, 200)
 
