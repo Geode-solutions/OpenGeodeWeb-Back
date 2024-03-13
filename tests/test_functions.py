@@ -39,7 +39,7 @@ def test_missing_files():
     for geode_object, value in geode_objects.geode_objects_dict().items():
         input_extensions = geode_functions.geode_object_input_extensions(geode_object)
         for input_extension in input_extensions:
-            file_absolute_path = os.path.abspath(f"tests/data/test.{input_extension}")
+            file_absolute_path = os.path.abspath(f"./tests/data/test.{input_extension}")
             missing_files = geode_functions.missing_files(
                 geode_object, file_absolute_path
             )
@@ -55,7 +55,7 @@ def test_is_loadable():
     for geode_object, value in geode_objects.geode_objects_dict().items():
         input_extensions = geode_functions.geode_object_input_extensions(geode_object)
         for input_extension in input_extensions:
-            file_absolute_path = os.path.abspath(f"tests/data/test.{input_extension}")
+            file_absolute_path = os.path.abspath(f"./tests/data/test.{input_extension}")
             is_loadable = geode_functions.is_loadable(geode_object, file_absolute_path)
             assert type(is_loadable) is bool
 
@@ -67,7 +67,7 @@ def test_load():
         for input_extension in input_extensions:
             print(f"\t{input_extension=}")
             missing_files = geode_functions.missing_files(
-                geode_object, f"tests/data/test.{input_extension}"
+                geode_object, f"./tests/data/test.{input_extension}"
             )
             has_missing_files = missing_files.has_missing_files()
             if has_missing_files:
@@ -150,7 +150,7 @@ def test_geode_object_output_extensions():
         for input_extension in input_extensions:
             print(f"\t{input_extension=}")
             missing_files = geode_functions.missing_files(
-                geode_object, f"tests/data/test.{input_extension}"
+                geode_object, f"./tests/data/test.{input_extension}"
             )
             has_missing_files = missing_files.has_missing_files()
             if has_missing_files:
@@ -228,7 +228,7 @@ def test_list_geode_objects():
         for geode_object, value in geode_objects.geode_objects_dict().items():
             for input_extension in input_extensions:
                 file_absolute_path = os.path.abspath(
-                    f"tests/data/test.{input_extension}"
+                    f"./tests/data/test.{input_extension}"
                 )
                 return_dict = geode_functions.list_geode_objects(
                     file_absolute_path, key
@@ -254,7 +254,7 @@ def test_geode_objects_output_extensions():
     for geode_object, value in geode_objects.geode_objects_dict().items():
         input_extensions = geode_functions.geode_object_input_extensions(geode_object)
         for input_extension in input_extensions:
-            file_absolute_path = f"tests/data/test.{input_extension}"
+            file_absolute_path = f"./tests/data/test.{input_extension}"
             if geode_functions.is_loadable(geode_object, file_absolute_path):
                 data = geode_functions.load(geode_object, file_absolute_path)
                 geode_objects_and_output_extensions = (
