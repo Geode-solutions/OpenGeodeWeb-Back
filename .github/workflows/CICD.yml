@@ -6,7 +6,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: ghcr.io/geode-solutions/vtk:3.9-cpu
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
