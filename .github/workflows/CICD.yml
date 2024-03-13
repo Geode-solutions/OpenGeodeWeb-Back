@@ -14,7 +14,7 @@ jobs:
       - name: Test
         run: |
           pip install -r requirements.txt
-          pip pytest
+          pip install pytest
           pytest
   build:
     runs-on: ubuntu-latest
