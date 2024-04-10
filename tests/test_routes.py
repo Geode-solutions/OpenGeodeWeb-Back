@@ -100,6 +100,18 @@ def test_geographic_coordinate_systems(client):
     )
 
 
+def test_inspect_file(client):
+    route = f"/inspect_file"
+
+    # Normal test with geode_object 'BRep'
+    response = client.post(
+        route, json={"input_geode_object": "BRep", "filename": "corbi.og_brep"}
+    )
+    assert response.status_code == 200
+    result = response.json["result"]
+    print(f"{result=}", flush=True)
+
+
 def test_geode_objects_and_output_extensions(client):
     route = "/geode_objects_and_output_extensions"
 
