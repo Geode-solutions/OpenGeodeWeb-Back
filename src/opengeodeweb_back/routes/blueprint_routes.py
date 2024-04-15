@@ -157,6 +157,33 @@ with open(
     inspect_file_json = json.load(file)
 
 
+def get_inspector_children(obj):
+    array = []
+    print(f"{obj=}", flush=True)
+
+    if "inspection_type" in dir(obj):
+        new_object = {"title": obj.inspection_type()}
+        print(f"{obj.inspection_type()=}", flush=True)
+        for obj_child in dir(obj):
+            if not obj_child.startswith('__') and not obj_child in ["inspection_type"] and type(obj.__getattribute__(obj_child)).__name__ != 'builtin_function_or_method':
+                print(f"{obj_child=}", flush=True)
+                child_instance = obj.__getattribute__(obj_child)
+                print(f"{child_instance=}", flush=True)
+                if child_instance != {}:
+                    class_children = get_inspector_children(child_instance)
+                    if class_children != []:
+                        new_object["children"] = class_children
+    else:
+        print(f"ELSE {obj=} {dir(obj)=}", flush=True)
+        new_object = {"title": ""}
+        nb_issues = obj.nb_issues()
+        issues = obj.issues()
+
+        print(f"{nb_issues=}{issues=}", flush=True)
+        
+    array.append(new_object)
+    return array
+
 @routes.route(
     inspect_file_json["route"],
     methods=inspect_file_json["methods"],
@@ -168,18 +195,18 @@ def inspect_file():
     secure_filename = werkzeug.utils.secure_filename(flask.request.json["filename"])
     file_path = os.path.abspath(os.path.join(UPLOAD_FOLDER, secure_filename))
     data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
-    brep_inspector = geode_functions.inspector(
+    inspector = geode_functions.inspector(
         flask.request.json["input_geode_object"], data
     )
-    print(f"{brep_inspector}", flush=True)
 
-    print(f"{dir(brep_inspector)}", flush=True)
+    inspection_result = geode_functions.inspect(flask.request.json["input_geode_object"], inspector)
+    print(f"{inspection_result=}", flush=True)
 
-    result = brep_inspector.inspect_brep()
+    tree = get_inspector_children(inspection_result)
+    print(f"{tree=}", flush=True)
 
-    print(f"{result=}", flush=True)
 
-    return flask.make_response({"result": result}, 200)
+    return flask.make_response({"tree": tree}, 200)
 
 
 with open(

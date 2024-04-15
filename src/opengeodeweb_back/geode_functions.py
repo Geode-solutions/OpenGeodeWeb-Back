@@ -93,6 +93,10 @@ def is_viewable(geode_object: str):
 def inspector(geode_object: str, data):
     return geode_object_value(geode_object)["inspector"](data)
 
+def inspect(geode_object: str, inspector):
+    print(f"{geode_object=}", flush=True)
+    return inspector.inspect_brep()
+
 
 def save_viewable(geode_object: str, data, folder_absolute_path: str, id: str):
     return geode_object_value(geode_object)["save_viewable"](
