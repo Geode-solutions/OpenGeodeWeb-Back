@@ -156,6 +156,7 @@ with open(
 ) as file:
     inspect_file_json = json.load(file)
 
+
 @routes.route(
     inspect_file_json["route"],
     methods=inspect_file_json["methods"],
@@ -167,7 +168,9 @@ def inspect_file():
     secure_filename = werkzeug.utils.secure_filename(flask.request.json["filename"])
     file_path = os.path.abspath(os.path.join(UPLOAD_FOLDER, secure_filename))
     data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
-    inspection_tree = geode_functions.inspect(flask.request.json["input_geode_object"], data)
+    inspection_tree = geode_functions.inspect(
+        flask.request.json["input_geode_object"], data
+    )
     inspection_result = [geode_functions.get_inspector_children(inspection_tree)]
     return flask.make_response({"inspection_result": inspection_result}, 200)
 
