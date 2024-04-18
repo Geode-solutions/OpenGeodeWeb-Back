@@ -90,12 +90,8 @@ def is_viewable(geode_object: str):
     return geode_object_value(geode_object)["is_viewable"]
 
 
-def inspector(geode_object: str, data):
+def inspect(geode_object: str, data):
     return geode_object_value(geode_object)["inspector"](data)
-
-def inspect(geode_object: str, inspector):
-    print(f"{geode_object=}", flush=True)
-    return inspector.inspect_brep()
 
 
 def save_viewable(geode_object: str, data, folder_absolute_path: str, id: str):
@@ -176,6 +172,37 @@ def geode_objects_output_extensions(geode_object: str, data):
             geode_objects_output_extensions(parent_geode_object, data)
         )
     return geode_objects_output_extensions_dict
+
+
+def get_inspector_children(obj):
+    new_object = {}
+
+    if "inspection_type" in dir(obj):
+        new_object["title"] = obj.inspection_type()
+        children = []
+        for child in dir(obj):
+            if not child.startswith('__') and not child in ["inspection_type"] and type(obj.__getattribute__(child)).__name__ != 'builtin_function_or_method':
+                child_instance = obj.__getattribute__(child)
+                if child_instance != {}:
+                    child_object = get_inspector_children(child_instance)
+                    if child_object != {}:
+                        children.append(child_object)
+        if children != []:
+            new_object["children"] = children
+    else:
+        if obj.__class__.__name__ != "method":
+            # try:
+            new_object["title"] = obj.description()
+            if "nb_issues" in dir(obj):
+                nb_issues = obj.nb_issues()
+                new_object["nb_issues"] = nb_issues
+            
+            if nb_issues > 0 and "string" in dir(obj):
+                issues = obj.string()
+                new_object["issues"] = issues
+            # except Exception as e:
+            #     print(f"ERROR : {str(e)}", flush=True)
+    return new_object
 
 
 def versions(list_packages: list):
