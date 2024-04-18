@@ -108,8 +108,8 @@ def test_inspect_file(client):
         route, json={"input_geode_object": "BRep", "filename": "corbi.og_brep"}
     )
     assert response.status_code == 200
-    result = response.json["result"]
-    print(f"{result=}", flush=True)
+    inspection_tree = response.json["inspection_tree"]
+    assert type(inspection_tree) is list
 
 
 def test_geode_objects_and_output_extensions(client):
