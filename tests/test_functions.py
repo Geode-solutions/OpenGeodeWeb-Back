@@ -208,7 +208,6 @@ def test_get_inspector_children():
                         print(f"\t\t{inspection_tree=}")
                         assert type(inspection_tree) is list
                         assert type(inspection_tree[0]) is dict
-    assert True == False
 
 def test_filter_geode_objects():
     filters_list = ["", "crs", "inspector", None]
