@@ -351,7 +351,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_structural_model,
-            "inspector": og_inspector.inspect_brep
+            "inspector": og_inspector.inspect_brep,
         },
         "TetrahedralSolid3D": {
             "input_factory": og.TetrahedralSolidInputFactory3D,

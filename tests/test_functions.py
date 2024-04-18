@@ -179,17 +179,21 @@ def test_geode_object_output_extensions():
                     ) in output_geode_object_value.items():
                         assert type(output_extension) is str
                         assert type(output_extension_value["is_saveable"]) is bool
-    
+
 
 def test_get_inspector_children():
     for geode_object, value in geode_objects.geode_objects_dict().items():
         if "inspector" in value:
             print(f"\n{geode_object=}")
-            input_extensions = geode_functions.geode_object_input_extensions(geode_object)
+            input_extensions = geode_functions.geode_object_input_extensions(
+                geode_object
+            )
             for input_extension in input_extensions:
                 if geode_object != "HybridSolid3D" and input_extension != "og_hso3d":
                     print(f"\t{input_extension=}")
-                    file_absolute_path = os.path.join(data_folder, f"test.{input_extension}")
+                    file_absolute_path = os.path.join(
+                        data_folder, f"test.{input_extension}"
+                    )
                     missing_files = geode_functions.missing_files(
                         geode_object, file_absolute_path
                     )
@@ -199,15 +203,22 @@ def test_get_inspector_children():
                         print(f"\t\t{mandatory_files=}")
                         additional_files = missing_files.additional_files
                         print(f"\t\t{additional_files=}")
-                    file_absolute_path = os.path.join(data_folder, f"test.{input_extension}")
+                    file_absolute_path = os.path.join(
+                        data_folder, f"test.{input_extension}"
+                    )
                     if geode_functions.is_loadable(geode_object, file_absolute_path):
                         data = geode_functions.load(geode_object, file_absolute_path)
                         inspection_result = geode_functions.inspect(geode_object, data)
-                        assert "InspectionResult" in inspection_result.__class__.__name__
-                        inspection_tree = [geode_functions.get_inspector_children(inspection_result)]
+                        assert (
+                            "InspectionResult" in inspection_result.__class__.__name__
+                        )
+                        inspection_tree = [
+                            geode_functions.get_inspector_children(inspection_result)
+                        ]
                         print(f"\t\t{inspection_tree=}")
                         assert type(inspection_tree) is list
                         assert type(inspection_tree[0]) is dict
+
 
 def test_filter_geode_objects():
     filters_list = ["", "crs", "inspector", None]
