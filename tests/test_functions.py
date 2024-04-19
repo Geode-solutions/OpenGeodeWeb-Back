@@ -208,9 +208,7 @@ def test_get_inspector_children():
                 if geode_functions.is_loadable(geode_object, file_absolute_path):
                     data = geode_functions.load(geode_object, file_absolute_path)
                     inspection_result = geode_functions.inspect(geode_object, data)
-                    assert (
-                        "InspectionResult" in inspection_result.__class__.__name__
-                    )
+                    assert "InspectionResult" in inspection_result.__class__.__name__
                     inspection_tree = [
                         geode_functions.get_inspector_children(inspection_result)
                     ]
