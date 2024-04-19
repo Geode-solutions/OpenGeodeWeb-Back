@@ -189,35 +189,34 @@ def test_get_inspector_children():
                 geode_object
             )
             for input_extension in input_extensions:
-                if geode_object != "HybridSolid3D" and input_extension != "og_hso3d":
-                    print(f"\t{input_extension=}")
-                    file_absolute_path = os.path.join(
-                        data_folder, f"test.{input_extension}"
+                print(f"\t{input_extension=}")
+                file_absolute_path = os.path.join(
+                    data_folder, f"test.{input_extension}"
+                )
+                missing_files = geode_functions.missing_files(
+                    geode_object, file_absolute_path
+                )
+                has_missing_files = missing_files.has_missing_files()
+                if has_missing_files:
+                    mandatory_files = missing_files.mandatory_files
+                    print(f"\t\t{mandatory_files=}")
+                    additional_files = missing_files.additional_files
+                    print(f"\t\t{additional_files=}")
+                file_absolute_path = os.path.join(
+                    data_folder, f"test.{input_extension}"
+                )
+                if geode_functions.is_loadable(geode_object, file_absolute_path):
+                    data = geode_functions.load(geode_object, file_absolute_path)
+                    inspection_result = geode_functions.inspect(geode_object, data)
+                    assert (
+                        "InspectionResult" in inspection_result.__class__.__name__
                     )
-                    missing_files = geode_functions.missing_files(
-                        geode_object, file_absolute_path
-                    )
-                    has_missing_files = missing_files.has_missing_files()
-                    if has_missing_files:
-                        mandatory_files = missing_files.mandatory_files
-                        print(f"\t\t{mandatory_files=}")
-                        additional_files = missing_files.additional_files
-                        print(f"\t\t{additional_files=}")
-                    file_absolute_path = os.path.join(
-                        data_folder, f"test.{input_extension}"
-                    )
-                    if geode_functions.is_loadable(geode_object, file_absolute_path):
-                        data = geode_functions.load(geode_object, file_absolute_path)
-                        inspection_result = geode_functions.inspect(geode_object, data)
-                        assert (
-                            "InspectionResult" in inspection_result.__class__.__name__
-                        )
-                        inspection_tree = [
-                            geode_functions.get_inspector_children(inspection_result)
-                        ]
-                        print(f"\t\t{inspection_tree=}")
-                        assert type(inspection_tree) is list
-                        assert type(inspection_tree[0]) is dict
+                    inspection_tree = [
+                        geode_functions.get_inspector_children(inspection_result)
+                    ]
+                    print(f"\t\t{inspection_tree=}")
+                    assert type(inspection_tree) is list
+                    assert type(inspection_tree[0]) is dict
 
 
 def test_filter_geode_objects():
