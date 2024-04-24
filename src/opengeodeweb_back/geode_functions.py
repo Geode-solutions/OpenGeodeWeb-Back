@@ -201,7 +201,7 @@ def get_inspector_children(obj):
                 nb_issues = obj.nb_issues()
                 new_object["nb_issues"] = nb_issues
             if nb_issues > 0 and "string" in dir(obj):
-                issues = obj.string()
+                issues = obj.string().split("\n")
                 new_object["issues"] = issues
     return new_object
 
