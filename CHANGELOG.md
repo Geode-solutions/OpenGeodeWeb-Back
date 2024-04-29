@@ -2,6 +2,13 @@
 
 
 
+## v4.1.0-rc.2 (2024-04-29)
+
+### Feature
+
+* feat(inspector): trigger semantic release ([`ec94ac6`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/ec94ac61161417cb5efddddd12b3344feceb18b2))
+
+
 ## v4.1.0-rc.1 (2024-04-29)
 
 ### Feature
