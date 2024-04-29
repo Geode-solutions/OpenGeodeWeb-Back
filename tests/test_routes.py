@@ -21,7 +21,7 @@ def test_allowed_objects(client):
             "filename": "corbi.og_brep",
             "supported_feature": None,
         }
- 
+
     # Normal test with filename 'corbi.og_brep'
     response = client.post(route, json=get_full_data())
     assert response.status_code == 200
@@ -112,9 +112,7 @@ def test_inspect_file(client):
     json = get_full_data()
 
     # Normal test with geode_object 'BRep'
-    response = client.post(
-        route, json=json
-    )
+    response = client.post(route, json=json)
     assert response.status_code == 200
     inspection_result = response.json["inspection_result"]
     assert type(inspection_result) is dict

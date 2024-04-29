@@ -182,10 +182,10 @@ def get_inspector_children(obj):
         new_object["nb_issues"] = 0
         new_object["children"] = []
         for child in dir(obj):
-            if (
-                not child.startswith("__")
-                and not child in ["inspection_type", "string"]
-            ):
+            if not child.startswith("__") and not child in [
+                "inspection_type",
+                "string",
+            ]:
                 child_instance = obj.__getattribute__(child)
                 child_object = get_inspector_children(child_instance)
                 new_object["children"].append(child_object)

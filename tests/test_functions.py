@@ -209,8 +209,10 @@ def test_get_inspector_children():
                     data = geode_functions.load(geode_object, file_absolute_path)
                     class_inspector = geode_functions.inspect(geode_object, data)
                     assert "InspectionResult" in class_inspector.__class__.__name__
-                    inspection_result = geode_functions.get_inspector_children(class_inspector)
-                    
+                    inspection_result = geode_functions.get_inspector_children(
+                        class_inspector
+                    )
+
                     print(f"\t\t{inspection_result=}", flush=True)
                     assert type(inspection_result) is dict
 
