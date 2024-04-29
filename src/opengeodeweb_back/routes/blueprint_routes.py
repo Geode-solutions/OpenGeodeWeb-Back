@@ -168,10 +168,10 @@ def inspect_file():
     secure_filename = werkzeug.utils.secure_filename(flask.request.json["filename"])
     file_path = os.path.abspath(os.path.join(UPLOAD_FOLDER, secure_filename))
     data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
-    inspection_tree = geode_functions.inspect(
+    class_inspector = geode_functions.inspect(
         flask.request.json["input_geode_object"], data
     )
-    inspection_result = [geode_functions.get_inspector_children(inspection_tree)]
+    inspection_result = geode_functions.get_inspector_children(class_inspector)
     return flask.make_response({"inspection_result": inspection_result}, 200)
 
 
