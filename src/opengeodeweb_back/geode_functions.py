@@ -179,30 +179,24 @@ def get_inspector_children(obj):
 
     if "inspection_type" in dir(obj):
         new_object["title"] = obj.inspection_type()
-        children = []
+        new_object["nb_issues"] = 0
+        new_object["children"] = []
         for child in dir(obj):
             if (
                 not child.startswith("__")
-                and not child in ["inspection_type"]
-                and type(obj.__getattribute__(child)).__name__
-                != "builtin_function_or_method"
+                and not child in ["inspection_type", "string"]
             ):
                 child_instance = obj.__getattribute__(child)
-                if child_instance != {}:
-                    child_object = get_inspector_children(child_instance)
-                    if child_object != {}:
-                        children.append(child_object)
-        if children != []:
-            new_object["children"] = children
+                child_object = get_inspector_children(child_instance)
+                new_object["children"].append(child_object)
+                new_object["nb_issues"] += child_object["nb_issues"]
     else:
-        if obj.__class__.__name__ != "method":
-            new_object["title"] = obj.description()
-            if "nb_issues" in dir(obj):
-                nb_issues = obj.nb_issues()
-                new_object["nb_issues"] = nb_issues
-            if nb_issues > 0 and "string" in dir(obj):
-                issues = obj.string().split("\n")
-                new_object["issues"] = issues
+        new_object["title"] = obj.description()
+        nb_issues = obj.nb_issues()
+        new_object["nb_issues"] = nb_issues
+        if nb_issues > 0:
+            issues = obj.string().split("\n")
+            new_object["issues"] = issues
     return new_object
 
 
