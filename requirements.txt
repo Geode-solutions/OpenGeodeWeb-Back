@@ -10,7 +10,7 @@ attrs==23.2.0
     # via
     #   jsonschema
     #   referencing
-blinker==1.7.0
+blinker==1.8.1
     # via flask
 click==8.1.7
     # via flask
