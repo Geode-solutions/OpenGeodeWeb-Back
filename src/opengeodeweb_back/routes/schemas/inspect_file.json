@@ -1,0 +1,15 @@
+{
+  "route": "/inspect_file",
+  "methods": ["POST"],
+  "type": "object",
+  "properties": {
+    "filename": {
+      "type": "string"
+    },
+    "input_geode_object": {
+      "type": "string"
+    }
+  },
+  "required": ["filename", "input_geode_object"],
+  "additionalProperties": false
+}

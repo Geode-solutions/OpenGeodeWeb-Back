@@ -151,6 +151,31 @@ def crs_converter_geographic_coordinate_systems():
 
 
 with open(
+    os.path.join(schemas, "inspect_file.json"),
+    "r",
+) as file:
+    inspect_file_json = json.load(file)
+
+
+@routes.route(
+    inspect_file_json["route"],
+    methods=inspect_file_json["methods"],
+)
+def inspect_file():
+    UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
+    geode_functions.validate_request(flask.request, inspect_file_json)
+
+    secure_filename = werkzeug.utils.secure_filename(flask.request.json["filename"])
+    file_path = os.path.abspath(os.path.join(UPLOAD_FOLDER, secure_filename))
+    data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
+    class_inspector = geode_functions.inspect(
+        flask.request.json["input_geode_object"], data
+    )
+    inspection_result = geode_functions.get_inspector_children(class_inspector)
+    return flask.make_response({"inspection_result": inspection_result}, 200)
+
+
+with open(
     os.path.join(schemas, "geode_objects_and_output_extensions.json"),
     "r",
 ) as file:
