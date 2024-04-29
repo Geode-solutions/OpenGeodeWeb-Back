@@ -207,14 +207,12 @@ def test_get_inspector_children():
                 )
                 if geode_functions.is_loadable(geode_object, file_absolute_path):
                     data = geode_functions.load(geode_object, file_absolute_path)
-                    inspection_result = geode_functions.inspect(geode_object, data)
-                    assert "InspectionResult" in inspection_result.__class__.__name__
-                    inspection_tree = [
-                        geode_functions.get_inspector_children(inspection_result)
-                    ]
-                    print(f"\t\t{inspection_tree=}", flush=True)
-                    assert type(inspection_tree) is list
-                    assert type(inspection_tree[0]) is dict
+                    class_inspector = geode_functions.inspect(geode_object, data)
+                    assert "InspectionResult" in class_inspector.__class__.__name__
+                    inspection_result = geode_functions.get_inspector_children(class_inspector)
+                    
+                    print(f"\t\t{inspection_result=}", flush=True)
+                    assert type(inspection_result) is dict
 
 
 def test_filter_geode_objects():

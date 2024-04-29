@@ -21,7 +21,7 @@ def test_allowed_objects(client):
             "filename": "corbi.og_brep",
             "supported_feature": None,
         }
-
+ 
     # Normal test with filename 'corbi.og_brep'
     response = client.post(route, json=get_full_data())
     assert response.status_code == 200
@@ -103,13 +103,29 @@ def test_geographic_coordinate_systems(client):
 def test_inspect_file(client):
     route = f"/inspect_file"
 
+    def get_full_data():
+        return {
+            "input_geode_object": "BRep",
+            "filename": "corbi.og_brep",
+        }
+
+    json = get_full_data()
+
     # Normal test with geode_object 'BRep'
     response = client.post(
-        route, json={"input_geode_object": "BRep", "filename": "corbi.og_brep"}
+        route, json=json
     )
     assert response.status_code == 200
     inspection_result = response.json["inspection_result"]
-    assert type(inspection_result) is list
+    assert type(inspection_result) is dict
+
+    for key, value in get_full_data().items():
+        json = get_full_data()
+        json.pop(key)
+        response = client.post(route, json=json)
+        assert response.status_code == 400
+        error_description = response.json["description"]
+        assert error_description == f"Validation error: '{key}' is a required property"
 
 
 def test_geode_objects_and_output_extensions(client):
