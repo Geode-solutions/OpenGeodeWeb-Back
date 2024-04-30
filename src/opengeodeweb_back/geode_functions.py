@@ -90,7 +90,7 @@ def is_viewable(geode_object: str):
     return geode_object_value(geode_object)["is_viewable"]
 
 
-def inspector(geode_object: str, data):
+def inspect(geode_object: str, data):
     return geode_object_value(geode_object)["inspector"](data)
 
 
@@ -172,6 +172,32 @@ def geode_objects_output_extensions(geode_object: str, data):
             geode_objects_output_extensions(parent_geode_object, data)
         )
     return geode_objects_output_extensions_dict
+
+
+def get_inspector_children(obj):
+    new_object = {}
+
+    if "inspection_type" in dir(obj):
+        new_object["title"] = obj.inspection_type()
+        new_object["nb_issues"] = 0
+        new_object["children"] = []
+        for child in dir(obj):
+            if not child.startswith("__") and not child in [
+                "inspection_type",
+                "string",
+            ]:
+                child_instance = obj.__getattribute__(child)
+                child_object = get_inspector_children(child_instance)
+                new_object["children"].append(child_object)
+                new_object["nb_issues"] += child_object["nb_issues"]
+    else:
+        new_object["title"] = obj.description()
+        nb_issues = obj.nb_issues()
+        new_object["nb_issues"] = nb_issues
+        if nb_issues > 0:
+            issues = obj.string().split("\n")
+            new_object["issues"] = issues
+    return new_object
 
 
 def versions(list_packages: list):

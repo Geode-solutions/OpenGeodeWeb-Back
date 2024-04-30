@@ -26,7 +26,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_brep,
-            "inspector": og_inspector.BRepInspector,
+            "inspector": og_inspector.inspect_brep,
         },
         "CrossSection": {
             "parent": "Section",
@@ -47,7 +47,7 @@ def geode_objects_dict():
             "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_cross_section,
-            "inspector": og_inspector.SectionInspector,
+            "inspector": og_inspector.inspect_section,
         },
         "EdgedCurve2D": {
             "input_factory": og.EdgedCurveInputFactory2D,
@@ -67,7 +67,7 @@ def geode_objects_dict():
             "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_edged_curve2D,
-            "inspector": og_inspector.EdgedCurveInspector2D,
+            "inspector": og_inspector.inspect_edgedcurve2D,
         },
         "EdgedCurve3D": {
             "input_factory": og.EdgedCurveInputFactory3D,
@@ -87,7 +87,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_edged_curve3D,
-            "inspector": og_inspector.EdgedCurveInspector3D,
+            "inspector": og_inspector.inspect_edgedcurve3D,
         },
         "Graph": {
             "input_factory": og.GraphInputFactory,
@@ -120,7 +120,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_hybrid_solid3D,
-            "inspector": og_inspector.SolidMeshInspector3D,
+            "inspector": og_inspector.inspect_solid3D,
         },
         "LightRegularGrid2D": {
             "input_factory": og.LightRegularGridInputFactory2D,
@@ -166,7 +166,7 @@ def geode_objects_dict():
             "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_point_set2D,
-            "inspector": og_inspector.PointSetInspector2D,
+            "inspector": og_inspector.inspect_pointset2D,
         },
         "PointSet3D": {
             "input_factory": og.PointSetInputFactory3D,
@@ -186,7 +186,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_point_set3D,
-            "inspector": og_inspector.PointSetInspector3D,
+            "inspector": og_inspector.inspect_pointset3D,
         },
         "PolygonalSurface2D": {
             "input_factory": og.PolygonalSurfaceInputFactory2D,
@@ -206,7 +206,7 @@ def geode_objects_dict():
             "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_polygonal_surface2D,
-            "inspector": og_inspector.SurfaceMeshInspector2D,
+            "inspector": og_inspector.inspect_surface2D,
         },
         "PolygonalSurface3D": {
             "input_factory": og.PolygonalSurfaceInputFactory3D,
@@ -226,7 +226,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_polygonal_surface3D,
-            "inspector": og_inspector.SurfaceMeshInspector3D,
+            "inspector": og_inspector.inspect_surface3D,
         },
         "PolyhedralSolid3D": {
             "input_factory": og.PolyhedralSolidInputFactory3D,
@@ -246,7 +246,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_polyhedral_solid3D,
-            "inspector": og_inspector.SolidMeshInspector3D,
+            "inspector": og_inspector.inspect_solid3D,
         },
         "RasterImage2D": {
             "input_factory": og.RasterImageInputFactory2D,
@@ -330,7 +330,7 @@ def geode_objects_dict():
             "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_section,
-            "inspector": og_inspector.SectionInspector,
+            "inspector": og_inspector.inspect_section,
         },
         "StructuralModel": {
             "parent": "BRep",
@@ -351,7 +351,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_structural_model,
-            "inspector": og_inspector.BRepInspector,
+            "inspector": og_inspector.inspect_brep,
         },
         "TetrahedralSolid3D": {
             "input_factory": og.TetrahedralSolidInputFactory3D,
@@ -371,7 +371,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_tetrahedral_solid3D,
-            "inspector": og_inspector.SolidMeshInspector3D,
+            "inspector": og_inspector.inspect_solid3D,
         },
         "TriangulatedSurface2D": {
             "input_factory": og.TriangulatedSurfaceInputFactory2D,
@@ -391,7 +391,7 @@ def geode_objects_dict():
             "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_triangulated_surface2D,
-            "inspector": og_inspector.TriangulatedSurfaceInspector2D,
+            "inspector": og_inspector.inspect_triangulated_surface2D,
         },
         "TriangulatedSurface3D": {
             "input_factory": og.TriangulatedSurfaceInputFactory3D,
@@ -411,7 +411,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_triangulated_surface3D,
-            "inspector": og_inspector.TriangulatedSurfaceInspector3D,
+            "inspector": og_inspector.inspect_triangulated_surface3D,
         },
         "VertexSet": {
             "input_factory": og.VertexSetInputFactory,

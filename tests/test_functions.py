@@ -181,6 +181,42 @@ def test_geode_object_output_extensions():
                         assert type(output_extension_value["is_saveable"]) is bool
 
 
+def test_get_inspector_children():
+    for geode_object, value in geode_objects.geode_objects_dict().items():
+        if "inspector" in value:
+            print(f"\n{geode_object=}", flush=True)
+            input_extensions = geode_functions.geode_object_input_extensions(
+                geode_object
+            )
+            for input_extension in input_extensions:
+                print(f"\t{input_extension=}", flush=True)
+                file_absolute_path = os.path.join(
+                    data_folder, f"test.{input_extension}"
+                )
+                missing_files = geode_functions.missing_files(
+                    geode_object, file_absolute_path
+                )
+                has_missing_files = missing_files.has_missing_files()
+                if has_missing_files:
+                    mandatory_files = missing_files.mandatory_files
+                    print(f"\t\t{mandatory_files=}", flush=True)
+                    additional_files = missing_files.additional_files
+                    print(f"\t\t{additional_files=}", flush=True)
+                file_absolute_path = os.path.join(
+                    data_folder, f"test.{input_extension}"
+                )
+                if geode_functions.is_loadable(geode_object, file_absolute_path):
+                    data = geode_functions.load(geode_object, file_absolute_path)
+                    class_inspector = geode_functions.inspect(geode_object, data)
+                    assert "InspectionResult" in class_inspector.__class__.__name__
+                    inspection_result = geode_functions.get_inspector_children(
+                        class_inspector
+                    )
+
+                    print(f"\t\t{inspection_result=}", flush=True)
+                    assert type(inspection_result) is dict
+
+
 def test_filter_geode_objects():
     filters_list = ["", "crs", "inspector", None]
 
