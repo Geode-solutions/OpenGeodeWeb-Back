@@ -2,13 +2,17 @@
 
 
 
-## v4.1.0 (2024-04-30)
+## v4.1.0-rc.3 (2024-05-03)
+
+### Fix
+
+* fix(actions): admin token for actions ([`1e11440`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/1e11440a57abbb553f8889dc2806937d7087cb7b))
 
 ### Unknown
 
-* Merge pull request #76 from Geode-solutions/next
+* Merge pull request #77 from Geode-solutions/fix/admin_token
 
-Next ([`018b66a`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/018b66a92eb26ba03f32f1d5649c95413dd5a834))
+fix(actions): admin token for actions ([`413664a`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/413664a77deb3ad37abb5d0c47014aaeaf570175))
 
 
 ## v4.1.0-rc.2 (2024-04-29)
