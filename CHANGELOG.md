@@ -2,6 +2,25 @@
 
 
 
+## v4.2.0-rc.1 (2024-05-27)
+
+### Feature
+
+* feat(error_handler): Add handler ([`4dd7dfb`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/4dd7dfb8998403c27c2d04dfbdd64c16662704b1))
+
+### Unknown
+
+* Merge pull request #79 from Geode-solutions/feat_config
+
+added test + handle_exception function ([`d0546b8`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/d0546b8203f48aac44491529b08f6d52b257767a))
+
+* requirements ([`78faf30`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/78faf30ed1be63b009e1763b293ccfabc53f10c4))
+
+* added test + handle_exception function ([`8f17937`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/8f17937dd05581ae9b6818b5a3a04abb1b95785f))
+
+*  ([`dca962e`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/dca962e5b0aed0366fa53ebe5ea074c9b3a65de6))
+
+
 ## v4.1.1 (2024-05-03)
 
 ### Unknown

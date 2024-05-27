@@ -354,3 +354,16 @@ def send_file(upload_folder, saved_files, new_file_name):
     response.headers["Access-Control-Expose-Headers"] = "new-file-name"
 
     return response
+
+
+def handle_exception(e):
+    response = e.get_response()
+    response.data = flask.json.dumps(
+        {
+            "code": e.code,
+            "name": e.name,
+            "description": e.description,
+        }
+    )
+    response.content_type = "application/json"
+    return response
