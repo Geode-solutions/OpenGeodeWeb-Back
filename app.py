@@ -6,9 +6,8 @@ import flask
 import flask_cors
 from werkzeug.exceptions import HTTPException
 
-from werkzeug.exceptions import HTTPException
-
 from src.opengeodeweb_back.routes import blueprint_routes
+from src.opengeodeweb_back.geode_functions import handle_exception
 
 
 """ Global config """
@@ -36,17 +35,19 @@ app.register_blueprint(
 
 
 @app.errorhandler(HTTPException)
-def handle_exception(e):
-    response = e.get_response()
-    response.data = flask.json.dumps(
-        {
-            "code": e.code,
-            "name": e.name,
-            "description": e.description,
-        }
-    )
-    response.content_type = "application/json"
-    return response
+def errorhandler(e):
+    # print("tutu", e, flush=True)
+    return handle_exception(e)
+
+
+@app.route(
+    "/error",
+    methods=["POST"],
+)
+def return_error():
+    # print("return_error 123", flush=True)
+    flask.abort(500, f"Test")
+    # return flask.make_response({}, 500)
 
 
 # ''' Main '''

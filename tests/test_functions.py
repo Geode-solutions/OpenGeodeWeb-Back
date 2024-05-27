@@ -1,6 +1,9 @@
 import os
 import uuid
 from src.opengeodeweb_back import geode_functions, geode_objects
+from werkzeug.exceptions import HTTPException
+from jsonschema import validate
+from jsonschema.exceptions import ValidationError
 
 
 data_folder = os.path.join(os.path.dirname(__file__), "data")
@@ -329,3 +332,14 @@ def test_extension_from_filename():
     extension = geode_functions.extension_from_filename("test.toto")
     assert type(extension) is str
     assert extension.count(".") == 0
+
+
+def test_handle_exception(client):
+    route = "/error"
+    response = client.post(route)
+    assert response.status_code == 500
+    data = response.get_json()
+    assert type(data) is dict
+    assert type(data["description"]) is str
+    assert type(data["name"]) is str
+    assert type(data["code"]) is int
