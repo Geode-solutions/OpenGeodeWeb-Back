@@ -36,7 +36,6 @@ app.register_blueprint(
 
 @app.errorhandler(HTTPException)
 def errorhandler(e):
-    # print("tutu", e, flush=True)
     return handle_exception(e)
 
 
@@ -45,9 +44,7 @@ def errorhandler(e):
     methods=["POST"],
 )
 def return_error():
-    # print("return_error 123", flush=True)
     flask.abort(500, f"Test")
-    # return flask.make_response({}, 500)
 
 
 # ''' Main '''

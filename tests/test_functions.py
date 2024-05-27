@@ -1,9 +1,6 @@
 import os
 import uuid
 from src.opengeodeweb_back import geode_functions, geode_objects
-from werkzeug.exceptions import HTTPException
-from jsonschema import validate
-from jsonschema.exceptions import ValidationError
 
 
 data_folder = os.path.join(os.path.dirname(__file__), "data")
