@@ -329,3 +329,14 @@ def test_extension_from_filename():
     extension = geode_functions.extension_from_filename("test.toto")
     assert type(extension) is str
     assert extension.count(".") == 0
+
+
+def test_handle_exception(client):
+    route = "/error"
+    response = client.post(route)
+    assert response.status_code == 500
+    data = response.get_json()
+    assert type(data) is dict
+    assert type(data["description"]) is str
+    assert type(data["name"]) is str
+    assert type(data["code"]) is int

@@ -31,7 +31,7 @@ def allowed_files():
     extensions = geode_functions.list_input_extensions(
         flask.request.json["supported_feature"]
     )
-    return {"status": 200, "extensions": extensions}
+    return flask.make_response({"extensions": extensions}, 200)
 
 
 with open(
