@@ -2,6 +2,23 @@
 
 
 
+## v4.2.1-rc.1 (2024-06-03)
+
+### Fix
+
+* fix(deps): update ([`b1eb9b6`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b1eb9b6a75e0f3d319348466d7aef14868e49fa0))
+
+### Unknown
+
+* Merge pull request #81 from Geode-solutions/fix/update_og_dependencies
+
+Fix/update og dependencies ([`9d3956c`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/9d3956c5798a08abe9e56ce3ce82053a19626f54))
+
+* update inspector api functions ([`c44099c`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c44099c00bf5217cd55f532d76354b850b6df9ff))
+
+*  ([`c8dec55`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c8dec55f3a0574264c21c1dacfded0934a658fbf))
+
+
 ## v4.2.0 (2024-05-27)
 
 ### Unknown
