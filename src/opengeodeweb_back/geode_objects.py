@@ -67,7 +67,7 @@ def geode_objects_dict():
             "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_edged_curve2D,
-            "inspector": og_inspector.inspect_edgedcurve2D,
+            "inspector": og_inspector.inspect_edged_curve2D,
         },
         "EdgedCurve3D": {
             "input_factory": og.EdgedCurveInputFactory3D,
@@ -87,7 +87,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_edged_curve3D,
-            "inspector": og_inspector.inspect_edgedcurve3D,
+            "inspector": og_inspector.inspect_edged_curve3D,
         },
         "Graph": {
             "input_factory": og.GraphInputFactory,
@@ -166,7 +166,7 @@ def geode_objects_dict():
             "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_point_set2D,
-            "inspector": og_inspector.inspect_pointset2D,
+            "inspector": og_inspector.inspect_point_set2D,
         },
         "PointSet3D": {
             "input_factory": og.PointSetInputFactory3D,
@@ -186,7 +186,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_point_set3D,
-            "inspector": og_inspector.inspect_pointset3D,
+            "inspector": og_inspector.inspect_point_set3D,
         },
         "PolygonalSurface2D": {
             "input_factory": og.PolygonalSurfaceInputFactory2D,
