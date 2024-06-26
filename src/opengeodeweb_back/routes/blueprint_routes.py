@@ -7,6 +7,7 @@ import flask
 import flask_cors
 from .. import geode_functions
 import werkzeug
+import uuid
 
 
 routes = flask.Blueprint("routes", __name__)
@@ -202,5 +203,59 @@ def geode_objects_and_output_extensions():
     )
     return flask.make_response(
         {"geode_objects_and_output_extensions": geode_objects_and_output_extensions},
+        200,
+    )
+
+
+with open(
+    os.path.join(schemas, "save_viewable_file.json"),
+    "r",
+) as file:
+    save_viewable_file_json = json.load(file)
+
+
+@routes.route(
+    save_viewable_file_json["route"],
+    methods=save_viewable_file_json["methods"],
+)
+def save_viewable_file():
+    UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
+    geode_functions.validate_request(flask.request, save_viewable_file_json)
+
+    secure_filename = werkzeug.utils.secure_filename(flask.request.json["filename"])
+    file_path = os.path.abspath(os.path.join(UPLOAD_FOLDER, secure_filename))
+    data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
+    generated_id = str(uuid.uuid4()).replace("-", "")
+
+    if geode_functions.is_viewable(flask.request.json["input_geode_object"]):
+        name = data.name()
+    else:
+        name = flask.request.json["filename"]
+
+    native_extension = data.native_extension()
+
+    absolute_native_file_path = os.path.join(
+        UPLOAD_FOLDER, generated_id + "." + native_extension
+    )
+
+    saved_viewable_file_path = geode_functions.save_viewable(
+        flask.request.json["input_geode_object"], data, UPLOAD_FOLDER, generated_id
+    )
+    geode_functions.save(
+        flask.request.json["input_geode_object"],
+        data,
+        UPLOAD_FOLDER,
+        generated_id + "." + native_extension,
+    )
+
+    native_file_name = os.path.basename(absolute_native_file_path)
+    viewable_file_name = os.path.basename(saved_viewable_file_path)
+    return flask.make_response(
+        {
+            "name": name,
+            "native_file_name": native_file_name,
+            "viewable_file_name": viewable_file_name,
+            "id": generated_id,
+        },
         200,
     )
