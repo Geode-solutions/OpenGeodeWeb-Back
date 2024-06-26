@@ -155,3 +155,33 @@ def test_geode_objects_and_output_extensions(client):
     assert (
         error_message == "Validation error: 'input_geode_object' is a required property"
     )
+
+
+def test_save_viewable_file(client):
+    route = f"/save_viewable_file"
+
+    def get_full_data():
+        return {
+            "input_geode_object": "BRep",
+            "filename": "corbi.og_brep",
+        }
+
+    # Normal test with filename 'corbi.og_brep'
+    response = client.post(route, json=get_full_data())
+    assert response.status_code == 200
+    name = response.json["name"]
+    assert type(name) is str
+    native_file_name = response.json["native_file_name"]
+    assert type(native_file_name) is str
+    viewable_file_name = response.json["viewable_file_name"]
+    assert type(viewable_file_name) is str
+    id = response.json["id"]
+    assert type(id) is str
+
+    for key, value in get_full_data().items():
+        json = get_full_data()
+        json.pop(key)
+        response = client.post(route, json=json)
+        assert response.status_code == 400
+        error_description = response.json["description"]
+        assert error_description == f"Validation error: '{key}' is a required property"
