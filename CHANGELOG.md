@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v4.3.0 (2024-06-26)
+
+### Unknown
+
+* Merge pull request #85 from Geode-solutions/next
+
+Next ([`dcafe7e`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/dcafe7e0cc040d4ce8405ce734e8d9fb027b99e0))
+
 ## v4.3.0-rc.1 (2024-06-26)
 
 ### Feature
