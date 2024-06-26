@@ -220,6 +220,8 @@ with open(
 )
 def save_viewable_file():
     UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
+    geode_functions.validate_request(flask.request, save_viewable_file_json)
+
     secure_filename = werkzeug.utils.secure_filename(flask.request.json["filename"])
     file_path = os.path.abspath(os.path.join(UPLOAD_FOLDER, secure_filename))
     data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
