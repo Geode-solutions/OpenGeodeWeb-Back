@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v4.3.1 (2024-07-17)
+
+### Unknown
+
+* Merge pull request #87 from Geode-solutions/next
+
+Next ([`07795d1`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/07795d10a8c830e42dcf040af578929c09c2e08a))
+
 ## v4.3.1-rc.1 (2024-07-17)
 
 ### Fix
