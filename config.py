@@ -9,6 +9,7 @@ class Config(object):
     PORT = "5000"
     CORS_HEADERS = "Content-Type"
     UPLOAD_FOLDER = "./uploads"
+    DATA_FOLDER_PATH = "./data/"
     WORKFLOWS_DATA_FOLDER = "./data_workflows/"
     LOCK_FOLDER = "./lock/"
     TIME_FOLDER = "./time/"
