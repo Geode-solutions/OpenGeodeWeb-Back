@@ -25,7 +25,7 @@ class ProdConfig(Config):
 
 class DevConfig(Config):
     SSL = None
-    ORIGINS = "http://localhost:3000"
+    ORIGINS = ["*"]
     MINUTES_BEFORE_TIMEOUT = "1000"
     SECONDS_BETWEEN_SHUTDOWNS = "60"
     DATA_FOLDER = "./data/"

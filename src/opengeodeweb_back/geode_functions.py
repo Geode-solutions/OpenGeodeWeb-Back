@@ -1,17 +1,10 @@
 # Standard library imports
 import os
-import time
-import threading
-import uuid
-import zipfile
 
 # Third party imports
 import flask
 import opengeode_geosciences as og_gs
 import opengeode as og
-import pkg_resources
-from jsonschema import validate
-from jsonschema.exceptions import ValidationError
 
 # Local application imports
 from .geode_objects import geode_objects_dict
@@ -200,75 +193,6 @@ def get_inspector_children(obj):
     return new_object
 
 
-def versions(list_packages: list):
-    list_with_versions = []
-    for package in list_packages:
-        list_with_versions.append(
-            {
-                "package": package,
-                "version": pkg_resources.get_distribution(package).version,
-            }
-        )
-    return list_with_versions
-
-
-def create_lock_file(
-    folder_absolute_path,
-):
-    if not os.path.exists(folder_absolute_path):
-        os.mkdir(folder_absolute_path)
-    id = uuid.uuid4()
-    file_absolute_path = f"{folder_absolute_path}/{str(id)}.txt"
-    f = open(file_absolute_path, "a")
-    f.close()
-    flask.g.UUID = id
-
-
-def create_time_file(folder_absolute_path):
-    if not os.path.exists(folder_absolute_path):
-        os.mkdir(folder_absolute_path)
-    file_path = f"{folder_absolute_path}/time.txt"
-    if not os.path.isfile(file_path):
-        f = open(file_path, "w")
-        f.close()
-
-    f = open(folder_absolute_path + "/time.txt", "w")
-    f.write(str(time.time()))
-    f.close()
-
-
-def remove_lock_file(folder_absolute_path):
-    id = flask.g.UUID
-    os.remove(f"{folder_absolute_path}/{str(id)}.txt")
-
-
-def set_interval(func, sec):
-    def func_wrapper():
-        set_interval(func, sec)
-        func()
-
-    t = threading.Timer(sec, func_wrapper)
-    t.daemon = True
-    t.start()
-    return t
-
-
-def extension_from_filename(filename):
-    return os.path.splitext(filename)[1][1:]
-
-
-def validate_request(request, schema):
-    json_data = request.get_json(force=True, silent=True)
-
-    if json_data is None:
-        json_data = {}
-
-    try:
-        validate(instance=json_data, schema=schema)
-    except ValidationError as e:
-        flask.abort(400, f"Validation error: {e.message}")
-
-
 def geographic_coordinate_systems(geode_object: str):
     if is_3D(geode_object):
         return og_gs.GeographicCoordinateSystem3D.geographic_coordinate_systems()
@@ -329,41 +253,3 @@ def create_coordinate_system(
     create_crs(
         geode_object, data, name, input_coordiante_system, output_coordiante_system
     )
-
-
-def send_file(upload_folder, saved_files, new_file_name):
-    if len(saved_files) == 1:
-        mimetype = "application/octet-binary"
-    else:
-        mimetype = "application/zip"
-        new_file_name = os.path.splitext(new_file_name)[0] + ".zip"
-        with zipfile.ZipFile(os.path.join(upload_folder, new_file_name), "w") as zipObj:
-            for saved_file_path in saved_files:
-                zipObj.write(
-                    saved_file_path,
-                    os.path.basename(saved_file_path),
-                )
-
-    response = flask.send_from_directory(
-        directory=upload_folder,
-        path=new_file_name,
-        as_attachment=True,
-        mimetype=mimetype,
-    )
-    response.headers["new-file-name"] = new_file_name
-    response.headers["Access-Control-Expose-Headers"] = "new-file-name"
-
-    return response
-
-
-def handle_exception(e):
-    response = e.get_response()
-    response.data = flask.json.dumps(
-        {
-            "code": e.code,
-            "name": e.name,
-            "description": e.description,
-        }
-    )
-    response.content_type = "application/json"
-    return response
