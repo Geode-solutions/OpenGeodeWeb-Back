@@ -11,16 +11,16 @@ import uuid
 
 routes = flask.Blueprint("routes", __name__)
 
-@routes.before_request
-def before_request():
-    if "ping" not in flask.request.path:
-        utils_functions.increment_request_counter(flask.current_app)
+# @routes.before_request
+# def before_request():
+#     if "ping" not in flask.request.path:
+#         utils_functions.increment_request_counter(flask.current_app)
 
-@routes.teardown_request
-def teardown_request(exception):
-    if "ping" not in flask.request.path:
-        utils_functions.decrement_request_counter(flask.current_app)
-        utils_functions.update_last_request_time(flask.current_app)
+# @routes.teardown_request
+# def teardown_request(exception):
+#     if "ping" not in flask.request.path:
+#         utils_functions.decrement_request_counter(flask.current_app)
+#         utils_functions.update_last_request_time(flask.current_app)
 
 schemas = os.path.join(os.path.dirname(__file__), "schemas")
 
@@ -36,7 +36,7 @@ with open(
     methods=allowed_files_json["methods"],
 )
 def allowed_files():
-    geode_functions.validate_request(flask.request, allowed_files_json)
+    utils_functions.validate_request(flask.request, allowed_files_json)
     extensions = geode_functions.list_input_extensions(
         flask.request.json["supported_feature"]
     )
@@ -83,7 +83,7 @@ def allowed_objects():
         return flask.make_response({}, 200)
 
     UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
-    geode_functions.validate_request(flask.request, allowed_objects_json)
+    utils_functions.validate_request(flask.request, allowed_objects_json)
     file_absolute_path = os.path.join(UPLOAD_FOLDER, flask.request.json["filename"])
     allowed_objects = geode_functions.list_geode_objects(
         file_absolute_path, flask.request.json["supported_feature"]
@@ -104,7 +104,7 @@ with open(
 )
 def missing_files():
     UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
-    geode_functions.validate_request(flask.request, missing_files_json)
+    utils_functions.validate_request(flask.request, missing_files_json)
 
     missing_files = geode_functions.missing_files(
         flask.request.json["input_geode_object"],
@@ -142,7 +142,7 @@ with open(
     methods=geographic_coordinate_systems_json["methods"],
 )
 def crs_converter_geographic_coordinate_systems():
-    geode_functions.validate_request(flask.request, geographic_coordinate_systems_json)
+    utils_functions.validate_request(flask.request, geographic_coordinate_systems_json)
     infos = geode_functions.geographic_coordinate_systems(
         flask.request.json["input_geode_object"]
     )
@@ -172,7 +172,7 @@ with open(
 )
 def inspect_file():
     UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
-    geode_functions.validate_request(flask.request, inspect_file_json)
+    utils_functions.validate_request(flask.request, inspect_file_json)
 
     secure_filename = werkzeug.utils.secure_filename(flask.request.json["filename"])
     file_path = os.path.abspath(os.path.join(UPLOAD_FOLDER, secure_filename))
@@ -197,7 +197,7 @@ with open(
 )
 def geode_objects_and_output_extensions():
     UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
-    geode_functions.validate_request(
+    utils_functions.validate_request(
         flask.request, geode_objects_and_output_extensions_json
     )
     data = geode_functions.load(
@@ -229,7 +229,7 @@ with open(
 def save_viewable_file():
     UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
     DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
-    geode_functions.validate_request(flask.request, save_viewable_file_json)
+    utils_functions.validate_request(flask.request, save_viewable_file_json)
 
     secure_filename = werkzeug.utils.secure_filename(flask.request.json["filename"])
     file_path = os.path.abspath(os.path.join(UPLOAD_FOLDER, secure_filename))

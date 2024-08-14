@@ -7,7 +7,7 @@ import flask_cors
 from werkzeug.exceptions import HTTPException
 
 from src.opengeodeweb_back.routes import blueprint_routes
-from src.opengeodeweb_back.geode_functions import handle_exception
+from src.opengeodeweb_back.utils_functions import handle_exception
 
 
 """ Global config """
