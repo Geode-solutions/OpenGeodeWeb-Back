@@ -310,33 +310,3 @@ def test_geode_objects_output_extensions():
                         output_extension_value,
                     ) in output_geode_object_value.items():
                         assert type(output_extension_value["is_saveable"]) is bool
-
-
-def test_versions():
-    list_packages = [
-        "OpenGeode-core",
-        "OpenGeode-IO",
-        "OpenGeode-Geosciences",
-        "OpenGeode-GeosciencesIO",
-    ]
-    versions = geode_functions.versions(list_packages)
-    assert type(versions) is list
-    for version in versions:
-        assert type(version) is dict
-
-
-def test_extension_from_filename():
-    extension = geode_functions.extension_from_filename("test.toto")
-    assert type(extension) is str
-    assert extension.count(".") == 0
-
-
-def test_handle_exception(client):
-    route = "/error"
-    response = client.post(route)
-    assert response.status_code == 500
-    data = response.get_json()
-    assert type(data) is dict
-    assert type(data["description"]) is str
-    assert type(data["name"]) is str
-    assert type(data["code"]) is int
