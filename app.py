@@ -11,9 +11,6 @@ from src.opengeodeweb_back.utils_functions import handle_exception
 from src.opengeodeweb_back import app_config
 
 
-print("Hello World", app_config)
-
-
 """ Global config """
 app = flask.Flask(__name__)
 
@@ -25,8 +22,6 @@ if FLASK_DEBUG == False:
 else:
     app.config.from_object(app_config.DevConfig)
 
-
-print(f"{app.config=}", flush=True)
 PORT = int(app.config.get("DEFAULT_PORT"))
 ORIGINS = app.config.get("ORIGINS")
 SSL = app.config.get("SSL")

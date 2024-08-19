@@ -147,8 +147,6 @@ def crs_converter_geographic_coordinate_systems():
         flask.request.json["input_geode_object"]
     )
     crs_list = []
-    print(infos)
-    print(flask.request.json["input_geode_object"])
     for info in infos:
         crs = {}
         crs["name"] = info.name
