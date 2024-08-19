@@ -13,18 +13,21 @@ import pkg_resources
 # Local application imports
 
 def increment_request_counter(current_app):
-    REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER"))
-    REQUEST_COUNTER += 1
-    current_app.config.update(REQUEST_COUNTER=REQUEST_COUNTER)
+    if "REQUEST_COUNTER" in current_app.config:
+        REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER"))
+        REQUEST_COUNTER += 1
+        current_app.config.update(REQUEST_COUNTER=REQUEST_COUNTER)
 
 def decrement_request_counter(current_app):
-    REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER"))
-    REQUEST_COUNTER -= 1
-    current_app.config.update(REQUEST_COUNTER=REQUEST_COUNTER)
+    if "REQUEST_COUNTER" in current_app.config:
+        REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER"))
+        REQUEST_COUNTER -= 1
+        current_app.config.update(REQUEST_COUNTER=REQUEST_COUNTER)
 
 def update_last_request_time(current_app):
-    LAST_REQUEST_TIME = time.time()
-    current_app.config.update(LAST_REQUEST_TIME=LAST_REQUEST_TIME)
+    if "LAST_REQUEST_TIME" in current_app.config:
+        LAST_REQUEST_TIME = time.time()
+        current_app.config.update(LAST_REQUEST_TIME=LAST_REQUEST_TIME)
 
 
 def kill_task(current_app):

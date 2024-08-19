@@ -8,6 +8,10 @@ from werkzeug.exceptions import HTTPException
 
 from src.opengeodeweb_back.routes import blueprint_routes
 from src.opengeodeweb_back.utils_functions import handle_exception
+from src.opengeodeweb_back import app_config
+
+
+print("Hello World", app_config)
 
 
 """ Global config """
@@ -17,12 +21,13 @@ app = flask.Flask(__name__)
 FLASK_DEBUG = True if os.environ.get("FLASK_DEBUG", default=None) == "True" else False
 
 if FLASK_DEBUG == False:
-    app.config.from_object("config.ProdConfig")
+    app.config.from_object(app_config.ProdConfig)
 else:
-    app.config.from_object("config.DevConfig")
+    app.config.from_object(app_config.DevConfig)
 
 
-PORT = int(app.config.get("PORT"))
+print(f"{app.config=}", flush=True)
+PORT = int(app.config.get("DEFAULT_PORT"))
 ORIGINS = app.config.get("ORIGINS")
 SSL = app.config.get("SSL")
 
