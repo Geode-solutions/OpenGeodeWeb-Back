@@ -10,6 +10,7 @@ import opengeode as og
 from .geode_objects import geode_objects_dict
 from . import utils_functions
 
+
 def geode_object_value(geode_object: str):
     return geode_objects_dict()[geode_object]
 
@@ -140,7 +141,9 @@ def list_geode_objects(
     key: str = None,
 ):
     return_dict = {}
-    file_extension = utils_functions.extension_from_filename(os.path.basename(file_absolute_path))
+    file_extension = utils_functions.extension_from_filename(
+        os.path.basename(file_absolute_path)
+    )
     geode_objects_filtered_list = filter_geode_objects(key)
 
     for geode_object in geode_objects_filtered_list:

@@ -5,6 +5,7 @@ import time
 # Third party imports
 # Local application imports
 
+
 class Config(object):
     FLASK_DEBUG = os.environ.get("FLASK_DEBUG", default=False)
     DEFAULT_PORT = "5000"

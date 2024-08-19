@@ -7,10 +7,12 @@ def test_increment_request_counter(app_context):
     utils_functions.increment_request_counter(flask.current_app)
     assert flask.current_app.config.get("REQUEST_COUNTER") == 1
 
+
 def test_decrement_request_counter(app_context):
     assert flask.current_app.config.get("REQUEST_COUNTER") == 1
     utils_functions.decrement_request_counter(flask.current_app)
     assert flask.current_app.config.get("REQUEST_COUNTER") == 0
+
 
 def test_update_last_request_time(app_context):
     LAST_REQUEST_TIME = flask.current_app.config.get("LAST_REQUEST_TIME")

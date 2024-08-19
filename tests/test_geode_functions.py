@@ -310,5 +310,3 @@ def test_geode_objects_output_extensions():
                         output_extension_value,
                     ) in output_geode_object_value.items():
                         assert type(output_extension_value["is_saveable"]) is bool
-
-

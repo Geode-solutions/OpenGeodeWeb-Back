@@ -12,17 +12,20 @@ import pkg_resources
 
 # Local application imports
 
+
 def increment_request_counter(current_app):
     if "REQUEST_COUNTER" in current_app.config:
         REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER"))
         REQUEST_COUNTER += 1
         current_app.config.update(REQUEST_COUNTER=REQUEST_COUNTER)
 
+
 def decrement_request_counter(current_app):
     if "REQUEST_COUNTER" in current_app.config:
         REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER"))
         REQUEST_COUNTER -= 1
         current_app.config.update(REQUEST_COUNTER=REQUEST_COUNTER)
+
 
 def update_last_request_time(current_app):
     if "LAST_REQUEST_TIME" in current_app.config:
@@ -40,12 +43,15 @@ def kill_task(current_app):
     minutes_since_last_request = (current_time - LAST_REQUEST_TIME) / 60
     minutes_since_last_ping = (current_time - LAST_PING_TIME) / 60
 
-    if (((minutes_since_last_request > MINUTES_BEFORE_TIMEOUT) and (DESKTOP_APP == False)) or 
-        (minutes_since_last_ping > MINUTES_BEFORE_TIMEOUT)
-        ) and (REQUEST_COUNTER == 0):
+    if (
+        (
+            (minutes_since_last_request > MINUTES_BEFORE_TIMEOUT)
+            and (DESKTOP_APP == False)
+        )
+        or (minutes_since_last_ping > MINUTES_BEFORE_TIMEOUT)
+    ) and (REQUEST_COUNTER == 0):
         print("Server timed out due to inactivity, shutting down...", flush=True)
         os._exit(0)
-
 
 
 def versions(list_packages: list):
@@ -60,7 +66,6 @@ def versions(list_packages: list):
     return list_with_versions
 
 
-
 def validate_request(request, schema):
     json_data = request.get_json(force=True, silent=True)
 
@@ -71,7 +76,6 @@ def validate_request(request, schema):
         validate(instance=json_data, schema=schema)
     except ValidationError as e:
         flask.abort(400, f"Validation error: {e.message}")
-
 
 
 def set_interval(func, sec, args=None):

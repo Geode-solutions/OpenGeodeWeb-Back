@@ -14,6 +14,7 @@ def client():
     client.headers = {"Content-type": "application/json", "Accept": "application/json"}
     yield client
 
+
 @pytest.fixture
 def app_context():
     with app.app_context():
