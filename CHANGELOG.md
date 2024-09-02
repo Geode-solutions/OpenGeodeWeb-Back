@@ -1,5 +1,43 @@
 # CHANGELOG
 
+## v5.0.0-rc.1 (2024-08-19)
+
+### Breaking
+
+* feat(ping route): updates LAST_PING_TIME
+
+BREAKING CHANGE: functions moved to utils_functions.py ([`bcb01de`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/bcb01ded807d2d8dfbca98dce209e5e13830aa40))
+
+### Chore
+
+* chore(deps): update ([`191bfbf`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/191bfbfca0d16aacef152429deccb091f0d60e23))
+
+### Unknown
+
+* Merge pull request #89 from Geode-solutions/feat/ping_route
+
+Feat/ping route ([`35cf6e6`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/35cf6e6a8b92ff28128d8dab10c93c458541515c))
+
+* Apply prepare changes ([`284b98b`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/284b98b64b209344ec5277cf34d782a475a52738))
+
+* cleanup Closes #83 ([`5e18763`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/5e187635380b0298ea36b10bd71733b5b946e0ac))
+
+* fix tests &amp; gloabl app_config ([`e247204`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/e247204a2d75c8c050f53b3b7d0eb00ee80765b0))
+
+* Merge branch &#39;next&#39; into feat/ping_route ([`e4c6644`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/e4c66440d7cbf4803080b357a42377bb5246dd10))
+
+* Merge pull request #88 from Geode-solutions/chore/update_ecosystem
+
+Chore/update ecosystem ([`1676c23`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/1676c239a68cc4115136452df209b6a87ce18fc3))
+
+* test.pl file ([`84696d1`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/84696d1a314f53ef5d8a1a20866cddaddc652b7a))
+
+* test ([`e8eb151`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/e8eb1514fe53c5be45e67f2943c5b433838efd6f))
+
+* update tests ([`326c3a9`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/326c3a9de028a5d1bdd2f42c26edf3c7227b55cf))
+
+*  ([`a98eb92`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/a98eb920912bc2d8d87b36bd2139e79be3ef6c74))
+
 ## v4.3.1 (2024-07-17)
 
 ### Unknown
