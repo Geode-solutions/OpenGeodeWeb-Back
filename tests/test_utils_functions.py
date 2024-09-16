@@ -20,6 +20,21 @@ def test_update_last_request_time(app_context):
     assert flask.current_app.config.get("LAST_REQUEST_TIME") >= LAST_REQUEST_TIME
 
 
+def test_before_request(app_context):
+    assert flask.current_app.config.get("REQUEST_COUNTER") == 0
+    utils_functions.before_request(flask.current_app)
+    assert flask.current_app.config.get("REQUEST_COUNTER") == 1
+
+
+def test_teardown_request(app_context):
+    LAST_REQUEST_TIME = flask.current_app.config.get("LAST_REQUEST_TIME")
+    assert flask.current_app.config.get("REQUEST_COUNTER") == 1
+    utils_functions.teardown_request(flask.current_app)
+    assert flask.current_app.config.get("REQUEST_COUNTER") == 0
+    assert flask.current_app.config.get("LAST_REQUEST_TIME") >= LAST_REQUEST_TIME
+
+
+
 def test_versions():
     list_packages = [
         "OpenGeode-core",
