@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## v5.1.0-rc.1 (2024-09-16)
+
+### Feature
+
+* feat(utils_functions): before &amp; teardown requests function wrappers ([`63af3ae`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/63af3aedea522d02e33a80c8bd8f137a1bf66a17))
+
+### Unknown
+
+* Merge pull request #91 from Geode-solutions/feat/before_teardown_request
+
+feat(utils_functions): before &amp; teardown requests function wrappers ([`01d7877`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/01d78772e243255bbd5dc7061ff7caa7190d1c3d))
+
+* Apply prepare changes ([`74bd569`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/74bd569d75f991ff9bfc91c7b648d1374f8d841e))
+
+*  ([`41db35c`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/41db35cab5bc1555bf8c46cca03e513fbabb4189))
+
 ## v5.0.0 (2024-09-02)
 
 ### Unknown
