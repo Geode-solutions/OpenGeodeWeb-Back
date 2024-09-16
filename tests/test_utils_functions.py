@@ -34,7 +34,6 @@ def test_teardown_request(app_context):
     assert flask.current_app.config.get("LAST_REQUEST_TIME") >= LAST_REQUEST_TIME
 
 
-
 def test_versions():
     list_packages = [
         "OpenGeode-core",

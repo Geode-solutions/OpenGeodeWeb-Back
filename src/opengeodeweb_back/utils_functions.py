@@ -32,12 +32,15 @@ def update_last_request_time(current_app):
         LAST_REQUEST_TIME = time.time()
         current_app.config.update(LAST_REQUEST_TIME=LAST_REQUEST_TIME)
 
+
 def before_request(current_app):
     increment_request_counter(current_app)
+
 
 def teardown_request(current_app):
     decrement_request_counter(current_app)
     update_last_request_time(current_app)
+
 
 def kill_task(current_app):
     DESKTOP_APP = bool(current_app.config.get("DESKTOP_APP"))
