@@ -1,6 +1,24 @@
 # CHANGELOG
 
 
+## v5.3.0-rc.1 (2024-10-15)
+
+### Features
+
+* feat(io): add io & mappings for ImplicitStructuralModel & ImplicitCrossSection
+closes #94 ([`1c0cfa5`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/1c0cfa5051c0931fdbace2ec0c58782d9b5f3c10))
+
+### Unknown
+
+* Merge pull request #97 from Geode-solutions/feat/implicit_cross_section_and_structural_model
+
+feat(io): add io & mappings for ImplicitStructuralModel & ImplicitCro… ([`25723a4`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/25723a4f4c1fe04a7473dfc0b6e9132eab30a8e8))
+
+* save_viewable_implicit_structural_model ([`0cceb4a`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/0cceb4afd051b8c3a756571bc0578d1a27431c6c))
+
+*  ([`000b1f1`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/000b1f1d1c57b4ca77458addfa5919d55101cdc9))
+
+
 ## v5.2.0 (2024-10-14)
 
 ### Unknown
