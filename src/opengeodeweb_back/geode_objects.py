@@ -161,7 +161,7 @@ def geode_objects_dict():
             "is_model": True,
             "is_3D": True,
             "is_viewable": True,
-            "save_viewable": g_v.save_viewable_structural_model,
+            "save_viewable": g_v.save_viewable_implicit_structural_model,
             "inspector": og_inspector.inspect_brep,
         },
         "LightRegularGrid2D": {
