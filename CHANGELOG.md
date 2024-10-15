@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v5.3.0 (2024-10-15)
+
+### Unknown
+
+* Merge pull request #98 from Geode-solutions/next
+
+Next ([`ffe0191`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/ffe0191fbaed7633e536ba021602f3c5c36bb97e))
+
+
 ## v5.3.0-rc.1 (2024-10-15)
 
 ### Features
