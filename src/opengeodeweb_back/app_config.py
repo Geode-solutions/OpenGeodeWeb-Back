@@ -8,6 +8,7 @@ import time
 
 class Config(object):
     FLASK_DEBUG = os.environ.get("FLASK_DEBUG", default=False)
+    DEFAULT_HOST = "localhost"
     DEFAULT_PORT = "5000"
     CORS_HEADERS = "Content-Type"
     UPLOAD_FOLDER = "./uploads"
