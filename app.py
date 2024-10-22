@@ -22,6 +22,7 @@ if FLASK_DEBUG == False:
 else:
     app.config.from_object(app_config.DevConfig)
 
+DEFAULT_HOST = app.config.get("DEFAULT_HOST")
 PORT = int(app.config.get("DEFAULT_PORT"))
 ORIGINS = app.config.get("ORIGINS")
 SSL = app.config.get("SSL")
@@ -50,4 +51,4 @@ def return_error():
 # ''' Main '''
 if __name__ == "__main__":
     print(f"Python is running in {FLASK_DEBUG} mode")
-    app.run(debug=FLASK_DEBUG, host="0.0.0.0", port=PORT, ssl_context=SSL)
+    app.run(debug=FLASK_DEBUG, host=DEFAULT_HOST, port=PORT, ssl_context=SSL)
