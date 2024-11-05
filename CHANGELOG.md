@@ -1,6 +1,23 @@
 # CHANGELOG
 
 
+## v5.3.2-rc.1 (2024-11-05)
+
+### Bug Fixes
+
+* fix(inspector): new api for TriangulatedSurfaces 2&3D ([`82afeae`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/82afeae0daab8d9f5e56cb59e0edbdca5b82fb18))
+
+### Unknown
+
+* Merge pull request #101 from Geode-solutions/fix/update_ecosystem
+
+fix(inspector): new api for TriangulatedSurfaces 2&3D ([`ce63803`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/ce63803580a01202c8abc198f3da14d16098d412))
+
+* update requirements master ([`c9edb88`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c9edb88035014179f4a243b5cecc9a470bb35df1))
+
+*  ([`7c3b4cb`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/7c3b4cb389000ab57cba0c2d904df1661abd9de9))
+
+
 ## v5.3.1 (2024-10-22)
 
 ### Unknown
