@@ -39,7 +39,7 @@ geode-conversion==6.0.14
     # via
     #   geode-explicit
     #   geode-implicit
-geode-explicit==6.1.13
+geode-explicit==6.1.14
     # via
     #   -r requirements.in
     #   geode-implicit
@@ -50,7 +50,7 @@ geode-numerics==5.1.8
     #   -r requirements.in
     #   geode-implicit
     #   geode-simplex
-geode-simplex==8.2.13
+geode-simplex==8.2.14
     # via
     #   -r requirements.in
     #   geode-implicit
@@ -93,7 +93,7 @@ opengeode-geosciencesio==5.2.3
     # via
     #   -r requirements.in
     #   geode-implicit
-opengeode-inspector==6.1.9
+opengeode-inspector==6.1.10
     # via
     #   -r requirements.in
     #   geode-explicit
@@ -115,7 +115,7 @@ rpds-py==0.20.1
     #   referencing
 typing-extensions==4.12.2
     # via asgiref
-werkzeug==3.1.1
+werkzeug==3.1.2
     # via
     #   -r requirements.in
     #   flask
