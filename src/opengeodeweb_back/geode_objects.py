@@ -433,7 +433,7 @@ def geode_objects_dict():
             "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_triangulated_surface2D,
-            "inspector": og_inspector.inspect_triangulated_surface2D,
+            "inspector": og_inspector.inspect_surface2D,
         },
         "TriangulatedSurface3D": {
             "input_factory": og.TriangulatedSurfaceInputFactory3D,
@@ -453,7 +453,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_triangulated_surface3D,
-            "inspector": og_inspector.inspect_triangulated_surface3D,
+            "inspector": og_inspector.inspect_surface3D,
         },
         "VertexSet": {
             "input_factory": og.VertexSetInputFactory,
