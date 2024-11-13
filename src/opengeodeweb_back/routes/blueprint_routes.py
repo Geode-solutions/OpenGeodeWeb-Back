@@ -278,7 +278,7 @@ with open(os.path.join(schemas, "create_point.json"), "r") as file:
     create_point_json = json.load(file)
 
 
-@routes.route(create_point_json["route"],methods=create_point_json["methods"] )
+@routes.route(create_point_json["route"], methods=create_point_json["methods"])
 def create_point():
     utils_functions.validate_request(flask.request, create_point_json)
     DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
@@ -291,7 +291,9 @@ def create_point():
     builder.create_point(opengeode.Point3D([x, y, z]))
 
     generated_id = str(uuid.uuid4()).replace("-", "")
-    saved_viewable_file_path = geode_functions.save_viewable("PointSet3D", PointSet3D, DATA_FOLDER_PATH, generated_id)
+    saved_viewable_file_path = geode_functions.save_viewable(
+        "PointSet3D", PointSet3D, DATA_FOLDER_PATH, generated_id
+    )
 
     return flask.make_response(
         {
