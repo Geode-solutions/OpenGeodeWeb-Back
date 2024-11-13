@@ -5,9 +5,12 @@ import time
 
 # Third party imports
 import flask
-from .. import geode_functions, utils_functions
-import werkzeug
+import opengeode
 import uuid
+import werkzeug
+
+# Local application imports
+from .. import geode_functions, utils_functions
 
 routes = flask.Blueprint("routes", __name__)
 
@@ -265,6 +268,34 @@ def save_viewable_file():
             "name": name,
             "native_file_name": native_file_name,
             "viewable_file_name": viewable_file_name,
+            "id": generated_id,
+        },
+        200,
+    )
+
+
+with open(os.path.join(schemas, "create_point.json"), "r") as file:
+    create_point_json = json.load(file)
+
+
+@routes.route(create_point_json["route"],methods=create_point_json["methods"] )
+def create_point():
+    utils_functions.validate_request(flask.request, create_point_json)
+    DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
+    x = flask.request.json["x"]
+    y = flask.request.json["y"]
+    z = flask.request.json["z"]
+    class_ = geode_functions.geode_object_class("PointSet3D")
+    PointSet3D = class_.create()
+    builder = geode_functions.create_builder("PointSet3D", PointSet3D)
+    builder.create_point(opengeode.Point3D([x, y, z]))
+
+    generated_id = str(uuid.uuid4()).replace("-", "")
+    saved_viewable_file_path = geode_functions.save_viewable("PointSet3D", PointSet3D, DATA_FOLDER_PATH, generated_id)
+
+    return flask.make_response(
+        {
+            "viewable_file_name": os.path.basename(saved_viewable_file_path),
             "id": generated_id,
         },
         200,
