@@ -44,6 +44,7 @@ def test_allowed_objects(client):
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
+
 def test_upload_file(client):
     response = client.put(
         f"/upload_file",
@@ -63,7 +64,7 @@ def test_missing_files(client):
         }
 
     json = get_full_data()
-    response = client.post(route,json=json)
+    response = client.post(route, json=json)
     assert response.status_code == 200
     has_missing_files = response.json["has_missing_files"]
     mandatory_files = response.json["mandatory_files"]
@@ -74,6 +75,7 @@ def test_missing_files(client):
 
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
+
 
 def test_geographic_coordinate_systems(client):
     route = f"/geographic_coordinate_systems"
@@ -89,8 +91,9 @@ def test_geographic_coordinate_systems(client):
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
+
 def test_inspect_file(client):
-    route = f"/inspect_file" 
+    route = f"/inspect_file"
 
     def get_full_data():
         return {
@@ -108,6 +111,7 @@ def test_inspect_file(client):
 
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
+
 
 def test_geode_objects_and_output_extensions(client):
     route = "/geode_objects_and_output_extensions"
@@ -159,6 +163,7 @@ def test_save_viewable_file(client):
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
+
 def test_vertex_attribute_names(client):
     response = client.put(
         f"/upload_file",
@@ -197,5 +202,5 @@ def test_create_point(client):
     id = response.json["id"]
     assert type(id) is str
 
-   # Test all params
+    # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)

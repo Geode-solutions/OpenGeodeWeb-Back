@@ -310,6 +310,7 @@ with open(
 ) as file:
     vertex_attribute_names_json = json.load(file)
 
+
 @routes.route(
     vertex_attribute_names_json["route"],
     methods=vertex_attribute_names_json["methods"],
@@ -318,8 +319,12 @@ def vertex_attribute_names():
 
     UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
     utils_functions.validate_request(flask.request, vertex_attribute_names_json)
-    file_absolute_path = os.path.join(UPLOAD_FOLDER, werkzeug.utils.secure_filename(flask.request.json["filename"]))
-    data = geode_functions.load(flask.request.json["input_geode_object"], file_absolute_path)
+    file_absolute_path = os.path.join(
+        UPLOAD_FOLDER, werkzeug.utils.secure_filename(flask.request.json["filename"])
+    )
+    data = geode_functions.load(
+        flask.request.json["input_geode_object"], file_absolute_path
+    )
     vertex_attribute_names = data.vertex_attribute_manager().attribute_names()
     print(f"vertex_attribute_names: {vertex_attribute_names}", flush=True)
     return flask.make_response(
