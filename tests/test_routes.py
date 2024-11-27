@@ -185,6 +185,34 @@ def test_vertex_attribute_names(client):
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
+
+def test_polygon_attribute_names(client):
+    response = client.put(
+        f"/upload_file",
+        data={"file": FileStorage(open("./tests/polygon_attribute.vtp", "rb"))},
+    )
+    assert response.status_code == 201
+
+    route = f"/polygon_attribute_names"
+
+    def get_full_data():
+        return {
+            "input_geode_object": "PolygonalSurface3D",
+            "filename": "polygon_attribute.vtp",
+        }
+
+    # Normal test with filename 'vertex_attribute.vtp'
+    response = client.post(route, json=get_full_data())
+    assert response.status_code == 200
+    polygon_attribute_names = response.json["polygon_attribute_names"]
+    assert type(polygon_attribute_names) is list
+    for polygon_attribute_name in polygon_attribute_names:
+        assert type(polygon_attribute_name) is str
+
+    # Test all params
+    test_utils.test_route_wrong_params(client, route, get_full_data)
+
+
 def test_create_point(client):
     route = f"/create_point"
     get_full_data = lambda: {"x": 1, "y": 2, "z": 3}
