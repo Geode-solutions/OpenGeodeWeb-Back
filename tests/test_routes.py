@@ -156,6 +156,7 @@ def test_save_viewable_file(client):
     id = response.json["id"]
     assert type(id) is str
 
+    # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 def test_vertex_attribute_names(client):
@@ -181,4 +182,20 @@ def test_vertex_attribute_names(client):
     for vertex_attribute_name in vertex_attribute_names:
         assert type(vertex_attribute_name) is str
 
+    test_utils.test_route_wrong_params(client, route, get_full_data)
+
+
+def test_create_point(client):
+    route = f"/create_point"
+    get_full_data = lambda: {"x": 1, "y": 2, "z": 3}
+
+    # Normal test with all keys
+    response = client.post(route, json=get_full_data())
+    assert response.status_code == 200
+    viewable_file_name = response.json["viewable_file_name"]
+    assert type(viewable_file_name) is str
+    id = response.json["id"]
+    assert type(id) is str
+
+   # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)

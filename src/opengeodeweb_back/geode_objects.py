@@ -13,6 +13,7 @@ import geode_viewables as g_v
 def geode_objects_dict():
     return {
         "BRep": {
+            "class": og.BRep,
             "input_factory": og.BRepInputFactory,
             "output_factory": og.BRepOutputFactory,
             "missing_files": og.check_brep_missing_files,
@@ -34,6 +35,7 @@ def geode_objects_dict():
         },
         "CrossSection": {
             "parent": "Section",
+            "class": og_gs.CrossSection,
             "input_factory": og_gs.CrossSectionInputFactory,
             "output_factory": og_gs.CrossSectionOutputFactory,
             "missing_files": og_gs.check_cross_section_missing_files,
@@ -54,6 +56,7 @@ def geode_objects_dict():
             "inspector": og_inspector.inspect_section,
         },
         "EdgedCurve2D": {
+            "class": og.EdgedCurve2D,
             "input_factory": og.EdgedCurveInputFactory2D,
             "output_factory": og.EdgedCurveOutputFactory2D,
             "missing_files": og.check_edged_curve_missing_files2D,
@@ -74,6 +77,7 @@ def geode_objects_dict():
             "inspector": og_inspector.inspect_edged_curve2D,
         },
         "EdgedCurve3D": {
+            "class": og.EdgedCurve3D,
             "input_factory": og.EdgedCurveInputFactory3D,
             "output_factory": og.EdgedCurveOutputFactory3D,
             "missing_files": og.check_edged_curve_missing_files3D,
@@ -94,6 +98,7 @@ def geode_objects_dict():
             "inspector": og_inspector.inspect_edged_curve3D,
         },
         "Graph": {
+            "class": og.Graph,
             "input_factory": og.GraphInputFactory,
             "output_factory": og.GraphOutputFactory,
             "missing_files": og.check_graph_missing_files,
@@ -107,6 +112,7 @@ def geode_objects_dict():
             "is_viewable": True,
         },
         "HybridSolid3D": {
+            "class": og.HybridSolid3D,
             "input_factory": og.HybridSolidInputFactory3D,
             "output_factory": og.HybridSolidOutputFactory3D,
             "missing_files": og.check_hybrid_solid_missing_files3D,
@@ -128,6 +134,7 @@ def geode_objects_dict():
         },
         "ImplicitCrossSection": {
             "parent": "CrossSection",
+            "class": og_gs.ImplicitCrossSection,
             "input_factory": og_gs.ImplicitCrossSectionInputFactory,
             "output_factory": og_gs.ImplicitCrossSectionOutputFactory,
             "missing_files": og_gs.check_implicit_cross_section_missing_files,
@@ -149,6 +156,7 @@ def geode_objects_dict():
         },
         "ImplicitStructuralModel": {
             "parent": "StructuralModel",
+            "class": og_gs.ImplicitStructuralModel,
             "input_factory": og_gs.ImplicitStructuralModelInputFactory,
             "output_factory": og_gs.ImplicitStructuralModelOutputFactory,
             "missing_files": og_gs.check_implicit_structural_model_missing_files,
@@ -169,6 +177,7 @@ def geode_objects_dict():
             "inspector": og_inspector.inspect_brep,
         },
         "LightRegularGrid2D": {
+            "class": og.LightRegularGrid2D,
             "input_factory": og.LightRegularGridInputFactory2D,
             "output_factory": og.LightRegularGridOutputFactory2D,
             "missing_files": og.check_light_regular_grid_missing_files2D,
@@ -182,6 +191,7 @@ def geode_objects_dict():
             "save_viewable": g_v.save_viewable_light_regular_grid2D,
         },
         "LightRegularGrid3D": {
+            "class": og.LightRegularGrid3D,
             "input_factory": og.LightRegularGridInputFactory3D,
             "output_factory": og.LightRegularGridOutputFactory3D,
             "missing_files": og.check_light_regular_grid_missing_files3D,
@@ -195,6 +205,7 @@ def geode_objects_dict():
             "save_viewable": g_v.save_viewable_light_regular_grid3D,
         },
         "PointSet2D": {
+            "class": og.PointSet2D,
             "input_factory": og.PointSetInputFactory2D,
             "output_factory": og.PointSetOutputFactory2D,
             "missing_files": og.check_point_set_missing_files2D,
@@ -215,6 +226,7 @@ def geode_objects_dict():
             "inspector": og_inspector.inspect_point_set2D,
         },
         "PointSet3D": {
+            "class": og.PointSet3D,
             "input_factory": og.PointSetInputFactory3D,
             "output_factory": og.PointSetOutputFactory3D,
             "missing_files": og.check_point_set_missing_files3D,
@@ -235,6 +247,7 @@ def geode_objects_dict():
             "inspector": og_inspector.inspect_point_set3D,
         },
         "PolygonalSurface2D": {
+            "class": og.PolygonalSurface2D,
             "input_factory": og.PolygonalSurfaceInputFactory2D,
             "output_factory": og.PolygonalSurfaceOutputFactory2D,
             "missing_files": og.check_polygonal_surface_missing_files2D,
@@ -255,6 +268,7 @@ def geode_objects_dict():
             "inspector": og_inspector.inspect_surface2D,
         },
         "PolygonalSurface3D": {
+            "class": og.PolygonalSurface3D,
             "input_factory": og.PolygonalSurfaceInputFactory3D,
             "output_factory": og.PolygonalSurfaceOutputFactory3D,
             "missing_files": og.check_polygonal_surface_missing_files3D,
@@ -275,6 +289,7 @@ def geode_objects_dict():
             "inspector": og_inspector.inspect_surface3D,
         },
         "PolyhedralSolid3D": {
+            "class": og.PolyhedralSolid3D,
             "input_factory": og.PolyhedralSolidInputFactory3D,
             "output_factory": og.PolyhedralSolidOutputFactory3D,
             "missing_files": og.check_polyhedral_solid_missing_files3D,
@@ -295,6 +310,7 @@ def geode_objects_dict():
             "inspector": og_inspector.inspect_solid3D,
         },
         "RasterImage2D": {
+            "class": og.RasterImage2D,
             "input_factory": og.RasterImageInputFactory2D,
             "output_factory": og.RasterImageOutputFactory2D,
             "missing_files": og.check_raster_image_missing_files2D,
@@ -308,6 +324,7 @@ def geode_objects_dict():
             "save_viewable": g_v.save_viewable_raster_image2D,
         },
         "RasterImage3D": {
+            "class": og.RasterImage3D,
             "input_factory": og.RasterImageInputFactory3D,
             "output_factory": og.RasterImageOutputFactory3D,
             "missing_files": og.check_raster_image_missing_files3D,
@@ -321,6 +338,7 @@ def geode_objects_dict():
             "save_viewable": g_v.save_viewable_raster_image3D,
         },
         "RegularGrid2D": {
+            "class": og.RegularGrid2D,
             "input_factory": og.RegularGridInputFactory2D,
             "output_factory": og.RegularGridOutputFactory2D,
             "missing_files": og.check_regular_grid_missing_files2D,
@@ -340,6 +358,7 @@ def geode_objects_dict():
             "save_viewable": g_v.save_viewable_regular_grid2D,
         },
         "RegularGrid3D": {
+            "class": og.RegularGrid3D,
             "input_factory": og.RegularGridInputFactory3D,
             "output_factory": og.RegularGridOutputFactory3D,
             "missing_files": og.check_regular_grid_missing_files3D,
@@ -359,6 +378,7 @@ def geode_objects_dict():
             "save_viewable": g_v.save_viewable_regular_grid3D,
         },
         "Section": {
+            "class": og.Section,
             "input_factory": og.SectionInputFactory,
             "output_factory": og.SectionOutputFactory,
             "missing_files": og.check_section_missing_files,
@@ -380,6 +400,7 @@ def geode_objects_dict():
         },
         "StructuralModel": {
             "parent": "BRep",
+            "class": og_gs.StructuralModel,
             "input_factory": og_gs.StructuralModelInputFactory,
             "output_factory": og_gs.StructuralModelOutputFactory,
             "missing_files": og_gs.check_structural_model_missing_files,
@@ -400,6 +421,7 @@ def geode_objects_dict():
             "inspector": og_inspector.inspect_brep,
         },
         "TetrahedralSolid3D": {
+            "class": og.TetrahedralSolid3D,
             "input_factory": og.TetrahedralSolidInputFactory3D,
             "output_factory": og.TetrahedralSolidOutputFactory3D,
             "missing_files": og.check_tetrahedral_solid_missing_files3D,
@@ -420,6 +442,7 @@ def geode_objects_dict():
             "inspector": og_inspector.inspect_solid3D,
         },
         "TriangulatedSurface2D": {
+            "class": og.TriangulatedSurface2D,
             "input_factory": og.TriangulatedSurfaceInputFactory2D,
             "output_factory": og.TriangulatedSurfaceOutputFactory2D,
             "missing_files": og.check_triangulated_surface_missing_files2D,
@@ -440,6 +463,7 @@ def geode_objects_dict():
             "inspector": og_inspector.inspect_surface2D,
         },
         "TriangulatedSurface3D": {
+            "class": og.TriangulatedSurface3D,
             "input_factory": og.TriangulatedSurfaceInputFactory3D,
             "output_factory": og.TriangulatedSurfaceOutputFactory3D,
             "missing_files": og.check_triangulated_surface_missing_files3D,
@@ -460,6 +484,7 @@ def geode_objects_dict():
             "inspector": og_inspector.inspect_surface3D,
         },
         "VertexSet": {
+            "class": og.VertexSet,
             "input_factory": og.VertexSetInputFactory,
             "output_factory": og.VertexSetOutputFactory,
             "missing_files": og.check_vertex_set_missing_files,
