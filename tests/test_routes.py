@@ -185,3 +185,26 @@ def test_save_viewable_file(client):
         assert response.status_code == 400
         error_description = response.json["description"]
         assert error_description == f"Validation error: '{key}' is a required property"
+
+
+def test_create_point(client):
+    route = f"/create_point"
+
+    def get_full_data():
+        return {"x": 1, "y": 2, "z": 3}
+
+    # Normal test with all keys
+    response = client.post(route, json=get_full_data())
+    assert response.status_code == 200
+    viewable_file_name = response.json["viewable_file_name"]
+    assert type(viewable_file_name) is str
+    id = response.json["id"]
+    assert type(id) is str
+
+    for key, value in get_full_data().items():
+        json = get_full_data()
+        json.pop(key)
+        response = client.post(route, json=json)
+        assert response.status_code == 400
+        error_description = response.json["description"]
+        assert error_description == f"Validation error: '{key}' is a required property"
