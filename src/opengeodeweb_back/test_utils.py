@@ -1,3 +1,8 @@
+# Standard library imports
+
+# Third party imports
+
+# Local application imports
 
 
 def test_route_wrong_params(client, route, get_full_data):

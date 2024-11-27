@@ -1,5 +1,10 @@
+# Standard library imports
 import os
 import uuid
+
+# Third party imports
+
+# Local application imports
 from src.opengeodeweb_back import geode_functions, geode_objects
 
 
