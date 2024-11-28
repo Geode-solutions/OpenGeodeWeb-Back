@@ -159,6 +159,10 @@ def test_save_viewable_file(client):
     assert type(viewable_file_name) is str
     id = response.json["id"]
     assert type(id) is str
+    object_type = response.json["object_type"]
+    assert type(object_type) is str
+    assert object_type in ["model", "mesh"]
+
 
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
