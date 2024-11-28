@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v5.4.0-rc.3 (2024-11-28)
+
+### Features
+
+- **routes**: Save_viewable return object_type
+  ([`da54ee3`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/da54ee312dfbad3756698538a1ec0cddbded9b51))
+
+
 ## v5.4.0-rc.2 (2024-11-28)
 
 
