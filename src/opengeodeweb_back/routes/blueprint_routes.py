@@ -305,6 +305,68 @@ def create_point():
 
 
 with open(
+    os.path.join(schemas, "vertex_attribute_names.json"),
+    "r",
+) as file:
+    vertex_attribute_names_json = json.load(file)
+
+
+@routes.route(
+    vertex_attribute_names_json["route"],
+    methods=vertex_attribute_names_json["methods"],
+)
+def vertex_attribute_names():
+
+    UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
+    utils_functions.validate_request(flask.request, vertex_attribute_names_json)
+    file_absolute_path = os.path.join(
+        UPLOAD_FOLDER, werkzeug.utils.secure_filename(flask.request.json["filename"])
+    )
+    data = geode_functions.load(
+        flask.request.json["input_geode_object"], file_absolute_path
+    )
+    vertex_attribute_names = data.vertex_attribute_manager().attribute_names()
+
+    return flask.make_response(
+        {
+            "vertex_attribute_names": vertex_attribute_names,
+        },
+        200,
+    )
+
+
+with open(
+    os.path.join(schemas, "polygon_attribute_names.json"),
+    "r",
+) as file:
+    polygon_attribute_names_json = json.load(file)
+
+
+@routes.route(
+    polygon_attribute_names_json["route"],
+    methods=polygon_attribute_names_json["methods"],
+)
+def polygon_attribute_names():
+
+    UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
+    utils_functions.validate_request(flask.request, vertex_attribute_names_json)
+    file_absolute_path = os.path.join(
+        UPLOAD_FOLDER, werkzeug.utils.secure_filename(flask.request.json["filename"])
+    )
+    data = geode_functions.load(
+        flask.request.json["input_geode_object"], file_absolute_path
+    )
+    polygon_attribute_names = data.polygon_attribute_manager().attribute_names()
+
+    return flask.make_response(
+        {
+            "polygon_attribute_names": polygon_attribute_names,
+        },
+        200,
+    )
+
+
+with open(
     os.path.join(schemas, "ping.json"),
     "r",
 ) as file:

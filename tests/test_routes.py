@@ -1,16 +1,27 @@
-import os
+# Standard library imports
 import base64
+import os
+
+# Third party imports
 from werkzeug.datastructures import FileStorage
+
+# Local application imports
+from src.opengeodeweb_back import test_utils
 
 
 def test_allowed_files(client):
     route = f"/allowed_files"
-    response = client.post(route, json={"supported_feature": None})
+    get_full_data = lambda: {"supported_feature": "None"}
+    json = get_full_data()
+    response = client.post(route, json=json)
     assert response.status_code == 200
     extensions = response.json["extensions"]
     assert type(extensions) is list
     for extension in extensions:
         assert type(extension) is str
+
+    # Test all params
+    test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
 def test_allowed_objects(client):
@@ -30,13 +41,8 @@ def test_allowed_objects(client):
     for allowed_object in allowed_objects:
         assert type(allowed_object) is str
 
-    for key, value in get_full_data().items():
-        json = get_full_data()
-        json.pop(key)
-        response = client.post(route, json=json)
-        assert response.status_code == 400
-        error_description = response.json["description"]
-        assert error_description == f"Validation error: '{key}' is a required property"
+    # Test all params
+    test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
 def test_upload_file(client):
@@ -58,11 +64,7 @@ def test_missing_files(client):
         }
 
     json = get_full_data()
-    response = client.post(
-        route,
-        json=json,
-    )
-
+    response = client.post(route, json=json)
     assert response.status_code == 200
     has_missing_files = response.json["has_missing_files"]
     mandatory_files = response.json["mandatory_files"]
@@ -71,33 +73,23 @@ def test_missing_files(client):
     assert type(mandatory_files) is list
     assert type(additional_files) is list
 
-    for key, value in get_full_data().items():
-        json = get_full_data()
-        json.pop(key)
-        response = client.post(route, json=json)
-        assert response.status_code == 400
-        error_description = response.json["description"]
-        assert error_description == f"Validation error: '{key}' is a required property"
+    # Test all params
+    test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
 def test_geographic_coordinate_systems(client):
     route = f"/geographic_coordinate_systems"
-
+    get_full_data = lambda: {"input_geode_object": "BRep"}
     # Normal test with geode_object 'BRep'
-    response = client.post(route, json={"input_geode_object": "BRep"})
+    response = client.post(route, json=get_full_data())
     assert response.status_code == 200
     crs_list = response.json["crs_list"]
     assert type(crs_list) is list
     for crs in crs_list:
         assert type(crs) is dict
 
-    # Test without geode_object
-    response = client.post(route, json={})
-    assert response.status_code == 400
-    error_message = response.json["description"]
-    assert (
-        error_message == "Validation error: 'input_geode_object' is a required property"
-    )
+    # Test all params
+    test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
 def test_inspect_file(client):
@@ -117,13 +109,8 @@ def test_inspect_file(client):
     inspection_result = response.json["inspection_result"]
     assert type(inspection_result) is dict
 
-    for key, value in get_full_data().items():
-        json = get_full_data()
-        json.pop(key)
-        response = client.post(route, json=json)
-        assert response.status_code == 400
-        error_description = response.json["description"]
-        assert error_description == f"Validation error: '{key}' is a required property"
+    # Test all params
+    test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
 def test_geode_objects_and_output_extensions(client):
@@ -148,13 +135,8 @@ def test_geode_objects_and_output_extensions(client):
             assert type(value) is dict
             assert type(value["is_saveable"]) is bool
 
-    # Test without input_geode_object
-    response = client.post(route, json={})
-    assert response.status_code == 400
-    error_message = response.json["description"]
-    assert (
-        error_message == "Validation error: 'input_geode_object' is a required property"
-    )
+    # Test all params
+    test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
 def test_save_viewable_file(client):
@@ -178,20 +160,66 @@ def test_save_viewable_file(client):
     id = response.json["id"]
     assert type(id) is str
 
-    for key, value in get_full_data().items():
-        json = get_full_data()
-        json.pop(key)
-        response = client.post(route, json=json)
-        assert response.status_code == 400
-        error_description = response.json["description"]
-        assert error_description == f"Validation error: '{key}' is a required property"
+    # Test all params
+    test_utils.test_route_wrong_params(client, route, get_full_data)
+
+
+def test_vertex_attribute_names(client):
+    response = client.put(
+        f"/upload_file",
+        data={"file": FileStorage(open("./tests/vertex_attribute.vtp", "rb"))},
+    )
+    assert response.status_code == 201
+
+    route = f"/vertex_attribute_names"
+
+    def get_full_data():
+        return {
+            "input_geode_object": "PolygonalSurface3D",
+            "filename": "vertex_attribute.vtp",
+        }
+
+    # Normal test with filename 'vertex_attribute.vtp'
+    response = client.post(route, json=get_full_data())
+    assert response.status_code == 200
+    vertex_attribute_names = response.json["vertex_attribute_names"]
+    assert type(vertex_attribute_names) is list
+    for vertex_attribute_name in vertex_attribute_names:
+        assert type(vertex_attribute_name) is str
+
+    test_utils.test_route_wrong_params(client, route, get_full_data)
+
+
+def test_polygon_attribute_names(client):
+    response = client.put(
+        f"/upload_file",
+        data={"file": FileStorage(open("./tests/polygon_attribute.vtp", "rb"))},
+    )
+    assert response.status_code == 201
+
+    route = f"/polygon_attribute_names"
+
+    def get_full_data():
+        return {
+            "input_geode_object": "PolygonalSurface3D",
+            "filename": "polygon_attribute.vtp",
+        }
+
+    # Normal test with filename 'vertex_attribute.vtp'
+    response = client.post(route, json=get_full_data())
+    assert response.status_code == 200
+    polygon_attribute_names = response.json["polygon_attribute_names"]
+    assert type(polygon_attribute_names) is list
+    for polygon_attribute_name in polygon_attribute_names:
+        assert type(polygon_attribute_name) is str
+
+    # Test all params
+    test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
 def test_create_point(client):
     route = f"/create_point"
-
-    def get_full_data():
-        return {"x": 1, "y": 2, "z": 3}
+    get_full_data = lambda: {"x": 1, "y": 2, "z": 3}
 
     # Normal test with all keys
     response = client.post(route, json=get_full_data())
@@ -201,10 +229,5 @@ def test_create_point(client):
     id = response.json["id"]
     assert type(id) is str
 
-    for key, value in get_full_data().items():
-        json = get_full_data()
-        json.pop(key)
-        response = client.post(route, json=json)
-        assert response.status_code == 400
-        error_description = response.json["description"]
-        assert error_description == f"Validation error: '{key}' is a required property"
+    # Test all params
+    test_utils.test_route_wrong_params(client, route, get_full_data)

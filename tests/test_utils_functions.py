@@ -1,4 +1,9 @@
+# Standard library imports
+
+# Third party imports
 import flask
+
+# Local application imports
 from src.opengeodeweb_back import utils_functions
 
 
