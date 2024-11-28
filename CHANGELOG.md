@@ -1,6 +1,9 @@
 # CHANGELOG
 
 
+## v5.4.0-rc.2 (2024-11-28)
+
+
 ## v5.4.0-rc.1 (2024-11-27)
 
 ### Features
@@ -10,6 +13,15 @@
 
 - **routes**: Create point3D route
   ([`88867c6`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/88867c629b8fbf2648faaf328f5adb3452b727c2))
+
+- **polygon attribute**: New route/schemas/test/data
+  ([`e50f3ff`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/e50f3ffeb7706e7b3a8fea49c303cd91b6cc1bce))
+
+- **vertex attribute**: New route/schemas/test/data
+  ([`11865dd`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/11865dd747b8e5501f17dbf5b70ad8052cbdef05))
+
+- **test_utils**: Automatic schema validation
+  ([`7dbb3fc`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/7dbb3fc4d1901d4d050249203d3bd84bc2d6b5c1))
 
 
 ## v5.3.2 (2024-11-08)
