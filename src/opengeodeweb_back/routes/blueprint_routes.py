@@ -260,8 +260,9 @@ def save_viewable_file():
         DATA_FOLDER_PATH,
         generated_id + "." + native_extension,
     )
-    object_type = geode_functions.get_object_type(flask.request.json["input_geode_object"])
-
+    object_type = geode_functions.get_object_type(
+        flask.request.json["input_geode_object"]
+    )
 
     native_file_name = os.path.basename(absolute_native_file_path)
     viewable_file_name = os.path.basename(saved_viewable_file_path)
@@ -271,7 +272,7 @@ def save_viewable_file():
             "native_file_name": native_file_name,
             "viewable_file_name": viewable_file_name,
             "id": generated_id,
-            "object_type": object_type
+            "object_type": object_type,
         },
         200,
     )

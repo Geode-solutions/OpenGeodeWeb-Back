@@ -163,7 +163,6 @@ def test_save_viewable_file(client):
     assert type(object_type) is str
     assert object_type in ["model", "mesh"]
 
-
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
 

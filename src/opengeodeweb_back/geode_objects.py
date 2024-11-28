@@ -457,7 +457,6 @@ def geode_objects_dict():
                 "convert": og_gs.convert_surface_mesh_coordinate_reference_system2D,
                 "create": og.create_surface_mesh_coordinate_system2D,
             },
-
             "object_type": "mesh",
             "is_3D": False,
             "is_viewable": True,
