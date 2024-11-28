@@ -326,7 +326,7 @@ def vertex_attribute_names():
         flask.request.json["input_geode_object"], file_absolute_path
     )
     vertex_attribute_names = data.vertex_attribute_manager().attribute_names()
-    
+
     return flask.make_response(
         {
             "vertex_attribute_names": vertex_attribute_names,

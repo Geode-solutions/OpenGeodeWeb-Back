@@ -172,6 +172,7 @@ def test_vertex_attribute_names(client):
     assert response.status_code == 201
 
     route = f"/vertex_attribute_names"
+
     def get_full_data():
         return {
             "input_geode_object": "PolygonalSurface3D",
