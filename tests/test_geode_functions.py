@@ -1,5 +1,10 @@
+# Standard library imports
 import os
 import uuid
+
+# Third party imports
+
+# Local application imports
 from src.opengeodeweb_back import geode_functions, geode_objects
 
 
@@ -120,10 +125,11 @@ def test_load():
                                 os.remove(saved_file)
 
 
-def test_is_model():
+def test_get_object_type():
     for geode_object, value in geode_objects.geode_objects_dict().items():
-        is_model = geode_functions.is_model(geode_object)
-        assert type(is_model) is bool
+        object_type = geode_functions.get_object_type(geode_object)
+        assert type(object_type) is str
+        assert object_type in ["model", "mesh"]
 
 
 def test_is_3D():

@@ -1,5 +1,5 @@
 .pytest_cache
-./data
+/data
 dist
 venv
 output

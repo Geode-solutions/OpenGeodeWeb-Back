@@ -5,9 +5,12 @@ import time
 
 # Third party imports
 import flask
-from .. import geode_functions, utils_functions
-import werkzeug
+import opengeode
 import uuid
+import werkzeug
+
+# Local application imports
+from .. import geode_functions, utils_functions
 
 routes = flask.Blueprint("routes", __name__)
 
@@ -257,6 +260,9 @@ def save_viewable_file():
         DATA_FOLDER_PATH,
         generated_id + "." + native_extension,
     )
+    object_type = geode_functions.get_object_type(
+        flask.request.json["input_geode_object"]
+    )
 
     native_file_name = os.path.basename(absolute_native_file_path)
     viewable_file_name = os.path.basename(saved_viewable_file_path)
@@ -266,6 +272,99 @@ def save_viewable_file():
             "native_file_name": native_file_name,
             "viewable_file_name": viewable_file_name,
             "id": generated_id,
+            "object_type": object_type,
+        },
+        200,
+    )
+
+
+with open(os.path.join(schemas, "create_point.json"), "r") as file:
+    create_point_json = json.load(file)
+
+
+@routes.route(create_point_json["route"], methods=create_point_json["methods"])
+def create_point():
+    utils_functions.validate_request(flask.request, create_point_json)
+    DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
+    x = flask.request.json["x"]
+    y = flask.request.json["y"]
+    z = flask.request.json["z"]
+    class_ = geode_functions.geode_object_class("PointSet3D")
+    PointSet3D = class_.create()
+    builder = geode_functions.create_builder("PointSet3D", PointSet3D)
+    builder.create_point(opengeode.Point3D([x, y, z]))
+
+    generated_id = str(uuid.uuid4()).replace("-", "")
+    saved_viewable_file_path = geode_functions.save_viewable(
+        "PointSet3D", PointSet3D, DATA_FOLDER_PATH, generated_id
+    )
+
+    return flask.make_response(
+        {
+            "viewable_file_name": os.path.basename(saved_viewable_file_path),
+            "id": generated_id,
+        },
+        200,
+    )
+
+
+with open(
+    os.path.join(schemas, "vertex_attribute_names.json"),
+    "r",
+) as file:
+    vertex_attribute_names_json = json.load(file)
+
+
+@routes.route(
+    vertex_attribute_names_json["route"],
+    methods=vertex_attribute_names_json["methods"],
+)
+def vertex_attribute_names():
+
+    UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
+    utils_functions.validate_request(flask.request, vertex_attribute_names_json)
+    file_absolute_path = os.path.join(
+        UPLOAD_FOLDER, werkzeug.utils.secure_filename(flask.request.json["filename"])
+    )
+    data = geode_functions.load(
+        flask.request.json["input_geode_object"], file_absolute_path
+    )
+    vertex_attribute_names = data.vertex_attribute_manager().attribute_names()
+
+    return flask.make_response(
+        {
+            "vertex_attribute_names": vertex_attribute_names,
+        },
+        200,
+    )
+
+
+with open(
+    os.path.join(schemas, "polygon_attribute_names.json"),
+    "r",
+) as file:
+    polygon_attribute_names_json = json.load(file)
+
+
+@routes.route(
+    polygon_attribute_names_json["route"],
+    methods=polygon_attribute_names_json["methods"],
+)
+def polygon_attribute_names():
+
+    UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
+    utils_functions.validate_request(flask.request, vertex_attribute_names_json)
+    file_absolute_path = os.path.join(
+        UPLOAD_FOLDER, werkzeug.utils.secure_filename(flask.request.json["filename"])
+    )
+    data = geode_functions.load(
+        flask.request.json["input_geode_object"], file_absolute_path
+    )
+    polygon_attribute_names = data.polygon_attribute_manager().attribute_names()
+
+    return flask.make_response(
+        {
+            "polygon_attribute_names": polygon_attribute_names,
         },
         200,
     )

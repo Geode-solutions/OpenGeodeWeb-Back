@@ -1,6 +1,11 @@
-import pytest
-from app import app
+# Standard library imports
 import time
+
+# Third party imports
+import pytest
+
+# Local application imports
+from app import app
 
 
 @pytest.fixture
