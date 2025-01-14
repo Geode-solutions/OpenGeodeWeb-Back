@@ -3,29 +3,55 @@ const path = require("path");
 const glob = require("glob");
 const process = require("process");
 
-const findDirectoryPath = (targetDirectoryName) => {
-  const pathToCheck = path.join(process.cwd(), targetDirectoryName);
+console.log("process.argv", process.argv);
+
+var projectName = process.argv[2];
+console.log("projectName", projectName);
+var folderName = process.argv[3];
+console.log("folderName", folderName);
+var key = process.argv[4];
+console.log("key", key);
+var separator = process.argv[5];
+console.log("separator", separator);
+
+const findDirectoryPath = (targetDirectoryName, folderName) => {
+  const pathToCheck = path.join(
+    process.cwd(),
+    "/src",
+    "/",
+    targetDirectoryName
+  );
+  console.log("pathToCheck", pathToCheck);
+
   const folders = fs
     .readdirSync(pathToCheck, { withFileTypes: true })
     .filter(
-      (folder) => folder.isDirectory() && !folder.name.endsWith(".egg-info")
+      (folder) =>
+        folder.isDirectory() &&
+        !folder.name.endsWith(".egg-info") &&
+        folder.name != "tests" &&
+        folder.name != "__pycache__" &&
+        folder.name.includes(folderName)
     )
     .map((folder) => ({
       name: folder.name,
       path: path.join(pathToCheck, folder.name),
     }));
-  const routesDirectory = path.join(folders[0].path, "routes");
-  return [routesDirectory, folders[0].name];
+  console.log("folders", folders);
+  const routesDirectory = path.join(folders[0].path);
+  return routesDirectory;
 };
 
-const [directoryPath, project_name] = findDirectoryPath("src/");
+const directoryPath = findDirectoryPath(projectName, folderName);
 
 const outputFile = path.join(process.cwd(), "schemas.json");
 
-function return_json_schema(directoryPath, folder_path, project_name) {
+function return_json_schema(directoryPath, folder_path, projectName) {
+  console.log("return_json_schema", directoryPath, folder_path, projectName);
+
   const folders = fs
     .readdirSync(path.normalize(directoryPath), { withFileTypes: true })
-    .filter((folder) => folder.isDirectory())
+    .filter((folder) => folder.isDirectory() && folder.name != "__pycache__")
     .map((folder) => ({
       name: folder.name,
       path: path.join(directoryPath, folder.name),
@@ -42,8 +68,24 @@ function return_json_schema(directoryPath, folder_path, project_name) {
           var filename = filePath
             .replace(/^.*[\\/]/, "")
             .replace(/\.[^/.]+$/, "");
-          var route = jsonData["route"];
-          jsonData["$id"] = project_name + folder_path + route;
+          var route = jsonData[key];
+          console.log("FOLDER PATH", projectName);
+          var values = [projectName, folder_path, route];
+          console.log("values", values);
+          values = values.map(function (x) {
+            console.log("x", x);
+            return x.replace("/", "").replace(".", "");
+          }); // first replace first . / by empty string
+          values = values.map(function (x) {
+            console.log("x", x);
+            return x.replaceAll("/", separator).replaceAll(".", separator);
+          }); // then replace all . / by separator
+          console.log("values", values);
+          jsonData["$id"] = values
+            .filter(function (val) {
+              return val;
+            })
+            .join(separator);
           schemas[filename] = jsonData;
         } catch (error) {
           console.error(
@@ -63,7 +105,7 @@ function return_json_schema(directoryPath, folder_path, project_name) {
       }, folders_schemas);
     } else {
       var new_folder_path = folder_path + "/" + folder.name;
-      var test = return_json_schema(folder.path, new_folder_path, project_name);
+      var test = return_json_schema(folder.path, new_folder_path, projectName);
       folders_schemas[folder.name] = test;
     }
   });
@@ -75,6 +117,6 @@ if (fs.existsSync(outputFile)) {
 }
 
 const finalJson = {};
-finalJson[project_name] = return_json_schema(directoryPath, "", project_name);
+finalJson[projectName] = return_json_schema(directoryPath, "", projectName);
 
 fs.writeFileSync(outputFile, JSON.stringify(finalJson, null, 2));
