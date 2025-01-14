@@ -73,11 +73,14 @@ function return_json_schema(directoryPath, folder_path, projectName) {
           var values = [projectName, folder_path, route];
           console.log("values", values);
           values = values.map(function (x) {
-            return x.replace("/", "");
-          });
+            console.log("x", x);
+            return x.replace("/", "").replace(".", "");
+          }); // first replace first . / by empty string
           values = values.map(function (x) {
-            return x.replace(".", "");
-          });
+            console.log("x", x);
+            return x.replaceAll("/", separator).replaceAll(".", separator);
+          }); // then replace all . / by separator
+          console.log("values", values);
           jsonData["$id"] = values
             .filter(function (val) {
               return val;
