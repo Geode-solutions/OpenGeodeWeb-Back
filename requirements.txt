@@ -69,7 +69,7 @@ markupsafe==3.0.2
     # via
     #   jinja2
     #   werkzeug
-opengeode-core==15.9.6
+opengeode-core==15.9.7
     # via
     #   -r requirements.in
     #   geode-background
@@ -90,11 +90,11 @@ opengeode-geosciences==8.2.1
     #   geode-implicit
     #   geode-viewables
     #   opengeode-geosciencesio
-opengeode-geosciencesio==5.3.3
+opengeode-geosciencesio==5.3.4
     # via
     #   -r requirements.in
     #   geode-implicit
-opengeode-inspector==6.3.3
+opengeode-inspector==6.3.4
     # via
     #   -r requirements.in
     #   geode-explicit
