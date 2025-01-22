@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v5.4.2-rc.1 (2025-01-22)
+
+### Bug Fixes
+
+- **deps**: Updates tests passing
+  ([`1f96002`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/1f960028dfcfa32d65fe3009017bbbff55105bde))
+
+
 ## v5.4.1 (2025-01-14)
 
 
