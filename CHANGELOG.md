@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v5.4.2-rc.3 (2025-01-22)
+
+### Bug Fixes
+
+- **package upload**: Pin twine 6.0.1
+  ([`ec866d0`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/ec866d06c907dd65a94f4a6a19d8f07d3fc97848))
+
+
 ## v5.4.2-rc.2 (2025-01-22)
 
 ### Bug Fixes
