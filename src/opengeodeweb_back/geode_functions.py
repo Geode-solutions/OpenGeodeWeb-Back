@@ -2,7 +2,6 @@
 import os
 
 # Third party imports
-import flask
 import opengeode_geosciences as og_gs
 import opengeode as og
 
