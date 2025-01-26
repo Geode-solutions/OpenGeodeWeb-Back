@@ -110,7 +110,7 @@ def geode_objects_dict():
             "builder": og.GraphBuilder.create,
             "object_type": "mesh",
             "is_3D": False,
-            "is_viewable": True,
+            "is_viewable": False,
         },
         "HybridSolid3D": {
             "class": og.HybridSolid3D,
@@ -321,7 +321,7 @@ def geode_objects_dict():
             "save": og.save_raster_image2D,
             "object_type": "mesh",
             "is_3D": False,
-            "is_viewable": False,
+            "is_viewable": True,
             "save_viewable": g_v.save_viewable_raster_image2D,
         },
         "RasterImage3D": {
@@ -335,7 +335,7 @@ def geode_objects_dict():
             "save": og.save_raster_image3D,
             "object_type": "mesh",
             "is_3D": False,
-            "is_viewable": False,
+            "is_viewable": True,
             "save_viewable": g_v.save_viewable_raster_image3D,
         },
         "RegularGrid2D": {
