@@ -86,13 +86,14 @@ def test_load():
                 print(f"\t\t{additional_files=}")
             if geode_functions.is_loadable(geode_object, file_absolute_path):
                 data = geode_functions.load(geode_object, file_absolute_path)
+                data_name = data.name()
                 if "save_viewable" in value:
                     uu_id = str(uuid.uuid4()).replace("-", "")
                     viewable_file_path = geode_functions.save_viewable(
                         geode_object,
                         data,
                         os.path.abspath(f"./output"),
-                        uu_id,
+                        data_name,
                     )
                     os.remove(viewable_file_path)
                 geode_objects_and_output_extensions = (
@@ -174,6 +175,7 @@ def test_geode_object_output_extensions():
                 geode_objets_and_output_extensions = (
                     geode_functions.geode_objects_output_extensions(geode_object, data)
                 )
+                data_name = data.name()
                 assert type(geode_objets_and_output_extensions) is dict
                 for (
                     output_geode_object,
