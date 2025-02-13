@@ -256,6 +256,7 @@ def save_viewable_file():
         DATA_FOLDER_PATH,
         generated_id + "." + native_extension,
     )
+    os.remove(os.path.join(UPLOAD_FOLDER, secure_filename))
     object_type = geode_functions.get_object_type(
         flask.request.json["input_geode_object"]
     )
@@ -316,11 +317,10 @@ with open(
     methods=vertex_attribute_names_json["methods"],
 )
 def vertex_attribute_names():
-
-    UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
+    DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
     utils_functions.validate_request(flask.request, vertex_attribute_names_json)
     file_absolute_path = os.path.join(
-        UPLOAD_FOLDER, werkzeug.utils.secure_filename(flask.request.json["filename"])
+        DATA_FOLDER_PATH, werkzeug.utils.secure_filename(flask.request.json["filename"])
     )
     data = geode_functions.load(
         flask.request.json["input_geode_object"], file_absolute_path
@@ -347,11 +347,10 @@ with open(
     methods=polygon_attribute_names_json["methods"],
 )
 def polygon_attribute_names():
-
-    UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
-    utils_functions.validate_request(flask.request, vertex_attribute_names_json)
+    DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
+    utils_functions.validate_request(flask.request, polygon_attribute_names_json)
     file_absolute_path = os.path.join(
-        UPLOAD_FOLDER, werkzeug.utils.secure_filename(flask.request.json["filename"])
+        DATA_FOLDER_PATH, werkzeug.utils.secure_filename(flask.request.json["filename"])
     )
     data = geode_functions.load(
         flask.request.json["input_geode_object"], file_absolute_path
@@ -361,6 +360,36 @@ def polygon_attribute_names():
     return flask.make_response(
         {
             "polygon_attribute_names": polygon_attribute_names,
+        },
+        200,
+    )
+
+
+with open(
+    os.path.join(schemas, "polyhedron_attribute_names.json"),
+    "r",
+) as file:
+    polyhedron_attribute_names_json = json.load(file)
+
+
+@routes.route(
+    polyhedron_attribute_names_json["route"],
+    methods=polyhedron_attribute_names_json["methods"],
+)
+def polyhedron_attribute_names():
+    DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
+    utils_functions.validate_request(flask.request, vertex_attribute_names_json)
+    file_absolute_path = os.path.join(
+        DATA_FOLDER_PATH, werkzeug.utils.secure_filename(flask.request.json["filename"])
+    )
+    data = geode_functions.load(
+        flask.request.json["input_geode_object"], file_absolute_path
+    )
+    polyhedron_attribute_names = data.polyhedron_attribute_manager().attribute_names()
+
+    return flask.make_response(
+        {
+            "polyhedron_attribute_names": polyhedron_attribute_names,
         },
         200,
     )

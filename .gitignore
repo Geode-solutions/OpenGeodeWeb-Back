@@ -1,5 +1,7 @@
 .pytest_cache
 /data
+/build
+*.egg-info
 dist
 venv
 output
