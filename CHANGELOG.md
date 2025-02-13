@@ -1,6 +1,9 @@
 # CHANGELOG
 
 
+## v5.5.0-rc.1 (2025-02-13)
+
+
 ## v5.4.3 (2025-01-26)
 
 
@@ -10,6 +13,11 @@
 
 - **deps**: Trigger semantic
   ([`ac4ddd7`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/ac4ddd70936ec159945b4b6864d97c664ce8b1b7))
+
+### Features
+
+- **polyhedron attributes**: New route and tests
+  ([`fb433b8`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/fb433b8f6f804f0022f13c9e720733d4daca4722))
 
 
 ## v5.4.2 (2025-01-22)
@@ -159,7 +167,7 @@
 
 BREAKING CHANGE: functions moved to utils_functions.py
 
-### BREAKING CHANGES
+### Breaking Changes
 
 - **ping route**: Functions moved to utils_functions.py
 
@@ -675,7 +683,7 @@ BREAKING CHANGE: geode_objects_output_extensions returns a dict
 
 BREAKING CHANGE: geode_objects_output_extensions takes data as input
 
-### BREAKING CHANGES
+### Breaking Changes
 
 - **dependencies**: Geode_objects_output_extensions takes data as input
 
@@ -718,7 +726,7 @@ BREAMING CHANGE: geode_objects_output_extensions needs data input
 
 BREAKING CHANGE: Arguments changement(array to json schema)
 
-### BREAKING CHANGES
+### Breaking Changes
 
 - **validate_request**: Arguments changement(array to json schema)
 
