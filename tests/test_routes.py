@@ -175,10 +175,13 @@ def test_vertex_attribute_names(client):
     )
     assert response.status_code == 201
 
-    response = client.post("/save_viewable_file", json={
-        "input_geode_object": "PolygonalSurface3D",
-        "filename": "vertex_attribute.vtp",
-    })
+    response = client.post(
+        "/save_viewable_file",
+        json={
+            "input_geode_object": "PolygonalSurface3D",
+            "filename": "vertex_attribute.vtp",
+        },
+    )
     assert response.status_code == 200
     native_file_name = response.json["native_file_name"]
 
@@ -208,10 +211,13 @@ def test_polygon_attribute_names(client):
     )
     assert response.status_code == 201
 
-    response = client.post("/save_viewable_file", json={
-        "input_geode_object": "PolygonalSurface3D",
-        "filename": "polygon_attribute.vtp",
-    })
+    response = client.post(
+        "/save_viewable_file",
+        json={
+            "input_geode_object": "PolygonalSurface3D",
+            "filename": "polygon_attribute.vtp",
+        },
+    )
     assert response.status_code == 200
     native_file_name = response.json["native_file_name"]
 
@@ -242,10 +248,13 @@ def test_polyhedron_attribute_names(client):
     )
     assert response.status_code == 201
 
-    response = client.post("/save_viewable_file", json={
-        "input_geode_object": "HybridSolid3D",
-        "filename": "polyhedron_attribute.vtu",
-    })
+    response = client.post(
+        "/save_viewable_file",
+        json={
+            "input_geode_object": "HybridSolid3D",
+            "filename": "polyhedron_attribute.vtu",
+        },
+    )
     assert response.status_code == 200
     native_file_name = response.json["native_file_name"]
 
