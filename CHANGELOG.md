@@ -1,6 +1,17 @@
 # CHANGELOG
 
 
+## v5.4.3 (2025-01-26)
+
+
+## v5.4.3-rc.1 (2025-01-26)
+
+### Bug Fixes
+
+- **deps**: Trigger semantic
+  ([`ac4ddd7`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/ac4ddd70936ec159945b4b6864d97c664ce8b1b7))
+
+
 ## v5.4.2 (2025-01-22)
 
 

@@ -240,11 +240,7 @@ def save_viewable_file():
     data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
     generated_id = str(uuid.uuid4()).replace("-", "")
 
-    if geode_functions.is_viewable(flask.request.json["input_geode_object"]):
-        name = data.name()
-    else:
-        name = flask.request.json["filename"]
-
+    name = data.name()
     native_extension = data.native_extension()
 
     absolute_native_file_path = os.path.join(
