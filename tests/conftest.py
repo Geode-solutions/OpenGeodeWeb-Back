@@ -14,6 +14,7 @@ def copy_data():
     shutil.rmtree("./data", ignore_errors=True)
     shutil.copytree("./tests/data", "./data", dirs_exist_ok=True)
 
+
 @pytest.fixture
 def client():
     app.config["TESTING"] = True

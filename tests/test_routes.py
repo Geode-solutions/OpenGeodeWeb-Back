@@ -170,21 +170,30 @@ def test_vertex_attribute_names(client):
     route = f"/vertex_attribute_names"
     for geode_object, value in geode_objects.geode_objects_dict().items():
         if value["object_type"] == "mesh":
-            input_extensions = geode_functions.geode_object_input_extensions(geode_object)
+            input_extensions = geode_functions.geode_object_input_extensions(
+                geode_object
+            )
             if "elements" in value:
                 elements = geode_functions.get_elements(geode_object)
                 if "points" in elements:
                     for input_extension in input_extensions:
-                        is_loadable = geode_functions.is_loadable(geode_object, os.path.join("./data", f"test.{input_extension}"))
+                        is_loadable = geode_functions.is_loadable(
+                            geode_object,
+                            os.path.join("./data", f"test.{input_extension}"),
+                        )
                         if is_loadable:
+
                             def get_full_data():
                                 return {
                                     "input_geode_object": geode_object,
                                     "filename": f"test.{input_extension}",
                                 }
+
                             response = client.post(route, json=get_full_data())
                             assert response.status_code == 200
-                            vertex_attribute_names = response.json["vertex_attribute_names"]
+                            vertex_attribute_names = response.json[
+                                "vertex_attribute_names"
+                            ]
                             assert type(vertex_attribute_names) is list
                             for vertex_attribute_name in vertex_attribute_names:
                                 assert type(vertex_attribute_name) is str
@@ -197,21 +206,30 @@ def test_polygon_attribute_names(client):
     route = f"/polygon_attribute_names"
     for geode_object, value in geode_objects.geode_objects_dict().items():
         if value["object_type"] == "mesh":
-            input_extensions = geode_functions.geode_object_input_extensions(geode_object)
+            input_extensions = geode_functions.geode_object_input_extensions(
+                geode_object
+            )
             if "elements" in value:
                 elements = geode_functions.get_elements(geode_object)
                 if "polygons" in elements:
                     for input_extension in input_extensions:
-                        is_loadable = geode_functions.is_loadable(geode_object, os.path.join("./data", f"test.{input_extension}"))
+                        is_loadable = geode_functions.is_loadable(
+                            geode_object,
+                            os.path.join("./data", f"test.{input_extension}"),
+                        )
                         if is_loadable:
+
                             def get_full_data():
                                 return {
                                     "input_geode_object": geode_object,
                                     "filename": f"test.{input_extension}",
                                 }
+
                             response = client.post(route, json=get_full_data())
                             assert response.status_code == 200
-                            polygon_attribute_names = response.json["polygon_attribute_names"]
+                            polygon_attribute_names = response.json[
+                                "polygon_attribute_names"
+                            ]
                             assert type(polygon_attribute_names) is list
                             for polygon_attribute_name in polygon_attribute_names:
                                 assert type(polygon_attribute_name) is str
@@ -224,21 +242,30 @@ def test_polyhedron_attribute_names(client):
     route = f"/polyhedron_attribute_names"
     for geode_object, value in geode_objects.geode_objects_dict().items():
         if value["object_type"] == "mesh":
-            input_extensions = geode_functions.geode_object_input_extensions(geode_object)
+            input_extensions = geode_functions.geode_object_input_extensions(
+                geode_object
+            )
             if "elements" in value:
                 elements = geode_functions.get_elements(geode_object)
                 if "polyhedrons" in elements:
                     for input_extension in input_extensions:
-                        is_loadable = geode_functions.is_loadable(geode_object, os.path.join("./data", f"test.{input_extension}"))
+                        is_loadable = geode_functions.is_loadable(
+                            geode_object,
+                            os.path.join("./data", f"test.{input_extension}"),
+                        )
                         if is_loadable:
+
                             def get_full_data():
                                 return {
                                     "input_geode_object": geode_object,
                                     "filename": f"test.{input_extension}",
                                 }
+
                             response = client.post(route, json=get_full_data())
                             assert response.status_code == 200
-                            polyhedron_attribute_names = response.json["polyhedron_attribute_names"]
+                            polyhedron_attribute_names = response.json[
+                                "polyhedron_attribute_names"
+                            ]
                             assert type(polyhedron_attribute_names) is list
                             for polyhedron_attribute_name in polyhedron_attribute_names:
                                 assert type(polyhedron_attribute_name) is str
