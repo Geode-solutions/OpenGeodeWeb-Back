@@ -1,5 +1,6 @@
 # Standard library imports
 import time
+import shutil
 
 # Third party imports
 import pytest
@@ -7,6 +8,11 @@ import pytest
 # Local application imports
 from app import app
 
+
+@pytest.fixture(scope="session", autouse=True)
+def copy_data():
+    shutil.rmtree("./data", ignore_errors=True)
+    shutil.copytree("./tests/data", "./data", dirs_exist_ok=True)
 
 @pytest.fixture
 def client():

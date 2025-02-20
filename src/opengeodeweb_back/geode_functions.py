@@ -78,6 +78,9 @@ def create_crs(
 def get_object_type(geode_object: str):
     return geode_object_value(geode_object)["object_type"]
 
+def get_elements(geode_object: str):
+    return geode_object_value(geode_object)["elements"]
+
 
 def is_3D(geode_object: str):
     return geode_object_value(geode_object)["is_3D"]
