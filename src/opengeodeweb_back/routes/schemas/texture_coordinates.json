@@ -17,7 +17,8 @@
     }
   },
   "required": [
-    "supported_feature"
+    "input_geode_object",
+    "filename"
   ],
   "additionalProperties": false
 }
