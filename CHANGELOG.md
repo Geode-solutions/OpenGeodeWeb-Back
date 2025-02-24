@@ -1,6 +1,17 @@
 # CHANGELOG
 
 
+## v5.5.1-rc.1 (2025-02-24)
+
+### Bug Fixes
+
+- **attributes**: Elements key on meshes
+  ([`6f0c0a6`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/6f0c0a61fe2dcaf12e956832bed81028be6a0644))
+
+- **deps**: Update
+  ([`9eab238`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/9eab2385f601ed526eb984804ce2f30d61e2d822))
+
+
 ## v5.5.0 (2025-02-13)
 
 
