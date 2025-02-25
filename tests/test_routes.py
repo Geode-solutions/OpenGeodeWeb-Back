@@ -1,13 +1,11 @@
 # Standard library imports
-import base64
 import os
 
 # Third party imports
 from werkzeug.datastructures import FileStorage
-from flask import app
 
 # Local application imports
-from src.opengeodeweb_back import test_utils
+from src.opengeodeweb_back import geode_functions, geode_objects, test_utils
 
 
 def test_allowed_files(client):
@@ -187,110 +185,111 @@ def test_texture_coordinates(client):
 
     
 def test_vertex_attribute_names(client):
-    response = client.put(
-        f"/upload_file",
-        data={"file": FileStorage(open("./tests/vertex_attribute.vtp", "rb"))},
-    )
-    assert response.status_code == 201
-
-    response = client.post(
-        "/save_viewable_file",
-        json={
-            "input_geode_object": "PolygonalSurface3D",
-            "filename": "vertex_attribute.vtp",
-        },
-    )
-    assert response.status_code == 200
-    native_file_name = response.json["native_file_name"]
-
     route = f"/vertex_attribute_names"
+    for geode_object, value in geode_objects.geode_objects_dict().items():
+        if value["object_type"] == "mesh":
+            input_extensions = geode_functions.geode_object_input_extensions(
+                geode_object
+            )
+            if "elements" in value:
+                elements = geode_functions.get_elements(geode_object)
+                if "points" in elements:
+                    for input_extension in input_extensions:
+                        is_loadable = geode_functions.is_loadable(
+                            geode_object,
+                            os.path.join("./data", f"test.{input_extension}"),
+                        )
+                        if is_loadable:
 
-    def get_full_data():
-        return {
-            "input_geode_object": "PolygonalSurface3D",
-            "filename": native_file_name,
-        }
+                            def get_full_data():
+                                return {
+                                    "input_geode_object": geode_object,
+                                    "filename": f"test.{input_extension}",
+                                }
 
-    # Normal test with filename 'vertex_attribute.vtp'
-    response = client.post(route, json=get_full_data())
-    assert response.status_code == 200
-    vertex_attribute_names = response.json["vertex_attribute_names"]
-    assert type(vertex_attribute_names) is list
-    for vertex_attribute_name in vertex_attribute_names:
-        assert type(vertex_attribute_name) is str
+                            response = client.post(route, json=get_full_data())
+                            assert response.status_code == 200
+                            vertex_attribute_names = response.json[
+                                "vertex_attribute_names"
+                            ]
+                            assert type(vertex_attribute_names) is list
+                            for vertex_attribute_name in vertex_attribute_names:
+                                assert type(vertex_attribute_name) is str
 
+    # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
 def test_polygon_attribute_names(client):
-    response = client.put(
-        f"/upload_file",
-        data={"file": FileStorage(open("./tests/polygon_attribute.vtp", "rb"))},
-    )
-    assert response.status_code == 201
-
-    response = client.post(
-        "/save_viewable_file",
-        json={
-            "input_geode_object": "PolygonalSurface3D",
-            "filename": "polygon_attribute.vtp",
-        },
-    )
-    assert response.status_code == 200
-    native_file_name = response.json["native_file_name"]
-
     route = f"/polygon_attribute_names"
+    for geode_object, value in geode_objects.geode_objects_dict().items():
+        if value["object_type"] == "mesh":
+            input_extensions = geode_functions.geode_object_input_extensions(
+                geode_object
+            )
+            if "elements" in value:
+                elements = geode_functions.get_elements(geode_object)
+                if "polygons" in elements:
+                    for input_extension in input_extensions:
+                        is_loadable = geode_functions.is_loadable(
+                            geode_object,
+                            os.path.join("./data", f"test.{input_extension}"),
+                        )
+                        if is_loadable:
 
-    def get_full_data():
-        return {
-            "input_geode_object": "PolygonalSurface3D",
-            "filename": native_file_name,
-        }
+                            def get_full_data():
+                                return {
+                                    "input_geode_object": geode_object,
+                                    "filename": f"test.{input_extension}",
+                                }
 
-    # Normal test with filename 'vertex_attribute.vtp'
-    response = client.post(route, json=get_full_data())
-    assert response.status_code == 200
-    polygon_attribute_names = response.json["polygon_attribute_names"]
-    assert type(polygon_attribute_names) is list
-    for polygon_attribute_name in polygon_attribute_names:
-        assert type(polygon_attribute_name) is str
+                            response = client.post(route, json=get_full_data())
+                            assert response.status_code == 200
+                            polygon_attribute_names = response.json[
+                                "polygon_attribute_names"
+                            ]
+                            assert type(polygon_attribute_names) is list
+                            for polygon_attribute_name in polygon_attribute_names:
+                                assert type(polygon_attribute_name) is str
 
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
 def test_polyhedron_attribute_names(client):
-    response = client.put(
-        f"/upload_file",
-        data={"file": FileStorage(open("./tests/polyhedron_attribute.vtu", "rb"))},
-    )
-    assert response.status_code == 201
-
-    response = client.post(
-        "/save_viewable_file",
-        json={
-            "input_geode_object": "HybridSolid3D",
-            "filename": "polyhedron_attribute.vtu",
-        },
-    )
-    assert response.status_code == 200
-    native_file_name = response.json["native_file_name"]
-
     route = f"/polyhedron_attribute_names"
+    for geode_object, value in geode_objects.geode_objects_dict().items():
+        if value["object_type"] == "mesh":
+            input_extensions = geode_functions.geode_object_input_extensions(
+                geode_object
+            )
+            if "elements" in value:
+                elements = geode_functions.get_elements(geode_object)
+                if "polyhedrons" in elements:
+                    for input_extension in input_extensions:
+                        is_loadable = geode_functions.is_loadable(
+                            geode_object,
+                            os.path.join("./data", f"test.{input_extension}"),
+                        )
+                        if is_loadable:
 
-    def get_full_data():
-        return {
-            "input_geode_object": "HybridSolid3D",
-            "filename": native_file_name,
-        }
+                            def get_full_data():
+                                return {
+                                    "input_geode_object": geode_object,
+                                    "filename": f"test.{input_extension}",
+                                }
 
-    # Normal test with filename 'vertex_attribute.vtp'
-    response = client.post(route, json=get_full_data())
-    assert response.status_code == 200
-    polygon_attribute_names = response.json["polyhedron_attribute_names"]
-    assert type(polygon_attribute_names) is list
-    for polygon_attribute_name in polygon_attribute_names:
-        assert type(polygon_attribute_name) is str
+                            response = client.post(route, json=get_full_data())
+                            assert response.status_code == 200
+                            polyhedron_attribute_names = response.json[
+                                "polyhedron_attribute_names"
+                            ]
+                            assert type(polyhedron_attribute_names) is list
+                            for polyhedron_attribute_name in polyhedron_attribute_names:
+                                assert type(polyhedron_attribute_name) is str
+
+    # Test all params
+    test_utils.test_route_wrong_params(client, route, get_full_data)
 
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
