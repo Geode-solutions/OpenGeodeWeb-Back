@@ -20,12 +20,12 @@ flask[async]==3.1.0
     #   flask-cors
 flask-cors==5.0.0
     # via -r requirements.in
-geode-background==8.8.10
+geode-background==8.9.3
     # via
     #   geode-explicit
     #   geode-implicit
     #   geode-simplex
-geode-common==33.4.0
+geode-common==33.5.0
     # via
     #   -r requirements.in
     #   geode-background
@@ -35,23 +35,23 @@ geode-common==33.4.0
     #   geode-numerics
     #   geode-simplex
     #   geode-viewables
-geode-conversion==6.1.4
+geode-conversion==6.1.5
     # via
     #   geode-explicit
     #   geode-implicit
     #   geode-simplex
-geode-explicit==6.1.26
+geode-explicit==6.1.28
     # via
     #   -r requirements.in
     #   geode-implicit
-geode-implicit==3.5.0
+geode-implicit==3.5.2
     # via -r requirements.in
-geode-numerics==5.2.4
+geode-numerics==5.2.5
     # via
     #   -r requirements.in
     #   geode-implicit
     #   geode-simplex
-geode-simplex==9.0.8
+geode-simplex==9.0.10
     # via
     #   -r requirements.in
     #   geode-implicit
@@ -69,7 +69,7 @@ markupsafe==3.0.2
     # via
     #   jinja2
     #   werkzeug
-opengeode-core==15.9.8
+opengeode-core==15.10.1
     # via
     #   -r requirements.in
     #   geode-background
@@ -90,17 +90,17 @@ opengeode-geosciences==8.2.2
     #   geode-implicit
     #   geode-viewables
     #   opengeode-geosciencesio
-opengeode-geosciencesio==5.3.4
+opengeode-geosciencesio==5.3.6
     # via
     #   -r requirements.in
     #   geode-implicit
-opengeode-inspector==6.3.4
+opengeode-inspector==6.3.7
     # via
     #   -r requirements.in
     #   geode-explicit
     #   geode-implicit
     #   geode-simplex
-opengeode-io==7.0.9
+opengeode-io==7.1.0
     # via
     #   -r requirements.in
     #   geode-implicit
