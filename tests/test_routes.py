@@ -166,9 +166,6 @@ def test_save_viewable_file(client):
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-
-
-
 def test_texture_coordinates(client):
     response = client.post(
         "/texture_coordinates",
@@ -183,7 +180,7 @@ def test_texture_coordinates(client):
     for texture_coordinate in texture_coordinates:
         assert type(texture_coordinate) is str
 
-    
+
 def test_vertex_attribute_names(client):
     route = f"/vertex_attribute_names"
     for geode_object, value in geode_objects.geode_objects_dict().items():
