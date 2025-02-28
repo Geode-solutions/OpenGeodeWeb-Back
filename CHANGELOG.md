@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v5.6.0-rc.2 (2025-02-28)
+
+### Bug Fixes
+
+- **createpoint**: Fix create point function
+  ([`1634179`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/16341793ec9cb249ab966f9d076539e2108760de))
+
+
 ## v5.6.0-rc.1 (2025-02-28)
 
 ### Features
