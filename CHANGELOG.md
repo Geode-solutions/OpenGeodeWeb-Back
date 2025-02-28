@@ -1,6 +1,28 @@
 # CHANGELOG
 
 
+## v5.6.0-rc.3 (2025-02-28)
+
+
+## v5.6.0-rc.2 (2025-02-28)
+
+### Bug Fixes
+
+- **createpoint**: Fix create point function
+  ([`1634179`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/16341793ec9cb249ab966f9d076539e2108760de))
+
+- **deps**: Stable
+  ([`a56191f`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/a56191fbb81bb2a7f08a8cf18850d2c3b15a6197))
+
+
+## v5.6.0-rc.1 (2025-02-28)
+
+### Features
+
+- **routes**: Texture coordinates route/data/schema
+  ([`b29cd27`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b29cd27028a7a474023f597ad7b6a4c6ebd4855c))
+
+
 ## v5.5.1 (2025-02-26)
 
 

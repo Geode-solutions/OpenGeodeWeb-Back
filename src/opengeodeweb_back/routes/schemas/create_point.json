@@ -5,6 +5,9 @@
   ],
   "type": "object",
   "properties": {
+    "title": {
+      "type": "string"
+    },
     "x": {
       "type": "number"
     },
@@ -16,6 +19,7 @@
     }
   },
   "required": [
+    "title",
     "x",
     "y",
     "z"
