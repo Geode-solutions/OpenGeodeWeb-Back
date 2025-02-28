@@ -166,6 +166,21 @@ def test_save_viewable_file(client):
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
+def test_texture_coordinates(client):
+    response = client.post(
+        "/texture_coordinates",
+        json={
+            "input_geode_object": "PolygonalSurface3D",
+            "filename": "hat.vtp",
+        },
+    )
+    assert response.status_code == 200
+    texture_coordinates = response.json["texture_coordinates"]
+    assert type(texture_coordinates) is list
+    for texture_coordinate in texture_coordinates:
+        assert type(texture_coordinate) is str
+
+
 def test_vertex_attribute_names(client):
     route = f"/vertex_attribute_names"
     for geode_object, value in geode_objects.geode_objects_dict().items():
