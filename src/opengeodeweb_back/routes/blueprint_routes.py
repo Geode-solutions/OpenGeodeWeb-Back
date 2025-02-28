@@ -292,7 +292,6 @@ def create_point():
     builder = geode_functions.create_builder("PointSet3D", PointSet3D)
     builder.create_point(opengeode.Point3D([x, y, z]))
     builder.set_name(title)
-    print(PointSet3D.name(), flush=True)
     name = PointSet3D.name()
     generated_id = str(uuid.uuid4()).replace("-", "")
     object_type = geode_functions.get_object_type("PointSet3D")
@@ -302,13 +301,9 @@ def create_point():
     saved_viewable_file_path = geode_functions.save_viewable(
         "PointSet3D", PointSet3D, DATA_FOLDER_PATH, generated_id
     )
-    print(saved_native_file_path, flush=True)
 
     native_file_name = os.path.basename(saved_native_file_path[0])
     viewable_file_name = os.path.basename(saved_viewable_file_path)
-
-    print(f"{native_file_name=}", flush=True)
-    print(f"{viewable_file_name=}", flush=True)
 
     return flask.make_response(
         {
