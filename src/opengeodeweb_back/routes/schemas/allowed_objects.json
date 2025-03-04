@@ -1,15 +1,24 @@
 {
   "route": "/allowed_objects",
-  "methods": ["POST"],
+  "methods": [
+    "POST"
+  ],
   "type": "object",
   "properties": {
     "filename": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     },
     "supported_feature": {
-      "type": ["string", "null"]
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
-  "required": ["filename", "supported_feature"],
+  "required": [
+    "filename",
+    "supported_feature"
+  ],
   "additionalProperties": false
 }

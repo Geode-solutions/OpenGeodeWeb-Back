@@ -6,14 +6,12 @@
   "type": "object",
   "properties": {
     "input_geode_object": {
-      "type": [
-        "string"
-      ]
+      "type": "string",
+      "minLength": 1
     },
     "filename": {
-      "type": [
-        "string"
-      ]
+      "type": "string",
+      "minLength": 1
     }
   },
   "required": [
