@@ -6,7 +6,8 @@
   "type": "object",
   "properties": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     },
     "x": {
       "type": "number"

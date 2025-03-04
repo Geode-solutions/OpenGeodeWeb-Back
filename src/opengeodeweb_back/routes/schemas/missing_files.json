@@ -1,15 +1,22 @@
 {
   "route": "/missing_files",
-  "methods": ["POST"],
+  "methods": [
+    "POST"
+  ],
   "type": "object",
   "properties": {
     "input_geode_object": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     },
     "filename": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     }
   },
-  "required": ["input_geode_object", "filename"],
+  "required": [
+    "input_geode_object",
+    "filename"
+  ],
   "additionalProperties": false
 }
