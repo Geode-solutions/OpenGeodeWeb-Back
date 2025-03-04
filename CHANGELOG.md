@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v5.6.1-rc.1 (2025-03-04)
+
+### Bug Fixes
+
+- **schemas**: Add minLength property to these schemas
+  ([`7d1e63d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/7d1e63d6c249a412fd836c1b3020b304ed809d37))
+
+
 ## v5.6.0 (2025-02-28)
 
 
