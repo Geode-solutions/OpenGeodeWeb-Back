@@ -5,6 +5,10 @@
   ],
   "type": "object",
   "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
     "x": {
       "type": "number"
     },
@@ -16,6 +20,7 @@
     }
   },
   "required": [
+    "title",
     "x",
     "y",
     "z"

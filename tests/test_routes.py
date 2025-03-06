@@ -294,7 +294,7 @@ def test_polyhedron_attribute_names(client):
 
 def test_create_point(client):
     route = f"/create_point"
-    get_full_data = lambda: {"x": 1, "y": 2, "z": 3}
+    get_full_data = lambda: {"title": "test_point", "x": 1, "y": 2, "z": 3}
 
     # Normal test with all keys
     response = client.post(route, json=get_full_data())

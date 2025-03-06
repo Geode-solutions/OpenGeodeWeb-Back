@@ -283,6 +283,7 @@ with open(os.path.join(schemas, "create_point.json"), "r") as file:
 def create_point():
     utils_functions.validate_request(flask.request, create_point_json)
     DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
+    title = flask.request.json["title"]
     x = flask.request.json["x"]
     y = flask.request.json["y"]
     z = flask.request.json["z"]
@@ -290,16 +291,29 @@ def create_point():
     PointSet3D = class_.create()
     builder = geode_functions.create_builder("PointSet3D", PointSet3D)
     builder.create_point(opengeode.Point3D([x, y, z]))
-
+    builder.set_name(title)
+    name = PointSet3D.name()
     generated_id = str(uuid.uuid4()).replace("-", "")
+    object_type = geode_functions.get_object_type("PointSet3D")
+    saved_native_file_path = geode_functions.save(
+        "PointSet3D", PointSet3D, DATA_FOLDER_PATH, generated_id + ".og_pts3d"
+    )
     saved_viewable_file_path = geode_functions.save_viewable(
         "PointSet3D", PointSet3D, DATA_FOLDER_PATH, generated_id
     )
+
+    native_file_name = os.path.basename(saved_native_file_path[0])
+    viewable_file_name = os.path.basename(saved_viewable_file_path)
 
     return flask.make_response(
         {
             "viewable_file_name": os.path.basename(saved_viewable_file_path),
             "id": generated_id,
+            "name": name,
+            "native_file_name": native_file_name,
+            "viewable_file_name": viewable_file_name,
+            "object_type": object_type,
+            "geode_object": "PointSet3D",
         },
         200,
     )
