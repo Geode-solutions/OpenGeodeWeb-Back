@@ -1,6 +1,9 @@
 # CHANGELOG
 
 
+## v5.6.2-rc.1 (2025-03-06)
+
+
 ## v5.6.1 (2025-03-04)
 
 
@@ -31,11 +34,6 @@
 
 ## v5.6.0-rc.1 (2025-02-28)
 
-### Features
-
-- **routes**: Texture coordinates route/data/schema
-  ([`b29cd27`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b29cd27028a7a474023f597ad7b6a4c6ebd4855c))
-
 
 ## v5.5.1 (2025-02-26)
 
@@ -47,8 +45,16 @@
 - **attributes**: Elements key on meshes
   ([`6f0c0a6`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/6f0c0a61fe2dcaf12e956832bed81028be6a0644))
 
+- **deps**: Stable
+  ([`cde95c2`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/cde95c22c92924e9d6b33d716d12d60f1715f678))
+
 - **deps**: Update
   ([`9eab238`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/9eab2385f601ed526eb984804ce2f30d61e2d822))
+
+### Features
+
+- **routes**: Texture coordinates route/data/schema
+  ([`b29cd27`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/b29cd27028a7a474023f597ad7b6a4c6ebd4855c))
 
 
 ## v5.5.0 (2025-02-13)
