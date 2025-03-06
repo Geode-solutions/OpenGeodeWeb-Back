@@ -304,8 +304,10 @@ def create_point():
         200,
     )
 
+
 with open(os.path.join(schemas, "texture_coordinates.json"), "r") as file:
     texture_coordinates_json = json.load(file)
+
 
 @routes.route(
     texture_coordinates_json["route"],
@@ -314,10 +316,14 @@ with open(os.path.join(schemas, "texture_coordinates.json"), "r") as file:
 def texture_coordinates():
     DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
     utils_functions.validate_request(flask.request, texture_coordinates_json)
-    data = geode_functions.load(flask.request.json["input_geode_object"], os.path.join(DATA_FOLDER_PATH, flask.request.json["filename"]))
+    data = geode_functions.load(
+        flask.request.json["input_geode_object"],
+        os.path.join(DATA_FOLDER_PATH, flask.request.json["filename"]),
+    )
     texture_coordinates = data.texture_manager().texture_names()
 
     return flask.make_response({"texture_coordinates": texture_coordinates}, 200)
+
 
 with open(
     os.path.join(schemas, "vertex_attribute_names.json"),
