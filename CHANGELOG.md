@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v5.6.3-rc.1 (2025-03-19)
+
+### Bug Fixes
+
+- **deps**: Update ecosystem
+  ([`136ffab`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/136ffabb8f733e7c8d32361deeec7f7c838c3858))
+
+
 ## v5.6.2 (2025-03-06)
 
 
