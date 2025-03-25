@@ -2,8 +2,8 @@ import json
 import os
 import xml.etree.ElementTree as ET
 import flask
-
 from src.opengeodeweb_back import geode_functions, utils_functions
+from opengeode import model
 
 routes = flask.Blueprint("models", __name__)
 
@@ -23,13 +23,13 @@ def teardown_request(exception):
 
 schemas = os.path.join(os.path.dirname(__file__), "schemas")
 
-with open(os.path.join(schemas, "components.json"), "r") as file:
-    components_json = json.load(file)
+with open(os.path.join(schemas, "mesh_components.json"), "r") as file:
+    mesh_components_json = json.load(file)
 
 
-@routes.route(components_json["route"], methods=components_json["methods"])
-def print_vtm_file():
-    utils_functions.validate_request(flask.request, components_json)
+@routes.route(mesh_components_json["route"], methods=mesh_components_json["methods"])
+def uuid_to_flat_index():
+    utils_functions.validate_request(flask.request, mesh_components_json)
     vtm_file_path = os.path.join(
         flask.current_app.config["DATA_FOLDER_PATH"], flask.request.json["id"] + ".vtm"
     )
@@ -50,3 +50,45 @@ def print_vtm_file():
         {"uuid_to_flat_index": uuid_to_flat_index},
         200,
     )
+
+
+def extract_model_uuids(geode_object, file_path):
+    model = geode_functions.load(geode_object, file_path)
+    components = {
+        "blocks": getattr(model, "blocks", lambda: [])(),
+        "lines": getattr(model, "lines", lambda: [])(),
+        "surfaces": getattr(model, "surfaces", lambda: [])(),
+        "corners": getattr(model, "corners", lambda: [])(),
+    }
+
+    uuid_dict = {
+        key: [
+            component.id().string()
+            for component in components[key]
+            if hasattr(component, "id")
+        ]
+        for key in components
+        if components[key]
+    }
+
+    print(f"{uuid_dict=}", flush=True)
+    return uuid_dict
+
+
+with open(os.path.join(schemas, "components_types.json"), "r") as file:
+    components_types_json = json.load(file)
+
+
+@routes.route(components_types_json["route"], methods=components_types_json["methods"])
+def extract_uuids_endpoint():
+    utils_functions.validate_request(flask.request, components_types_json)
+
+    file_path = os.path.join(
+        flask.current_app.config["DATA_FOLDER_PATH"], flask.request.json["filename"]
+    )
+
+    if not os.path.exists(file_path):
+        return flask.make_response({"error": "File not found"}, 404)
+
+    uuid_dict = extract_model_uuids(flask.request.json["geode_object"], file_path)
+    return flask.make_response(uuid_dict, 200)

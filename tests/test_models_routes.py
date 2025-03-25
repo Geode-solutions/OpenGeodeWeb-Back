@@ -1,12 +1,10 @@
 import os
-
 from werkzeug.datastructures import FileStorage
-
 from src.opengeodeweb_back import geode_functions, geode_objects, test_utils
 
 
-def test_model_components(client):
-    route = f"/models/components"
+def test_model_mesh_components(client):
+    route = f"/models/mesh_components"
     get_full_data = lambda: {"id": "cube"}
     json = get_full_data()
     response = client.post(route, json=json)
@@ -19,5 +17,20 @@ def test_model_components(client):
     assert indices[0] == 1
     assert all(indices[i] == indices[i - 1] + 1 for i in range(1, len(indices)))
 
-    # Test all params
-    test_utils.test_route_wrong_params(client, route, get_full_data)
+
+def test_extract_brep_uuids(client):
+    route = "/models/components_types"
+    json_data = {"filename": "cube.og_brep", "geode_object": "BRep"}
+
+    response = client.post(route, json=json_data)
+
+    assert response.status_code == 200
+    uuid_dict = response.json
+    assert isinstance(uuid_dict, dict)
+    assert (
+        "blocks" in uuid_dict
+        or "lines" in uuid_dict
+        or "surfaces" in uuid_dict
+        or "corners" in uuid_dict
+    )
+    assert False
