@@ -5,12 +5,16 @@
   ],
   "type": "object",
   "properties": {
-    "id": {
+    "filename": {
+      "type": "string"
+    },
+    "geode_object": {
       "type": "string"
     }
   },
   "required": [
-    "id"
+    "filename",
+    "geode_object"
   ],
   "additionalProperties": false
 }

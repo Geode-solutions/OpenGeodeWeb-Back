@@ -1,20 +1,16 @@
 {
-  "route": "/components_types",
+  "route": "/vtm_component_indices",
   "methods": [
     "POST"
   ],
   "type": "object",
   "properties": {
-    "filename": {
-      "type": "string"
-    },
-    "geode_object": {
+    "id": {
       "type": "string"
     }
   },
   "required": [
-    "filename",
-    "geode_object"
+    "id"
   ],
   "additionalProperties": false
 }
