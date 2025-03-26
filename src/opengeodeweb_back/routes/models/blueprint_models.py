@@ -44,8 +44,6 @@ def uuid_to_flat_index():
             uuid_to_flat_index[elem.attrib["uuid"]] = current_index
             current_index += 1
 
-    print(f"{uuid_to_flat_index=}", flush=True)
-
     return flask.make_response(
         {"uuid_to_flat_index": uuid_to_flat_index},
         200,
@@ -62,7 +60,6 @@ def extract_model_uuids(geode_object, file_path):
         component_name = mesh_component.get()
         uuid_dict[component_name] = [id.string() for id in ids]
 
-    print(f"{uuid_dict=}", flush=True)
     return uuid_dict
 
 
