@@ -28,9 +28,8 @@ def test_extract_brep_uuids(client):
     uuid_dict = response.json
     assert isinstance(uuid_dict, dict)
     assert (
-        "blocks" in uuid_dict
-        or "lines" in uuid_dict
-        or "surfaces" in uuid_dict
-        or "corners" in uuid_dict
+        "Block" in uuid_dict
+        or "Line" in uuid_dict
+        or "Surface" in uuid_dict
+        or "Corner" in uuid_dict
     )
-    assert False

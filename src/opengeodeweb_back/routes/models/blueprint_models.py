@@ -54,22 +54,13 @@ def uuid_to_flat_index():
 
 def extract_model_uuids(geode_object, file_path):
     model = geode_functions.load(geode_object, file_path)
-    components = {
-        "blocks": getattr(model, "blocks", lambda: [])(),
-        "lines": getattr(model, "lines", lambda: [])(),
-        "surfaces": getattr(model, "surfaces", lambda: [])(),
-        "corners": getattr(model, "corners", lambda: [])(),
-    }
+    mesh_components = model.mesh_components()
 
-    uuid_dict = {
-        key: [
-            component.id().string()
-            for component in components[key]
-            if hasattr(component, "id")
-        ]
-        for key in components
-        if components[key]
-    }
+    uuid_dict = {}
+
+    for mesh_component, ids in mesh_components.items():
+        component_name = mesh_component.get()
+        uuid_dict[component_name] = [id.string() for id in ids]
 
     print(f"{uuid_dict=}", flush=True)
     return uuid_dict
