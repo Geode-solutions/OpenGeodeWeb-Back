@@ -7,6 +7,7 @@ import flask_cors
 from werkzeug.exceptions import HTTPException
 
 from src.opengeodeweb_back.routes import blueprint_routes
+from src.opengeodeweb_back.routes.models import blueprint_models
 from src.opengeodeweb_back.utils_functions import handle_exception
 from src.opengeodeweb_back import app_config
 
@@ -32,6 +33,12 @@ app.register_blueprint(
     blueprint_routes.routes,
     url_prefix="/",
     name="blueprint_routes",
+)
+
+app.register_blueprint(
+    blueprint_models.routes,
+    url_prefix="/models",
+    name="blueprint_models",
 )
 
 
