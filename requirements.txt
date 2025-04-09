@@ -22,12 +22,12 @@ flask[async]==3.1.0
     #   flask-cors
 flask-cors==5.0.1
     # via -r requirements.in
-geode-background==9.1.1
+geode-background==9.1.3
     # via
     #   geode-explicit
     #   geode-implicit
     #   geode-simplex
-geode-common==33.6.2
+geode-common==33.7.0
     # via
     #   -r requirements.in
     #   geode-background
@@ -37,27 +37,27 @@ geode-common==33.6.2
     #   geode-numerics
     #   geode-simplex
     #   geode-viewables
-geode-conversion==6.2.3
+geode-conversion==6.2.6
     # via
     #   geode-explicit
     #   geode-implicit
     #   geode-simplex
-geode-explicit==6.1.33
+geode-explicit==6.1.34
     # via
     #   -r requirements.in
     #   geode-implicit
-geode-implicit==3.7.1
+geode-implicit==3.7.3
     # via -r requirements.in
-geode-numerics==6.0.1
+geode-numerics==6.0.2
     # via
     #   -r requirements.in
     #   geode-implicit
     #   geode-simplex
-geode-simplex==9.2.1
+geode-simplex==9.2.3
     # via
     #   -r requirements.in
     #   geode-implicit
-geode-viewables==3.0.11
+geode-viewables==3.0.12
     # via -r requirements.in
 itsdangerous==2.2.0
     # via flask
@@ -71,7 +71,7 @@ markupsafe==3.0.2
     # via
     #   jinja2
     #   werkzeug
-opengeode-core==15.17.4
+opengeode-core==15.17.7
     # via
     #   -r requirements.in
     #   geode-background
@@ -86,23 +86,23 @@ opengeode-core==15.17.4
     #   opengeode-geosciencesio
     #   opengeode-inspector
     #   opengeode-io
-opengeode-geosciences==8.4.2
+opengeode-geosciences==8.4.3
     # via
     #   -r requirements.in
     #   geode-implicit
     #   geode-viewables
     #   opengeode-geosciencesio
-opengeode-geosciencesio==5.3.7
+opengeode-geosciencesio==5.3.8
     # via
     #   -r requirements.in
     #   geode-implicit
-opengeode-inspector==6.3.10
+opengeode-inspector==6.3.11
     # via
     #   -r requirements.in
     #   geode-explicit
     #   geode-implicit
     #   geode-simplex
-opengeode-io==7.1.4
+opengeode-io==7.1.5
     # via
     #   -r requirements.in
     #   geode-implicit
@@ -117,7 +117,9 @@ rpds-py==0.24.0
     #   jsonschema
     #   referencing
 typing-extensions==4.13.1
-    # via referencing
+    # via
+    #   asgiref
+    #   referencing
 werkzeug==3.1.3
     # via
     #   -r requirements.in
