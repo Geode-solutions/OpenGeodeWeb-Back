@@ -1,6 +1,9 @@
 # CHANGELOG
 
 
+## v5.6.5-rc.1 (2025-04-09)
+
+
 ## v5.6.4 (2025-04-04)
 
 
@@ -10,6 +13,9 @@
 
 - **/save_viewable**: Update dependencies
   ([`c01aa71`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c01aa719df95ff21afe840d8630fddd09837b214))
+
+- **deps**: Update
+  ([`78afaf9`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/78afaf9f1f80c3e8491a508f5f7dac0173c9678d))
 
 
 ## v5.6.3 (2025-03-19)
