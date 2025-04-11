@@ -51,20 +51,20 @@ def kill_task(current_app):
     minutes_since_last_request = (current_time - LAST_REQUEST_TIME) / 60
     minutes_since_last_ping = (current_time - LAST_PING_TIME) / 60
 
-    if (REQUEST_COUNTER > 0):
+    if REQUEST_COUNTER > 0:
         return
     if MINUTES_BEFORE_TIMEOUT == 0:
         return
-    if (minutes_since_last_ping > MINUTES_BEFORE_TIMEOUT):
+    if minutes_since_last_ping > MINUTES_BEFORE_TIMEOUT:
         kill_server()
-    if (minutes_since_last_request > MINUTES_BEFORE_TIMEOUT):
+    if minutes_since_last_request > MINUTES_BEFORE_TIMEOUT:
         kill_server()
 
 
 def kill_server():
     print("Server timed out due to inactivity, shutting down...", flush=True)
     os._exit(0)
-    
+
 
 def versions(list_packages: list):
     list_with_versions = []
