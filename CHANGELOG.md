@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v5.6.6 (2025-04-11)
+
+### Bug Fixes
+
+- **CICD**: Trigger semantic
+  ([`581e69f`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/581e69f5ec156648bafac9954a399a32642300cd))
+
+
 ## v5.6.6-rc.2 (2025-04-11)
 
 ### Bug Fixes
