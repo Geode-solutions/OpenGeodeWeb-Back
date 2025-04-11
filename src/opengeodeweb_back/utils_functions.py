@@ -43,7 +43,6 @@ def teardown_request(current_app):
 
 
 def kill_task(current_app):
-    DESKTOP_APP = bool(current_app.config.get("DESKTOP_APP"))
     REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER"))
     LAST_PING_TIME = float(current_app.config.get("LAST_PING_TIME"))
     LAST_REQUEST_TIME = float(current_app.config.get("LAST_REQUEST_TIME"))
@@ -52,16 +51,20 @@ def kill_task(current_app):
     minutes_since_last_request = (current_time - LAST_REQUEST_TIME) / 60
     minutes_since_last_ping = (current_time - LAST_PING_TIME) / 60
 
-    if (
-        (
-            (minutes_since_last_request > MINUTES_BEFORE_TIMEOUT)
-            and (DESKTOP_APP == False)
-        )
-        or (minutes_since_last_ping > MINUTES_BEFORE_TIMEOUT)
-    ) and (REQUEST_COUNTER == 0):
-        print("Server timed out due to inactivity, shutting down...", flush=True)
-        os._exit(0)
+    if (REQUEST_COUNTER > 0):
+        return
+    if MINUTES_BEFORE_TIMEOUT == 0:
+        return
+    if (minutes_since_last_ping > MINUTES_BEFORE_TIMEOUT):
+        kill_server()
+    if (minutes_since_last_request > MINUTES_BEFORE_TIMEOUT):
+        kill_server()
 
+
+def kill_server():
+    print("Server timed out due to inactivity, shutting down...", flush=True)
+    os._exit(0)
+    
 
 def versions(list_packages: list):
     list_with_versions = []
