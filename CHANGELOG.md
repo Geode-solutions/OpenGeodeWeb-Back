@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v5.6.6-rc.2 (2025-04-11)
+
+### Bug Fixes
+
+- **deps**: Update deps, fixes windows tests
+  ([`861ee0d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/861ee0d7d157e995f271b1e8e8d3422bc3260ea0))
+
+
 ## v5.6.6-rc.1 (2025-04-11)
 
 ### Bug Fixes
