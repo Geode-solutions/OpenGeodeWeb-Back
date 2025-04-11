@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v5.6.6-rc.1 (2025-04-11)
+
+### Bug Fixes
+
+- **server timeout**: Timeout 0 = infinite
+  ([`8db3eef`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/8db3eef5c07ce5827ce689b9fad433739f045418))
+
+
 ## v5.6.5 (2025-04-09)
 
 
