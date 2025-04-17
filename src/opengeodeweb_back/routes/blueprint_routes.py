@@ -12,7 +12,7 @@ import werkzeug
 # Local application imports
 from .. import geode_functions, utils_functions
 
-from opengeodeweb_back.routes.models import blueprint_models
+from .models import blueprint_models
 
 routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
 

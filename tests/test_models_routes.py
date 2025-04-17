@@ -1,8 +1,3 @@
-import os
-from werkzeug.datastructures import FileStorage
-from src.opengeodeweb_back import geode_functions, geode_objects, test_utils
-
-
 def test_model_mesh_components(client):
     route = f"/models/vtm_component_indices"
     get_full_data = lambda: {"id": "cube"}

@@ -2,7 +2,7 @@ import json
 import os
 import xml.etree.ElementTree as ET
 import flask
-from src.opengeodeweb_back import geode_functions, utils_functions
+from ... import geode_functions, utils_functions
 
 routes = flask.Blueprint("models", __name__, url_prefix="/models")
 
