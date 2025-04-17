@@ -1,6 +1,9 @@
 # CHANGELOG
 
 
+## v5.7.0-rc.1 (2025-04-17)
+
+
 ## v5.6.6 (2025-04-11)
 
 ### Bug Fixes
@@ -43,6 +46,11 @@
 
 - **deps**: Update
   ([`78afaf9`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/78afaf9f1f80c3e8491a508f5f7dac0173c9678d))
+
+### Features
+
+- **models blueprint & test**: New blueprint models, json schema, test
+  ([`8461b4a`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/8461b4a1c20cf0ba4d32e1c9c4cf8070631c928d))
 
 
 ## v5.6.3 (2025-03-19)
