@@ -3,22 +3,8 @@ import os
 import xml.etree.ElementTree as ET
 import flask
 from src.opengeodeweb_back import geode_functions, utils_functions
-from opengeode import model
 
-routes = flask.Blueprint("models", __name__)
-
-
-@routes.before_request
-def before_request():
-    if "ping" not in flask.request.path:
-        utils_functions.increment_request_counter(flask.current_app)
-
-
-@routes.teardown_request
-def teardown_request(exception):
-    if "ping" not in flask.request.path:
-        utils_functions.decrement_request_counter(flask.current_app)
-        utils_functions.update_last_request_time(flask.current_app)
+routes = flask.Blueprint("models", __name__, url_prefix="/models")
 
 
 schemas = os.path.join(os.path.dirname(__file__), "schemas")
@@ -31,6 +17,8 @@ with open(os.path.join(schemas, "vtm_component_indices.json"), "r") as file:
     vtm_component_indices_json["route"], methods=vtm_component_indices_json["methods"]
 )
 def uuid_to_flat_index():
+
+    print(f"uuid_to_flat_index : {flask.request=}", flush=True)
     utils_functions.validate_request(flask.request, vtm_component_indices_json)
     vtm_file_path = os.path.join(
         flask.current_app.config["DATA_FOLDER_PATH"], flask.request.json["id"] + ".vtm"
@@ -71,6 +59,8 @@ with open(os.path.join(schemas, "mesh_components.json"), "r") as file:
 
 @routes.route(mesh_components_json["route"], methods=mesh_components_json["methods"])
 def extract_uuids_endpoint():
+    print(f"extract_uuids_endpoint : {flask.request=}", flush=True)
+
     utils_functions.validate_request(flask.request, mesh_components_json)
 
     file_path = os.path.join(
@@ -81,4 +71,4 @@ def extract_uuids_endpoint():
         return flask.make_response({"error": "File not found"}, 404)
 
     uuid_dict = extract_model_uuids(flask.request.json["geode_object"], file_path)
-    return flask.make_response(uuid_dict, 200)
+    return flask.make_response({"uuid_dict": uuid_dict}, 200)

@@ -4,7 +4,7 @@ from src.opengeodeweb_back import geode_functions, geode_objects, test_utils
 
 
 def test_model_mesh_components(client):
-    route = f"/models/mesh_components"
+    route = f"/models/vtm_component_indices"
     get_full_data = lambda: {"id": "cube"}
     json = get_full_data()
     response = client.post(route, json=json)
@@ -19,7 +19,7 @@ def test_model_mesh_components(client):
 
 
 def test_extract_brep_uuids(client):
-    route = "/models/components_types"
+    route = "/models/mesh_components"
     json_data = {"filename": "cube.og_brep", "geode_object": "BRep"}
 
     response = client.post(route, json=json_data)
