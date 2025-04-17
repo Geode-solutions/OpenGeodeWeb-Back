@@ -1,6 +1,50 @@
 # CHANGELOG
 
 
+## v5.6.6 (2025-04-11)
+
+### Bug Fixes
+
+- **CICD**: Trigger semantic
+  ([`581e69f`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/581e69f5ec156648bafac9954a399a32642300cd))
+
+
+## v5.6.6-rc.2 (2025-04-11)
+
+### Bug Fixes
+
+- **deps**: Update deps, fixes windows tests
+  ([`861ee0d`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/861ee0d7d157e995f271b1e8e8d3422bc3260ea0))
+
+
+## v5.6.6-rc.1 (2025-04-11)
+
+### Bug Fixes
+
+- **server timeout**: Timeout 0 = infinite
+  ([`8db3eef`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/8db3eef5c07ce5827ce689b9fad433739f045418))
+
+
+## v5.6.5 (2025-04-09)
+
+
+## v5.6.5-rc.1 (2025-04-09)
+
+
+## v5.6.4 (2025-04-04)
+
+
+## v5.6.4-rc.1 (2025-04-04)
+
+### Bug Fixes
+
+- **/save_viewable**: Update dependencies
+  ([`c01aa71`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c01aa719df95ff21afe840d8630fddd09837b214))
+
+- **deps**: Update
+  ([`78afaf9`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/78afaf9f1f80c3e8491a508f5f7dac0173c9678d))
+
+
 ## v5.6.3 (2025-03-19)
 
 

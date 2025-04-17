@@ -20,12 +20,12 @@ flask[async]==3.1.0
     #   flask-cors
 flask-cors==5.0.1
     # via -r requirements.in
-geode-background==9.0.7
+geode-background==9.1.5
     # via
     #   geode-explicit
     #   geode-implicit
     #   geode-simplex
-geode-common==33.6.0
+geode-common==33.7.2
     # via
     #   -r requirements.in
     #   geode-background
@@ -35,27 +35,27 @@ geode-common==33.6.0
     #   geode-numerics
     #   geode-simplex
     #   geode-viewables
-geode-conversion==6.2.0
+geode-conversion==6.2.7
     # via
     #   geode-explicit
     #   geode-implicit
     #   geode-simplex
-geode-explicit==6.1.31
+geode-explicit==6.1.35
     # via
     #   -r requirements.in
     #   geode-implicit
-geode-implicit==3.6.3
+geode-implicit==3.7.4
     # via -r requirements.in
-geode-numerics==5.4.2
+geode-numerics==6.0.3
     # via
     #   -r requirements.in
     #   geode-implicit
     #   geode-simplex
-geode-simplex==9.2.0
+geode-simplex==9.2.5
     # via
     #   -r requirements.in
     #   geode-implicit
-geode-viewables==3.0.10
+geode-viewables==3.0.12
     # via -r requirements.in
 itsdangerous==2.2.0
     # via flask
@@ -69,7 +69,7 @@ markupsafe==3.0.2
     # via
     #   jinja2
     #   werkzeug
-opengeode-core==15.16.2
+opengeode-core==15.17.8
     # via
     #   -r requirements.in
     #   geode-background
@@ -84,23 +84,23 @@ opengeode-core==15.16.2
     #   opengeode-geosciencesio
     #   opengeode-inspector
     #   opengeode-io
-opengeode-geosciences==8.4.0
+opengeode-geosciences==8.4.3
     # via
     #   -r requirements.in
     #   geode-implicit
     #   geode-viewables
     #   opengeode-geosciencesio
-opengeode-geosciencesio==5.3.7
+opengeode-geosciencesio==5.3.8
     # via
     #   -r requirements.in
     #   geode-implicit
-opengeode-inspector==6.3.10
+opengeode-inspector==6.3.11
     # via
     #   -r requirements.in
     #   geode-explicit
     #   geode-implicit
     #   geode-simplex
-opengeode-io==7.1.3
+opengeode-io==7.1.5
     # via
     #   -r requirements.in
     #   geode-implicit
@@ -110,11 +110,11 @@ referencing==0.36.2
     # via
     #   jsonschema
     #   jsonschema-specifications
-rpds-py==0.23.1
+rpds-py==0.24.0
     # via
     #   jsonschema
     #   referencing
-typing-extensions==4.12.2
+typing-extensions==4.13.2
     # via
     #   asgiref
     #   referencing

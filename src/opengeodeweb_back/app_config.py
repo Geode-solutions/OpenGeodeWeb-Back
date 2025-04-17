@@ -12,7 +12,6 @@ class Config(object):
     DEFAULT_PORT = "5000"
     CORS_HEADERS = "Content-Type"
     UPLOAD_FOLDER = "./uploads"
-    DESKTOP_APP = False
     REQUEST_COUNTER = 0
     LAST_REQUEST_TIME = time.time()
     LAST_PING_TIME = time.time()
