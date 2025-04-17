@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v5.7.0-rc.2 (2025-04-17)
+
+### Bug Fixes
+
+- **toml**: Fix toml
+  ([`c4ba0ac`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c4ba0ac9f6bc53061b18d43cd1fee8918dd1c550))
+
+
 ## v5.7.0-rc.1 (2025-04-17)
 
 
