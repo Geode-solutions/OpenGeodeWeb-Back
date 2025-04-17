@@ -451,7 +451,6 @@ with open(
     methods=ping_json["methods"],
 )
 def ping():
-    print(f"ping : {flask.request=}  {ping_json=}", flush=True)
     utils_functions.validate_request(flask.request, ping_json)
     flask.current_app.config.update(LAST_PING_TIME=time.time())
     return flask.make_response({"message": "Flask server is running"}, 200)
