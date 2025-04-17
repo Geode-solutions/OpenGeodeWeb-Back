@@ -25,7 +25,7 @@ def test_extract_brep_uuids(client):
     response = client.post(route, json=json_data)
 
     assert response.status_code == 200
-    uuid_dict = response.json
+    uuid_dict = response.json["uuid_dict"]
     assert isinstance(uuid_dict, dict)
     assert (
         "Block" in uuid_dict
