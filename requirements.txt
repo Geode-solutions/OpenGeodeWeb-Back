@@ -20,12 +20,12 @@ flask[async]==3.1.0
     #   flask-cors
 flask-cors==5.0.1
     # via -r requirements.in
-geode-background==9.2.0
+geode-background==9.2.3
     # via
     #   geode-explicit
     #   geode-implicit
     #   geode-simplex
-geode-common==33.7.5
+geode-common==33.7.6
     # via
     #   -r requirements.in
     #   geode-background
@@ -35,27 +35,27 @@ geode-common==33.7.5
     #   geode-numerics
     #   geode-simplex
     #   geode-viewables
-geode-conversion==6.2.9
+geode-conversion==6.2.11
     # via
     #   geode-explicit
     #   geode-implicit
     #   geode-simplex
-geode-explicit==6.1.37
+geode-explicit==6.1.38
     # via
     #   -r requirements.in
     #   geode-implicit
-geode-implicit==3.7.6
+geode-implicit==3.7.8
     # via -r requirements.in
-geode-numerics==6.0.3
+geode-numerics==6.0.6
     # via
     #   -r requirements.in
     #   geode-implicit
     #   geode-simplex
-geode-simplex==9.2.6
+geode-simplex==9.2.8
     # via
     #   -r requirements.in
     #   geode-implicit
-geode-viewables==3.1.0
+geode-viewables==3.1.1
     # via -r requirements.in
 itsdangerous==2.2.0
     # via flask
@@ -63,13 +63,13 @@ jinja2==3.1.6
     # via flask
 jsonschema==4.23.0
     # via -r requirements.in
-jsonschema-specifications==2024.10.1
+jsonschema-specifications==2025.4.1
     # via jsonschema
 markupsafe==3.0.2
     # via
     #   jinja2
     #   werkzeug
-opengeode-core==15.17.12
+opengeode-core==15.17.14
     # via
     #   -r requirements.in
     #   geode-background
@@ -84,23 +84,23 @@ opengeode-core==15.17.12
     #   opengeode-geosciencesio
     #   opengeode-inspector
     #   opengeode-io
-opengeode-geosciences==8.4.4
+opengeode-geosciences==8.4.6
     # via
     #   -r requirements.in
     #   geode-implicit
     #   geode-viewables
     #   opengeode-geosciencesio
-opengeode-geosciencesio==5.3.8
+opengeode-geosciencesio==5.3.9
     # via
     #   -r requirements.in
     #   geode-implicit
-opengeode-inspector==6.3.11
+opengeode-inspector==6.4.0
     # via
     #   -r requirements.in
     #   geode-explicit
     #   geode-implicit
     #   geode-simplex
-opengeode-io==7.1.5
+opengeode-io==7.2.0
     # via
     #   -r requirements.in
     #   geode-implicit
