@@ -1,0 +1,20 @@
+{
+  "route": "/mesh_components",
+  "methods": [
+    "POST"
+  ],
+  "type": "object",
+  "properties": {
+    "filename": {
+      "type": "string"
+    },
+    "geode_object": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "filename",
+    "geode_object"
+  ],
+  "additionalProperties": false
+}

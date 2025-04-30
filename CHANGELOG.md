@@ -1,12 +1,34 @@
 # CHANGELOG
 
 
+## v5.7.0-rc.3 (2025-04-29)
+
+
+## v5.7.0-rc.2 (2025-04-17)
+
+### Bug Fixes
+
+- **toml**: Fix toml
+  ([`c4ba0ac`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/c4ba0ac9f6bc53061b18d43cd1fee8918dd1c550))
+
+
+## v5.7.0-rc.1 (2025-04-17)
+
+
 ## v5.6.6 (2025-04-11)
 
 ### Bug Fixes
 
 - **CICD**: Trigger semantic
   ([`581e69f`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/581e69f5ec156648bafac9954a399a32642300cd))
+
+- **deps**: Update ecosystem
+  ([`982355a`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/982355a51305ca7a41905cde3646a8cc3ab462d3))
+
+### Features
+
+- **models blueprint & test**: New blueprint models, json schema, test
+  ([`8461b4a`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/8461b4a1c20cf0ba4d32e1c9c4cf8070631c928d))
 
 
 ## v5.6.6-rc.2 (2025-04-11)
