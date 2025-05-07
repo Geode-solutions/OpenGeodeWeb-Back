@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v5.7.1-rc.1 (2025-05-07)
+
+### Bug Fixes
+
+- **deps**: Update ecosystem
+  ([`dcc9f2e`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/dcc9f2e7c3018124b9f616bb41ced1e29f51acc1))
+
+
 ## v5.7.0 (2025-04-30)
 
 
