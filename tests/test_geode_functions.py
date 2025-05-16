@@ -87,8 +87,8 @@ def test_load():
             if geode_functions.is_loadable(geode_object, file_absolute_path):
                 data = geode_functions.load(geode_object, file_absolute_path)
                 data_name = data.name()
+                uu_id = str(uuid.uuid4()).replace("-", "")
                 if "save_viewable" in value:
-                    uu_id = str(uuid.uuid4()).replace("-", "")
                     viewable_file_path = geode_functions.save_viewable(
                         geode_object,
                         data,
@@ -96,6 +96,15 @@ def test_load():
                         data_name,
                     )
                     os.remove(viewable_file_path)
+
+                if "save_light_viewable" in value:
+                    light_viewable_file_path = geode_functions.save_light_viewable(
+                        geode_object,
+                        data,
+                        os.path.abspath(f"./output"),
+                        data_name,
+                    )
+                    os.remove(light_viewable_file_path)
                 geode_objects_and_output_extensions = (
                     geode_functions.geode_objects_output_extensions(geode_object, data)
                 )

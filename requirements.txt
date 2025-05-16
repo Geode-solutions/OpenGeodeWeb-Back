@@ -12,20 +12,20 @@ attrs==25.3.0
     #   referencing
 blinker==1.9.0
     # via flask
-click==8.1.8
+click==8.2.0
     # via flask
-flask[async]==3.1.0
+flask[async]==3.1.1
     # via
     #   -r requirements.in
     #   flask-cors
 flask-cors==5.0.1
     # via -r requirements.in
-geode-background==9.2.4
+geode-background==9.2.5
     # via
     #   geode-explicit
     #   geode-implicit
     #   geode-simplex
-geode-common==33.8.1
+geode-common==33.8.2
     # via
     #   -r requirements.in
     #   geode-background
@@ -35,22 +35,22 @@ geode-common==33.8.1
     #   geode-numerics
     #   geode-simplex
     #   geode-viewables
-geode-conversion==6.2.13
+geode-conversion==6.2.14
     # via
     #   geode-explicit
     #   geode-implicit
-geode-explicit==6.1.39
+geode-explicit==6.1.40
     # via
     #   -r requirements.in
     #   geode-implicit
-geode-implicit==3.7.10
+geode-implicit==3.8.0
     # via -r requirements.in
-geode-numerics==6.0.6
+geode-numerics==6.1.0
     # via
     #   -r requirements.in
     #   geode-implicit
     #   geode-simplex
-geode-simplex==9.3.2
+geode-simplex==9.3.4
     # via
     #   -r requirements.in
     #   geode-implicit
@@ -66,9 +66,10 @@ jsonschema-specifications==2025.4.1
     # via jsonschema
 markupsafe==3.0.2
     # via
+    #   flask
     #   jinja2
     #   werkzeug
-opengeode-core==15.18.0
+opengeode-core==15.18.1
     # via
     #   -r requirements.in
     #   geode-background
@@ -83,7 +84,7 @@ opengeode-core==15.18.0
     #   opengeode-geosciencesio
     #   opengeode-inspector
     #   opengeode-io
-opengeode-geosciences==8.4.7
+opengeode-geosciences==8.4.8
     # via
     #   -r requirements.in
     #   geode-implicit
@@ -93,7 +94,7 @@ opengeode-geosciencesio==5.3.9
     # via
     #   -r requirements.in
     #   geode-implicit
-opengeode-inspector==6.4.1
+opengeode-inspector==6.4.3
     # via
     #   -r requirements.in
     #   geode-explicit
@@ -109,7 +110,7 @@ referencing==0.36.2
     # via
     #   jsonschema
     #   jsonschema-specifications
-rpds-py==0.24.0
+rpds-py==0.25.0
     # via
     #   jsonschema
     #   referencing
