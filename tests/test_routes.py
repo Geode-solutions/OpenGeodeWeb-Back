@@ -44,10 +44,10 @@ def test_allowed_objects(client):
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_upload_file(client):
+def test_upload_file(client, filename="corbi.og_brep"):
     response = client.put(
         f"/upload_file",
-        data={"file": FileStorage(open("./tests/corbi.og_brep", "rb"))},
+        data={"file": FileStorage(open(f"./tests/{filename}", "rb"))},
     )
 
     assert response.status_code == 201
@@ -139,6 +139,8 @@ def test_geode_objects_and_output_extensions(client):
 
 
 def test_save_viewable_file(client):
+
+    test_upload_file(client, filename="corbi.og_brep")
     route = f"/save_viewable_file"
 
     def get_full_data():
@@ -161,6 +163,8 @@ def test_save_viewable_file(client):
     object_type = response.json["object_type"]
     assert type(object_type) is str
     assert object_type in ["model", "mesh"]
+    binary_light_viewable = response.json["binary_light_viewable"]
+    assert type(binary_light_viewable) is str
 
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)

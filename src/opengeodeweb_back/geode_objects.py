@@ -40,6 +40,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_brep,
+            "save_light_viewable": g_v.save_light_viewable_brep,
             "inspector": og_inspector.inspect_brep,
         },
         "CrossSection": {
@@ -62,6 +63,7 @@ def geode_objects_dict():
             "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_cross_section,
+            "save_light_viewable": g_v.save_light_viewable_cross_section,
             "inspector": og_inspector.inspect_section,
         },
         "EdgedCurve2D": {
@@ -84,6 +86,7 @@ def geode_objects_dict():
             "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_edged_curve2D,
+            "save_light_viewable": g_v.save_light_viewable_edged_curve2D,
             "inspector": og_inspector.inspect_edged_curve2D,
         },
         "EdgedCurve3D": {
@@ -106,6 +109,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_edged_curve3D,
+            "save_light_viewable": g_v.save_light_viewable_edged_curve3D,
             "inspector": og_inspector.inspect_edged_curve3D,
         },
         "Graph": {
@@ -142,6 +146,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_hybrid_solid3D,
+            "save_light_viewable": g_v.save_light_viewable_hybrid_solid3D,
             "inspector": og_inspector.inspect_solid3D,
         },
         "ImplicitCrossSection": {
@@ -164,6 +169,7 @@ def geode_objects_dict():
             "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_implicit_cross_section,
+            "save_light_viewable": g_v.save_light_viewable_implicit_cross_section,
             "inspector": og_inspector.inspect_section,
         },
         "ImplicitStructuralModel": {
@@ -186,6 +192,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_implicit_structural_model,
+            "save_light_viewable": g_v.save_light_viewable_implicit_structural_model,
             "inspector": og_inspector.inspect_brep,
         },
         "LightRegularGrid2D": {
@@ -201,7 +208,8 @@ def geode_objects_dict():
             "elements": [points, polygons],
             "is_3D": False,
             "is_viewable": True,
-            "save_viewable": g_v.save_viewable_light_regular_grid2D,
+            "save_viewable": g_v.save_light_viewable_light_regular_grid2D,
+            "save_light_viewable": g_v.save_light_viewable_light_regular_grid2D,
         },
         "LightRegularGrid3D": {
             "class": og.LightRegularGrid3D,
@@ -217,6 +225,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_light_regular_grid3D,
+            "save_light_viewable": g_v.save_light_viewable_light_regular_grid3D,
         },
         "PointSet2D": {
             "class": og.PointSet2D,
@@ -238,6 +247,7 @@ def geode_objects_dict():
             "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_point_set2D,
+            "save_light_viewable": g_v.save_light_viewable_point_set2D,
             "inspector": og_inspector.inspect_point_set2D,
         },
         "PointSet3D": {
@@ -260,6 +270,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_point_set3D,
+            "save_light_viewable": g_v.save_light_viewable_point_set3D,
             "inspector": og_inspector.inspect_point_set3D,
         },
         "PolygonalSurface2D": {
@@ -282,6 +293,7 @@ def geode_objects_dict():
             "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_polygonal_surface2D,
+            "save_light_viewable": g_v.save_light_viewable_polygonal_surface2D,
             "inspector": og_inspector.inspect_surface2D,
         },
         "PolygonalSurface3D": {
@@ -304,6 +316,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_polygonal_surface3D,
+            "save_light_viewable": g_v.save_light_viewable_polygonal_surface3D,
             "inspector": og_inspector.inspect_surface3D,
         },
         "PolyhedralSolid3D": {
@@ -326,6 +339,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_polyhedral_solid3D,
+            "save_light_viewable": g_v.save_light_viewable_polyhedral_solid3D,
             "inspector": og_inspector.inspect_solid3D,
         },
         "RasterImage2D": {
@@ -376,6 +390,7 @@ def geode_objects_dict():
             "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_regular_grid2D,
+            "save_light_viewable": g_v.save_light_viewable_regular_grid2D,
         },
         "RegularGrid3D": {
             "class": og.RegularGrid3D,
@@ -397,6 +412,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_regular_grid3D,
+            "save_light_viewable": g_v.save_light_viewable_regular_grid3D,
         },
         "Section": {
             "class": og.Section,
@@ -417,6 +433,7 @@ def geode_objects_dict():
             "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_section,
+            "save_light_viewable": g_v.save_light_viewable_section,
             "inspector": og_inspector.inspect_section,
         },
         "StructuralModel": {
@@ -439,6 +456,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_structural_model,
+            "save_light_viewable": g_v.save_light_viewable_structural_model,
             "inspector": og_inspector.inspect_brep,
         },
         "TetrahedralSolid3D": {
@@ -461,6 +479,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_tetrahedral_solid3D,
+            "save_light_viewable": g_v.save_light_viewable_tetrahedral_solid3D,
             "inspector": og_inspector.inspect_solid3D,
         },
         "TriangulatedSurface2D": {
@@ -483,6 +502,7 @@ def geode_objects_dict():
             "is_3D": False,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_triangulated_surface2D,
+            "save_light_viewable": g_v.save_light_viewable_triangulated_surface2D,
             "inspector": og_inspector.inspect_surface2D,
         },
         "TriangulatedSurface3D": {
@@ -505,6 +525,7 @@ def geode_objects_dict():
             "is_3D": True,
             "is_viewable": True,
             "save_viewable": g_v.save_viewable_triangulated_surface3D,
+            "save_light_viewable": g_v.save_light_viewable_triangulated_surface3D,
             "inspector": og_inspector.inspect_surface3D,
         },
         "VertexSet": {
