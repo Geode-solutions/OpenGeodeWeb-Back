@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v5.7.2-rc.1 (2025-05-19)
+
+### Bug Fixes
+
+- **blueprint_models**: Change getroot to find & rm current_index from the if
+  ([`3ddcf96`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/3ddcf96fff539f273542da63f6091f654e892ad1))
+
+
 ## v5.7.1 (2025-05-07)
 
 
