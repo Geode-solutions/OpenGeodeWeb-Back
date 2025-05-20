@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v5.7.3-rc.1 (2025-05-20)
+
+### Bug Fixes
+
+- **blueprint_models**: Set current_index
+  ([`1e831c7`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/1e831c792d99bd812234e7a03cab25902dc6c9fb))
+
+
 ## v5.7.2 (2025-05-19)
 
 
