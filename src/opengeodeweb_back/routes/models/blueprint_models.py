@@ -27,11 +27,12 @@ def uuid_to_flat_index():
     tree = ET.parse(vtm_file_path)
     root = tree.find("vtkMultiBlockDataSet")
     uuid_to_flat_index = {}
-    current_index = 1
+    current_index = 0
 
     for elem in root.iter():
         if "uuid" in elem.attrib and elem.tag == "DataSet":
             uuid_to_flat_index[elem.attrib["uuid"]] = current_index
+
         current_index += 1
 
     return flask.make_response(
