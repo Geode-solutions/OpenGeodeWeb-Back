@@ -76,7 +76,6 @@ def versions(list_packages: list):
                
             }
         )
-        print(f"{package} version: {metadata.distribution(package)}", flush=True)
     return list_with_versions
 
 
