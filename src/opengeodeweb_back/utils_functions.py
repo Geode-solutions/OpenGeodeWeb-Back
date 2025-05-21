@@ -8,7 +8,7 @@ import zipfile
 import flask
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
-import pkg_resources
+import importlib.metadata as metadata
 
 # Local application imports
 
@@ -70,10 +70,7 @@ def versions(list_packages: list):
     list_with_versions = []
     for package in list_packages:
         list_with_versions.append(
-            {
-                "package": package,
-                "version": pkg_resources.get_distribution(package).version,
-            }
+            {"package": package, "version": metadata.distribution(package).version}
         )
     return list_with_versions
 
