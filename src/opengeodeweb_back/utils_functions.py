@@ -70,11 +70,7 @@ def versions(list_packages: list):
     list_with_versions = []
     for package in list_packages:
         list_with_versions.append(
-            {
-                "package": package,
-                "version": metadata.distribution(package).version
-               
-            }
+            {"package": package, "version": metadata.distribution(package).version}
         )
     return list_with_versions
 
