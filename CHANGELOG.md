@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v5.7.4-rc.1 (2025-05-21)
+
+### Bug Fixes
+
+- **python 3.12**: Compatibility
+  ([`0b43168`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/0b43168d1ce5776c2767172df02e922898c908bb))
+
+
 ## v5.7.3 (2025-05-20)
 
 
