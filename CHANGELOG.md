@@ -1,6 +1,47 @@
 # CHANGELOG
 
 
+## v5.7.4 (2025-05-21)
+
+
+## v5.7.4-rc.2 (2025-05-21)
+
+### Bug Fixes
+
+- **Copyright**: Update year
+  ([`af8afcf`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/af8afcfafb9a7ed6f98add3263feead6ea8a25b1))
+
+
+## v5.7.4-rc.1 (2025-05-21)
+
+### Bug Fixes
+
+- **python 3.12**: Compatibility
+  ([`0b43168`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/0b43168d1ce5776c2767172df02e922898c908bb))
+
+
+## v5.7.3 (2025-05-20)
+
+
+## v5.7.3-rc.1 (2025-05-20)
+
+### Bug Fixes
+
+- **blueprint_models**: Set current_index
+  ([`1e831c7`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/1e831c792d99bd812234e7a03cab25902dc6c9fb))
+
+
+## v5.7.2 (2025-05-19)
+
+
+## v5.7.2-rc.1 (2025-05-19)
+
+### Bug Fixes
+
+- **blueprint_models**: Change getroot to find & rm current_index from the if
+  ([`3ddcf96`](https://github.com/Geode-solutions/OpenGeodeWeb-Back/commit/3ddcf96fff539f273542da63f6091f654e892ad1))
+
+
 ## v5.7.1 (2025-05-07)
 
 

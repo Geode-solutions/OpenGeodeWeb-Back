@@ -5,14 +5,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "OpenGeodeWeb-Back"
-version = "5.7.1"
+version = "5.7.4"
 dynamic = ["dependencies"]
 authors = [
   { name="Geode-solutions", email="team-web@geode-solutions.com" },
 ]
 description = "OpenGeodeWeb-Back is an open source framework that proposes handy python functions and wrappers for the OpenGeode ecosystem"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9, <3.13"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
