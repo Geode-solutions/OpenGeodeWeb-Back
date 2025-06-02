@@ -101,6 +101,12 @@ def save_viewable(geode_object: str, data, folder_absolute_path: str, id: str):
     )
 
 
+def save_light_viewable(geode_object: str, data, folder_absolute_path: str, id: str):
+    return geode_object_value(geode_object)["save_light_viewable"](
+        data, os.path.join(folder_absolute_path, id)
+    )
+
+
 def geode_object_input_extensions(geode_object: str):
     geode_object_input_list_creators = input_factory(geode_object).list_creators()
     geode_object_input_list_creators.sort()
