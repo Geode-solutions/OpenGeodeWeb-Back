@@ -262,7 +262,10 @@ def save_viewable_file():
     )
 
     saved_light_viewable_file_path = geode_functions.save_light_viewable(
-        flask.request.json["input_geode_object"], data, DATA_FOLDER_PATH, "light_" + generated_id
+        flask.request.json["input_geode_object"],
+        data,
+        DATA_FOLDER_PATH,
+        "light_" + generated_id,
     )
 
     f = open(saved_light_viewable_file_path, "rb")
