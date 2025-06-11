@@ -69,7 +69,7 @@ markupsafe==3.0.2
     #   flask
     #   jinja2
     #   werkzeug
-opengeode-core==15.21.0
+opengeode-core==15.21.1rc1
     # via
     #   -r requirements.in
     #   geode-background
