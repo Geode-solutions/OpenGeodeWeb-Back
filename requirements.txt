@@ -25,7 +25,7 @@ geode-background==9.2.9
     #   geode-explicit
     #   geode-implicit
     #   geode-simplex
-geode-common==33.8.7
+geode-common==33.8.8
     # via
     #   -r requirements.in
     #   geode-background
@@ -35,7 +35,7 @@ geode-common==33.8.7
     #   geode-numerics
     #   geode-simplex
     #   geode-viewables
-geode-conversion==6.3.2
+geode-conversion==6.3.3
     # via
     #   geode-explicit
     #   geode-implicit
@@ -43,7 +43,7 @@ geode-explicit==6.2.3
     # via
     #   -r requirements.in
     #   geode-implicit
-geode-implicit==3.9.3
+geode-implicit==3.9.4
     # via -r requirements.in
 geode-numerics==6.2.2
     # via
@@ -54,7 +54,7 @@ geode-simplex==9.4.2
     # via
     #   -r requirements.in
     #   geode-implicit
-geode-viewables==3.1.3
+geode-viewables==3.1.4
     # via -r requirements.in
 itsdangerous==2.2.0
     # via flask
@@ -84,13 +84,13 @@ opengeode-core==15.21.2
     #   opengeode-geosciencesio
     #   opengeode-inspector
     #   opengeode-io
-opengeode-geosciences==8.5.2
+opengeode-geosciences==9.0.0
     # via
     #   -r requirements.in
     #   geode-implicit
     #   geode-viewables
     #   opengeode-geosciencesio
-opengeode-geosciencesio==5.4.1
+opengeode-geosciencesio==5.4.2
     # via
     #   -r requirements.in
     #   geode-implicit
