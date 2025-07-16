@@ -7,7 +7,6 @@ import zipfile
 # Third party imports
 import flask
 import fastjsonschema
-from fastjsonschema.exceptions import JsonSchemaDefinitionException
 import importlib.metadata as metadata
 
 # Local application imports
