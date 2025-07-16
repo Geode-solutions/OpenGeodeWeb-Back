@@ -85,7 +85,19 @@ def validate_request(request, schema):
         validate = fastjsonschema.compile(schema)
         validate(json_data)
     except fastjsonschema.JsonSchemaException as e:
-        flask.abort(400, f"Validation error: {str(e)}")
+        error_msg = str(e)
+        
+        # Transforme les messages d'erreur pour les rendre plus lisibles
+        if "data must contain" in error_msg:
+            # Estraire le nom du champ depuis jsonschema erreurs
+            field = error_msg.split("data must contain ['")[1].split("']")[0]
+            error_msg = f"'{field}' is a required property"
+        elif "data must not contain" in error_msg:
+            # Extrait le nom en plus du champ
+            field = error_msg.split("data must not contain {'")[1].split("'")[0]
+            error_msg = f"Additional properties are not allowed ('{field}' was unexpected)"
+            
+        flask.abort(400, f"Validation error: {error_msg}")
 
 
 def set_interval(func, sec, args=None):
