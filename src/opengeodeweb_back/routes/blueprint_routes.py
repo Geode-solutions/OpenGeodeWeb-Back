@@ -324,6 +324,13 @@ def create_point():
     saved_viewable_file_path = geode_functions.save_viewable(
         "PointSet3D", PointSet3D, DATA_FOLDER_PATH, generated_id
     )
+    saved_light_viewable_file_path = geode_functions.save_light_viewable(
+        "PointSet3D", PointSet3D, DATA_FOLDER_PATH, "light_" + generated_id
+    )
+
+    f = open(saved_light_viewable_file_path, "rb")
+    binary_light_viewable = f.read()
+    f.close()
 
     native_file_name = os.path.basename(saved_native_file_path[0])
     viewable_file_name = os.path.basename(saved_viewable_file_path)
@@ -337,6 +344,7 @@ def create_point():
             "viewable_file_name": viewable_file_name,
             "object_type": object_type,
             "geode_object": "PointSet3D",
+            "binary_light_viewable": str(binary_light_viewable, "utf-8"),
         },
         200,
     )
