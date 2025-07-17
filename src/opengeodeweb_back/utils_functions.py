@@ -2,6 +2,7 @@
 import os
 import threading
 import time
+import uuid
 import zipfile
 
 # Third party imports
@@ -10,6 +11,7 @@ import fastjsonschema
 import importlib.metadata as metadata
 
 # Local application imports
+from opengeodeweb_back import geode_functions
 
 
 def increment_request_counter(current_app):
@@ -147,3 +149,42 @@ def handle_exception(e):
     )
     response.content_type = "application/json"
     return response
+
+
+def save_native_viewable_binary_file_names(geode_object, data, folder_absolute_path):
+    generated_id = str(uuid.uuid4()).replace("-", "")
+    saved_native_file_path = geode_functions.save(
+        geode_object, data, folder_absolute_path, generated_id + "." + data.native_extension()
+    )
+    saved_viewable_file_path = geode_functions.save_viewable(
+        geode_object, data, folder_absolute_path, generated_id
+    )
+    saved_light_viewable_file_path = geode_functions.save_light_viewable(
+        geode_object, data, folder_absolute_path, "light_" + generated_id
+    )
+    f = open(saved_light_viewable_file_path, "rb")
+    binary_light_viewable = f.read()
+    f.close()
+    return {
+        "native_file_name": os.path.basename(saved_native_file_path[0]),
+        "viewable_file_name": os.path.basename(saved_viewable_file_path[0]), 
+        "binary_light_viewable": str(binary_light_viewable, "utf-8"),
+    }
+def create_geode_object_response(geode_object, data, folder_absolute_path):
+    generated_id = str(uuid.uuid4()).replace("-", "")
+    name = data.name()
+    object_type = geode_functions.get_object_type(geode_object)
+
+    native_file_name, viewable_file_name, binary_light_viewable = save_native_viewable_binary_file_names(
+        geode_object, data, folder_absolute_path
+    )
+    
+    return {
+        "name": name,
+        "native_file_name": native_file_name,
+        "viewable_file_name": viewable_file_name,
+        "id": generated_id,
+        "object_type": object_type,
+        "binary_light_viewable": binary_light_viewable,
+        "geode_object": geode_object,
+    }
