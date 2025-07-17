@@ -86,13 +86,10 @@ def validate_request(request, schema):
     except fastjsonschema.JsonSchemaException as e:
         error_msg = str(e)
         
-        # Transforme les messages d'erreur pour les rendre plus lisibles
         if "data must contain" in error_msg:
-            # Estraire le nom du champ depuis jsonschema erreurs
             field = error_msg.split("data must contain ['")[1].split("']")[0]
             error_msg = f"'{field}' is a required property"
         elif "data must not contain" in error_msg:
-            # Extrait le nom en plus du champ
             field = error_msg.split("data must not contain {'")[1].split("'")[0]
             error_msg = f"Additional properties are not allowed ('{field}' was unexpected)"
             
