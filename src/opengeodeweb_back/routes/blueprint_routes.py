@@ -247,11 +247,11 @@ def save_viewable_file():
     secure_filename = werkzeug.utils.secure_filename(flask.request.json["filename"])
     file_path = os.path.abspath(os.path.join(UPLOAD_FOLDER, secure_filename))
     data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
-    
+    generated_id = str(uuid.uuid4()).replace("-", "")
     name = data.name()
     object_type = geode_functions.get_object_type(flask.request.json["input_geode_object"])
-    utils_functions.create_geode_object_response(flask.request.json["input_geode_object"], data, DATA_FOLDER_PATH),
-    return flask.make_response(200, {})
+    response_data = utils_functions.create_geode_object_response(flask.request.json["input_geode_object"], data, DATA_FOLDER_PATH)
+    return flask.jsonify(response_data), 200
 
 
 with open(os.path.join(schemas, "create_point.json"), "r") as file:
