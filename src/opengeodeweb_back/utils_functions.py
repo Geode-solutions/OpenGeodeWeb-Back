@@ -89,6 +89,7 @@ def validate_request(request, schema):
         error_msg = str(e)
         flask.abort(400, error_msg)
 
+
 def set_interval(func, sec, args=None):
     def func_wrapper():
         set_interval(func, sec, args)
