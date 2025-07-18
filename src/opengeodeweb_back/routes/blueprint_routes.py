@@ -241,61 +241,16 @@ with open(
     methods=save_viewable_file_json["methods"],
 )
 def save_viewable_file():
+    utils_functions.validate_request(flask.request, save_viewable_file_json)
     UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
     DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
-    utils_functions.validate_request(flask.request, save_viewable_file_json)
-
     secure_filename = werkzeug.utils.secure_filename(flask.request.json["filename"])
     file_path = os.path.abspath(os.path.join(UPLOAD_FOLDER, secure_filename))
     data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
-    generated_id = str(uuid.uuid4()).replace("-", "")
-
-    name = data.name()
-    native_extension = data.native_extension()
-
-    absolute_native_file_path = os.path.join(
-        UPLOAD_FOLDER, generated_id + "." + native_extension
+    response_data = utils_functions.create_response_with_binary_light_viewable(
+        flask.request.json["input_geode_object"], data, DATA_FOLDER_PATH
     )
-
-    saved_viewable_file_path = geode_functions.save_viewable(
-        flask.request.json["input_geode_object"], data, DATA_FOLDER_PATH, generated_id
-    )
-
-    saved_light_viewable_file_path = geode_functions.save_light_viewable(
-        flask.request.json["input_geode_object"],
-        data,
-        DATA_FOLDER_PATH,
-        "light_" + generated_id,
-    )
-
-    f = open(saved_light_viewable_file_path, "rb")
-    binary_light_viewable = f.read()
-    f.close()
-
-    geode_functions.save(
-        flask.request.json["input_geode_object"],
-        data,
-        DATA_FOLDER_PATH,
-        generated_id + "." + native_extension,
-    )
-    os.remove(os.path.join(UPLOAD_FOLDER, secure_filename))
-    object_type = geode_functions.get_object_type(
-        flask.request.json["input_geode_object"]
-    )
-
-    native_file_name = os.path.basename(absolute_native_file_path)
-    viewable_file_name = os.path.basename(saved_viewable_file_path)
-    return flask.make_response(
-        {
-            "name": name,
-            "native_file_name": native_file_name,
-            "viewable_file_name": viewable_file_name,
-            "id": generated_id,
-            "object_type": object_type,
-            "binary_light_viewable": str(binary_light_viewable, "utf-8"),
-        },
-        200,
-    )
+    return flask.jsonify(response_data), 200
 
 
 with open(os.path.join(schemas, "create_point.json"), "r") as file:
@@ -315,29 +270,10 @@ def create_point():
     builder = geode_functions.create_builder("PointSet3D", PointSet3D)
     builder.create_point(opengeode.Point3D([x, y, z]))
     builder.set_name(title)
-    name = PointSet3D.name()
-    generated_id = str(uuid.uuid4()).replace("-", "")
-    object_type = geode_functions.get_object_type("PointSet3D")
-    saved_native_file_path = geode_functions.save(
-        "PointSet3D", PointSet3D, DATA_FOLDER_PATH, generated_id + ".og_pts3d"
-    )
-    saved_viewable_file_path = geode_functions.save_viewable(
-        "PointSet3D", PointSet3D, DATA_FOLDER_PATH, generated_id
-    )
-
-    native_file_name = os.path.basename(saved_native_file_path[0])
-    viewable_file_name = os.path.basename(saved_viewable_file_path)
-
     return flask.make_response(
-        {
-            "viewable_file_name": os.path.basename(saved_viewable_file_path),
-            "id": generated_id,
-            "name": name,
-            "native_file_name": native_file_name,
-            "viewable_file_name": viewable_file_name,
-            "object_type": object_type,
-            "geode_object": "PointSet3D",
-        },
+        utils_functions.create_response_with_binary_light_viewable(
+            "PointSet3D", PointSet3D, DATA_FOLDER_PATH
+        ),
         200,
     )
 
