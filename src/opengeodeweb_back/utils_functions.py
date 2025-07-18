@@ -87,14 +87,16 @@ def validate_request(request, schema):
         validate(json_data)
     except fastjsonschema.JsonSchemaException as e:
         error_msg = str(e)
-        
+
         if "data must contain" in error_msg:
             field = error_msg.split("data must contain ['")[1].split("']")[0]
             error_msg = f"'{field}' is a required property"
         elif "data must not contain" in error_msg:
             field = error_msg.split("data must not contain {'")[1].split("'")[0]
-            error_msg = f"Additional properties are not allowed ('{field}' was unexpected)"
-            
+            error_msg = (
+                f"Additional properties are not allowed ('{field}' was unexpected)"
+            )
+
         flask.abort(400, f"Validation error: {error_msg}")
 
 
@@ -154,7 +156,10 @@ def handle_exception(e):
 def save_native_viewable_binary_file_names(geode_object, data, folder_absolute_path):
     generated_id = str(uuid.uuid4()).replace("-", "")
     saved_native_file_path = geode_functions.save(
-        geode_object, data, folder_absolute_path, generated_id + "." + data.native_extension()
+        geode_object,
+        data,
+        folder_absolute_path,
+        generated_id + "." + data.native_extension(),
     )
     saved_viewable_file_path = geode_functions.save_viewable(
         geode_object, data, folder_absolute_path, generated_id
@@ -167,18 +172,22 @@ def save_native_viewable_binary_file_names(geode_object, data, folder_absolute_p
     f.close()
     return {
         "native_file_name": os.path.basename(saved_native_file_path[0]),
-        "viewable_file_name": os.path.basename(saved_viewable_file_path[0]), 
+        "viewable_file_name": os.path.basename(saved_viewable_file_path[0]),
         "binary_light_viewable": str(binary_light_viewable, "utf-8"),
     }
-def create_response_with_binary_light_viewable(geode_object, data, folder_absolute_path):
+
+
+def create_response_with_binary_light_viewable(
+    geode_object, data, folder_absolute_path
+):
     generated_id = str(uuid.uuid4()).replace("-", "")
     name = data.name()
     object_type = geode_functions.get_object_type(geode_object)
 
-    native_file_name, viewable_file_name, binary_light_viewable = save_native_viewable_binary_file_names(
-        geode_object, data, folder_absolute_path
+    native_file_name, viewable_file_name, binary_light_viewable = (
+        save_native_viewable_binary_file_names(geode_object, data, folder_absolute_path)
     )
-    
+
     return {
         "name": name,
         "native_file_name": native_file_name,
