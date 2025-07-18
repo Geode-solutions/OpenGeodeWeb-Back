@@ -247,10 +247,7 @@ def save_viewable_file():
     secure_filename = werkzeug.utils.secure_filename(flask.request.json["filename"])
     file_path = os.path.abspath(os.path.join(UPLOAD_FOLDER, secure_filename))
     data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
-    generated_id = str(uuid.uuid4()).replace("-", "")
-    name = data.name()
-    object_type = geode_functions.get_object_type(flask.request.json["input_geode_object"])
-    response_data = utils_functions.create_geode_object_response(flask.request.json["input_geode_object"], data, DATA_FOLDER_PATH)
+    response_data = utils_functions.create_response_with_binary_light_viewable(flask.request.json["input_geode_object"], data, DATA_FOLDER_PATH)
     return flask.jsonify(response_data), 200
 
 
@@ -271,11 +268,8 @@ def create_point():
     builder = geode_functions.create_builder("PointSet3D", PointSet3D)
     builder.create_point(opengeode.Point3D([x, y, z]))
     builder.set_name(title)
-    name = PointSet3D.name()
-    generated_id = str(uuid.uuid4()).replace("-", "")
-    object_type = geode_functions.get_object_type("PointSet3D")
     return flask.make_response(
-    utils_functions.create_geode_object_response("PointSet3D", PointSet3D, DATA_FOLDER_PATH),
+    utils_functions.create_response_with_binary_light_viewable("PointSet3D", PointSet3D, DATA_FOLDER_PATH),
     200,
     )
 

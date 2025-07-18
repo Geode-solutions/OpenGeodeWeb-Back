@@ -11,7 +11,7 @@ import fastjsonschema
 import importlib.metadata as metadata
 
 # Local application imports
-from opengeodeweb_back import geode_functions
+from . import geode_functions
 
 
 def increment_request_counter(current_app):
