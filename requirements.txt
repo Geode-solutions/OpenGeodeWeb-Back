@@ -14,6 +14,8 @@ blinker==1.9.0
     # via flask
 click==8.2.1
     # via flask
+fastjsonschema==2.21.1
+# via -r requirements.in
 flask[async]==3.1.1
     # via
     #   -r requirements.in
@@ -60,10 +62,6 @@ itsdangerous==2.2.0
     # via flask
 jinja2==3.1.6
     # via flask
-jsonschema==4.24.0
-    # via -r requirements.in
-jsonschema-specifications==2025.4.1
-    # via jsonschema
 markupsafe==3.0.2
     # via
     #   flask

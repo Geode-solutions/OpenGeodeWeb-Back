@@ -6,8 +6,7 @@ import zipfile
 
 # Third party imports
 import flask
-from jsonschema import validate
-from jsonschema.exceptions import ValidationError
+import fastjsonschema
 import importlib.metadata as metadata
 
 # Local application imports
@@ -82,9 +81,11 @@ def validate_request(request, schema):
         json_data = {}
 
     try:
-        validate(instance=json_data, schema=schema)
-    except ValidationError as e:
-        flask.abort(400, f"Validation error: {e.message}")
+        validate = fastjsonschema.compile(schema)
+        validate(json_data)
+    except fastjsonschema.JsonSchemaException as e:
+        error_msg = str(e)
+        flask.abort(400, error_msg)
 
 
 def set_interval(func, sec, args=None):
