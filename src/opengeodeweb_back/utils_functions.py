@@ -170,7 +170,7 @@ def save_native_viewable_binary_file_names(geode_object, data, folder_absolute_p
         "viewable_file_name": os.path.basename(saved_viewable_file_path[0]), 
         "binary_light_viewable": str(binary_light_viewable, "utf-8"),
     }
-def create_geode_object_response(geode_object, data, folder_absolute_path):
+def create_response_with_binary_light_viewable(geode_object, data, folder_absolute_path):
     generated_id = str(uuid.uuid4()).replace("-", "")
     name = data.name()
     object_type = geode_functions.get_object_type(geode_object)
