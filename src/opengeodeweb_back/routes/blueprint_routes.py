@@ -249,8 +249,12 @@ def save_viewable_file():
     data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
     generated_id = str(uuid.uuid4()).replace("-", "")
     name = data.name()
-    object_type = geode_functions.get_object_type(flask.request.json["input_geode_object"])
-    response_data = utils_functions.create_geode_object_response(flask.request.json["input_geode_object"], data, DATA_FOLDER_PATH)
+    object_type = geode_functions.get_object_type(
+        flask.request.json["input_geode_object"]
+    )
+    response_data = utils_functions.create_geode_object_response(
+        flask.request.json["input_geode_object"], data, DATA_FOLDER_PATH
+    )
     return flask.jsonify(response_data), 200
 
 
@@ -275,8 +279,10 @@ def create_point():
     generated_id = str(uuid.uuid4()).replace("-", "")
     object_type = geode_functions.get_object_type("PointSet3D")
     return flask.make_response(
-    utils_functions.create_geode_object_response("PointSet3D", PointSet3D, DATA_FOLDER_PATH),
-    200,
+        utils_functions.create_geode_object_response(
+            "PointSet3D", PointSet3D, DATA_FOLDER_PATH
+        ),
+        200,
     )
 
 
