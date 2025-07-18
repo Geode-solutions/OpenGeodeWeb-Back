@@ -87,16 +87,7 @@ def validate_request(request, schema):
         validate(json_data)
     except fastjsonschema.JsonSchemaException as e:
         error_msg = str(e)
-        
-        if "data must contain" in error_msg:
-            field = error_msg.split("data must contain ['")[1].split("']")[0]
-            error_msg = f"'{field}' is a required property"
-        elif "data must not contain" in error_msg:
-            field = error_msg.split("data must not contain {'")[1].split("'")[0]
-            error_msg = f"Additional properties are not allowed ('{field}' was unexpected)"
-            
-        flask.abort(400, f"Validation error: {error_msg}")
-
+        flask.abort(400, error_msg)
 
 def set_interval(func, sec, args=None):
     def func_wrapper():
