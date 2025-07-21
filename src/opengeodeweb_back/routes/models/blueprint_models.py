@@ -17,13 +17,10 @@ with open(os.path.join(schemas, "vtm_component_indices.json"), "r") as file:
     vtm_component_indices_json["route"], methods=vtm_component_indices_json["methods"]
 )
 def uuid_to_flat_index():
-
-    print(f"uuid_to_flat_index : {flask.request=}", flush=True)
     utils_functions.validate_request(flask.request, vtm_component_indices_json)
     vtm_file_path = os.path.join(
         flask.current_app.config["DATA_FOLDER_PATH"], flask.request.json["id"] + ".vtm"
     )
-
     tree = ET.parse(vtm_file_path)
     root = tree.find("vtkMultiBlockDataSet")
     uuid_to_flat_index = {}
@@ -60,16 +57,11 @@ with open(os.path.join(schemas, "mesh_components.json"), "r") as file:
 
 @routes.route(mesh_components_json["route"], methods=mesh_components_json["methods"])
 def extract_uuids_endpoint():
-    print(f"extract_uuids_endpoint : {flask.request=}", flush=True)
-
     utils_functions.validate_request(flask.request, mesh_components_json)
-
     file_path = os.path.join(
         flask.current_app.config["DATA_FOLDER_PATH"], flask.request.json["filename"]
     )
-
     if not os.path.exists(file_path):
         return flask.make_response({"error": "File not found"}, 404)
-
     uuid_dict = extract_model_uuids(flask.request.json["geode_object"], file_path)
     return flask.make_response({"uuid_dict": uuid_dict}, 200)

@@ -6,7 +6,6 @@ import time
 # Third party imports
 import flask
 import opengeode
-import uuid
 import werkzeug
 
 # Local application imports
@@ -247,10 +246,12 @@ def save_viewable_file():
     secure_filename = werkzeug.utils.secure_filename(flask.request.json["filename"])
     file_path = os.path.abspath(os.path.join(UPLOAD_FOLDER, secure_filename))
     data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
-    response_data = utils_functions.create_response_with_binary_light_viewable(
-        flask.request.json["input_geode_object"], data, DATA_FOLDER_PATH
+    return flask.make_response(
+        utils_functions.generate_native_viewable_and_light_viewable(
+            flask.request.json["input_geode_object"], data, DATA_FOLDER_PATH
+        ),
+        200,
     )
-    return flask.jsonify(response_data), 200
 
 
 with open(os.path.join(schemas, "create_point.json"), "r") as file:
@@ -271,7 +272,7 @@ def create_point():
     builder.create_point(opengeode.Point3D([x, y, z]))
     builder.set_name(title)
     return flask.make_response(
-        utils_functions.create_response_with_binary_light_viewable(
+        utils_functions.generate_native_viewable_and_light_viewable(
             "PointSet3D", PointSet3D, DATA_FOLDER_PATH
         ),
         200,
