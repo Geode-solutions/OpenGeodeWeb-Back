@@ -9,7 +9,7 @@ geode-simplex
 geode-explicit
 geode-implicit
 geode-common
-jsonschema
+fastjsonschema
 Flask[async]
 Flask-Cors
 werkzeug
