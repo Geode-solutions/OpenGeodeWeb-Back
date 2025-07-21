@@ -1,10 +1,12 @@
 # Standard library imports
+import re
+import os
 
 # Third party imports
 import flask
 
 # Local application imports
-from src.opengeodeweb_back import utils_functions
+from src.opengeodeweb_back import geode_functions, utils_functions
 
 
 def test_increment_request_counter(app_context):
@@ -67,3 +69,25 @@ def test_handle_exception(client):
     assert type(data["description"]) is str
     assert type(data["name"]) is str
     assert type(data["code"]) is int
+
+
+def test_generate_native_viewable_and_light_viewable():
+    geode_object = "BRep"
+    folder_absolute_path = os.path.abspath("./data")
+    data = geode_functions.load(
+        geode_object, os.path.join(folder_absolute_path, "test.og_brep")
+    )
+    folder_absolute_path = "None"
+    result = utils_functions.generate_native_viewable_and_light_viewable(
+        geode_object, data, folder_absolute_path
+    )
+    assert type(result) is dict
+    assert type(result["name"]) is str
+    assert type(result["native_file_name"]) is str
+    assert re.match(r"[0-9a-f]{32}\.[a-zA-Z0-9]+", result["native_file_name"])
+    assert type(result["viewable_file_name"]) is str
+    assert re.match(r"[0-9a-f]{32}\.[a-zA-Z0-9]+", result["viewable_file_name"])
+    assert type(result["id"]) is str
+    assert re.match(r"[0-9a-f]{32}", result["id"])
+    assert type(result["object_type"]) is str
+    assert type(result["binary_light_viewable"]) is str
