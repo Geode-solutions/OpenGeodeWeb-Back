@@ -6,12 +6,12 @@
     "json": "node generate_schemas.js opengeodeweb_back routes route /"
   },
   "dependencies": {
-    "glob": "^10.3.10"
+    "glob": "^11.0.3"
   },
   "exports": {
-    "./schemas.json": {
-      "import": "./schemas.json",
-      "require": "./schemas.json"
+    "./opendgeodeweb_back_schemas.json": {
+      "import": "./opengeodeweb_back_schemas.json",
+      "require": "./opengeodeweb_back_schemas.json"
     }
   },
   "main": "generate_schemas.js",
@@ -33,6 +33,6 @@
     "access": "public"
   },
   "files": [
-    "schemas.json"
+    "opengeodeweb_back_schemas.json"
   ]
 }
