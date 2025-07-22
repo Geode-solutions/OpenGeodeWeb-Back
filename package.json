@@ -9,7 +9,7 @@
     "glob": "^11.0.3"
   },
   "exports": {
-    "./schemas.json": {
+    "./opendgeodeweb_back_schemas.json": {
       "import": "./opengeodeweb_back_schemas.json",
       "require": "./opengeodeweb_back_schemas.json"
     }
