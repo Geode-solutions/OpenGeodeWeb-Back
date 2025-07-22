@@ -44,7 +44,7 @@ const findDirectoryPath = (targetDirectoryName, folderName) => {
 
 const directoryPath = findDirectoryPath(projectName, folderName);
 
-const outputFile = path.join(process.cwd(), "schemas.json");
+const outputFile = path.join(process.cwd(), `${projectName}_schemas.json`);
 
 function return_json_schema(directoryPath, folder_path, projectName) {
   console.log("return_json_schema", directoryPath, folder_path, projectName);
