@@ -147,20 +147,21 @@ def generate_native_viewable_and_light_viewable(
     geode_object, data, folder_absolute_path
 ):
     generated_id = str(uuid.uuid4()).replace("-", "")
+    data_path = os.path.join(folder_absolute_path, generated_id)
     name = data.name()
     object_type = geode_functions.get_object_type(geode_object)
 
     saved_native_file_path = geode_functions.save(
         geode_object,
         data,
-        folder_absolute_path,
-        generated_id + "." + data.native_extension(),
+        data_path,
+        "native." + data.native_extension(),
     )
     saved_viewable_file_path = geode_functions.save_viewable(
-        geode_object, data, folder_absolute_path, generated_id
+        geode_object, data, data_path, "viewable"
     )
     saved_light_viewable_file_path = geode_functions.save_light_viewable(
-        geode_object, data, folder_absolute_path, "light_" + generated_id
+        geode_object, data, data_path, "light_viewable"
     )
     f = open(saved_light_viewable_file_path, "rb")
     binary_light_viewable = f.read()
