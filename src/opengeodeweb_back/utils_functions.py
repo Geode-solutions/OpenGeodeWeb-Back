@@ -142,9 +142,11 @@ def handle_exception(e):
     response.content_type = "application/json"
     return response
 
+
 folder_absolute_path = os.path.dirname(os.path.abspath(__file__))
 generated_id = str(uuid.uuid4()).replace("-", "")
 data_path = os.path.join(folder_absolute_path, generated_id)
+
 
 def generate_native_viewable_and_light_viewable(
     geode_object, data, folder_absolute_path
@@ -159,16 +161,10 @@ def generate_native_viewable_and_light_viewable(
         "native_viewable." + data.native_extension(),
     )
     saved_viewable_file_path = geode_functions.save_viewable(
-        geode_object,
-        data,
-        folder_absolute_path,
-        generated_id
+        geode_object, data, folder_absolute_path, generated_id
     )
     saved_light_viewable_file_path = geode_functions.save_light_viewable(
-        geode_object,
-        data,
-        folder_absolute_path,
-        "light_viewable." + generated_id
+        geode_object, data, folder_absolute_path, "light_viewable." + generated_id
     )
     f = open(saved_light_viewable_file_path, "rb")
     binary_light_viewable = f.read()
