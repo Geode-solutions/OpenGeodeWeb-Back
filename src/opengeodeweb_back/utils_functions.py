@@ -177,7 +177,6 @@ def generate_native_viewable_and_light_viewable(
         "name": name,
         "native_file_name": os.path.basename(saved_native_file_path[0]),
         "viewable_file_name": os.path.basename(saved_viewable_file_path),
-        "light_viewable_file_name": os.path.basename(saved_light_viewable_file_path),
         "id": generated_id,
         "object_type": object_type,
         "binary_light_viewable": str(binary_light_viewable, "utf-8"),
