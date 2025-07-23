@@ -158,16 +158,10 @@ def generate_native_viewable_and_light_viewable(
         "native." + data.native_extension(),
     )
     saved_viewable_file_path = geode_functions.save_viewable(
-        geode_object,
-        data,
-        data_path,
-        "viewable"
+        geode_object, data, data_path, "viewable"
     )
     saved_light_viewable_file_path = geode_functions.save_light_viewable(
-        geode_object,
-        data,
-        data_path,
-        "light_viewable"
+        geode_object, data, data_path, "light_viewable"
     )
     f = open(saved_light_viewable_file_path, "rb")
     binary_light_viewable = f.read()
