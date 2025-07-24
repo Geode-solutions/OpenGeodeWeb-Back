@@ -148,6 +148,8 @@ def generate_native_viewable_and_light_viewable(
 ):
     generated_id = str(uuid.uuid4()).replace("-", "")
     data_path = os.path.join(folder_absolute_path, generated_id)
+    upload_folder = os.path.join(folder_absolute_path, "uploads")
+    os.makedirs(upload_folder, exist_ok=True)
     name = data.name()
     object_type = geode_functions.get_object_type(geode_object)
 
@@ -158,8 +160,9 @@ def generate_native_viewable_and_light_viewable(
         "native." + data.native_extension(),
     )
     saved_viewable_file_path = geode_functions.save_viewable(
-        geode_object, data, data_path, "viewable"
+    geode_object, data, data_path, "viewable"
     )
+    viewable_file_name = os.path.basename(data_path) + "/" + os.path.basename(saved_viewable_file_path)
     saved_light_viewable_file_path = geode_functions.save_light_viewable(
         geode_object, data, data_path, "light_viewable"
     )
@@ -170,7 +173,7 @@ def generate_native_viewable_and_light_viewable(
     return {
         "name": name,
         "native_file_name": os.path.basename(saved_native_file_path[0]),
-        "viewable_file_name": os.path.basename(saved_viewable_file_path),
+        "viewable_file_name":viewable_file_name,
         "id": generated_id,
         "object_type": object_type,
         "binary_light_viewable": str(binary_light_viewable, "utf-8"),

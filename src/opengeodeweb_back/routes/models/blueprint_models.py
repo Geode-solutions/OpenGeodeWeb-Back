@@ -19,7 +19,7 @@ with open(os.path.join(schemas, "vtm_component_indices.json"), "r") as file:
 def uuid_to_flat_index():
     utils_functions.validate_request(flask.request, vtm_component_indices_json)
     vtm_file_path = os.path.join(
-        flask.current_app.config["DATA_FOLDER_PATH"], flask.request.json["id"] + ".vtm"
+        flask.current_app.config["DATA_FOLDER_PATH"], flask.request.json["id"] , "viewable.vtm"
     )
     tree = ET.parse(vtm_file_path)
     root = tree.find("vtkMultiBlockDataSet")
