@@ -1,9 +1,11 @@
 # Standard library imports
 import time
 import shutil
+import os
 
 # Third party imports
 import pytest
+import uuid
 
 # Local application imports
 from app import app
@@ -31,3 +33,23 @@ def client():
 def app_context():
     with app.app_context():
         yield
+
+@pytest.fixture
+def uuid_project_structure():
+    uuid_project = uuid.uuid4().hex
+    uuid_data = uuid.uuid4().hex
+
+    base_path = os.path.join("tmp", "vease", uuid_project)
+    data_path = os.path.join(base_path, uuid_data)
+    uploads_path = os.path.join(base_path, "uploads")
+
+    os.makedirs(data_path, exist_ok=True)
+    os.makedirs(uploads_path, exist_ok=True)
+
+    return {
+        "uuid_project": uuid_project,
+        "uuid_data": uuid_data,
+        "base_path": base_path,
+        "data_path": data_path,
+        "uploads_path": uploads_path,
+    }
