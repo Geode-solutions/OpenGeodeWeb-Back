@@ -77,18 +77,16 @@ def test_generate_native_viewable_and_light_viewable():
     data = geode_functions.load(
         geode_object, os.path.join(folder_absolute_path, "test.og_brep")
     )
-    if not os.path.isdir(folder_absolute_path):
-        raise ValueError(f"Invalid folder path: {folder_absolute_path}")
-    # folder_absolute_path = "None"
+    folder_absolute_path = "None"
     result = utils_functions.generate_native_viewable_and_light_viewable(
         geode_object, data, folder_absolute_path
     )
     assert type(result) is dict
     assert type(result["name"]) is str
     assert type(result["native_file_name"]) is str
-    assert re.match(r"native\.[a-zA-Z0-9]+", result["native_file_name"])
+    assert re.match(r"[0-9a-f]{32}\.[a-zA-Z0-9]+", result["native_file_name"])
     assert type(result["viewable_file_name"]) is str
-    assert re.match(r"viewable\.[a-zA-Z0-9]+", result["viewable_file_name"])
+    assert re.match(r"[0-9a-f]{32}\.[a-zA-Z0-9]+", result["viewable_file_name"])
     assert type(result["id"]) is str
     assert re.match(r"[0-9a-f]{32}", result["id"])
     assert type(result["object_type"]) is str
