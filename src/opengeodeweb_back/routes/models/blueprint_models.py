@@ -59,7 +59,7 @@ with open(os.path.join(schemas, "mesh_components.json"), "r") as file:
 def extract_uuids_endpoint():
     utils_functions.validate_request(flask.request, mesh_components_json)
     file_path = os.path.join(
-        flask.current_app.config["DATA_FOLDER_PATH"], flask.request.json["filename"]
+        flask.current_app.config["DATA_FOLDER_PATH"], flask.request.json["id"], flask.request.json["filename"]
     )
     if not os.path.exists(file_path):
         return flask.make_response({"error": "File not found"}, 404)

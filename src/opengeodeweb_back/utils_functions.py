@@ -144,12 +144,11 @@ def handle_exception(e):
 
 
 def generate_native_viewable_and_light_viewable(
-    geode_object, data, folder_absolute_path
+    geode_object, data
 ):
     generated_id = str(uuid.uuid4()).replace("-", "")
-    data_path = os.path.join(folder_absolute_path, generated_id)
-    upload_folder = os.path.join(folder_absolute_path, "uploads")
-    os.makedirs(upload_folder, exist_ok=True)
+    DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
+    data_path = os.path.join(DATA_FOLDER_PATH, generated_id)
     name = data.name()
     object_type = geode_functions.get_object_type(geode_object)
 
@@ -162,7 +161,7 @@ def generate_native_viewable_and_light_viewable(
     saved_viewable_file_path = geode_functions.save_viewable(
     geode_object, data, data_path, "viewable"
     )
-    viewable_file_name = os.path.basename(data_path) + "/" + os.path.basename(saved_viewable_file_path)
+    viewable_file_name = os.path.basename(saved_viewable_file_path)
     saved_light_viewable_file_path = geode_functions.save_light_viewable(
         geode_object, data, data_path, "light_viewable"
     )

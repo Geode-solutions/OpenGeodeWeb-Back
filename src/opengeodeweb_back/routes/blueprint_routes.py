@@ -242,13 +242,12 @@ with open(
 def save_viewable_file():
     utils_functions.validate_request(flask.request, save_viewable_file_json)
     UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
-    DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
     secure_filename = werkzeug.utils.secure_filename(flask.request.json["filename"])
     file_path = os.path.abspath(os.path.join(UPLOAD_FOLDER, secure_filename))
     data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
     return flask.make_response(
         utils_functions.generate_native_viewable_and_light_viewable(
-            flask.request.json["input_geode_object"], data, DATA_FOLDER_PATH
+            flask.request.json["input_geode_object"], data
         ),
         200,
     )
@@ -261,7 +260,6 @@ with open(os.path.join(schemas, "create_point.json"), "r") as file:
 @routes.route(create_point_json["route"], methods=create_point_json["methods"])
 def create_point():
     utils_functions.validate_request(flask.request, create_point_json)
-    DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
     title = flask.request.json["title"]
     x = flask.request.json["x"]
     y = flask.request.json["y"]
@@ -273,7 +271,7 @@ def create_point():
     builder.set_name(title)
     return flask.make_response(
         utils_functions.generate_native_viewable_and_light_viewable(
-            "PointSet3D", PointSet3D, DATA_FOLDER_PATH
+            "PointSet3D", PointSet3D
         ),
         200,
     )
