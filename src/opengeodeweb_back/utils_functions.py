@@ -143,9 +143,7 @@ def handle_exception(e):
     return response
 
 
-def generate_native_viewable_and_light_viewable(
-    geode_object, data
-):
+def generate_native_viewable_and_light_viewable(geode_object, data):
     generated_id = str(uuid.uuid4()).replace("-", "")
     DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
     data_path = os.path.join(DATA_FOLDER_PATH, generated_id)
@@ -159,7 +157,7 @@ def generate_native_viewable_and_light_viewable(
         "native." + data.native_extension(),
     )
     saved_viewable_file_path = geode_functions.save_viewable(
-    geode_object, data, data_path, "viewable"
+        geode_object, data, data_path, "viewable"
     )
     viewable_file_name = os.path.basename(saved_viewable_file_path)
     saved_light_viewable_file_path = geode_functions.save_light_viewable(
@@ -172,7 +170,7 @@ def generate_native_viewable_and_light_viewable(
     return {
         "name": name,
         "native_file_name": os.path.basename(saved_native_file_path[0]),
-        "viewable_file_name":viewable_file_name,
+        "viewable_file_name": viewable_file_name,
         "id": generated_id,
         "object_type": object_type,
         "binary_light_viewable": str(binary_light_viewable, "utf-8"),

@@ -34,6 +34,7 @@ def app_context():
     with app.app_context():
         yield
 
+
 @pytest.fixture
 def uuid_project_structure():
     uuid_project = uuid.uuid4().hex
