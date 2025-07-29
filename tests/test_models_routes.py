@@ -1,8 +1,5 @@
 import os
 import shutil
-
-from src.opengeodeweb_back import geode_functions
-
 def test_model_mesh_components(client, test_id):
     route = "/models/vtm_component_indices"
 

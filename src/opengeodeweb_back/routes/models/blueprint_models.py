@@ -21,7 +21,7 @@ def uuid_to_flat_index():
     try:
         vtm_file_path = geode_functions.data_file_path(
             flask.request.json,
-            "viewable.vtm"
+            "viewable.vtm",
         )
         tree = ET.parse(vtm_file_path)
     except FileNotFoundError:
