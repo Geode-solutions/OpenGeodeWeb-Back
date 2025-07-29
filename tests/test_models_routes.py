@@ -1,6 +1,7 @@
 import shutil
 import os
 
+
 def test_model_mesh_components(client, uuid_project_structure):
     route = "/models/vtm_component_indices"
     uuid_data = uuid_project_structure["uuid_data"]
@@ -26,7 +27,6 @@ def test_model_mesh_components(client, uuid_project_structure):
         client.application.config["DATA_FOLDER_PATH"] = original_path
 
 
-
 def test_extract_brep_uuids(client, uuid_project_structure):
     route = "/models/mesh_components"
     uuid_data = uuid_project_structure["uuid_data"]
@@ -41,7 +41,7 @@ def test_extract_brep_uuids(client, uuid_project_structure):
         json_data = {
             "filename": "cube.og_brep",
             "geode_object": "BRep",
-            "id": uuid_data
+            "id": uuid_data,
         }
         response = client.post(route, json=json_data)
         assert response.status_code == 200
@@ -55,4 +55,3 @@ def test_extract_brep_uuids(client, uuid_project_structure):
             assert all(isinstance(v, str) for v in value)
     finally:
         client.application.config["DATA_FOLDER_PATH"] = original_path
-
