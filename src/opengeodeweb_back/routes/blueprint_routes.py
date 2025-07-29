@@ -125,8 +125,8 @@ def missing_files():
 
     missing_files = geode_functions.missing_files(
         flask.request.json["input_geode_object"],
-        geode_functions.upload_file_path(UPLOAD_FOLDER, flask.request.json["filename"])
-    )    
+        geode_functions.upload_file_path(UPLOAD_FOLDER, flask.request.json["filename"]),
+    )
     has_missing_files = missing_files.has_missing_files()
 
     mandatory_files = []
