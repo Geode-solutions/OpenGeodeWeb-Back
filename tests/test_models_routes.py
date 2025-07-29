@@ -1,12 +1,17 @@
 import os
 import shutil
+
+from src.opengeodeweb_back import geode_functions
+
 def test_model_mesh_components(client, test_id):
     route = "/models/vtm_component_indices"
 
-    base_path = client.application.config["DATA_FOLDER_PATH"]
-    data_path = os.path.join(base_path, test_id)
-    os.makedirs(data_path, exist_ok=True)
-    shutil.copy("./tests/data/cube.vtm", os.path.join(data_path, "viewable.vtm"))
+    data_path = geode_functions.data_file_path(
+        {"id": test_id},
+        "viewable.vtm"
+    )
+    os.makedirs(os.path.dirname(data_path), exist_ok=True)
+    shutil.copy("./tests/data/cube.vtm", data_path)
 
     response = client.post(route, json={"id": test_id})
     assert response.status_code == 200
@@ -23,12 +28,16 @@ def test_model_mesh_components(client, test_id):
 def test_extract_brep_uuids(client, test_id):
     route = "/models/mesh_components"
 
-    base_path = client.application.config["DATA_FOLDER_PATH"]
-    data_path = os.path.join(base_path, test_id)
-    os.makedirs(data_path, exist_ok=True)
-    shutil.copy("./tests/data/cube.og_brep", os.path.join(data_path, "cube.og_brep"))
+    brep_filename = "cube.og_brep"
+    json_data = {"id": test_id, "geode_object": "BRep", "filename": brep_filename}
 
-    json_data = {"id": test_id, "geode_object": "BRep", "filename": "cube.og_brep"}
+    data_path = geode_functions.data_file_path(
+        json_data,
+        brep_filename
+    )
+    os.makedirs(os.path.dirname(data_path), exist_ok=True)
+    shutil.copy(f"./tests/data/{brep_filename}", data_path)
+
     response = client.post(route, json=json_data)
     assert response.status_code == 200
 

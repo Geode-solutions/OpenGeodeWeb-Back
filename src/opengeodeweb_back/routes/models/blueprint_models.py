@@ -19,8 +19,7 @@ with open(os.path.join(schemas, "vtm_component_indices.json"), "r") as file:
 def uuid_to_flat_index():
     utils_functions.validate_request(flask.request, vtm_component_indices_json)
     try:
-        vtm_file_path = geode_functions.build_data_path(
-            flask.current_app.config["DATA_FOLDER_PATH"],
+        vtm_file_path = geode_functions.data_file_path(
             flask.request.json,
             "viewable.vtm"
         )
@@ -30,13 +29,11 @@ def uuid_to_flat_index():
     root = tree.find("vtkMultiBlockDataSet")
     uuid_to_flat_index = {}
     current_index = 0
-
     for elem in root.iter():
         if "uuid" in elem.attrib and elem.tag == "DataSet":
             uuid_to_flat_index[elem.attrib["uuid"]] = current_index
         current_index += 1
     return flask.make_response({"uuid_to_flat_index": uuid_to_flat_index}, 200)
-
 
 def extract_model_uuids(model):
     mesh_components = model.mesh_components()
@@ -55,7 +52,7 @@ with open(os.path.join(schemas, "mesh_components.json"), "r") as file:
 def extract_uuids_endpoint():
     utils_functions.validate_request(flask.request, mesh_components_json)
     try:
-        model = geode_functions.load_from_request(
+        model = geode_functions.load_data(
             flask.request.json["geode_object"],
             flask.current_app.config["DATA_FOLDER_PATH"],
             flask.request.json,
