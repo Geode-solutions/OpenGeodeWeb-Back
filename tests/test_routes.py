@@ -1,5 +1,6 @@
 # Standard library imports
 import os
+
 # Third party imports
 from werkzeug.datastructures import FileStorage
 

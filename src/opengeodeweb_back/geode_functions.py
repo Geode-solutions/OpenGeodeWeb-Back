@@ -38,6 +38,7 @@ def is_loadable(geode_object: str, file_absolute_path: str):
 def load(geode_object: str, file_absolute_path: str):
     return geode_object_value(geode_object)["load"](file_absolute_path)
 
+
 def load_from_request(geode_object: str, data_folder_path: str, request_json: dict):
     file_absolute_path = os.path.join(
         data_folder_path,
@@ -46,6 +47,7 @@ def load_from_request(geode_object: str, data_folder_path: str, request_json: di
     )
     return load(geode_object, file_absolute_path)
 
+
 def build_data_path(data_folder_path, request_json, filename):
     return os.path.join(
         data_folder_path,
@@ -53,10 +55,10 @@ def build_data_path(data_folder_path, request_json, filename):
         werkzeug.utils.secure_filename(filename),
     )
 
+
 def build_upload_file_path(upload_folder, filename):
     secure_filename = werkzeug.utils.secure_filename(filename)
-    return os.path.abspath(os.path.join(upload_folder, secure_filename)
-    )
+    return os.path.abspath(os.path.join(upload_folder, secure_filename))
 
 
 def is_saveable(geode_object: str, data, filename: str):
