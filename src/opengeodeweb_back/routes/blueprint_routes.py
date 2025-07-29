@@ -126,6 +126,9 @@ def missing_files():
         flask.request.json["input_geode_object"],
         geode_functions.upload_file_path(
     UPLOAD_FOLDER, flask.request.json["filename"]),
+        geode_functions.build_upload_file_path(
+            UPLOAD_FOLDER, flask.request.json["filename"]
+        ),
     )
     has_missing_files = missing_files.has_missing_files()
 
@@ -219,6 +222,9 @@ def geode_objects_and_output_extensions():
         flask.request.json["input_geode_object"],
         geode_functions.upload_file_path(
     UPLOAD_FOLDER, flask.request.json["filename"]),
+        geode_functions.build_upload_file_path(
+            UPLOAD_FOLDER, flask.request.json["filename"]
+        ),
     )
     geode_objects_and_output_extensions = (
         geode_functions.geode_objects_output_extensions(
