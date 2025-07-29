@@ -35,6 +35,7 @@ def uuid_to_flat_index():
         current_index += 1
     return flask.make_response({"uuid_to_flat_index": uuid_to_flat_index}, 200)
 
+
 def extract_model_uuids(model):
     mesh_components = model.mesh_components()
     uuid_dict = {}
