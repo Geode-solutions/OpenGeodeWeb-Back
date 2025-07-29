@@ -51,9 +51,7 @@ def load_data(geode_object: str, request_json: dict):
 
 
 def data_file_path(request_json, filename):
-    data_folder_path = flask.current_app.config[
-        "DATA_FOLDER_PATH"
-    ]  # Use the load_data function to get the data folder path
+    data_folder_path = flask.current_app.config["DATA_FOLDER_PATH"]
     return os.path.join(
         data_folder_path,
         request_json["id"],
