@@ -55,7 +55,6 @@ def extract_uuids_endpoint():
     try:
         model = geode_functions.load_data(
             flask.request.json["geode_object"],
-            flask.current_app.config["DATA_FOLDER_PATH"],
             flask.request.json,
         )
     except FileNotFoundError:

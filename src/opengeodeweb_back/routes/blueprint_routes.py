@@ -217,10 +217,7 @@ def geode_objects_and_output_extensions():
     )
     data = geode_functions.load(
         flask.request.json["input_geode_object"],
-        geode_functions.upload_file_path(UPLOAD_FOLDER, flask.request.json["filename"]),
-        geode_functions.build_upload_file_path(
-            UPLOAD_FOLDER, flask.request.json["filename"]
-        ),
+        geode_functions.upload_file_path(UPLOAD_FOLDER, flask.request.json["filename"])
     )
     geode_objects_and_output_extensions = (
         geode_functions.geode_objects_output_extensions(
@@ -370,7 +367,7 @@ with open(
     methods=polyhedron_attribute_names_json["methods"],
 )
 def polyhedron_attribute_names():
-    utils_functions.validate_request(flask.request, vertex_attribute_names_json)
+    utils_functions.validate_request(flask.request, polyhedron_attribute_names_json)
     data = geode_functions.load_data(
         flask.request.json["input_geode_object"],
         flask.request.json,
