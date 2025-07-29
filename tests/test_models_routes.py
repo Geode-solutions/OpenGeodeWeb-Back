@@ -1,8 +1,6 @@
 import os
 import shutil
-
-def test_model_mesh_components(client):
-    test_id = "1"
+def test_model_mesh_components(client, test_id):
     route = "/models/vtm_component_indices"
 
     base_path = client.application.config["DATA_FOLDER_PATH"]
@@ -25,8 +23,7 @@ def test_model_mesh_components(client):
         assert isinstance(key, str)
 
 
-def test_extract_brep_uuids(client):
-    test_id = "1"
+def test_extract_brep_uuids(client, test_id):
     route = "/models/mesh_components"
 
     base_path = client.application.config["DATA_FOLDER_PATH"]
@@ -52,4 +49,3 @@ def test_extract_brep_uuids(client):
     for values in uuid_dict.values():
         assert isinstance(values, list)
         assert all(isinstance(v, str) for v in values)
-

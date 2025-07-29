@@ -1,8 +1,12 @@
+# Standard library imports
 import os
 import time
 import shutil
 
+# Third party imports
 import pytest
+
+# Local application imports
 from app import app
 
 
@@ -28,3 +32,7 @@ def client():
 def app_context():
     with app.app_context():
         yield
+
+@pytest.fixture
+def test_id():
+    return "1"

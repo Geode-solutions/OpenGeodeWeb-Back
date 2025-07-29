@@ -1,6 +1,5 @@
 # Standard library imports
 import os
-
 # Third party imports
 from werkzeug.datastructures import FileStorage
 
@@ -170,12 +169,12 @@ def test_save_viewable_file(client):
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_texture_coordinates(client):
+def test_texture_coordinates(client, test_id):
     response = client.post(
         "/texture_coordinates",
         json={
             "input_geode_object": "PolygonalSurface3D",
-            "id": "1",
+            "id": test_id,
             "filename": "hat.vtp",
         },
     )
@@ -186,7 +185,7 @@ def test_texture_coordinates(client):
         assert type(texture_coordinate) is str
 
 
-def test_vertex_attribute_names(client):
+def test_vertex_attribute_names(client, test_id):
     route = f"/vertex_attribute_names"
     for geode_object, value in geode_objects.geode_objects_dict().items():
         if value["object_type"] == "mesh":
@@ -206,7 +205,7 @@ def test_vertex_attribute_names(client):
                             def get_full_data():
                                 return {
                                     "input_geode_object": geode_object,
-                                    "id": "1",
+                                    "id": test_id,
                                     "filename": f"test.{input_extension}",
                                 }
 
@@ -223,7 +222,7 @@ def test_vertex_attribute_names(client):
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_polygon_attribute_names(client):
+def test_polygon_attribute_names(client, test_id):
     route = f"/polygon_attribute_names"
     for geode_object, value in geode_objects.geode_objects_dict().items():
         if value["object_type"] == "mesh":
@@ -243,7 +242,7 @@ def test_polygon_attribute_names(client):
                             def get_full_data():
                                 return {
                                     "input_geode_object": geode_object,
-                                    "id": "1",
+                                    "id": test_id,
                                     "filename": f"test.{input_extension}",
                                 }
 
@@ -260,7 +259,7 @@ def test_polygon_attribute_names(client):
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_polyhedron_attribute_names(client):
+def test_polyhedron_attribute_names(client, test_id):
     route = f"/polyhedron_attribute_names"
     for geode_object, value in geode_objects.geode_objects_dict().items():
         if value["object_type"] == "mesh":
@@ -280,7 +279,7 @@ def test_polyhedron_attribute_names(client):
                             def get_full_data():
                                 return {
                                     "input_geode_object": geode_object,
-                                    "id": "1",
+                                    "id": test_id,
                                     "filename": f"test.{input_extension}",
                                 }
 
