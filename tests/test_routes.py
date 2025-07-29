@@ -178,7 +178,7 @@ def test_texture_coordinates(client, test_id):
         )
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
         shutil.copy("./tests/vertex_attribute.vtp", data_path)
-    
+
     response = client.post(
         "/texture_coordinates",
         json={
