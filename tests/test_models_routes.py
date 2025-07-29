@@ -1,6 +1,7 @@
 import os
 import shutil
 
+
 def test_model_mesh_components(client):
     test_id = "1"
     route = "/models/vtm_component_indices"
@@ -8,10 +9,7 @@ def test_model_mesh_components(client):
     base_path = client.application.config["DATA_FOLDER_PATH"]
     data_path = os.path.join(base_path, test_id)
     os.makedirs(data_path, exist_ok=True)
-    shutil.copy(
-        "./tests/data/cube.vtm",
-        os.path.join(data_path, "viewable.vtm")
-    )
+    shutil.copy("./tests/data/cube.vtm", os.path.join(data_path, "viewable.vtm"))
 
     response = client.post(route, json={"id": test_id})
     assert response.status_code == 200
@@ -20,7 +18,7 @@ def test_model_mesh_components(client):
     assert isinstance(uuid_dict, dict)
 
     indices = sorted(uuid_dict.values())
-    assert all(indices[i] > indices[i-1] for i in range(1, len(indices)))
+    assert all(indices[i] > indices[i - 1] for i in range(1, len(indices)))
     for key in uuid_dict:
         assert isinstance(key, str)
 
@@ -32,16 +30,9 @@ def test_extract_brep_uuids(client):
     base_path = client.application.config["DATA_FOLDER_PATH"]
     data_path = os.path.join(base_path, test_id)
     os.makedirs(data_path, exist_ok=True)
-    shutil.copy(
-        "./tests/data/cube.og_brep",
-        os.path.join(data_path, "cube.og_brep")
-    )
+    shutil.copy("./tests/data/cube.og_brep", os.path.join(data_path, "cube.og_brep"))
 
-    json_data = {
-        "id": test_id,
-        "geode_object": "BRep",
-        "filename": "cube.og_brep"
-    }
+    json_data = {"id": test_id, "geode_object": "BRep", "filename": "cube.og_brep"}
     response = client.post(route, json=json_data)
     assert response.status_code == 200
 
@@ -52,4 +43,3 @@ def test_extract_brep_uuids(client):
     for values in uuid_dict.values():
         assert isinstance(values, list)
         assert all(isinstance(v, str) for v in values)
-
