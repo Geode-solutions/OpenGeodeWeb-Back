@@ -290,7 +290,7 @@ def texture_coordinates():
     utils_functions.validate_request(flask.request, texture_coordinates_json)
     data = geode_functions.load(
         flask.request.json["input_geode_object"],
-        os.path.join(DATA_FOLDER_PATH, flask.request.json["filename"]),
+        os.path.join(DATA_FOLDER_PATH, flask.request.json["id"], flask.request.json["filename"]),
     )
     texture_coordinates = data.texture_manager().texture_names()
 
@@ -312,7 +312,7 @@ def vertex_attribute_names():
     DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
     utils_functions.validate_request(flask.request, vertex_attribute_names_json)
     file_absolute_path = os.path.join(
-        DATA_FOLDER_PATH, werkzeug.utils.secure_filename(flask.request.json["filename"])
+        DATA_FOLDER_PATH, flask.request.json["id"], werkzeug.utils.secure_filename(flask.request.json["filename"])
     )
     data = geode_functions.load(
         flask.request.json["input_geode_object"], file_absolute_path
@@ -342,7 +342,7 @@ def polygon_attribute_names():
     DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
     utils_functions.validate_request(flask.request, polygon_attribute_names_json)
     file_absolute_path = os.path.join(
-        DATA_FOLDER_PATH, werkzeug.utils.secure_filename(flask.request.json["filename"])
+        DATA_FOLDER_PATH, flask.request.json["id"], werkzeug.utils.secure_filename(flask.request.json["filename"])
     )
     data = geode_functions.load(
         flask.request.json["input_geode_object"], file_absolute_path
@@ -372,7 +372,7 @@ def polyhedron_attribute_names():
     DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
     utils_functions.validate_request(flask.request, vertex_attribute_names_json)
     file_absolute_path = os.path.join(
-        DATA_FOLDER_PATH, werkzeug.utils.secure_filename(flask.request.json["filename"])
+        DATA_FOLDER_PATH, flask.request.json["id"], werkzeug.utils.secure_filename(flask.request.json["filename"])
     )
     data = geode_functions.load(
         flask.request.json["input_geode_object"], file_absolute_path

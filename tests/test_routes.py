@@ -175,6 +175,7 @@ def test_texture_coordinates(client):
         "/texture_coordinates",
         json={
             "input_geode_object": "PolygonalSurface3D",
+            "id": "1",
             "filename": "hat.vtp",
         },
     )
@@ -205,6 +206,7 @@ def test_vertex_attribute_names(client):
                             def get_full_data():
                                 return {
                                     "input_geode_object": geode_object,
+                                    "id": "1",
                                     "filename": f"test.{input_extension}",
                                 }
 
@@ -241,6 +243,7 @@ def test_polygon_attribute_names(client):
                             def get_full_data():
                                 return {
                                     "input_geode_object": geode_object,
+                                    "id": "1",
                                     "filename": f"test.{input_extension}",
                                 }
 
@@ -277,6 +280,7 @@ def test_polyhedron_attribute_names(client):
                             def get_full_data():
                                 return {
                                     "input_geode_object": geode_object,
+                                    "id": "1",
                                     "filename": f"test.{input_extension}",
                                 }
 
