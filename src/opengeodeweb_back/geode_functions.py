@@ -39,6 +39,7 @@ def is_loadable(geode_object: str, file_absolute_path: str):
 def load(geode_object: str, file_absolute_path: str):
     return geode_object_value(geode_object)["load"](file_absolute_path)
 
+
 def load_data(geode_object: str, request_json: dict):
     data_folder_path = flask.current_app.config["DATA_FOLDER_PATH"]
     file_absolute_path = os.path.join(
@@ -48,18 +49,23 @@ def load_data(geode_object: str, request_json: dict):
     )
     return load(geode_object, file_absolute_path)
 
+
 def data_file_path(request_json, filename):
-    data_folder_path = flask.current_app.config["DATA_FOLDER_PATH"] # Use the load_data function to get the data folder path
+    data_folder_path = flask.current_app.config[
+        "DATA_FOLDER_PATH"
+    ]  # Use the load_data function to get the data folder path
     return os.path.join(
         data_folder_path,
         request_json["id"],
         werkzeug.utils.secure_filename(filename),
     )
 
+
 def upload_file_path(upload_folder, filename):
-    secure_filename = werkzeug.utils.secure_filename(filename) # filename must be grabbed from the data_file_path function
-    return os.path.abspath(os.path.join(upload_folder, secure_filename)
-    )
+    secure_filename = werkzeug.utils.secure_filename(
+        filename
+    )  # filename must be grabbed from the data_file_path function
+    return os.path.abspath(os.path.join(upload_folder, secure_filename))
 
 
 def is_saveable(geode_object: str, data, filename: str):

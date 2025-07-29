@@ -100,7 +100,8 @@ def allowed_objects():
     UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
     utils_functions.validate_request(flask.request, allowed_objects_json)
     file_absolute_path = geode_functions.upload_file_path(
-    UPLOAD_FOLDER, flask.request.json["filename"])
+        UPLOAD_FOLDER, flask.request.json["filename"]
+    )
     allowed_objects = geode_functions.list_geode_objects(
         file_absolute_path, flask.request.json["supported_feature"]
     )
@@ -124,8 +125,7 @@ def missing_files():
 
     missing_files = geode_functions.missing_files(
         flask.request.json["input_geode_object"],
-        geode_functions.upload_file_path(
-    UPLOAD_FOLDER, flask.request.json["filename"]),
+        geode_functions.upload_file_path(UPLOAD_FOLDER, flask.request.json["filename"]),
         geode_functions.build_upload_file_path(
             UPLOAD_FOLDER, flask.request.json["filename"]
         ),
@@ -220,8 +220,7 @@ def geode_objects_and_output_extensions():
     )
     data = geode_functions.load(
         flask.request.json["input_geode_object"],
-        geode_functions.upload_file_path(
-    UPLOAD_FOLDER, flask.request.json["filename"]),
+        geode_functions.upload_file_path(UPLOAD_FOLDER, flask.request.json["filename"]),
         geode_functions.build_upload_file_path(
             UPLOAD_FOLDER, flask.request.json["filename"]
         ),
@@ -297,9 +296,9 @@ with open(os.path.join(schemas, "texture_coordinates.json"), "r") as file:
 def texture_coordinates():
     utils_functions.validate_request(flask.request, texture_coordinates_json)
     data = geode_functions.load_data(
-    flask.request.json["input_geode_object"],
-    flask.request.json,
-)
+        flask.request.json["input_geode_object"],
+        flask.request.json,
+    )
 
     texture_coordinates = data.texture_manager().texture_names()
 
@@ -320,8 +319,8 @@ with open(
 def vertex_attribute_names():
     utils_functions.validate_request(flask.request, vertex_attribute_names_json)
     data = geode_functions.load_data(
-    flask.request.json["input_geode_object"],
-    flask.request.json,
+        flask.request.json["input_geode_object"],
+        flask.request.json,
     )
 
     vertex_attribute_names = data.vertex_attribute_manager().attribute_names()
@@ -348,8 +347,8 @@ with open(
 def polygon_attribute_names():
     utils_functions.validate_request(flask.request, polygon_attribute_names_json)
     data = geode_functions.load_data(
-    flask.request.json["input_geode_object"],
-    flask.request.json,
+        flask.request.json["input_geode_object"],
+        flask.request.json,
     )
 
     polygon_attribute_names = data.polygon_attribute_manager().attribute_names()
@@ -376,8 +375,8 @@ with open(
 def polyhedron_attribute_names():
     utils_functions.validate_request(flask.request, vertex_attribute_names_json)
     data = geode_functions.load_data(
-    flask.request.json["input_geode_object"],
-    flask.request.json,
+        flask.request.json["input_geode_object"],
+        flask.request.json,
     )
 
     polyhedron_attribute_names = data.polyhedron_attribute_manager().attribute_names()
