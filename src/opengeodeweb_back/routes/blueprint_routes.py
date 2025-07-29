@@ -217,7 +217,7 @@ def geode_objects_and_output_extensions():
     )
     data = geode_functions.load(
         flask.request.json["input_geode_object"],
-        geode_functions.upload_file_path(UPLOAD_FOLDER, flask.request.json["filename"])
+        geode_functions.upload_file_path(UPLOAD_FOLDER, flask.request.json["filename"]),
     )
     geode_objects_and_output_extensions = (
         geode_functions.geode_objects_output_extensions(
