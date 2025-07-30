@@ -8,11 +8,13 @@ import pytest
 # Local application imports
 from app import app
 
+TEST_ID = "1"
+
 
 @pytest.fixture(scope="session", autouse=True)
 def copy_data():
     shutil.rmtree("./data", ignore_errors=True)
-    shutil.copytree("./tests/data/", "./data/1/", dirs_exist_ok=True)
+    shutil.copytree("./tests/data/", f"./data/{TEST_ID}/", dirs_exist_ok=True)
 
 
 @pytest.fixture
@@ -35,4 +37,4 @@ def app_context():
 
 @pytest.fixture
 def test_id():
-    return "1"
+    return TEST_ID

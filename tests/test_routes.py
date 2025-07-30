@@ -304,9 +304,6 @@ def test_polyhedron_attribute_names(client, test_id):
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
-    # Test all params
-    test_utils.test_route_wrong_params(client, route, get_full_data)
-
 
 def test_create_point(client):
     route = f"/create_point"
