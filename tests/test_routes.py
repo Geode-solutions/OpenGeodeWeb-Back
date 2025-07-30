@@ -46,11 +46,70 @@ def test_allowed_objects(client):
 
 
 def test_upload_file(client, filename="corbi.og_brep"):
+    # Test upload normal
     response = client.put(
         f"/upload_file",
-        data={"file": FileStorage(open(f"./tests/{filename}", "rb"))},
+        data={"file": FileStorage(open(f"./tests/data/{filename}", "rb"))},
     )
+    assert response.status_code == 201
+    assert response.json["message"] == "File uploaded"
+    assert response.json["filename"] == filename
+    assert response.json["replaced"] == False
 
+    # Test upload du même fichier sans remplacement (doit échouer)
+    response = client.put(
+        f"/upload_file",
+        data={
+            "file": FileStorage(open(f"./tests/data/{filename}", "rb")),
+            "replace_if_exists": "false"
+        },
+    )
+    assert response.status_code == 409
+    assert "File already exists" in response.json["error"]
+
+    # Test upload du même fichier avec remplacement (doit réussir)
+    response = client.put(
+        f"/upload_file",
+        data={
+            "file": FileStorage(open(f"./tests/data/{filename}", "rb")),
+            "replace_if_exists": "true"
+        },
+    )
+    assert response.status_code == 201
+    assert response.json["message"] == "File uploaded"
+    assert response.json["filename"] == filename
+    assert response.json["replaced"] == True
+
+
+def test_upload_file_new_parameter_validation(client):
+    """Test que le paramètre replace_if_exists est optionnel."""
+    route = "/upload_file"
+    
+    # Test avec replace_if_exists = true
+    response = client.put(
+        route,
+        data={
+            "file": FileStorage(open("./tests/data/corbi.og_brep", "rb")),
+            "replace_if_exists": "true"
+        },
+    )
+    assert response.status_code == 201
+    
+    # Test avec replace_if_exists = false
+    response = client.put(
+        route,
+        data={
+            "file": FileStorage(open("./tests/data/test.og_brep", "rb")),
+            "replace_if_exists": "false"
+        },
+    )
+    assert response.status_code == 201
+    
+    # Test sans replace_if_exists (doit utiliser la valeur par défaut false)
+    response = client.put(
+        route,
+        data={"file": FileStorage(open("./tests/data/cube.og_brep", "rb"))},
+    )
     assert response.status_code == 201
 
 

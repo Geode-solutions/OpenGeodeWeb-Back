@@ -76,10 +76,31 @@ def upload_file():
     UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
     if not os.path.exists(UPLOAD_FOLDER):
         os.mkdir(UPLOAD_FOLDER)
+    
     file = flask.request.files["file"]
     filename = werkzeug.utils.secure_filename(os.path.basename(file.filename))
-    file.save(os.path.join(UPLOAD_FOLDER, filename))
-    return flask.make_response({"message": "File uploaded"}, 201)
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
+    
+    # Vérifier si le fichier existe déjà
+    file_existed = os.path.exists(file_path)
+    if file_existed:
+        replace_if_exists = flask.request.form.get('replace_if_exists', 'false').lower() == 'true'
+        if not replace_if_exists:
+            return flask.make_response({
+                "error": "File already exists",
+                "message": f"Le fichier '{filename}' existe déjà. Utilisez 'replace_if_exists=true' pour le remplacer.",
+                "existing_file": filename
+            }, 409)  # 409 Conflict
+    
+    file.save(file_path)
+    
+    response_data = {
+        "message": "File uploaded",
+        "filename": filename,
+        "replaced": file_existed
+    }
+    
+    return flask.make_response(response_data, 201)
 
 
 with open(
