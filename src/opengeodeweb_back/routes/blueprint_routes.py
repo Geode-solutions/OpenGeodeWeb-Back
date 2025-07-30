@@ -98,7 +98,9 @@ def allowed_objects():
         return flask.make_response({}, 200)
 
     utils_functions.validate_request(flask.request, allowed_objects_json)
-    file_absolute_path = geode_functions.upload_file_path(flask.request.json["filename"])
+    file_absolute_path = geode_functions.upload_file_path(
+        flask.request.json["filename"]
+    )
     allowed_objects = geode_functions.list_geode_objects(
         file_absolute_path, flask.request.json["supported_feature"]
     )
@@ -289,12 +291,7 @@ def texture_coordinates():
 
     texture_coordinates = data.texture_manager().texture_names()
 
-    return flask.make_response(
-        {
-            "texture_coordinates": texture_coordinates
-            }, 
-            200
-    )
+    return flask.make_response({"texture_coordinates": texture_coordinates}, 200)
 
 
 with open(
