@@ -31,6 +31,3 @@ class DevConfig(Config):
     MINUTES_BEFORE_TIMEOUT = "1"
     SECONDS_BETWEEN_SHUTDOWNS = "10"
     DATA_FOLDER_PATH = "./data/"
-
-
-TEST_ID = "1"

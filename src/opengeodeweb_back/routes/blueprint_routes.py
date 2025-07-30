@@ -97,11 +97,8 @@ def allowed_objects():
     if flask.request.method == "OPTIONS":
         return flask.make_response({}, 200)
 
-    UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
     utils_functions.validate_request(flask.request, allowed_objects_json)
-    file_absolute_path = geode_functions.upload_file_path(
-        UPLOAD_FOLDER, flask.request.json["filename"]
-    )
+    file_absolute_path = geode_functions.upload_file_path(flask.request.json["filename"])
     allowed_objects = geode_functions.list_geode_objects(
         file_absolute_path, flask.request.json["supported_feature"]
     )
@@ -120,12 +117,11 @@ with open(
     methods=missing_files_json["methods"],
 )
 def missing_files():
-    UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
     utils_functions.validate_request(flask.request, missing_files_json)
-
+    file_path = geode_functions.upload_file_path(flask.request.json["filename"])
     missing_files = geode_functions.missing_files(
         flask.request.json["input_geode_object"],
-        geode_functions.upload_file_path(UPLOAD_FOLDER, flask.request.json["filename"]),
+        file_path,
     )
     has_missing_files = missing_files.has_missing_files()
 
@@ -186,11 +182,9 @@ with open(
     methods=inspect_file_json["methods"],
 )
 def inspect_file():
-    UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
     utils_functions.validate_request(flask.request, inspect_file_json)
 
-    secure_filename = werkzeug.utils.secure_filename(flask.request.json["filename"])
-    file_path = os.path.abspath(os.path.join(UPLOAD_FOLDER, secure_filename))
+    file_path = geode_functions.upload_file_path(flask.request.json["filename"])
     data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
     class_inspector = geode_functions.inspect(
         flask.request.json["input_geode_object"], data
@@ -211,13 +205,13 @@ with open(
     methods=geode_objects_and_output_extensions_json["methods"],
 )
 def geode_objects_and_output_extensions():
-    UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
     utils_functions.validate_request(
         flask.request, geode_objects_and_output_extensions_json
     )
+    file_path = geode_functions.upload_file_path(flask.request.json["filename"])
     data = geode_functions.load(
         flask.request.json["input_geode_object"],
-        geode_functions.upload_file_path(UPLOAD_FOLDER, flask.request.json["filename"]),
+        file_path,
     )
     geode_objects_and_output_extensions = (
         geode_functions.geode_objects_output_extensions(
@@ -243,9 +237,8 @@ with open(
 )
 def save_viewable_file():
     utils_functions.validate_request(flask.request, save_viewable_file_json)
-    UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
-    secure_filename = werkzeug.utils.secure_filename(flask.request.json["filename"])
-    file_path = os.path.abspath(os.path.join(UPLOAD_FOLDER, secure_filename))
+
+    file_path = geode_functions.upload_file_path(flask.request.json["filename"])
     data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
     return flask.make_response(
         utils_functions.generate_native_viewable_and_light_viewable(
@@ -296,7 +289,12 @@ def texture_coordinates():
 
     texture_coordinates = data.texture_manager().texture_names()
 
-    return flask.make_response({"texture_coordinates": texture_coordinates}, 200)
+    return flask.make_response(
+        {
+            "texture_coordinates": texture_coordinates
+            }, 
+            200
+    )
 
 
 with open(

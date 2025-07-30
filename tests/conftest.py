@@ -7,13 +7,12 @@ import pytest
 
 # Local application imports
 from app import app
-from src.opengeodeweb_back.app_config import TEST_ID
 
 
 @pytest.fixture(scope="session", autouse=True)
 def copy_data():
     shutil.rmtree("./data", ignore_errors=True)
-    shutil.copytree("./tests/data/", "./data/{TEST_ID}/", dirs_exist_ok=True)
+    shutil.copytree("./tests/data/", "./data/1/", dirs_exist_ok=True)
 
 
 @pytest.fixture
