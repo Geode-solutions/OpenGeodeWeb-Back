@@ -18,14 +18,11 @@ with open(os.path.join(schemas, "vtm_component_indices.json"), "r") as file:
 )
 def uuid_to_flat_index():
     utils_functions.validate_request(flask.request, vtm_component_indices_json)
-    try:
-        vtm_file_path = geode_functions.data_file_path(
-            flask.request.json,
-            "viewable.vtm",
-        )
-        tree = ET.parse(vtm_file_path)
-    except FileNotFoundError:
-        return flask.make_response({"error": "VTM file not found"}, 404)
+
+    vtm_file_path = geode_functions.data_file_path(
+        flask.request.json["id"], "viewable.vtm"
+    )
+    tree = ET.parse(vtm_file_path)
     root = tree.find("vtkMultiBlockDataSet")
     uuid_to_flat_index = {}
     current_index = 0
@@ -52,12 +49,12 @@ with open(os.path.join(schemas, "mesh_components.json"), "r") as file:
 @routes.route(mesh_components_json["route"], methods=mesh_components_json["methods"])
 def extract_uuids_endpoint():
     utils_functions.validate_request(flask.request, mesh_components_json)
-    try:
-        model = geode_functions.load_data(
-            flask.request.json["geode_object"],
-            flask.request.json,
-        )
-    except FileNotFoundError:
-        return flask.make_response({"error": "File not found"}, 404)
+
+    model = geode_functions.load_data(
+        flask.request.json["geode_object"],
+        flask.request.json["id"],
+        flask.request.json["filename"],
+    )
+
     uuid_dict = extract_model_uuids(model)
     return flask.make_response({"uuid_dict": uuid_dict}, 200)

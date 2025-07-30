@@ -9,7 +9,7 @@ def test_model_mesh_components(client, test_id):
     route = f"/models/vtm_component_indices"
 
     with client.application.app_context():
-        data_path = geode_functions.data_file_path({"id": test_id}, "viewable.vtm")
+        data_path = geode_functions.data_file_path(test_id, "viewable.vtm")
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
         shutil.copy("./tests/data/cube.vtm", data_path)
 
@@ -33,7 +33,7 @@ def test_extract_brep_uuids(client, test_id):
     json_data = {"id": test_id, "geode_object": "BRep", "filename": brep_filename}
 
     with client.application.app_context():
-        data_path = geode_functions.data_file_path(json_data, brep_filename)
+        data_path = geode_functions.data_file_path(json_data["id"], brep_filename)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
         shutil.copy(f"./tests/data/{brep_filename}", data_path)
     response = client.post(route, json=json_data)

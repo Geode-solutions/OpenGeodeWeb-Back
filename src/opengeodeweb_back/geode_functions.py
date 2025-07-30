@@ -40,17 +40,17 @@ def load(geode_object: str, file_absolute_path: str):
     return geode_object_value(geode_object)["load"](file_absolute_path)
 
 
-def data_file_path(request_json, filename):
+def data_file_path(data_id: str, filename: str) -> str:
     data_folder_path = flask.current_app.config["DATA_FOLDER_PATH"]
     return os.path.join(
         data_folder_path,
-        request_json["id"],
+        data_id,
         werkzeug.utils.secure_filename(filename),
     )
 
 
-def load_data(geode_object: str, request_json: dict):
-    file_absolute_path = data_file_path(request_json, request_json["filename"])
+def load_data(geode_object: str, data_id: str, filename: str):
+    file_absolute_path = data_file_path(data_id, filename)
     return load(geode_object, file_absolute_path)
 
 

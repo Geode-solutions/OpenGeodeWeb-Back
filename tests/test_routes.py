@@ -174,7 +174,7 @@ def test_save_viewable_file(client):
 def test_texture_coordinates(client, test_id):
     with client.application.app_context():
         data_path = geode_functions.data_file_path(
-            {"id": test_id, "filename": "hat.vtp"}, "hat.vtp"
+        test_id, "hat.vtp"
         )
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
         shutil.copy("./tests/vertex_attribute.vtp", data_path)
