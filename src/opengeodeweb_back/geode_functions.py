@@ -4,6 +4,8 @@ import os
 # Third party imports
 import opengeode_geosciences as og_gs
 import opengeode as og
+import werkzeug
+import flask
 
 # Local application imports
 from .geode_objects import geode_objects_dict
@@ -36,6 +38,26 @@ def is_loadable(geode_object: str, file_absolute_path: str):
 
 def load(geode_object: str, file_absolute_path: str):
     return geode_object_value(geode_object)["load"](file_absolute_path)
+
+
+def data_file_path(data_id: str, filename: str) -> str:
+    data_folder_path = flask.current_app.config["DATA_FOLDER_PATH"]
+    return os.path.join(
+        data_folder_path,
+        data_id,
+        werkzeug.utils.secure_filename(filename),
+    )
+
+
+def load_data(geode_object: str, data_id: str, filename: str):
+    file_absolute_path = data_file_path(data_id, filename)
+    return load(geode_object, file_absolute_path)
+
+
+def upload_file_path(filename):
+    upload_folder = flask.current_app.config["UPLOAD_FOLDER"]
+    secure_filename = werkzeug.utils.secure_filename(filename)
+    return os.path.abspath(os.path.join(upload_folder, secure_filename))
 
 
 def is_saveable(geode_object: str, data, filename: str):

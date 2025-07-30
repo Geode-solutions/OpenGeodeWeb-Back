@@ -18,36 +18,27 @@ with open(os.path.join(schemas, "vtm_component_indices.json"), "r") as file:
 )
 def uuid_to_flat_index():
     utils_functions.validate_request(flask.request, vtm_component_indices_json)
-    vtm_file_path = os.path.join(
-        flask.current_app.config["DATA_FOLDER_PATH"], flask.request.json["id"] + ".vtm"
+
+    vtm_file_path = geode_functions.data_file_path(
+        flask.request.json["id"], "viewable.vtm"
     )
     tree = ET.parse(vtm_file_path)
     root = tree.find("vtkMultiBlockDataSet")
     uuid_to_flat_index = {}
     current_index = 0
-
     for elem in root.iter():
         if "uuid" in elem.attrib and elem.tag == "DataSet":
             uuid_to_flat_index[elem.attrib["uuid"]] = current_index
-
         current_index += 1
-
-    return flask.make_response(
-        {"uuid_to_flat_index": uuid_to_flat_index},
-        200,
-    )
+    return flask.make_response({"uuid_to_flat_index": uuid_to_flat_index}, 200)
 
 
-def extract_model_uuids(geode_object, file_path):
-    model = geode_functions.load(geode_object, file_path)
+def extract_model_uuids(model):
     mesh_components = model.mesh_components()
-
     uuid_dict = {}
-
     for mesh_component, ids in mesh_components.items():
         component_name = mesh_component.get()
         uuid_dict[component_name] = [id.string() for id in ids]
-
     return uuid_dict
 
 
@@ -58,10 +49,12 @@ with open(os.path.join(schemas, "mesh_components.json"), "r") as file:
 @routes.route(mesh_components_json["route"], methods=mesh_components_json["methods"])
 def extract_uuids_endpoint():
     utils_functions.validate_request(flask.request, mesh_components_json)
-    file_path = os.path.join(
-        flask.current_app.config["DATA_FOLDER_PATH"], flask.request.json["filename"]
+
+    model = geode_functions.load_data(
+        flask.request.json["geode_object"],
+        flask.request.json["id"],
+        flask.request.json["filename"],
     )
-    if not os.path.exists(file_path):
-        return flask.make_response({"error": "File not found"}, 404)
-    uuid_dict = extract_model_uuids(flask.request.json["geode_object"], file_path)
+
+    uuid_dict = extract_model_uuids(model)
     return flask.make_response({"uuid_dict": uuid_dict}, 200)

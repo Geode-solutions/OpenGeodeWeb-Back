@@ -5,14 +5,21 @@
   ],
   "type": "object",
   "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1      
+    },
     "filename": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     },
     "geode_object": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     }
   },
   "required": [
+    "id",
     "filename",
     "geode_object"
   ],

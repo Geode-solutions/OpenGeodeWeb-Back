@@ -12,10 +12,15 @@
     "filename": {
       "type": "string",
       "minLength": 1
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
     }
   },
   "required": [
     "input_geode_object",
+    "id",
     "filename"
   ],
   "additionalProperties": false
