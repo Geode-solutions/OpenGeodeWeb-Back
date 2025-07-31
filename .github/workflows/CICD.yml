@@ -69,6 +69,7 @@ jobs:
       #     github_token: ${{ secrets.TOKEN }}
       - name: Build
         run: |
+          sed -i 's/version = "[0-9]*\.[0-9]*\.[0-9]*"/version = "0.0.0"/' pyproject.toml
           python3 -m pip install --upgrade build
           python3 -m build
       - name: Upload GH
