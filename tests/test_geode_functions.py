@@ -48,13 +48,13 @@ def test_missing_files():
         input_extensions = geode_functions.geode_object_input_extensions(geode_object)
         for input_extension in input_extensions:
             file_absolute_path = os.path.join(data_folder, f"test.{input_extension}")
-            missing_files = geode_functions.additional_files(
+            additional_files = geode_functions.additional_files(
                 geode_object, file_absolute_path
             )
-            mandatory_files = missing_files.mandatory_files
-            additional_files = missing_files.optional_files
+            mandatory_files = additional_files.mandatory_files
+            optional_files = additional_files.optional_files
             assert type(mandatory_files) is list
-            assert type(additional_files) is list
+            assert type(optional_files) is list
 
 
 def test_is_loadable():
