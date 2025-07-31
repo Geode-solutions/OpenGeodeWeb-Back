@@ -140,25 +140,30 @@ with open(
     methods=missing_files_json["methods"],
 )
 def missing_files():
+    UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
     utils_functions.validate_request(flask.request, missing_files_json)
-    file_path = geode_functions.upload_file_path(flask.request.json["filename"])
     missing_files = geode_functions.missing_files(
         flask.request.json["input_geode_object"],
-        file_path,
+        os.path.join(UPLOAD_FOLDER, flask.request.json["filename"]),
     )
     has_missing_files = missing_files.has_missing_files()
 
     mandatory_files = []
-    for mandatory_file in missing_files.mandatory_files:
-        mandatory_files.append(os.path.basename(mandatory_file))
+    for mf in missing_files.mandatory_files:
+        mandatory_files.append({
+            "filename": os.path.basename(mf.path),
+            "is_missing": mf.is_missing,
+        })
 
     additional_files = []
-    for additional_file in missing_files.additional_files:
-        additional_files.append(os.path.basename(additional_file))
+    for af in missing_files.additional_files:
+        additional_files.append({
+            "filename": os.path.basename(af.path),
+            "is_missing": af.is_missing,
+        })
 
     return flask.make_response(
         {
-            "has_missing_files": has_missing_files,
             "mandatory_files": mandatory_files,
             "additional_files": additional_files,
         },

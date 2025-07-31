@@ -13,15 +13,8 @@ TEST_ID = "1"
 
 @pytest.fixture(scope="session", autouse=True)
 def copy_data():
-    # Nettoyer les dossiers de test
     shutil.rmtree("./data", ignore_errors=True)
-    shutil.rmtree("./uploads", ignore_errors=True)
-    
-    # Copier les données de test
     shutil.copytree("./tests/data/", f"./data/{TEST_ID}/", dirs_exist_ok=True)
-    
-    # Créer le dossier uploads pour les tests
-    os.makedirs("./uploads", exist_ok=True)
 
 
 @pytest.fixture

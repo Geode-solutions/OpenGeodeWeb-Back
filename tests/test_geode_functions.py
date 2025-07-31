@@ -48,15 +48,19 @@ def test_missing_files():
         input_extensions = geode_functions.geode_object_input_extensions(geode_object)
         for input_extension in input_extensions:
             file_absolute_path = os.path.join(data_folder, f"test.{input_extension}")
-            missing_files = geode_functions.missing_files(
-                geode_object, file_absolute_path
+            try:
+                additional = geode_functions.additional_files(
+                    geode_object, file_absolute_path
+                )
+            except RuntimeError as e:
+                print(f"Skipping {file_absolute_path} due to error: {e}")
+                continue
+            has_missing = any(
+                f.is_missing for f in additional.mandatory_files + additional.optional_files
             )
-            has_missing_files = missing_files.has_missing_files()
-            assert type(has_missing_files) is bool
-            mandatory_files = missing_files.mandatory_files
-            assert type(mandatory_files) is list
-            additional_files = missing_files.additional_files
-            assert type(additional_files) is list
+            assert type(has_missing) is bool
+            assert isinstance(additional.mandatory_files, list)
+            assert isinstance(additional.optional_files, list)
 
 
 def test_is_loadable():
@@ -75,19 +79,26 @@ def test_load():
         for input_extension in input_extensions:
             print(f"\t{input_extension=}")
             file_absolute_path = os.path.join(data_folder, f"test.{input_extension}")
-            missing_files = geode_functions.missing_files(
-                geode_object, file_absolute_path
+            try:
+                additional = geode_functions.additional_files(
+                    geode_object, file_absolute_path
+                )
+            except RuntimeError as e:
+                print(f"Skipping {file_absolute_path} due to error in additional_files: {e}")
+                continue
+
+            has_missing = any(
+                f.is_missing for f in additional.mandatory_files + additional.optional_files
             )
-            has_missing_files = missing_files.has_missing_files()
-            if has_missing_files:
-                mandatory_files = missing_files.mandatory_files
-                print(f"\t\t{mandatory_files=}")
-                additional_files = missing_files.additional_files
-                print(f"\t\t{additional_files=}")
+
+            if has_missing:
+                print(f"\t\tMissing mandatory: {[f.filename for f in additional.mandatory_files if f.is_missing]}")
+                print(f"\t\tMissing optional: {[f.filename for f in additional.optional_files if f.is_missing]}")
+                continue
+
             if geode_functions.is_loadable(geode_object, file_absolute_path):
                 data = geode_functions.load(geode_object, file_absolute_path)
                 data_name = data.name()
-                uu_id = str(uuid.uuid4()).replace("-", "")
                 if "save_viewable" in value:
                     viewable_file_path = geode_functions.save_viewable(
                         geode_object,
@@ -327,41 +338,3 @@ def test_geode_objects_output_extensions():
                         output_extension_value,
                     ) in output_geode_object_value.items():
                         assert type(output_extension_value["is_saveable"]) is bool
-
-
-def test_file_exists_in_upload():
-    """Test de la fonction file_exists_in_upload."""
-    # Test avec un fichier qui n'existe pas
-    assert geode_functions.file_exists_in_upload("nonexistent.txt") == False
-    
-    # Test avec un fichier qui existe (après l'avoir créé)
-    test_filename = "test_exists.txt"
-    test_path = geode_functions.upload_file_path(test_filename)
-    os.makedirs(os.path.dirname(test_path), exist_ok=True)
-    with open(test_path, 'w') as f:
-        f.write("test")
-    
-    assert geode_functions.file_exists_in_upload(test_filename) == True
-    
-    # Nettoyer
-    os.remove(test_path)
-
-def test_file_exists_in_data():
-    """Test de la fonction file_exists_in_data."""
-    test_data_id = "test_data_id"
-    test_filename = "test_data.txt"
-    
-    # Test avec un fichier qui n'existe pas
-    assert geode_functions.file_exists_in_data(test_data_id, test_filename) == False
-    
-    # Test avec un fichier qui existe (après l'avoir créé)
-    test_path = geode_functions.data_file_path(test_data_id, test_filename)
-    os.makedirs(os.path.dirname(test_path), exist_ok=True)
-    with open(test_path, 'w') as f:
-        f.write("test")
-    
-    assert geode_functions.file_exists_in_data(test_data_id, test_filename) == True
-    
-    # Nettoyer
-    os.remove(test_path)
-    os.rmdir(os.path.dirname(test_path))

@@ -9,12 +9,7 @@
     "filename": {
       "type": "string",
       "minLength": 1
-    },
-    "replace_if_exists": {
-      "type": "boolean",
-      "default": false
     }
   },
-  "required": ["filename"],
   "additionalProperties": false
 }
