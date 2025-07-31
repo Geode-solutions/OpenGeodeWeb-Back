@@ -141,13 +141,13 @@ def test_geode_objects_and_output_extensions(client):
 
 def test_save_viewable_file(client):
 
-    test_upload_file(client, filename="corbi.og_brep")
+    test_upload_file(client, filename="test.og_brep")
     route = f"/save_viewable_file"
 
     def get_full_data():
         return {
             "input_geode_object": "BRep",
-            "filename": "corbi.og_brep",
+            "filename": "test.og_brep",
         }
 
     # Normal test with filename 'corbi.og_brep'
@@ -175,7 +175,7 @@ def test_texture_coordinates(client, test_id):
     with client.application.app_context():
         data_path = geode_functions.data_file_path(test_id, "hat.vtp")
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        shutil.copy("./tests/vertex_attribute.vtp", data_path)
+        shutil.copy("./tests/hat.vtp", data_path)
 
     response = client.post(
         "/texture_coordinates",
