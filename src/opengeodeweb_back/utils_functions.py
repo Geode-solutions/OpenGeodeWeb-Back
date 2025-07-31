@@ -143,12 +143,27 @@ def handle_exception(e):
     return response
 
 
-def generate_native_viewable_and_light_viewable(geode_object, data):
+def generate_native_viewable_and_light_viewable(geode_object, data, original_filename=None):
     generated_id = str(uuid.uuid4()).replace("-", "")
     DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
     data_path = os.path.join(DATA_FOLDER_PATH, generated_id)
     name = data.name()
     object_type = geode_functions.get_object_type(geode_object)
+
+    os.makedirs(data_path, exist_ok=True)
+
+    additional_files_copied = []
+    if original_filename:
+        original_file_path = geode_functions.upload_file_path(original_filename)
+        additional = geode_functions.additional_files(geode_object, original_file_path)
+        
+        import shutil
+        for additional_file in additional.mandatory_files + additional.optional_files:
+            if not additional_file.is_missing and geode_functions.file_exists_in_upload(additional_file.filename):
+                source_path = geode_functions.upload_file_path(additional_file.filename)
+                dest_path = os.path.join(data_path, additional_file.filename)
+                shutil.copy2(source_path, dest_path)
+                additional_files_copied.append(additional_file.filename)
 
     saved_native_file_path = geode_functions.save(
         geode_object,
@@ -167,7 +182,7 @@ def generate_native_viewable_and_light_viewable(geode_object, data):
     binary_light_viewable = f.read()
     f.close()
 
-    return {
+    result = {
         "name": name,
         "native_file_name": os.path.basename(saved_native_file_path[0]),
         "viewable_file_name": viewable_file_name,
@@ -176,3 +191,8 @@ def generate_native_viewable_and_light_viewable(geode_object, data):
         "binary_light_viewable": str(binary_light_viewable, "utf-8"),
         "geode_object": geode_object,
     }
+    
+    if additional_files_copied:
+        result["additional_files"] = additional_files_copied
+    
+    return result
