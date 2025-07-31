@@ -48,19 +48,13 @@ def test_missing_files():
         input_extensions = geode_functions.geode_object_input_extensions(geode_object)
         for input_extension in input_extensions:
             file_absolute_path = os.path.join(data_folder, f"test.{input_extension}")
-            try:
-                additional = geode_functions.additional_files(
-                    geode_object, file_absolute_path
-                )
-            except RuntimeError as e:
-                print(f"Skipping {file_absolute_path} due to error: {e}")
-                continue
-            has_missing = any(
-                f.is_missing for f in additional.mandatory_files + additional.optional_files
+            missing_files = geode_functions.additional_files(
+                geode_object, file_absolute_path
             )
-            assert type(has_missing) is bool
-            assert isinstance(additional.mandatory_files, list)
-            assert isinstance(additional.optional_files, list)
+            mandatory_files = missing_files.mandatory_files
+            additional_files = missing_files.optional_files
+            assert type(mandatory_files) is list
+            assert type(additional_files) is list
 
 
 def test_is_loadable():
@@ -79,23 +73,6 @@ def test_load():
         for input_extension in input_extensions:
             print(f"\t{input_extension=}")
             file_absolute_path = os.path.join(data_folder, f"test.{input_extension}")
-            try:
-                additional = geode_functions.additional_files(
-                    geode_object, file_absolute_path
-                )
-            except RuntimeError as e:
-                print(f"Skipping {file_absolute_path} due to error in additional_files: {e}")
-                continue
-
-            has_missing = any(
-                f.is_missing for f in additional.mandatory_files + additional.optional_files
-            )
-
-            if has_missing:
-                print(f"\t\tMissing mandatory: {[f.filename for f in additional.mandatory_files if f.is_missing]}")
-                print(f"\t\tMissing optional: {[f.filename for f in additional.optional_files if f.is_missing]}")
-                continue
-
             if geode_functions.is_loadable(geode_object, file_absolute_path):
                 data = geode_functions.load(geode_object, file_absolute_path)
                 data_name = data.name()
@@ -180,23 +157,20 @@ def test_geode_object_output_extensions():
         for input_extension in input_extensions:
             print(f"\t{input_extension=}")
             file_absolute_path = os.path.join(data_folder, f"test.{input_extension}")
-            missing_files = geode_functions.missing_files(
-                geode_object, file_absolute_path
+            additional = geode_functions.additional_files(geode_object, file_absolute_path)
+            has_missing_files = any(
+                f.is_missing for f in additional.mandatory_files + additional.optional_files
             )
-            has_missing_files = missing_files.has_missing_files()
             if has_missing_files:
-                mandatory_files = missing_files.mandatory_files
-                print(f"\t\t{mandatory_files=}")
-                additional_files = missing_files.additional_files
-                print(f"\t\t{additional_files=}")
-            file_absolute_path = os.path.join(data_folder, f"test.{input_extension}")
+                print(f"\t\tMandatory files: {[f.filename for f in additional.mandatory_files]}")
+                print(f"\t\tAdditional files: {[f.filename for f in additional.optional_files]}")
             if geode_functions.is_loadable(geode_object, file_absolute_path):
                 data = geode_functions.load(geode_object, file_absolute_path)
                 geode_objets_and_output_extensions = (
                     geode_functions.geode_objects_output_extensions(geode_object, data)
                 )
                 data_name = data.name()
-                assert type(geode_objets_and_output_extensions) is dict
+                assert isinstance(geode_objets_and_output_extensions, dict)
                 for (
                     output_geode_object,
                     output_geode_object_value,
@@ -205,8 +179,8 @@ def test_geode_object_output_extensions():
                         output_extension,
                         output_extension_value,
                     ) in output_geode_object_value.items():
-                        assert type(output_extension) is str
-                        assert type(output_extension_value["is_saveable"]) is bool
+                        assert isinstance(output_extension, str)
+                        assert isinstance(output_extension_value["is_saveable"], bool)
 
 
 def test_get_inspector_children():
@@ -221,18 +195,17 @@ def test_get_inspector_children():
                 file_absolute_path = os.path.join(
                     data_folder, f"test.{input_extension}"
                 )
-                missing_files = geode_functions.missing_files(
+                additional = geode_functions.additional_files(
                     geode_object, file_absolute_path
                 )
-                has_missing_files = missing_files.has_missing_files()
-                if has_missing_files:
-                    mandatory_files = missing_files.mandatory_files
-                    print(f"\t\t{mandatory_files=}", flush=True)
-                    additional_files = missing_files.additional_files
-                    print(f"\t\t{additional_files=}", flush=True)
-                file_absolute_path = os.path.join(
-                    data_folder, f"test.{input_extension}"
+                has_missing_files = any(
+                    f.is_missing for f in additional.mandatory_files + additional.optional_files
                 )
+                if has_missing_files:
+                    mandatory_files = [f.filename for f in additional.mandatory_files]
+                    print(f"\t\t{mandatory_files=}", flush=True)
+                    additional_files = [f.filename for f in additional.optional_files]
+                    print(f"\t\t{additional_files=}", flush=True)
                 if geode_functions.is_loadable(geode_object, file_absolute_path):
                     data = geode_functions.load(geode_object, file_absolute_path)
                     class_inspector = geode_functions.inspect(geode_object, data)
@@ -242,7 +215,7 @@ def test_get_inspector_children():
                     )
 
                     print(f"\t\t{inspection_result=}", flush=True)
-                    assert type(inspection_result) is dict
+                    assert isinstance(inspection_result, dict)
 
 
 def test_filter_geode_objects():

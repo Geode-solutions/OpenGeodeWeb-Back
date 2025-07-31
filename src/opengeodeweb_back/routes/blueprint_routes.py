@@ -76,31 +76,10 @@ def upload_file():
     UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
     if not os.path.exists(UPLOAD_FOLDER):
         os.mkdir(UPLOAD_FOLDER)
-    
     file = flask.request.files["file"]
     filename = werkzeug.utils.secure_filename(os.path.basename(file.filename))
-    file_path = os.path.join(UPLOAD_FOLDER, filename)
-    
-    # Vérifier si le fichier existe déjà
-    file_existed = os.path.exists(file_path)
-    if file_existed:
-        replace_if_exists = flask.request.form.get('replace_if_exists', 'false').lower() == 'true'
-        if not replace_if_exists:
-            return flask.make_response({
-                "error": "File already exists",
-                "message": f"Le fichier '{filename}' existe déjà. Utilisez 'replace_if_exists=true' pour le remplacer.",
-                "existing_file": filename
-            }, 409)  # 409 Conflict
-    
-    file.save(file_path)
-    
-    response_data = {
-        "message": "File uploaded",
-        "filename": filename,
-        "replaced": file_existed
-    }
-    
-    return flask.make_response(response_data, 201)
+    file.save(os.path.join(UPLOAD_FOLDER, filename))
+    return flask.make_response({"message": "File uploaded"}, 201)
 
 
 with open(
@@ -140,30 +119,28 @@ with open(
     methods=missing_files_json["methods"],
 )
 def missing_files():
-    UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
     utils_functions.validate_request(flask.request, missing_files_json)
-    missing_files = geode_functions.missing_files(
+    file_path = geode_functions.upload_file_path(flask.request.json["filename"])
+
+    additional = geode_functions.additional_files(
         flask.request.json["input_geode_object"],
-        os.path.join(UPLOAD_FOLDER, flask.request.json["filename"]),
+        file_path,
     )
-    has_missing_files = missing_files.has_missing_files()
 
-    mandatory_files = []
-    for mf in missing_files.mandatory_files:
-        mandatory_files.append({
-            "filename": os.path.basename(mf.path),
-            "is_missing": mf.is_missing,
-        })
+    has_missing_files = any(
+        f.is_missing for f in additional.mandatory_files + additional.optional_files
+    )
 
-    additional_files = []
-    for af in missing_files.additional_files:
-        additional_files.append({
-            "filename": os.path.basename(af.path),
-            "is_missing": af.is_missing,
-        })
+    mandatory_files = [
+        os.path.basename(f.filename) for f in additional.mandatory_files if f.is_missing
+    ]
+    additional_files = [
+        os.path.basename(f.filename) for f in additional.optional_files if f.is_missing
+    ]
 
     return flask.make_response(
         {
+            "has_missing_files": has_missing_files,
             "mandatory_files": mandatory_files,
             "additional_files": additional_files,
         },
