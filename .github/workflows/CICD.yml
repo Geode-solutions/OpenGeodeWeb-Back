@@ -69,7 +69,7 @@ jobs:
       #     github_token: ${{ secrets.TOKEN }}
       - name: Build
         run: |
-          sed -i 's/version = "[0-9]*\.[0-9]*\.[0-9]*\(-rc\.[0-9]*\)\?"/version = "100.0.0"/' pyproject.toml
+          sed -i 's/version = "[0-9]*\.[0-9]*\.[0-9]*\(-rc\.[0-9]*\)\?"/version = "0.0.0"/' pyproject.toml
           cat pyproject.toml
           python3 -m pip install --upgrade build
           python3 -m build
