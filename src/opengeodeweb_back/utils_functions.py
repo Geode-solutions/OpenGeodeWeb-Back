@@ -148,7 +148,9 @@ def generate_native_viewable_and_light_viewable_from_object(geode_object, data):
     return generate_native_viewable_and_light_viewable(geode_object, data)
 
 
-def generate_native_viewable_and_light_viewable_from_file(geode_object, data_id, input_filename):
+def generate_native_viewable_and_light_viewable_from_file(
+    geode_object, data_id, input_filename
+):
     file_absolute_path = geode_functions.data_file_path(data_id, input_filename)
     data = geode_functions.load(geode_object, file_absolute_path)
     return generate_native_viewable_and_light_viewable(
