@@ -150,10 +150,14 @@ def generate_native_viewable_and_light_viewable_from_object(geode_object, data):
 
 def generate_native_viewable_and_light_viewable_from_file(geode_object, input_filename):
     data = geode_functions.load(geode_object, input_filename)
-    return generate_native_viewable_and_light_viewable(geode_object, data, input_filename)
+    return generate_native_viewable_and_light_viewable(
+        geode_object, data, input_filename
+    )
 
 
-def generate_native_viewable_and_light_viewable(geode_object, data, input_filename=None):
+def generate_native_viewable_and_light_viewable(
+    geode_object, data, input_filename=None
+):
     generated_id = str(uuid.uuid4()).replace("-", "")
     DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
     data_path = os.path.join(DATA_FOLDER_PATH, generated_id)
@@ -165,7 +169,9 @@ def generate_native_viewable_and_light_viewable(geode_object, data, input_filena
         for additional_file in additional.mandatory_files + additional.optional_files:
             if additional_file.is_missing:
                 continue
-            source_path = os.path.join(os.path.dirname(input_filename), additional_file.filename)
+            source_path = os.path.join(
+                os.path.dirname(input_filename), additional_file.filename
+            )
             if not os.path.exists(source_path):
                 continue
             dest_path = os.path.join(data_path, additional_file.filename)
