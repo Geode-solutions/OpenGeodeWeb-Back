@@ -43,7 +43,7 @@ def test_output_factory():
             assert type(output) is str
 
 
-def test_missing_files():
+def test_additional_files():
     for geode_object, value in geode_objects.geode_objects_dict().items():
         input_extensions = geode_functions.geode_object_input_extensions(geode_object)
         for input_extension in input_extensions:
