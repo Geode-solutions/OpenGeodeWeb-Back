@@ -128,14 +128,19 @@ def missing_files():
     )
 
     has_missing_files = any(
-        f.is_missing for f in additional.mandatory_files + additional.optional_files
+    file.is_missing 
+        for file in additional.mandatory_files + additional.optional_files
     )
 
     mandatory_files = [
-        os.path.basename(f.filename) for f in additional.mandatory_files if f.is_missing
+        os.path.basename(file.filename) 
+        for file in additional.mandatory_files 
+        if file.is_missing
     ]
     additional_files = [
-        os.path.basename(f.filename) for f in additional.optional_files if f.is_missing
+        os.path.basename(f.filename) 
+        for file in additional.optional_files 
+        if file.is_missing
     ]
 
     return flask.make_response(
