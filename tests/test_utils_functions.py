@@ -70,6 +70,51 @@ def test_handle_exception(client):
     assert type(data["name"]) is str
     assert type(data["code"]) is int
 
+def test_generate_native_viewable_and_light_viewable_from_object(client):
+    app = client.application
+    with app.app_context():
+        geode_object = "BRep"
+        data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
+
+        result = utils_functions.generate_native_viewable_and_light_viewable_from_object(
+            geode_object, data
+        )
+
+    assert isinstance(result, dict)
+    assert isinstance(result["name"], str)
+    assert isinstance(result["native_file_name"], str)
+    assert result["native_file_name"].startswith("native.")
+    assert isinstance(result["viewable_file_name"], str)
+    assert result["viewable_file_name"].endswith(".vtm")
+    assert isinstance(result["id"], str)
+    assert re.match(r"[0-9a-f]{32}", result["id"])
+    assert isinstance(result["object_type"], str)
+    assert isinstance(result["binary_light_viewable"], str)
+    assert result["input_files"] == []
+
+
+def test_generate_native_viewable_and_light_viewable_from_file(client):
+    app = client.application
+    with app.app_context():
+        geode_object = "BRep"
+        input_filename = "./tests/data/test.og_brep"
+
+        result = utils_functions.generate_native_viewable_and_light_viewable_from_file(
+            geode_object, input_filename
+        )
+
+    assert isinstance(result, dict)
+    assert isinstance(result["name"], str)
+    assert isinstance(result["native_file_name"], str)
+    assert result["native_file_name"].startswith("native.")
+    assert isinstance(result["viewable_file_name"], str)
+    assert result["viewable_file_name"].endswith(".vtm")
+    assert isinstance(result["id"], str)
+    assert re.match(r"[0-9a-f]{32}", result["id"])
+    assert isinstance(result["object_type"], str)
+    assert isinstance(result["binary_light_viewable"], str)
+    assert isinstance(result["input_files"], list)
+
 
 def test_generate_native_viewable_and_light_viewable(client):
     app = client.application

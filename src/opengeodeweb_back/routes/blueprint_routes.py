@@ -242,14 +242,10 @@ with open(
 )
 def save_viewable_file():
     utils_functions.validate_request(flask.request, save_viewable_file_json)
-
-    file_path = geode_functions.upload_file_path(flask.request.json["filename"])
-    data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
     return flask.make_response(
-        utils_functions.generate_native_viewable_and_light_viewable(
+        utils_functions.generate_native_viewable_and_light_viewable_from_file(
             flask.request.json["input_geode_object"],
-            data,
-            original_filename=flask.request.json["filename"],
+            input_filename=flask.request.json["filename"],
         ),
         200,
     )
@@ -272,7 +268,7 @@ def create_point():
     builder.create_point(opengeode.Point3D([x, y, z]))
     builder.set_name(title)
     return flask.make_response(
-        utils_functions.generate_native_viewable_and_light_viewable(
+        utils_functions.generate_native_viewable_and_light_viewable_from_object(
             "PointSet3D", PointSet3D
         ),
         200,
