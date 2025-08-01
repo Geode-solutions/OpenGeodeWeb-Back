@@ -100,10 +100,14 @@ def test_generate_native_viewable_and_light_viewable_from_file(client):
     app = client.application
     with app.app_context():
         geode_object = "BRep"
-        input_filename = "./tests/data/test.og_brep"
+        data_id = "test_id"
+        input_filename = "test.og_brep"
+        data_path = geode_functions.data_file_path(data_id, input_filename)
+        os.makedirs(os.path.dirname(data_path), exist_ok=True)
+        shutil.copy("./tests/data/test.og_brep", data_path)
 
         result = utils_functions.generate_native_viewable_and_light_viewable_from_file(
-            geode_object, input_filename
+            geode_object, data_id, input_filename
         )
 
     assert isinstance(result, dict)
