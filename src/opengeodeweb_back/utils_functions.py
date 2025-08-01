@@ -144,7 +144,9 @@ def handle_exception(e):
     return response
 
 
-def generate_native_viewable_and_light_viewable(geode_object, data, original_filename=None):
+def generate_native_viewable_and_light_viewable(
+    geode_object, data, original_filename=None
+):
     generated_id = str(uuid.uuid4()).replace("-", "")
     DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
     data_path = os.path.join(DATA_FOLDER_PATH, generated_id)

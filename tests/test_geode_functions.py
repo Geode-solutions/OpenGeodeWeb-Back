@@ -157,13 +157,20 @@ def test_geode_object_output_extensions():
         for input_extension in input_extensions:
             print(f"\t{input_extension=}")
             file_absolute_path = os.path.join(data_folder, f"test.{input_extension}")
-            additional = geode_functions.additional_files(geode_object, file_absolute_path)
+            additional = geode_functions.additional_files(
+                geode_object, file_absolute_path
+            )
             has_missing_files = any(
-                f.is_missing for f in additional.mandatory_files + additional.optional_files
+                f.is_missing
+                for f in additional.mandatory_files + additional.optional_files
             )
             if has_missing_files:
-                print(f"\t\tMandatory files: {[f.filename for f in additional.mandatory_files]}")
-                print(f"\t\tAdditional files: {[f.filename for f in additional.optional_files]}")
+                print(
+                    f"\t\tMandatory files: {[f.filename for f in additional.mandatory_files]}"
+                )
+                print(
+                    f"\t\tAdditional files: {[f.filename for f in additional.optional_files]}"
+                )
             if geode_functions.is_loadable(geode_object, file_absolute_path):
                 data = geode_functions.load(geode_object, file_absolute_path)
                 geode_objets_and_output_extensions = (
@@ -199,7 +206,8 @@ def test_get_inspector_children():
                     geode_object, file_absolute_path
                 )
                 has_missing_files = any(
-                    f.is_missing for f in additional.mandatory_files + additional.optional_files
+                    f.is_missing
+                    for f in additional.mandatory_files + additional.optional_files
                 )
                 if has_missing_files:
                     mandatory_files = [f.filename for f in additional.mandatory_files]
