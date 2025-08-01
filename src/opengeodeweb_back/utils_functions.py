@@ -151,16 +151,19 @@ def generate_native_viewable_and_light_viewable(geode_object, data, original_fil
     name = data.name()
     object_type = geode_functions.get_object_type(geode_object)
 
-    additional_files_copied = []
+    additional_files_copied = []  # List to store files that are successfully copied
     if original_filename:
-        original_file_path = geode_functions.upload_file_path(original_filename)
-        additional = geode_functions.additional_files(geode_object, original_file_path)
-
+        additional = geode_functions.additional_files(geode_object, original_filename)
         for additional_file in additional.mandatory_files + additional.optional_files:
             if not additional_file.is_missing:
-                source_path = geode_functions.upload_file_path(additional_file.filename)
+                # Construct the source path for the additional file
+                source_path = os.path.join(
+                    os.path.dirname(original_filename), additional_file.filename
+                )
                 if os.path.exists(source_path):
+                    # Construct the destination path and ensure the directory exists
                     dest_path = os.path.join(data_path, additional_file.filename)
+                    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
                     shutil.copy2(source_path, dest_path)
                     additional_files_copied.append(additional_file.filename)
 
