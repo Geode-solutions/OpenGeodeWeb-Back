@@ -100,8 +100,12 @@ def test_generate_native_viewable_and_light_viewable_from_file(client):
     app = client.application
     with app.app_context():
         geode_object = "BRep"
-        data_id = "test_id"
+        data_id = "test_data"
         input_filename = "test.og_brep"
+        
+        # Copier le fichier de test dans le dossier data_id
+        import shutil
+        import os
         data_path = geode_functions.data_file_path(data_id, input_filename)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
         shutil.copy("./tests/data/test.og_brep", data_path)
