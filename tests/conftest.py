@@ -22,6 +22,7 @@ def client():
     app.config["TESTING"] = True
     app.config["SERVER_NAME"] = "TEST"
     app.config["DATA_FOLDER_PATH"] = "./data/"
+    app.config["UPLOAD_FOLDER"] = "./tests/data/"
     app.config["REQUEST_COUNTER"] = 0
     app.config["LAST_REQUEST_TIME"] = time.time()
     client = app.test_client()

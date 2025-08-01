@@ -28,8 +28,8 @@ def output_factory(geode_object: str):
     return geode_object_value(geode_object)["output_factory"]
 
 
-def missing_files(geode_object: str, file_absolute_path: str):
-    return geode_object_value(geode_object)["missing_files"](file_absolute_path)
+def additional_files(geode_object: str, file_absolute_path: str):
+    return geode_object_value(geode_object)["additional_files"](file_absolute_path)
 
 
 def is_loadable(geode_object: str, file_absolute_path: str):
