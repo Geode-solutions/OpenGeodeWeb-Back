@@ -70,14 +70,17 @@ def test_handle_exception(client):
     assert type(data["name"]) is str
     assert type(data["code"]) is int
 
+
 def test_generate_native_viewable_and_light_viewable_from_object(client):
     app = client.application
     with app.app_context():
         geode_object = "BRep"
         data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
 
-        result = utils_functions.generate_native_viewable_and_light_viewable_from_object(
-            geode_object, data
+        result = (
+            utils_functions.generate_native_viewable_and_light_viewable_from_object(
+                geode_object, data
+            )
         )
 
     assert isinstance(result, dict)

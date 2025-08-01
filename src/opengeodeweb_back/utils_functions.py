@@ -143,6 +143,7 @@ def handle_exception(e):
     response.content_type = "application/json"
     return response
 
+
 def generate_native_viewable_and_light_viewable_from_object(geode_object, data):
     generated_id = str(uuid.uuid4()).replace("-", "")
     DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
@@ -180,6 +181,7 @@ def generate_native_viewable_and_light_viewable_from_object(geode_object, data):
     }
     return result
 
+
 def generate_native_viewable_and_light_viewable_from_file(geode_object, input_filename):
     generated_id = str(uuid.uuid4()).replace("-", "")
     DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
@@ -195,7 +197,9 @@ def generate_native_viewable_and_light_viewable_from_file(geode_object, input_fi
     for additional_file in additional.mandatory_files + additional.optional_files:
         if additional_file.is_missing:
             continue
-        source_path = os.path.join(os.path.dirname(input_filename), additional_file.filename)
+        source_path = os.path.join(
+            os.path.dirname(input_filename), additional_file.filename
+        )
         if not os.path.exists(source_path):
             continue
         dest_path = os.path.join(data_path, additional_file.filename)
