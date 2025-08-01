@@ -151,9 +151,6 @@ def generate_native_viewable_and_light_viewable(geode_object, data, original_fil
     name = data.name()
     object_type = geode_functions.get_object_type(geode_object)
 
-    if not os.path.isdir(data_path):
-        os.makedirs(data_path)
-
     additional_files_copied = []
     if original_filename:
         original_file_path = geode_functions.upload_file_path(original_filename)
