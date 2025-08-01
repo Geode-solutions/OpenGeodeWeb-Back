@@ -128,18 +128,18 @@ def missing_files():
     )
 
     has_missing_files = any(
-    file.is_missing 
+        file.is_missing
         for file in additional.mandatory_files + additional.optional_files
     )
 
     mandatory_files = [
-        os.path.basename(file.filename) 
-        for file in additional.mandatory_files 
+        os.path.basename(file.filename)
+        for file in additional.mandatory_files
         if file.is_missing
     ]
     additional_files = [
-        os.path.basename(f.filename) 
-        for file in additional.optional_files 
+        os.path.basename(f.filename)
+        for file in additional.optional_files
         if file.is_missing
     ]
 
