@@ -119,23 +119,22 @@ def test_generate_native_viewable_and_light_viewable_from_file(client):
     assert isinstance(result["input_files"], list)
 
 
-# def test_generate_native_viewable_and_light_viewable(client):
-#     app = client.application
-#     with app.app_context():
-#         geode_object = "BRep"
-#         data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
+def test_native_viewable_and_light_viewable(client):
+    app = client.application
+    with app.app_context():
+        geode_object = "BRep"
+        data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
+        result = utils_functions.generate_native_viewable_and_light_viewable(
+            geode_object, data
+        )
 
-#         result = utils_functions.generate_native_viewable_and_light_viewable(
-#             geode_object, data
-#         )
-
-#     assert type(result) is dict
-#     assert type(result["name"]) is str
-#     assert type(result["native_file_name"]) is str
-#     assert result["native_file_name"] == "native.og_brep"
-#     assert type(result["viewable_file_name"]) is str
-#     assert result["viewable_file_name"] == "viewable.vtm"
-#     assert type(result["id"]) is str
-#     assert re.match(r"[0-9a-f]{32}", result["id"])
-#     assert type(result["object_type"]) is str
-#     assert type(result["binary_light_viewable"]) is str
+    assert isinstance(result, dict)
+    assert isinstance(result["name"], str)
+    assert isinstance(result["native_file_name"], str)
+    assert result["native_file_name"].startswith("native.")
+    assert isinstance(result["viewable_file_name"], str)
+    assert result["viewable_file_name"].endswith(".vtm")
+    assert isinstance(result["id"], str)
+    assert re.match(r"[0-9a-f]{32}", result["id"])
+    assert isinstance(result["object_type"], str)
+    assert isinstance(result["binary_light_viewable"], str)

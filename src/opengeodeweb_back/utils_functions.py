@@ -145,67 +145,33 @@ def handle_exception(e):
 
 
 def generate_native_viewable_and_light_viewable_from_object(geode_object, data):
-    generated_id = str(uuid.uuid4()).replace("-", "")
-    DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
-    data_path = os.path.join(DATA_FOLDER_PATH, generated_id)
-    name = data.name()
-    object_type = geode_functions.get_object_type(geode_object)
-
-    additional_files_copied = []
-
-    saved_native_file_path = geode_functions.save(
-        geode_object,
-        data,
-        data_path,
-        "native." + data.native_extension(),
-    )
-    saved_viewable_file_path = geode_functions.save_viewable(
-        geode_object, data, data_path, "viewable"
-    )
-    viewable_file_name = os.path.basename(saved_viewable_file_path)
-    saved_light_viewable_file_path = geode_functions.save_light_viewable(
-        geode_object, data, data_path, "light_viewable"
-    )
-    with open(saved_light_viewable_file_path, "rb") as f:
-        binary_light_viewable = f.read()
-
-    result = {
-        "name": name,
-        "native_file_name": os.path.basename(saved_native_file_path[0]),
-        "viewable_file_name": viewable_file_name,
-        "id": generated_id,
-        "object_type": object_type,
-        "binary_light_viewable": binary_light_viewable.decode("utf-8"),
-        "geode_object": geode_object,
-        "input_files": additional_files_copied,
-    }
-    return result
+    return generate_native_viewable_and_light_viewable(geode_object, data)
 
 
 def generate_native_viewable_and_light_viewable_from_file(geode_object, input_filename):
+    data = geode_functions.load(geode_object, input_filename)
+    return generate_native_viewable_and_light_viewable(geode_object, data, input_filename)
+
+
+def generate_native_viewable_and_light_viewable(geode_object, data, input_filename=None):
     generated_id = str(uuid.uuid4()).replace("-", "")
     DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
     data_path = os.path.join(DATA_FOLDER_PATH, generated_id)
     os.makedirs(data_path, exist_ok=True)
 
-    data = geode_functions.load(geode_object, input_filename)
-    name = data.name()
-    object_type = geode_functions.get_object_type(geode_object)
-
     additional_files_copied = []
-    additional = geode_functions.additional_files(geode_object, input_filename)
-    for additional_file in additional.mandatory_files + additional.optional_files:
-        if additional_file.is_missing:
-            continue
-        source_path = os.path.join(
-            os.path.dirname(input_filename), additional_file.filename
-        )
-        if not os.path.exists(source_path):
-            continue
-        dest_path = os.path.join(data_path, additional_file.filename)
-        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-        shutil.copy2(source_path, dest_path)
-        additional_files_copied.append(additional_file.filename)
+    if input_filename:
+        additional = geode_functions.additional_files(geode_object, input_filename)
+        for additional_file in additional.mandatory_files + additional.optional_files:
+            if additional_file.is_missing:
+                continue
+            source_path = os.path.join(os.path.dirname(input_filename), additional_file.filename)
+            if not os.path.exists(source_path):
+                continue
+            dest_path = os.path.join(data_path, additional_file.filename)
+            os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+            shutil.copy2(source_path, dest_path)
+            additional_files_copied.append(additional_file.filename)
 
     saved_native_file_path = geode_functions.save(
         geode_object,
@@ -224,65 +190,12 @@ def generate_native_viewable_and_light_viewable_from_file(geode_object, input_fi
         binary_light_viewable = f.read()
 
     return {
-        "name": name,
+        "name": data.name(),
         "native_file_name": os.path.basename(saved_native_file_path[0]),
         "viewable_file_name": viewable_file_name,
         "id": generated_id,
-        "object_type": object_type,
+        "object_type": geode_functions.get_object_type(geode_object),
         "binary_light_viewable": binary_light_viewable.decode("utf-8"),
         "geode_object": geode_object,
         "input_files": additional_files_copied,
     }
-
-
-# def generate_native_viewable_and_light_viewable(
-#     geode_object, data, input_filename
-# ):
-#     generated_id = str(uuid.uuid4()).replace("-", "")
-#     DATA_FOLDER_PATH = flask.current_app.config["DATA_FOLDER_PATH"]
-#     data_path = os.path.join(DATA_FOLDER_PATH, generated_id)
-#     name = data.name()
-#     object_type = geode_functions.get_object_type(geode_object)
-
-#     additional_files_copied = []
-#     additional = geode_functions.additional_files(geode_object, input_filename)
-#     for additional_file in additional.mandatory_files + additional.optional_files:
-#         if additional_file.is_missing:
-#             continue
-#         source_path = os.path.join(
-#             os.path.dirname(input_filename), additional_file.filename
-#         )
-#         if not os.path.exists(source_path):
-#             continue
-#         dest_path = os.path.join(data_path, additional_file.filename)
-#         os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-#         shutil.copy2(source_path, dest_path)
-#         additional_files_copied.append(additional_file.filename)
-
-#     saved_native_file_path = geode_functions.save(
-#         geode_object,
-#         data,
-#         data_path,
-#         "native." + data.native_extension(),
-#     )
-#     saved_viewable_file_path = geode_functions.save_viewable(
-#         geode_object, data, data_path, "viewable"
-#     )
-#     viewable_file_name = os.path.basename(saved_viewable_file_path)
-#     saved_light_viewable_file_path = geode_functions.save_light_viewable(
-#         geode_object, data, data_path, "light_viewable"
-#     )
-#     with open(saved_light_viewable_file_path, "rb") as f:
-#         binary_light_viewable = f.read()
-
-#     result = {
-#         "name": name,
-#         "native_file_name": os.path.basename(saved_native_file_path[0]),
-#         "viewable_file_name": viewable_file_name,
-#         "id": generated_id,
-#         "object_type": object_type,
-#         "binary_light_viewable": binary_light_viewable.decode("utf-8"),
-#         "geode_object": geode_object,
-#         "input_files": additional_files_copied
-#     }
-#     return result
