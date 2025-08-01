@@ -151,19 +151,21 @@ def generate_native_viewable_and_light_viewable(geode_object, data, original_fil
     name = data.name()
     object_type = geode_functions.get_object_type(geode_object)
 
-    os.makedirs(data_path, exist_ok=True)
+    if not os.path.isdir(data_path):
+        os.makedirs(data_path)
 
     additional_files_copied = []
     if original_filename:
         original_file_path = geode_functions.upload_file_path(original_filename)
         additional = geode_functions.additional_files(geode_object, original_file_path)
-        
+
         for additional_file in additional.mandatory_files + additional.optional_files:
-            if not additional_file.is_missing and geode_functions.file_exists_in_upload(additional_file.filename):
+            if not additional_file.is_missing:
                 source_path = geode_functions.upload_file_path(additional_file.filename)
-                dest_path = os.path.join(data_path, additional_file.filename)
-                shutil.copy2(source_path, dest_path)
-                additional_files_copied.append(additional_file.filename)
+                if os.path.exists(source_path):
+                    dest_path = os.path.join(data_path, additional_file.filename)
+                    shutil.copy2(source_path, dest_path)
+                    additional_files_copied.append(additional_file.filename)
 
     saved_native_file_path = geode_functions.save(
         geode_object,
@@ -178,9 +180,8 @@ def generate_native_viewable_and_light_viewable(geode_object, data, original_fil
     saved_light_viewable_file_path = geode_functions.save_light_viewable(
         geode_object, data, data_path, "light_viewable"
     )
-    f = open(saved_light_viewable_file_path, "rb")
-    binary_light_viewable = f.read()
-    f.close()
+    with open(saved_light_viewable_file_path, "rb") as f:
+        binary_light_viewable = f.read()
 
     result = {
         "name": name,
@@ -188,11 +189,11 @@ def generate_native_viewable_and_light_viewable(geode_object, data, original_fil
         "viewable_file_name": viewable_file_name,
         "id": generated_id,
         "object_type": object_type,
-        "binary_light_viewable": str(binary_light_viewable, "utf-8"),
+        "binary_light_viewable": binary_light_viewable.decode("utf-8"),
         "geode_object": geode_object,
     }
-    
+
     if additional_files_copied:
         result["additional_files"] = additional_files_copied
-    
+
     return result

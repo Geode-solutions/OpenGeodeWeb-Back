@@ -293,12 +293,12 @@ def create_coordinate_system(
     )
 
 
-def file_exists_in_upload(filename: str) -> bool:
-    """Vérifie si un fichier existe dans le dossier d'upload."""
-    file_path = upload_file_path(filename)
-    return os.path.exists(file_path)
+# def file_exists_in_upload(filename: str) -> bool:
+#     """Vérifie si un fichier existe dans le dossier d'upload."""
+#     file_path = upload_file_path(filename)
+#     return os.path.exists(file_path)
 
-def file_exists_in_data(data_id: str, filename: str) -> bool:
-    """Vérifie si un fichier existe dans le dossier de données."""
-    file_path = data_file_path(data_id, filename)
-    return os.path.exists(file_path)
+# def file_exists_in_data(data_id: str, filename: str) -> bool:
+#     """Vérifie si un fichier existe dans le dossier de données."""
+#     file_path = data_file_path(data_id, filename)
+#     return os.path.exists(file_path)
