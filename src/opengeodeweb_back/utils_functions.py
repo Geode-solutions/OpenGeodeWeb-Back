@@ -9,6 +9,7 @@ import zipfile
 import flask
 import fastjsonschema
 import importlib.metadata as metadata
+import shutil
 
 # Local application imports
 from . import geode_functions
@@ -157,7 +158,6 @@ def generate_native_viewable_and_light_viewable(geode_object, data, original_fil
         original_file_path = geode_functions.upload_file_path(original_filename)
         additional = geode_functions.additional_files(geode_object, original_file_path)
         
-        import shutil
         for additional_file in additional.mandatory_files + additional.optional_files:
             if not additional_file.is_missing and geode_functions.file_exists_in_upload(additional_file.filename):
                 source_path = geode_functions.upload_file_path(additional_file.filename)
