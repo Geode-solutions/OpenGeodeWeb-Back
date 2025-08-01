@@ -247,9 +247,9 @@ def save_viewable_file():
     data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
     return flask.make_response(
         utils_functions.generate_native_viewable_and_light_viewable(
-            flask.request.json["input_geode_object"], 
+            flask.request.json["input_geode_object"],
             data,
-            original_filename=flask.request.json["filename"]
+            original_filename=flask.request.json["filename"],
         ),
         200,
     )
