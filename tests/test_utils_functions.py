@@ -76,7 +76,7 @@ def test_create_unique_data_folder():
     base_data_folder = "./tests/data"
     generated_id, data_path = utils_functions.create_unique_data_folder(base_data_folder)
     assert isinstance(generated_id, str)
-    assert re.fullmatch(r"[0-9a-f]{32}", generated_id), "ID should be 32 hex characters"
+    assert re.fullmatch(r"[0-9a-f]{32}", generated_id)
     assert os.path.exists(data_path)
     assert data_path.startswith(base_data_folder)
     assert generated_id in data_path
