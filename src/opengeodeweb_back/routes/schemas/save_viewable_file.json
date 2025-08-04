@@ -20,7 +20,8 @@
     },
     "required": [
         "input_geode_object",
-        "filename"
+        "filename",
+        "data_id"
     ],
     "additionalProperties": false
 }

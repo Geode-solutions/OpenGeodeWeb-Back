@@ -138,14 +138,15 @@ def test_geode_objects_and_output_extensions(client):
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_save_viewable_file(client):
-    test_upload_file(client, filename="test.og_brep")
+def test_save_viewable_file(client, test_id):
+    test_upload_file(client, filename="corbi.og_brep")
     route = f"/save_viewable_file"
 
     def get_full_data():
         return {
             "input_geode_object": "BRep",
-            "filename": "test.og_brep",
+            "filename": "corbi.og_brep",
+            "data_id": test_id,
         }
 
     # Normal test with filename 'corbi.og_brep'
