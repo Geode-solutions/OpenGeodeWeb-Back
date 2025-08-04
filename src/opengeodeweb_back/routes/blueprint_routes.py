@@ -249,9 +249,9 @@ def save_viewable_file():
     utils_functions.validate_request(flask.request, save_viewable_file_json)
     return flask.make_response(
         utils_functions.generate_native_viewable_and_light_viewable_from_file(
-            flask.request.json["input_geode_object"],
-            "upload",
-            flask.request.json["filename"]
+            input_geode_object=flask.request.json["input_geode_object"],
+            data_id=flask.request.json["data_id"],
+            filename=flask.request.json["filename"]
         ),
         200,
     )

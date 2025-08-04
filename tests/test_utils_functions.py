@@ -96,15 +96,14 @@ def test_generate_native_viewable_and_light_viewable_from_object(client):
     assert result["input_files"] == []
 
 
-def test_generate_native_viewable_and_light_viewable_from_file(client, test_id):
+def test_generate_native_viewable_and_light_viewable_from_file(client):
     app = client.application
     with app.app_context():
         geode_object = "BRep"
-        data_id = test_id
-        filename = "test.og_brep"
+        input_filename = "./tests/data/test.og_brep"
 
         result = utils_functions.generate_native_viewable_and_light_viewable_from_file(
-            geode_object, data_id, filename
+            geode_object, input_filename
         )
 
     assert isinstance(result, dict)
