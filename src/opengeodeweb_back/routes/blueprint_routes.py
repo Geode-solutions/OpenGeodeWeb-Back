@@ -121,19 +121,27 @@ with open(
 def missing_files():
     utils_functions.validate_request(flask.request, missing_files_json)
     file_path = geode_functions.upload_file_path(flask.request.json["filename"])
-    missing_files = geode_functions.missing_files(
+
+    additional_files = geode_functions.additional_files(
         flask.request.json["input_geode_object"],
         file_path,
     )
-    has_missing_files = missing_files.has_missing_files()
 
-    mandatory_files = []
-    for mandatory_file in missing_files.mandatory_files:
-        mandatory_files.append(os.path.basename(mandatory_file))
+    has_missing_files = any(
+        file.is_missing
+        for file in additional_files.mandatory_files + additional_files.optional_files
+    )
 
-    additional_files = []
-    for additional_file in missing_files.additional_files:
-        additional_files.append(os.path.basename(additional_file))
+    mandatory_files = [
+        os.path.basename(file.filename)
+        for file in additional_files.mandatory_files
+        if file.is_missing
+    ]
+    additional_files = [
+        os.path.basename(file.filename)
+        for file in additional_files.optional_files
+        if file.is_missing
+    ]
 
     return flask.make_response(
         {
@@ -239,12 +247,10 @@ with open(
 )
 def save_viewable_file():
     utils_functions.validate_request(flask.request, save_viewable_file_json)
-
-    file_path = geode_functions.upload_file_path(flask.request.json["filename"])
-    data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
     return flask.make_response(
-        utils_functions.generate_native_viewable_and_light_viewable(
-            flask.request.json["input_geode_object"], data
+        utils_functions.generate_native_viewable_and_light_viewable_from_file(
+            geode_object=flask.request.json["input_geode_object"],
+            input_filename=flask.request.json["filename"],
         ),
         200,
     )
@@ -267,7 +273,7 @@ def create_point():
     builder.create_point(opengeode.Point3D([x, y, z]))
     builder.set_name(title)
     return flask.make_response(
-        utils_functions.generate_native_viewable_and_light_viewable(
+        utils_functions.generate_native_viewable_and_light_viewable_from_object(
             "PointSet3D", PointSet3D
         ),
         200,
