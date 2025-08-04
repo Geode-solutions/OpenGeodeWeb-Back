@@ -85,7 +85,6 @@ def test_create_unique_data_folder(client):
         assert not os.path.exists(data_path)
 
 
-
 def test_save_all_viewables_and_return_info(client):
     app = client.application
     with app.app_context():

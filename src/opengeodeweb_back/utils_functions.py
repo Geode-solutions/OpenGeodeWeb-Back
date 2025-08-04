@@ -154,11 +154,8 @@ def create_unique_data_folder() -> tuple[str, str]:
 
 
 def save_all_viewables_and_return_info(
-        geode_object, 
-        data, generated_id, 
-        data_path, 
-        additional_files=None
-    ):
+    geode_object, data, generated_id, data_path, additional_files=None
+):
     saved_native_file_path = geode_functions.save(
         geode_object,
         data,
@@ -185,22 +182,21 @@ def save_all_viewables_and_return_info(
         "input_files": additional_files or [],
     }
 
-def generate_native_viewable_and_light_viewable_from_object(
-        geode_object, 
-        data
-    ):
+
+def generate_native_viewable_and_light_viewable_from_object(geode_object, data):
     generated_id, data_path = create_unique_data_folder()
-    return save_all_viewables_and_return_info(geode_object, data, generated_id, data_path)
+    return save_all_viewables_and_return_info(
+        geode_object, data, generated_id, data_path
+    )
 
 
-def generate_native_viewable_and_light_viewable_from_file(
-        geode_object, 
-        input_filename
-    ):
+def generate_native_viewable_and_light_viewable_from_file(geode_object, input_filename):
     generated_id, data_path = create_unique_data_folder()
 
     full_input_filename = geode_functions.upload_file_path(input_filename)
-    copied_full_path = os.path.join(data_path, werkzeug.utils.secure_filename(input_filename))
+    copied_full_path = os.path.join(
+        data_path, werkzeug.utils.secure_filename(input_filename)
+    )
     shutil.copy2(full_input_filename, copied_full_path)
 
     additional_files_copied = []
@@ -208,7 +204,9 @@ def generate_native_viewable_and_light_viewable_from_file(
     for additional_file in additional.mandatory_files + additional.optional_files:
         if additional_file.is_missing:
             continue
-        source_path = os.path.join(os.path.dirname(full_input_filename), additional_file.filename)
+        source_path = os.path.join(
+            os.path.dirname(full_input_filename), additional_file.filename
+        )
         if not os.path.exists(source_path):
             continue
         dest_path = os.path.join(data_path, additional_file.filename)
