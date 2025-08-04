@@ -145,14 +145,20 @@ def handle_exception(e):
     return response
 
 
-def create_unique_data_folder(base_data_folder: str) -> tuple[str, str]:
+def create_unique_data_folder() -> tuple[str, str]:
+    base_data_folder = flask.current_app.config["DATA_FOLDER_PATH"]
     generated_id = str(uuid.uuid4()).replace("-", "")
     data_path = os.path.join(base_data_folder, generated_id)
     os.makedirs(data_path, exist_ok=True)
     return generated_id, data_path
 
 
-def save_all_viewables_and_return_info(geode_object, data, generated_id, data_path, additional_files=None):
+def save_all_viewables_and_return_info(
+        geode_object, 
+        data, generated_id, 
+        data_path, 
+        additional_files=None
+    ):
     saved_native_file_path = geode_functions.save(
         geode_object,
         data,
@@ -179,14 +185,19 @@ def save_all_viewables_and_return_info(geode_object, data, generated_id, data_pa
         "input_files": additional_files or [],
     }
 
-def generate_native_viewable_and_light_viewable_from_object(geode_object, data):
+def generate_native_viewable_and_light_viewable_from_object(
+        geode_object, 
+        data
+    ):
     base_data_folder = flask.current_app.config["DATA_FOLDER_PATH"]
     generated_id, data_path = create_unique_data_folder(base_data_folder)
-
     return save_all_viewables_and_return_info(geode_object, data, generated_id, data_path)
 
 
-def generate_native_viewable_and_light_viewable_from_file(geode_object, input_filename):
+def generate_native_viewable_and_light_viewable_from_file(
+        geode_object, 
+        input_filename
+    ):
     base_data_folder = flask.current_app.config["DATA_FOLDER_PATH"]
     generated_id, data_path = create_unique_data_folder(base_data_folder)
 
