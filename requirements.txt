@@ -40,16 +40,16 @@ opengeode-core==15.24.1
     #   opengeode-geosciencesio
     #   opengeode-inspector
     #   opengeode-io
-opengeode-geosciences==9.0.0
+opengeode-geosciences==9.2.1
     # via
     #   -r requirements.in
     #   geode-viewables
     #   opengeode-geosciencesio
-opengeode-geosciencesio==5.4.2
+opengeode-geosciencesio==5.7.1
     # via -r requirements.in
-opengeode-inspector==6.6.1
+opengeode-inspector==6.7.0
     # via -r requirements.in
-opengeode-io==7.2.1
+opengeode-io==7.3.1
     # via
     #   -r requirements.in
     #   geode-viewables
