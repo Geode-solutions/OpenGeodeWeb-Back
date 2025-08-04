@@ -251,7 +251,6 @@ def save_viewable_file():
         utils_functions.generate_native_viewable_and_light_viewable_from_file(
             geode_object=flask.request.json["input_geode_object"],
             input_filename=flask.request.json["filename"],
-            data_id=flask.request.json["data_id"],
         ),
         200,
     )
