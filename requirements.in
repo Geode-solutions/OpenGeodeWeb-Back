@@ -1,8 +1,8 @@
 OpenGeode-core==15.24.1
-OpenGeode-IO==7.2.1
-OpenGeode-Inspector==6.6.1
-OpenGeode-Geosciences==9.0.0
-OpenGeode-GeosciencesIO==5.4.2
+OpenGeode-IO==7.3.1
+OpenGeode-Inspector==6.7.0
+OpenGeode-Geosciences==9.2.1
+OpenGeode-GeosciencesIO==5.7.1
 Geode-Viewables==3.1.4
 fastjsonschema==2.16.2
 Flask[async]==3.0.3
