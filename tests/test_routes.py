@@ -45,12 +45,11 @@ def test_allowed_objects(client):
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_upload_file(client, filename="corbi.og_brep"):
+def test_upload_file(client, filename="test.og_brep"):
     response = client.put(
         f"/upload_file",
-        data={"file": FileStorage(open(f"./tests/{filename}", "rb"))},
+        data={"file": FileStorage(open(f"./tests/data/{filename}", "rb"))},
     )
-
     assert response.status_code == 201
 
 
@@ -60,7 +59,7 @@ def test_missing_files(client):
     def get_full_data():
         return {
             "input_geode_object": "BRep",
-            "filename": "corbi.og_brep",
+            "filename": "test.og_brep",
         }
 
     json = get_full_data()
@@ -140,7 +139,6 @@ def test_geode_objects_and_output_extensions(client):
 
 
 def test_save_viewable_file(client):
-
     test_upload_file(client, filename="corbi.og_brep")
     route = f"/save_viewable_file"
 
@@ -175,7 +173,7 @@ def test_texture_coordinates(client, test_id):
     with client.application.app_context():
         data_path = geode_functions.data_file_path(test_id, "hat.vtp")
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        shutil.copy("./tests/vertex_attribute.vtp", data_path)
+        shutil.copy("./tests/data/hat.vtp", data_path)
 
     response = client.post(
         "/texture_coordinates",

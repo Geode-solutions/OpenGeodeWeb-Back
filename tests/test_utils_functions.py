@@ -4,6 +4,7 @@ import os
 
 # Third party imports
 import flask
+import shutil
 
 # Local application imports
 from src.opengeodeweb_back import geode_functions, utils_functions
@@ -71,23 +72,86 @@ def test_handle_exception(client):
     assert type(data["code"]) is int
 
 
-def test_generate_native_viewable_and_light_viewable(client):
+def test_create_unique_data_folder(client):
+    app = client.application
+    with app.app_context():
+        generated_id, data_path = utils_functions.create_unique_data_folder()
+        assert isinstance(generated_id, str)
+        assert re.fullmatch(r"[0-9a-f]{32}", generated_id)
+        assert os.path.exists(data_path)
+        assert data_path.startswith(flask.current_app.config["DATA_FOLDER_PATH"])
+        assert generated_id in data_path
+        shutil.rmtree(data_path, ignore_errors=True)
+        assert not os.path.exists(data_path)
+
+
+
+def test_save_all_viewables_and_return_info(client):
+    app = client.application
+    with app.app_context():
+        geode_object = "BRep"
+        data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
+        generated_id, data_path = utils_functions.create_unique_data_folder()
+        additional_files = ["additional_file.txt"]
+
+        result = utils_functions.save_all_viewables_and_return_info(
+            geode_object, data, generated_id, data_path, additional_files
+        )
+
+    assert isinstance(result, dict)
+    assert result["name"] == data.name()
+    assert result["native_file_name"].startswith("native.")
+    assert result["viewable_file_name"].endswith(".vtm")
+    assert re.match(r"[0-9a-f]{32}", result["id"])
+    assert isinstance(result["object_type"], str)
+    assert isinstance(result["binary_light_viewable"], str)
+    assert result["geode_object"] == geode_object
+    assert result["input_files"] == additional_files
+
+
+def test_generate_native_viewable_and_light_viewable_from_object(client):
     app = client.application
     with app.app_context():
         geode_object = "BRep"
         data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
 
-        result = utils_functions.generate_native_viewable_and_light_viewable(
-            geode_object, data
+        result = (
+            utils_functions.generate_native_viewable_and_light_viewable_from_object(
+                geode_object, data
+            )
         )
 
-    assert type(result) is dict
-    assert type(result["name"]) is str
-    assert type(result["native_file_name"]) is str
-    assert result["native_file_name"] == "native.og_brep"
-    assert type(result["viewable_file_name"]) is str
-    assert result["viewable_file_name"] == "viewable.vtm"
-    assert type(result["id"]) is str
+    assert isinstance(result, dict)
+    assert isinstance(result["name"], str)
+    assert isinstance(result["native_file_name"], str)
+    assert result["native_file_name"].startswith("native.")
+    assert isinstance(result["viewable_file_name"], str)
+    assert result["viewable_file_name"].endswith(".vtm")
+    assert isinstance(result["id"], str)
     assert re.match(r"[0-9a-f]{32}", result["id"])
-    assert type(result["object_type"]) is str
-    assert type(result["binary_light_viewable"]) is str
+    assert isinstance(result["object_type"], str)
+    assert isinstance(result["binary_light_viewable"], str)
+    assert result["input_files"] == []
+
+
+def test_generate_native_viewable_and_light_viewable_from_file(client):
+    app = client.application
+    with app.app_context():
+        geode_object = "BRep"
+        input_filename = "test.og_brep"
+
+        result = utils_functions.generate_native_viewable_and_light_viewable_from_file(
+            geode_object, input_filename
+        )
+
+    assert isinstance(result, dict)
+    assert isinstance(result["name"], str)
+    assert isinstance(result["native_file_name"], str)
+    assert result["native_file_name"].startswith("native.")
+    assert isinstance(result["viewable_file_name"], str)
+    assert result["viewable_file_name"].endswith(".vtm")
+    assert isinstance(result["id"], str)
+    assert re.match(r"[0-9a-f]{32}", result["id"])
+    assert isinstance(result["object_type"], str)
+    assert isinstance(result["binary_light_viewable"], str)
+    assert isinstance(result["input_files"], list)
