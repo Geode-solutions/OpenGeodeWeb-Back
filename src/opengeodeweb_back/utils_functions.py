@@ -189,8 +189,7 @@ def generate_native_viewable_and_light_viewable_from_object(
         geode_object, 
         data
     ):
-    base_data_folder = flask.current_app.config["DATA_FOLDER_PATH"]
-    generated_id, data_path = create_unique_data_folder(base_data_folder)
+    generated_id, data_path = create_unique_data_folder()
     return save_all_viewables_and_return_info(geode_object, data, generated_id, data_path)
 
 
@@ -198,8 +197,7 @@ def generate_native_viewable_and_light_viewable_from_file(
         geode_object, 
         input_filename
     ):
-    base_data_folder = flask.current_app.config["DATA_FOLDER_PATH"]
-    generated_id, data_path = create_unique_data_folder(base_data_folder)
+    generated_id, data_path = create_unique_data_folder()
 
     full_input_filename = geode_functions.upload_file_path(input_filename)
     copied_full_path = os.path.join(data_path, werkzeug.utils.secure_filename(input_filename))

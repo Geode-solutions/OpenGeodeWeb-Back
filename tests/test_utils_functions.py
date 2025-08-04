@@ -78,7 +78,8 @@ def test_create_unique_data_folder(client):
         generated_id, data_path = utils_functions.create_unique_data_folder()
         assert isinstance(generated_id, str)
         assert re.fullmatch(r"[0-9a-f]{32}", generated_id)
-        assert os.path.isdir(data_path)
+        assert os.path.exists(data_path)
+        assert data_path.startswith(flask.current_app.config["DATA_FOLDER_PATH"])
         assert generated_id in data_path
         shutil.rmtree(data_path, ignore_errors=True)
         assert not os.path.exists(data_path)
@@ -90,14 +91,13 @@ def test_save_all_viewables_and_return_info(client):
     with app.app_context():
         geode_object = "BRep"
         data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
-        generated_id, data_path = utils_functions.create_unique_data_folder(
-            flask.current_app.config["DATA_FOLDER_PATH"]
-        )
+        generated_id, data_path = utils_functions.create_unique_data_folder()
         additional_files = ["additional_file.txt"]
 
         result = utils_functions.save_all_viewables_and_return_info(
             geode_object, data, generated_id, data_path, additional_files
         )
+
     assert isinstance(result, dict)
     assert result["name"] == data.name()
     assert result["native_file_name"].startswith("native.")
@@ -114,11 +114,13 @@ def test_generate_native_viewable_and_light_viewable_from_object(client):
     with app.app_context():
         geode_object = "BRep"
         data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
+
         result = (
             utils_functions.generate_native_viewable_and_light_viewable_from_object(
                 geode_object, data
             )
         )
+
     assert isinstance(result, dict)
     assert isinstance(result["name"], str)
     assert isinstance(result["native_file_name"], str)
@@ -141,6 +143,7 @@ def test_generate_native_viewable_and_light_viewable_from_file(client):
         result = utils_functions.generate_native_viewable_and_light_viewable_from_file(
             geode_object, input_filename
         )
+
     assert isinstance(result, dict)
     assert isinstance(result["name"], str)
     assert isinstance(result["native_file_name"], str)
