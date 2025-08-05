@@ -189,23 +189,6 @@ def list_geode_objects(
         if has_creator(geode_object, file_extension):
             loadability_score = is_loadable(geode_object, file_absolute_path)
             return_dict[geode_object] = {"is_loadable": loadability_score}
-    if return_dict:
-        max_loadability_score = max(
-            obj_info["is_loadable"] for obj_info in return_dict.values()
-        )
-        best_objects = {
-            object_name: object_info
-            for object_name, object_info in return_dict.items()
-            if object_info["is_loadable"] == max_loadability_score
-        }
-        if len(best_objects) > 1:
-            best_object_name = max(
-                best_objects,
-                key=lambda name: object_priority(name, file_absolute_path),
-            )
-            return {best_object_name: return_dict[best_object_name]}
-        else:
-            return best_objects
     return return_dict
 
 
