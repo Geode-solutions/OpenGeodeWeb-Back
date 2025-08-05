@@ -201,10 +201,14 @@ def test_vertex_attribute_names(client, test_id):
                 elements = geode_functions.get_elements(geode_object)
                 if "points" in elements:
                     for input_extension in input_extensions:
-                        if geode_functions.is_loadable(
-                            geode_object,
-                            os.path.join("./data", f"test.{input_extension}"),
-                        ) > 0.0:
+                        if (
+                            geode_functions.is_loadable(
+                                geode_object,
+                                os.path.join("./data", f"test.{input_extension}"),
+                            )
+                            > 0.0
+                        ):
+
                             def get_full_data():
                                 return {
                                     "input_geode_object": geode_object,
@@ -236,10 +240,14 @@ def test_polygon_attribute_names(client, test_id):
                 elements = geode_functions.get_elements(geode_object)
                 if "polygons" in elements:
                     for input_extension in input_extensions:
-                        if geode_functions.is_loadable(
-                            geode_object,
-                            os.path.join("./data", f"test.{input_extension}"),
-                        ) > 0.0:
+                        if (
+                            geode_functions.is_loadable(
+                                geode_object,
+                                os.path.join("./data", f"test.{input_extension}"),
+                            )
+                            > 0.0
+                        ):
+
                             def get_full_data():
                                 return {
                                     "input_geode_object": geode_object,
@@ -271,10 +279,14 @@ def test_polyhedron_attribute_names(client, test_id):
                 elements = geode_functions.get_elements(geode_object)
                 if "polyhedrons" in elements:
                     for input_extension in input_extensions:
-                        if geode_functions.is_loadable(
-                            geode_object,
-                            os.path.join("./data", f"test.{input_extension}"),
-                        ) > 0.0:
+                        if (
+                            geode_functions.is_loadable(
+                                geode_object,
+                                os.path.join("./data", f"test.{input_extension}"),
+                            )
+                            > 0.0
+                        ):
+
                             def get_full_data():
                                 return {
                                     "input_geode_object": geode_object,
