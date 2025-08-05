@@ -63,6 +63,7 @@ def test_is_loadable():
         for input_extension in input_extensions:
             file_absolute_path = os.path.join(data_folder, f"test.{input_extension}")
             is_loadable = geode_functions.is_loadable(geode_object, file_absolute_path)
+            assert isinstance(is_loadable, bool)
             assert isinstance(is_loadable, float)
             assert 0.0 <= is_loadable <= 1.0
 
