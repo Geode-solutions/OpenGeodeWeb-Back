@@ -36,8 +36,10 @@ def is_loadable(geode_object: str, file_absolute_path: str) -> float:
     percentage = geode_object_value(geode_object)["is_loadable"](file_absolute_path)
     return percentage.value()
 
+
 def object_priority(geode_object: str, file_absolute_path: str) -> int:
     return geode_object_value(geode_object)["object_priority"](file_absolute_path)
+
 
 def load(geode_object: str, file_absolute_path: str):
     return geode_object_value(geode_object)["load"](file_absolute_path)
@@ -188,7 +190,9 @@ def list_geode_objects(
             loadability_score = is_loadable(geode_object, file_absolute_path)
             return_dict[geode_object] = {"is_loadable": loadability_score}
     if return_dict:
-        max_loadability_score = max(obj_info["is_loadable"] for obj_info in return_dict.values())
+        max_loadability_score = max(
+            obj_info["is_loadable"] for obj_info in return_dict.values()
+        )
         best_objects = {
             object_name: object_info
             for object_name, object_info in return_dict.items()
