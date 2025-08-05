@@ -45,11 +45,11 @@ opengeode-geosciences==9.2.2
     #   -r requirements.in
     #   geode-viewables
     #   opengeode-geosciencesio
-opengeode-geosciencesio==5.7.1
+opengeode-geosciencesio==5.7.2
     # via -r requirements.in
 opengeode-inspector==6.7.0
     # via -r requirements.in
-opengeode-io==7.3.1
+opengeode-io==7.3.2
     # via
     #   -r requirements.in
     #   geode-viewables
