@@ -36,6 +36,8 @@ def is_loadable(geode_object: str, file_absolute_path: str) -> float:
     percentage = geode_object_value(geode_object)["is_loadable"](file_absolute_path)
     return percentage.value()
 
+def object_priority(geode_object: str, file_absolute_path: str) -> int:
+    return geode_object_value(geode_object)["object_priority"](file_absolute_path)
 
 def load(geode_object: str, file_absolute_path: str):
     return geode_object_value(geode_object)["load"](file_absolute_path)
@@ -181,11 +183,25 @@ def list_geode_objects(
         os.path.basename(file_absolute_path)
     )
     geode_objects_filtered_list = filter_geode_objects(key)
-
     for geode_object in geode_objects_filtered_list:
         if has_creator(geode_object, file_extension):
             loadability_score = is_loadable(geode_object, file_absolute_path)
             return_dict[geode_object] = {"is_loadable": loadability_score}
+    if return_dict:
+        max_loadability_score = max(obj_info["is_loadable"] for obj_info in return_dict.values())
+        best_objects = {
+            object_name: object_info
+            for object_name, object_info in return_dict.items()
+            if object_info["is_loadable"] == max_loadability_score
+        }
+        if len(best_objects) > 1:
+            best_object_name = max(
+                best_objects,
+                key=lambda name: object_priority(name, file_absolute_path),
+            )
+            return {best_object_name: return_dict[best_object_name]}
+        else:
+            return best_objects
     return return_dict
 
 
