@@ -63,7 +63,8 @@ def test_is_loadable():
         for input_extension in input_extensions:
             file_absolute_path = os.path.join(data_folder, f"test.{input_extension}")
             is_loadable = geode_functions.is_loadable(geode_object, file_absolute_path)
-            assert type(is_loadable) is bool
+            assert isinstance(is_loadable, float)
+            assert 0.0 <= is_loadable <= 1.0
 
 
 def test_load():
@@ -73,7 +74,7 @@ def test_load():
         for input_extension in input_extensions:
             print(f"\t{input_extension=}")
             file_absolute_path = os.path.join(data_folder, f"test.{input_extension}")
-            if geode_functions.is_loadable(geode_object, file_absolute_path):
+            if geode_functions.is_loadable(geode_object, file_absolute_path) > 0.0:
                 data = geode_functions.load(geode_object, file_absolute_path)
                 data_name = data.name()
                 if "save_viewable" in value:
@@ -171,7 +172,7 @@ def test_geode_object_output_extensions():
                 print(
                     f"\t\tAdditional files: {[f.filename for f in additional.optional_files]}"
                 )
-            if geode_functions.is_loadable(geode_object, file_absolute_path):
+            if geode_functions.is_loadable(geode_object, file_absolute_path) > 0.0:
                 data = geode_functions.load(geode_object, file_absolute_path)
                 geode_objets_and_output_extensions = (
                     geode_functions.geode_objects_output_extensions(geode_object, data)
@@ -214,7 +215,7 @@ def test_get_inspector_children():
                     print(f"\t\t{mandatory_files=}", flush=True)
                     additional_files = [f.filename for f in additional.optional_files]
                     print(f"\t\t{additional_files=}", flush=True)
-                if geode_functions.is_loadable(geode_object, file_absolute_path):
+                if geode_functions.is_loadable(geode_object, file_absolute_path) > 0.0:
                     data = geode_functions.load(geode_object, file_absolute_path)
                     class_inspector = geode_functions.inspect(geode_object, data)
                     assert "InspectionResult" in class_inspector.__class__.__name__
@@ -296,7 +297,8 @@ def test_list_geode_objects():
                             input_extension,
                             input_extension_value,
                         ) in input_extension_dict.items():
-                            assert type(input_extension_value) is bool
+                            assert isinstance(input_extension_value, float)
+                            assert 0.0 <= input_extension_value <= 1.0
 
 
 def test_geode_objects_output_extensions():
@@ -304,7 +306,7 @@ def test_geode_objects_output_extensions():
         input_extensions = geode_functions.geode_object_input_extensions(geode_object)
         for input_extension in input_extensions:
             file_absolute_path = os.path.join(data_folder, f"test.{input_extension}")
-            if geode_functions.is_loadable(geode_object, file_absolute_path):
+            if geode_functions.is_loadable(geode_object, file_absolute_path) > 0.0:
                 data = geode_functions.load(geode_object, file_absolute_path)
                 geode_objects_and_output_extensions = (
                     geode_functions.geode_objects_output_extensions(geode_object, data)

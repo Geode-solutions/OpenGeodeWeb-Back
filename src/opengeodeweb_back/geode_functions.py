@@ -32,8 +32,9 @@ def additional_files(geode_object: str, file_absolute_path: str):
     return geode_object_value(geode_object)["additional_files"](file_absolute_path)
 
 
-def is_loadable(geode_object: str, file_absolute_path: str):
-    return geode_object_value(geode_object)["is_loadable"](file_absolute_path)
+def is_loadable(geode_object: str, file_absolute_path: str) -> float:
+    percentage = geode_object_value(geode_object)["is_loadable"](file_absolute_path)
+    return percentage.value()
 
 
 def load(geode_object: str, file_absolute_path: str):
@@ -183,8 +184,8 @@ def list_geode_objects(
 
     for geode_object in geode_objects_filtered_list:
         if has_creator(geode_object, file_extension):
-            file_is_loadable = is_loadable(geode_object, file_absolute_path)
-            return_dict[geode_object] = {"is_loadable": file_is_loadable}
+            loadability_score = is_loadable(geode_object, file_absolute_path)
+            return_dict[geode_object] = {"is_loadable": loadability_score}
     return return_dict
 
 
