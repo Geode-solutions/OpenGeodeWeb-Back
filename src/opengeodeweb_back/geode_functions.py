@@ -37,6 +37,10 @@ def is_loadable(geode_object: str, file_absolute_path: str) -> float:
     return percentage.value()
 
 
+def object_priority(geode_object: str, file_absolute_path: str) -> int:
+    return geode_object_value(geode_object)["object_priority"](file_absolute_path)
+
+
 def load(geode_object: str, file_absolute_path: str):
     return geode_object_value(geode_object)["load"](file_absolute_path)
 
@@ -181,7 +185,6 @@ def list_geode_objects(
         os.path.basename(file_absolute_path)
     )
     geode_objects_filtered_list = filter_geode_objects(key)
-
     for geode_object in geode_objects_filtered_list:
         if has_creator(geode_object, file_extension):
             loadability_score = is_loadable(geode_object, file_absolute_path)
