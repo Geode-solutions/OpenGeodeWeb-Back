@@ -66,6 +66,13 @@ def test_is_loadable():
             assert isinstance(is_loadable, float)
             assert 0.0 <= is_loadable <= 1.0
 
+def test_object_priority():
+    for geode_object, _value in geode_objects.geode_objects_dict().items():
+        input_extensions = geode_functions.geode_object_input_extensions(geode_object)
+        for input_extension in input_extensions:
+            file_absolute_path = os.path.join(data_folder, f"test.{input_extension}")
+            priority = geode_functions.object_priority(geode_object, file_absolute_path)
+            assert isinstance(priority, int), f"Priority should be int for {geode_object}"
 
 def test_load():
     for geode_object, value in geode_objects.geode_objects_dict().items():

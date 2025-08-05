@@ -439,7 +439,7 @@ def geode_objects_dict():
             "output_factory": og.SectionOutputFactory,
             "additional_files": og.section_additional_files,
             "is_loadable": og.is_section_loadable,
-            "object_prioriity": og.section_object_priority,
+            "object_priority": og.section_object_priority,
             "load": og.load_section,
             "is_saveable": og.is_section_saveable,
             "save": og.save_section,
