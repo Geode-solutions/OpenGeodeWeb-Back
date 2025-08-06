@@ -188,7 +188,11 @@ def list_geode_objects(
     for geode_object in geode_objects_filtered_list:
         if has_creator(geode_object, file_extension):
             loadability_score = is_loadable(geode_object, file_absolute_path)
-            return_dict[geode_object] = {"is_loadable": loadability_score}
+            object_priority = object_priority(geode_object, file_absolute_path)
+            return_dict[geode_object] = {
+                "is_loadable": loadability_score,
+                "priority": object_priority
+                }
     return return_dict
 
 
