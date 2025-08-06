@@ -304,12 +304,15 @@ def test_list_geode_objects():
                     assert len(return_dict.keys()) >= 1
                     for input_geode_object, input_extension_dict in return_dict.items():
                         assert type(input_extension_dict) is dict
-                        for (
-                            input_extension,
-                            input_extension_value,
-                        ) in input_extension_dict.items():
-                            assert isinstance(input_extension_value, float)
-                            assert 0.0 <= input_extension_value <= 1.0
+                        if "is_loadable" in input_extension_dict:
+                            is_loadable_value = input_extension_dict["is_loadable"]
+                            assert isinstance(is_loadable_value, float)
+                            assert 0.0 <= is_loadable_value <= 1.0
+                            assert "object_priority" in input_extension_dict
+                            object_priority_value = input_extension_dict[
+                                "object_priority"
+                            ]
+                            assert isinstance(object_priority_value, int)
 
 
 def test_geode_objects_output_extensions():
