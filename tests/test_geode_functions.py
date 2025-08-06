@@ -309,7 +309,9 @@ def test_list_geode_objects():
                             assert isinstance(is_loadable_value, float)
                             assert 0.0 <= is_loadable_value <= 1.0
                             assert "object_priority" in input_extension_dict
-                            object_priority_value = input_extension_dict["object_priority"]
+                            object_priority_value = input_extension_dict[
+                                "object_priority"
+                            ]
                             assert isinstance(object_priority_value, int)
 
 
