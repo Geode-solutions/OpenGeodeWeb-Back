@@ -17,6 +17,7 @@ from . import geode_functions
 from .models import Data
 from .database import db
 
+
 def increment_request_counter(current_app):
     if "REQUEST_COUNTER" in current_app.config:
         REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER"))
@@ -181,7 +182,7 @@ def save_all_viewables_and_return_info(
         geode_object=geode_object,
         input_files=additional_files or [],
     )
-    
+
     db.session.add(data_entry)
     db.session.commit()
 
