@@ -14,9 +14,8 @@ import werkzeug
 
 # Local application imports
 from . import geode_functions
-from .models import Data, Base
-from .database import get_engine, get_session
-
+from .models import Data
+from .database import db
 
 def increment_request_counter(current_app):
     if "REQUEST_COUNTER" in current_app.config:
@@ -173,12 +172,6 @@ def save_all_viewables_and_return_info(
     with open(saved_light_viewable_file_path, "rb") as f:
         binary_light_viewable = f.read()
 
-    project_root_path = os.path.dirname(data_path)
-    engine = get_engine(os.path.join(project_root_path, "db.sqlite3"))
-
-    Base.metadata.create_all(engine)
-    session = get_session(engine)
-
     data_entry = Data(
         id=generated_id,
         name=data.name(),
@@ -188,9 +181,9 @@ def save_all_viewables_and_return_info(
         geode_object=geode_object,
         input_files=additional_files or [],
     )
-    session.add(data_entry)
-    session.commit()
-    session.close()
+    
+    db.session.add(data_entry)
+    db.session.commit()
 
     return {
         "name": data.name(),
