@@ -17,7 +17,7 @@ class Data(Base):
     name = Column(String, nullable=False)
     native_file_name = Column(String, nullable=False)
     viewable_file_name = Column(String, nullable=False)
-    binary_light_viewable = Column(String, nullable=True) 
+    binary_light_viewable = Column(String, nullable=True)
     geode_object = Column(String, nullable=False)
     input_files = Column(JSON, nullable=True)
     created_at = Column(DateTime, default=datetime.now)
