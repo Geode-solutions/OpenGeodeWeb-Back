@@ -20,4 +20,4 @@ class Data(Base):
     geode_object = Column(String, nullable=False)
     binary_light_viewable = Column(String, nullable=True) 
     input_files = Column(JSON, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now)
