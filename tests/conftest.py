@@ -26,7 +26,7 @@ def client():
     app.config["REQUEST_COUNTER"] = 0
     app.config["LAST_REQUEST_TIME"] = time.time()
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-    db_path = os.path.join(BASE_DIR, "data", "project.db") 
+    db_path = os.path.join(BASE_DIR, "data", "project.db")
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 
     print("Current working directory:", os.getcwd())

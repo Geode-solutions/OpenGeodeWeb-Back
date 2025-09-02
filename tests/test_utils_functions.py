@@ -113,7 +113,9 @@ def test_save_all_viewables_and_return_info(client):
         assert db_entry is not None
         assert db_entry.name == data.name()
         assert db_entry.native_file_name == os.path.basename(result["native_file_name"])
-        assert db_entry.viewable_file_name == os.path.basename(result["viewable_file_name"])
+        assert db_entry.viewable_file_name == os.path.basename(
+            result["viewable_file_name"]
+        )
         assert db_entry.light_viewable == os.path.basename(db_entry.light_viewable)
         assert db_entry.geode_object == geode_object
         assert db_entry.input_files == additional_files
