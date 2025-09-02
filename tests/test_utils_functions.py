@@ -7,6 +7,8 @@ import flask
 import shutil
 
 # Local application imports
+from src.opengeodeweb_back.database import db
+from src.opengeodeweb_back.models import Data
 from src.opengeodeweb_back import geode_functions, utils_functions
 
 
@@ -97,15 +99,24 @@ def test_save_all_viewables_and_return_info(client):
             geode_object, data, generated_id, data_path, additional_files
         )
 
-    assert isinstance(result, dict)
-    assert result["name"] == data.name()
-    assert result["native_file_name"].startswith("native.")
-    assert result["viewable_file_name"].endswith(".vtm")
-    assert re.match(r"[0-9a-f]{32}", result["id"])
-    assert isinstance(result["object_type"], str)
-    assert isinstance(result["binary_light_viewable"], str)
-    assert result["geode_object"] == geode_object
-    assert result["input_files"] == additional_files
+        assert isinstance(result, dict)
+        assert result["name"] == data.name()
+        assert result["native_file_name"].startswith("native.")
+        assert result["viewable_file_name"].endswith(".vtm")
+        assert re.match(r"[0-9a-f]{32}", result["id"])
+        assert isinstance(result["object_type"], str)
+        assert isinstance(result["binary_light_viewable"], str)
+        assert result["geode_object"] == geode_object
+        assert result["input_files"] == additional_files
+
+        db_entry = Data.query.get(generated_id)
+        assert db_entry is not None
+        assert db_entry.name == data.name()
+        assert db_entry.native_file_name == os.path.basename(result["native_file_name"])
+        assert db_entry.viewable_file_name == os.path.basename(result["viewable_file_name"])
+        assert db_entry.light_viewable == os.path.basename(db_entry.light_viewable)
+        assert db_entry.geode_object == geode_object
+        assert db_entry.input_files == additional_files
 
 
 def test_generate_native_viewable_and_light_viewable_from_object(client):

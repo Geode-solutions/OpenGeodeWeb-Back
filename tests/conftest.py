@@ -1,12 +1,12 @@
 # Standard library imports
 import time
 import shutil
-
-# Third party imports
+import os
 import pytest
 
-# Local application imports
+
 from app import app
+from src.opengeodeweb_back.database import init_db
 
 TEST_ID = "1"
 
@@ -25,6 +25,14 @@ def client():
     app.config["UPLOAD_FOLDER"] = "./tests/data/"
     app.config["REQUEST_COUNTER"] = 0
     app.config["LAST_REQUEST_TIME"] = time.time()
+    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+    db_path = os.path.join(BASE_DIR, "data", "project.db") 
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+
+    print("Current working directory:", os.getcwd())
+    print("Directory contents:", os.listdir("."))
+
+    init_db(app)
     client = app.test_client()
     client.headers = {"Content-type": "application/json", "Accept": "application/json"}
     yield client

@@ -10,6 +10,7 @@ from src.opengeodeweb_back.routes import blueprint_routes
 from src.opengeodeweb_back.routes.models import blueprint_models
 from src.opengeodeweb_back.utils_functions import handle_exception
 from src.opengeodeweb_back import app_config
+from src.opengeodeweb_back.database import init_db
 
 
 """ Global config """
@@ -58,4 +59,5 @@ def return_error():
 # ''' Main '''
 if __name__ == "__main__":
     print(f"Python is running in {FLASK_DEBUG} mode")
+    init_db(app)
     app.run(debug=FLASK_DEBUG, host=DEFAULT_HOST, port=PORT, ssl_context=SSL)

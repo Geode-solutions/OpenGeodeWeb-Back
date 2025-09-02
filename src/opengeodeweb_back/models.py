@@ -15,9 +15,7 @@ class Data(db.Model):
     name = db.Column(String, nullable=False)
     native_file_name = db.Column(String, nullable=False)
     viewable_file_name = db.Column(String, nullable=False)
-    light_viewable = db.Column(
-        String, nullable=True
-    )  # Renommé pour correspondre au code
+    light_viewable = db.Column(String, nullable=True)
     geode_object = db.Column(String, nullable=False)
     input_files = db.Column(JSON, nullable=True)
     created_at = db.Column(DateTime, default=datetime.now)
