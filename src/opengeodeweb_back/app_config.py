@@ -23,7 +23,7 @@ class ProdConfig(Config):
     ORIGINS = ""
     MINUTES_BEFORE_TIMEOUT = "1"
     SECONDS_BETWEEN_SHUTDOWNS = "10"
-    DATA_FOLDER_PATH = "/data/"
+    DATA_FOLDER_PATH = "/data"
     SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.abspath(
         os.path.join(DATA_FOLDER_PATH, 'db.sqlite3')
         )}"
@@ -34,7 +34,8 @@ class DevConfig(Config):
     ORIGINS = "*"
     MINUTES_BEFORE_TIMEOUT = "1"
     SECONDS_BETWEEN_SHUTDOWNS = "10"
-    DATA_FOLDER_PATH = "./data/"
-    SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.abspath(
-        os.path.join(DATA_FOLDER_PATH, 'db.sqlite3')
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    DATA_FOLDER_PATH = os.path.join(BASE_DIR, "data")
+    SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(
+        BASE_DIR, DATA_FOLDER_PATH, 'db.sqlite3'
         )}"
