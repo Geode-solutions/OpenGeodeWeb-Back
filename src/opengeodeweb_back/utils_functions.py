@@ -14,7 +14,7 @@ import werkzeug
 
 # Local application imports
 from . import geode_functions
-from .models import Data
+from .data import Data
 from .database import db
 
 
@@ -180,7 +180,8 @@ def save_all_viewables_and_return_info(
         viewable_file_name=os.path.basename(saved_viewable_file_path),
         light_viewable=os.path.basename(saved_light_viewable_file_path),
         geode_object=geode_object,
-        input_files=additional_files or [],
+        input_file=additional_files or [],
+        additional_files=additional_files or [],
     )
 
     db.session.add(data_entry)
@@ -190,7 +191,7 @@ def save_all_viewables_and_return_info(
         "name": data.name(),
         "native_file_name": os.path.basename(saved_native_file_path[0]),
         "viewable_file_name": os.path.basename(saved_viewable_file_path),
-        "id": generated_id,
+        "id": data_entry.id,
         "object_type": geode_functions.get_object_type(geode_object),
         "binary_light_viewable": binary_light_viewable.decode("utf-8"),
         "geode_object": geode_object,

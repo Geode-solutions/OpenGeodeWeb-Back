@@ -8,7 +8,7 @@ import shutil
 
 # Local application imports
 from src.opengeodeweb_back.database import db
-from src.opengeodeweb_back.models import Data
+from src.opengeodeweb_back.data import Data
 from src.opengeodeweb_back import geode_functions, utils_functions
 
 
@@ -99,11 +99,11 @@ def test_save_all_viewables_and_return_info(client):
 
         geode_object = "BRep"
         data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
-        generated_id, data_path = utils_functions.create_unique_data_folder()
+        folder_id, data_path = utils_functions.create_unique_data_folder()
         additional_files = ["additional_file.txt"]
 
         result = utils_functions.save_all_viewables_and_return_info(
-            geode_object, data, generated_id, data_path, additional_files
+            geode_object, data, folder_id, data_path, additional_files
         )
 
         assert isinstance(result, dict)
@@ -116,16 +116,15 @@ def test_save_all_viewables_and_return_info(client):
         assert result["geode_object"] == geode_object
         assert result["input_files"] == additional_files
 
-        db_entry = Data.query.get(generated_id)
+        db_entry = Data.query.get(result["id"])
         assert db_entry is not None
         assert db_entry.name == data.name()
         assert db_entry.native_file_name == os.path.basename(result["native_file_name"])
-        assert db_entry.viewable_file_name == os.path.basename(
-            result["viewable_file_name"]
-        )
+        assert db_entry.viewable_file_name == os.path.basename(result["viewable_file_name"])
         assert db_entry.light_viewable == os.path.basename(db_entry.light_viewable)
         assert db_entry.geode_object == geode_object
-        assert db_entry.input_files == additional_files
+        assert db_entry.input_file == additional_files
+        assert db_entry.additional_files == additional_files
 
 
 def test_generate_native_viewable_and_light_viewable_from_object(client):
