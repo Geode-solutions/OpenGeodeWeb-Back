@@ -90,6 +90,13 @@ def test_create_unique_data_folder(client):
 def test_save_all_viewables_and_return_info(client):
     app = client.application
     with app.app_context():
+        base_dir = os.path.abspath(os.path.dirname(__file__))
+        expected_db_path = os.path.join(base_dir, "data", "project.db")
+        expected_uri = f"sqlite:///{expected_db_path}"
+
+        assert app.config["SQLALCHEMY_DATABASE_URI"] == expected_uri
+        assert os.path.exists(expected_db_path)
+
         geode_object = "BRep"
         data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
         generated_id, data_path = utils_functions.create_unique_data_folder()
