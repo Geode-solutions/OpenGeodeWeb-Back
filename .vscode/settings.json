@@ -4,5 +4,10 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "mypy-type-checker.args": ["--config-file=mypy.ini"]
+    "mypy-type-checker.args": [
+        "--config-file=mypy.ini"
+    ],
+    "mypy-type-checker.interpreter": [
+        "${workspaceFolder}/venv/bin/python"
+    ]
 }
