@@ -1,10 +1,12 @@
 from flask_sqlalchemy import SQLAlchemy
 
-db = SQLAlchemy()
+DATABASE_FILENAME = "project.db"
+
+database = SQLAlchemy()
 
 
 def initialize_database(app):
-    db.init_app(app)
+    database.init_app(app)
     with app.app_context():
-        db.create_all()
-    return db
+        database.create_all()
+    return database

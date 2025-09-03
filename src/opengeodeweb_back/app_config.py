@@ -4,6 +4,7 @@ import time
 
 # Third party imports
 # Local application imports
+from .database import DATABASE_FILENAME
 
 
 class Config(object):
@@ -25,7 +26,7 @@ class ProdConfig(Config):
     SECONDS_BETWEEN_SHUTDOWNS = "10"
     DATA_FOLDER_PATH = "/data"
     SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.abspath(
-        os.path.join(DATA_FOLDER_PATH, 'db.sqlite3')
+        os.path.join(DATA_FOLDER_PATH, DATABASE_FILENAME)
         )}"
 
 
@@ -37,5 +38,5 @@ class DevConfig(Config):
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     DATA_FOLDER_PATH = os.path.join(BASE_DIR, "data")
     SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(
-        BASE_DIR, DATA_FOLDER_PATH, 'db.sqlite3'
+        BASE_DIR, DATA_FOLDER_PATH, DATABASE_FILENAME
         )}"
