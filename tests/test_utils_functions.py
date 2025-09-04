@@ -100,7 +100,7 @@ def test_save_all_viewables_and_return_info(client):
 
         geode_object = "BRep"
         data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
-        input_file = ["test.og_brep"]
+        input_file = "test.og_brep"
         additional_files = ["additional_file.txt"]
 
         result = utils_functions.save_all_viewables_and_return_info(
@@ -137,7 +137,7 @@ def test_save_all_viewables_commits_to_db_properly(client):
     with app.app_context():
         geode_object = "BRep"
         data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
-        input_file = ["test.og_brep"]
+        input_file = "test.og_brep"
         result = utils_functions.save_all_viewables_and_return_info(
             geode_object, data, input_file
         )
@@ -175,7 +175,7 @@ def test_generate_native_viewable_and_light_viewable_from_object(client):
     assert re.match(r"[0-9a-f]{32}", result["id"])
     assert isinstance(result["object_type"], str)
     assert isinstance(result["binary_light_viewable"], str)
-    assert result["input_files"] == []
+    assert result["input_files"] == ""
 
 
 def test_generate_native_viewable_and_light_viewable_from_file(client):
@@ -198,4 +198,4 @@ def test_generate_native_viewable_and_light_viewable_from_file(client):
     assert re.match(r"[0-9a-f]{32}", result["id"])
     assert isinstance(result["object_type"], str)
     assert isinstance(result["binary_light_viewable"], str)
-    assert isinstance(result["input_files"], list)
+    assert isinstance(result["input_files"], str)

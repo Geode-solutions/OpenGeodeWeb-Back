@@ -158,8 +158,11 @@ def save_all_viewables_and_return_info(
     geode_object: str,
     data: Any,
     input_file: str,
-    additional_files: list[str] = [],
+    additional_files: list[str] | None = None,
 ) -> dict[str, Any]:
+    if additional_files is None:
+        additional_files = []
+        
     data_entry = Data.create(
         name=data.name(),
         geode_object=geode_object,
@@ -201,9 +204,9 @@ def save_all_viewables_and_return_info(
 
 
 def generate_native_viewable_and_light_viewable_from_object(
-    geode_object: str, data: Any, input_file: str
+    geode_object: str, data: Any
 ) -> dict[str, Any]:
-    return save_all_viewables_and_return_info(geode_object, data, input_file)
+    return save_all_viewables_and_return_info(geode_object, data, input_file="")
 
 
 def generate_native_viewable_and_light_viewable_from_file(
@@ -247,6 +250,6 @@ def generate_native_viewable_and_light_viewable_from_file(
     return save_all_viewables_and_return_info(
         geode_object,
         data,
-        input_file=[input_filename],
+        input_file=input_filename,
         additional_files=additional_files_copied,
     )

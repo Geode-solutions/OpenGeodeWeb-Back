@@ -23,10 +23,10 @@ class Data(Base):
     def create(
         name: str,
         geode_object: str,
-        input_file: str,
+        input_file: str | None = None,
         additional_files: list[str] | None = None,
     ) -> "Data":
-        input_file = input_file if input_file is not None else {}
+        input_file = input_file if input_file is not None else ""
         additional_files = additional_files if additional_files is not None else []
 
         data_entry = Data(
