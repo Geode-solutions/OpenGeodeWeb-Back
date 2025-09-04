@@ -157,7 +157,7 @@ def create_data_folder_from_id(data_id: str) -> str:
 def save_all_viewables_and_return_info(
     geode_object: str,
     data: Any,
-    input_file: list[str],
+    input_file: str,
     additional_files: list[str] = [],
 ) -> dict[str, Any]:
     data_entry = Data.create(
