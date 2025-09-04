@@ -162,7 +162,7 @@ def save_all_viewables_and_return_info(
 ) -> dict[str, Any]:
     if additional_files is None:
         additional_files = []
-        
+
     data_entry = Data.create(
         name=data.name(),
         geode_object=geode_object,
