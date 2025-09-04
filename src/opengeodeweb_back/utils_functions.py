@@ -201,9 +201,9 @@ def save_all_viewables_and_return_info(
 
 
 def generate_native_viewable_and_light_viewable_from_object(
-    geode_object: str, data: Any
+    geode_object: str, data: Any, input_file: str
 ) -> dict[str, Any]:
-    return save_all_viewables_and_return_info(geode_object, data, input_file=[])
+    return save_all_viewables_and_return_info(geode_object, data, input_file)
 
 
 def generate_native_viewable_and_light_viewable_from_file(
