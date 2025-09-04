@@ -41,16 +41,15 @@ def object_priority(geode_object: str, file_absolute_path: str) -> int:
     return geode_object_value(geode_object)["object_priority"](file_absolute_path)
 
 
-def load(geode_object: str, file_absolute_path: str):
+def load(geode_object: str, file_absolute_path: str): # A virer
     return geode_object_value(geode_object)["load"](file_absolute_path)
 
 
-def data_file_path(data_id: str, filename: str) -> str:
+def data_file_path(data_id: str) -> str:
     data_folder_path = flask.current_app.config["DATA_FOLDER_PATH"]
     return os.path.join(
         data_folder_path,
         data_id,
-        werkzeug.utils.secure_filename(filename),
     )
 
 
