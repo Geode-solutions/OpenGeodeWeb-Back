@@ -24,7 +24,7 @@ class Data(Base):
         name: str,
         geode_object: str,
         input_file: str,
-        additional_files: list[str] | None = None
+        additional_files: list[str] | None = None,
     ) -> "Data":
         input_file = input_file if input_file is not None else {}
         additional_files = additional_files if additional_files is not None else []
