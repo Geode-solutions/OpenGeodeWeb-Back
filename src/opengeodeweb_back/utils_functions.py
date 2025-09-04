@@ -3,6 +3,7 @@ import os
 import threading
 import time
 import zipfile
+from typing import List, Dict, Any
 
 # Third party imports
 import flask
@@ -154,8 +155,11 @@ def create_data_folder_from_id(data_id: str) -> str:
 
 
 def save_all_viewables_and_return_info(
-    geode_object, data, input_file, additional_files=None
-):
+    geode_object: str, 
+    data: Any, 
+    input_file: List[str], 
+    additional_files: List[str] = []
+) -> Dict[str, Any]:
     data_entry = Data.create(
         name=data.name(),
         geode_object=geode_object,
@@ -191,18 +195,27 @@ def save_all_viewables_and_return_info(
         "object_type": geode_functions.get_object_type(geode_object),
         "binary_light_viewable": binary_light_viewable.decode("utf-8"),
         "geode_object": data_entry.geode_object,
-        "input_files": data_entry.additional_files,
+        "input_files": data_entry.input_file,
+        "additional_files": data_entry.additional_files,
     }
 
 
-def generate_native_viewable_and_light_viewable_from_object(geode_object, data):
-    return save_all_viewables_and_return_info(geode_object, data)
+def generate_native_viewable_and_light_viewable_from_object(
+    geode_object: str, 
+    data: Any
+) -> Dict[str, Any]:
+    return save_all_viewables_and_return_info(geode_object, data, input_file=[])
 
 
-def generate_native_viewable_and_light_viewable_from_file(geode_object, input_filename):
-    temp_data_entry = Data.create_and_get_id(
+def generate_native_viewable_and_light_viewable_from_file(
+    geode_object: str, 
+    input_filename: str
+) -> Dict[str, Any]:
+    temp_data_entry = Data.create(
         name="temp",
-        geode_object=geode_object
+        geode_object=geode_object,
+        input_file=[input_filename],
+        additional_files=[],
     )
     
     data_path = create_data_folder_from_id(temp_data_entry.id)
@@ -213,7 +226,7 @@ def generate_native_viewable_and_light_viewable_from_file(geode_object, input_fi
     )
     shutil.copy2(full_input_filename, copied_full_path)
 
-    additional_files_copied = []
+    additional_files_copied: List[str] = []
     additional = geode_functions.additional_files(geode_object, full_input_filename)
     for additional_file in additional.mandatory_files + additional.optional_files:
         if additional_file.is_missing:
@@ -236,5 +249,6 @@ def generate_native_viewable_and_light_viewable_from_file(geode_object, input_fi
     return save_all_viewables_and_return_info(
         geode_object,
         data,
+        input_file=[input_filename],
         additional_files=additional_files_copied,
     )
