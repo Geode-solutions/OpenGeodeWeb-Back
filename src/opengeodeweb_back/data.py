@@ -1,7 +1,7 @@
 from sqlalchemy import String, JSON
 from .database import database
 import uuid
-from typing import List, Type
+from typing import Type
 
 DatabaseModel : Type = database.Model
 
@@ -26,8 +26,8 @@ class Data(database.Model):
         name: str,
         geode_object: str,
         input_file: str,
-        additional_files: List[str]
-    ) -> "Data":
+        additional_files: list[str]
+    ) -> Type["Data"]:
         if input_file is None:
             input_file = []
         if additional_files is None:
