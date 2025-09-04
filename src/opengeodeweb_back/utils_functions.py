@@ -164,7 +164,7 @@ def save_all_viewables_and_return_info(
         name=data.name(),
         geode_object=geode_object,
         input_file=input_file,
-        additional_files=additional_files
+        additional_files=additional_files,
     )
     data_path = create_data_folder_from_id(data_entry.id)
     saved_native_file_path = geode_functions.save(
@@ -184,7 +184,7 @@ def save_all_viewables_and_return_info(
     data_entry.native_file_name = os.path.basename(saved_native_file_path[0])
     data_entry.viewable_file_name = os.path.basename(saved_viewable_file_path)
     data_entry.light_viewable = os.path.basename(saved_light_viewable_file_path)
-    
+
     database.session.commit()
 
     return {

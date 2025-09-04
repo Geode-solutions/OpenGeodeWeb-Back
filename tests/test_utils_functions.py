@@ -117,7 +117,7 @@ def test_save_all_viewables_and_return_info(client):
         assert isinstance(result["object_type"], str)
         assert isinstance(result["binary_light_viewable"], str)
         assert result["geode_object"] == geode_object
-        assert result["input_files"] == input_file  
+        assert result["input_files"] == input_file
 
         db_entry = database.session.get(Data, result["id"])
         assert db_entry is not None
