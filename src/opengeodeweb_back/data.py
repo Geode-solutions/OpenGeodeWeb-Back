@@ -4,6 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from .database import database, Base
 import uuid
 
+
 class Data(Base):
     __tablename__ = "datas"
 
@@ -23,7 +24,7 @@ class Data(Base):
         name: str,
         geode_object: str,
         input_file: Optional[dict] = None,
-        additional_files: Optional[List[str]] = None
+        additional_files: Optional[List[str]] = None,
     ) -> "Data":
         input_file = input_file if input_file is not None else {}
         additional_files = additional_files if additional_files is not None else []

@@ -4,10 +4,13 @@ from sqlalchemy.orm import DeclarativeBase
 
 DATABASE_FILENAME = "project.db"
 
+
 class Base(DeclarativeBase):
     pass
 
+
 database = SQLAlchemy(model_class=Base)
+
 
 def initialize_database(app: Flask) -> SQLAlchemy:
     database.init_app(app)
