@@ -214,7 +214,7 @@ def generate_native_viewable_and_light_viewable_from_file(
     temp_data_entry = Data.create(
         name="temp",
         geode_object=geode_object,
-        input_file=[input_filename],
+        input_file=input_filename,
         additional_files=[],
     )
     
