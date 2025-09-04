@@ -3,15 +3,14 @@ from .database import database
 import uuid
 from typing import List, Type
 
-DatabaseModel : Type = database.Model
+DatabaseModel: Type = database.Model
+
 
 class Data(database.Model):
     __tablename__ = "datas"
 
     id = database.Column(
-        String,
-        primary_key=True,
-        default=lambda: str(uuid.uuid4()).replace("-", "")
+        String, primary_key=True, default=lambda: str(uuid.uuid4()).replace("-", "")
     )
     name = database.Column(String, nullable=False)
     native_file_name = database.Column(String, nullable=False)
@@ -23,10 +22,7 @@ class Data(database.Model):
 
     @staticmethod
     def create(
-        name: str,
-        geode_object: str,
-        input_file: str,
-        additional_files: List[str]
+        name: str, geode_object: str, input_file: str, additional_files: List[str]
     ) -> "Data":
         if input_file is None:
             input_file = []
