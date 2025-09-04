@@ -3,6 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from .database import database, Base
 import uuid
 
+
 class Data(Base):
     __tablename__ = "datas"
 
