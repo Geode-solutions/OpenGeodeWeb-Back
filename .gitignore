@@ -10,3 +10,4 @@ __pycache__
 uploads
 node_modules
 schemas.json
+.mypy_cache
