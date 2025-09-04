@@ -4,11 +4,14 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from .database import database
 import uuid
 
+
 class Base(DeclarativeBase):
     pass
 
+
 if TYPE_CHECKING:
     from sqlalchemy.orm import DeclarativeBase
+
 
 class Data(Base):
     __tablename__ = "datas"
@@ -26,10 +29,7 @@ class Data(Base):
 
     @staticmethod
     def create(
-        name: str,
-        geode_object: str,
-        input_file: str,
-        additional_files: list[str]
+        name: str, geode_object: str, input_file: str, additional_files: list[str]
     ) -> "Data":
         if input_file is None:
             input_file = []
