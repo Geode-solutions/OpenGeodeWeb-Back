@@ -155,10 +155,10 @@ def create_data_folder_from_id(data_id: str) -> str:
 
 
 def save_all_viewables_and_return_info(
-    geode_object: str, 
-    data: Any, 
-    input_file: List[str], 
-    additional_files: List[str] = []
+    geode_object: str,
+    data: Any,
+    input_file: List[str],
+    additional_files: List[str] = [],
 ) -> Dict[str, Any]:
     data_entry = Data.create(
         name=data.name(),
@@ -201,15 +201,13 @@ def save_all_viewables_and_return_info(
 
 
 def generate_native_viewable_and_light_viewable_from_object(
-    geode_object: str, 
-    data: Any
+    geode_object: str, data: Any
 ) -> Dict[str, Any]:
     return save_all_viewables_and_return_info(geode_object, data, input_file=[])
 
 
 def generate_native_viewable_and_light_viewable_from_file(
-    geode_object: str, 
-    input_filename: str
+    geode_object: str, input_filename: str
 ) -> Dict[str, Any]:
     temp_data_entry = Data.create(
         name="temp",
@@ -217,7 +215,7 @@ def generate_native_viewable_and_light_viewable_from_file(
         input_file=[input_filename],
         additional_files=[],
     )
-    
+
     data_path = create_data_folder_from_id(temp_data_entry.id)
 
     full_input_filename = geode_functions.upload_file_path(input_filename)
