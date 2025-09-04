@@ -41,7 +41,7 @@ def object_priority(geode_object: str, file_absolute_path: str) -> int:
     return geode_object_value(geode_object)["object_priority"](file_absolute_path)
 
 
-def load(geode_object: str, file_absolute_path: str): # A virer
+def load(geode_object: str, file_absolute_path: str): # La fonction n'est plus utile
     return geode_object_value(geode_object)["load"](file_absolute_path)
 
 
@@ -52,7 +52,7 @@ def data_file_path(data_id: str) -> str:
         data_id,
     )
 
-
+# c'est le point d'entrée après l'upload et l'inscription dans la database, virer les paramètres de fonctions réutilisants l'id de data afin de simplifier les appels et virer les params également dans les schemas. Corriger ensuite les erreurs dans les routes
 def load_data(geode_object: str, data_id: str, filename: str):
     file_absolute_path = data_file_path(data_id, filename)
     return load(geode_object, file_absolute_path)
