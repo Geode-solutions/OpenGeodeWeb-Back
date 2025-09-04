@@ -1,17 +1,8 @@
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional
 from sqlalchemy import String, JSON
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from .database import database
+from sqlalchemy.orm import Mapped, mapped_column
+from .database import database, Base
 import uuid
-
-
-class Base(DeclarativeBase):
-    pass
-
-
-if TYPE_CHECKING:
-    from sqlalchemy.orm import DeclarativeBase
-
 
 class Data(Base):
     __tablename__ = "datas"
@@ -19,22 +10,23 @@ class Data(Base):
     id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4()).replace("-", "")
     )
-    name = database.Column(String, nullable=False)
-    native_file_name = database.Column(String, nullable=False)
-    viewable_file_name = database.Column(String, nullable=False)
-    light_viewable = database.Column(String, nullable=True)
-    geode_object = database.Column(String, nullable=False)
-    input_file = database.Column(JSON, nullable=True)
-    additional_files = database.Column(JSON, nullable=True)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    native_file_name: Mapped[str] = mapped_column(String, nullable=False)
+    viewable_file_name: Mapped[str] = mapped_column(String, nullable=False)
+    light_viewable: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    geode_object: Mapped[str] = mapped_column(String, nullable=False)
+    input_file: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    additional_files: Mapped[Optional[List[str]]] = mapped_column(JSON, nullable=True)
 
     @staticmethod
     def create(
-        name: str, geode_object: str, input_file: str, additional_files: list[str]
+        name: str,
+        geode_object: str,
+        input_file: Optional[dict] = None,
+        additional_files: Optional[List[str]] = None
     ) -> "Data":
-        if input_file is None:
-            input_file = []
-        if additional_files is None:
-            additional_files = []
+        input_file = input_file if input_file is not None else {}
+        additional_files = additional_files if additional_files is not None else []
 
         data_entry = Data(
             name=name,
