@@ -32,7 +32,7 @@ class Data(database.Model):
             input_file = []
         if additional_files is None:
             additional_files = []
-            
+
         data_entry = Data(
             name=name,
             geode_object=geode_object,

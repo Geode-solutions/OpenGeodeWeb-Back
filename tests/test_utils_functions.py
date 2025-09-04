@@ -142,12 +142,14 @@ def test_save_all_viewables_commits_to_db_properly(client):
             geode_object, data, input_file
         )
         data_id = result["id"]
-        db_entry_before = database.session.get(Data,data_id)
+        db_entry_before = database.session.get(Data, data_id)
         assert db_entry_before is not None
         assert db_entry_before.native_file_name == result["native_file_name"]
         database.session.rollback()
         db_entry_after = database.session.get(Data, data_id)
-        assert db_entry_after is not None, "database.session.commit() was not called - entry missing after rollback"
+        assert (
+            db_entry_after is not None
+        ), "database.session.commit() was not called - entry missing after rollback"
         assert db_entry_after.native_file_name == result["native_file_name"]
 
 
