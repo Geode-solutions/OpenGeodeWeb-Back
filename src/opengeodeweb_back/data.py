@@ -1,13 +1,19 @@
+from typing import List, Optional, TYPE_CHECKING
 from sqlalchemy import String, JSON
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from .database import database
 import uuid
-from typing import Type
 
+class Base(DeclarativeBase):
+    pass
 
-class Data(database.Model):
+if TYPE_CHECKING:
+    from sqlalchemy.orm import DeclarativeBase
+
+class Data(Base):
     __tablename__ = "datas"
 
-    id = database.Column(
+    id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4()).replace("-", "")
     )
     name = database.Column(String, nullable=False)
@@ -24,7 +30,7 @@ class Data(database.Model):
         geode_object: str,
         input_file: str,
         additional_files: list[str]
-    ) -> Type["Data"]:
+    ) -> "Data":
         if input_file is None:
             input_file = []
         if additional_files is None:
@@ -37,7 +43,7 @@ class Data(database.Model):
             additional_files=additional_files,
             native_file_name="",
             viewable_file_name="",
-            light_viewable="",
+            light_viewable=None,
         )
 
         database.session.add(data_entry)
