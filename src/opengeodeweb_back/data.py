@@ -20,10 +20,7 @@ class Data(database.Model):
 
     @staticmethod
     def create(
-        name: str,
-        geode_object: str,
-        input_file: str,
-        additional_files: list[str]
+        name: str, geode_object: str, input_file: str, additional_files: list[str]
     ) -> Type["Data"]:
         if input_file is None:
             input_file = []
