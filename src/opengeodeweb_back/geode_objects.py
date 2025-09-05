@@ -1,12 +1,12 @@
 # Standard library imports
 
 # Third party imports
-import opengeode as og
-import opengeode_io as og_io
-import opengeode_inspector as og_inspector
-import opengeode_geosciences as og_gs
-import opengeode_geosciencesio as og_gs_io
-import geode_viewables as g_v
+import opengeode as og  # type: ignore
+import opengeode_io as og_io  # type: ignore
+import opengeode_inspector as og_inspector  # type: ignore
+import opengeode_geosciences as og_gs  # type: ignore
+import opengeode_geosciencesio as og_gs_io  # type: ignore
+import geode_viewables as g_v  # type: ignore
 
 # Local application imports
 

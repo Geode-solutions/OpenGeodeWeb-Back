@@ -3,13 +3,15 @@ import os
 import threading
 import time
 import zipfile
+from collections.abc import Callable
 from typing import Any
 
 # Third party imports
 import flask
-import fastjsonschema
+import fastjsonschema  # type: ignore
 import importlib.metadata as metadata
 import shutil
+from werkzeug.exceptions import HTTPException
 import werkzeug
 
 # Local application imports
@@ -18,40 +20,40 @@ from .data import Data
 from .database import database
 
 
-def increment_request_counter(current_app):
+def increment_request_counter(current_app: flask.Flask) -> None:
     if "REQUEST_COUNTER" in current_app.config:
-        REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER"))
+        REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER", 0))
         REQUEST_COUNTER += 1
         current_app.config.update(REQUEST_COUNTER=REQUEST_COUNTER)
 
 
-def decrement_request_counter(current_app):
+def decrement_request_counter(current_app: flask.Flask) -> None:
     if "REQUEST_COUNTER" in current_app.config:
-        REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER"))
+        REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER", 0))
         REQUEST_COUNTER -= 1
         current_app.config.update(REQUEST_COUNTER=REQUEST_COUNTER)
 
 
-def update_last_request_time(current_app):
+def update_last_request_time(current_app: flask.Flask) -> None:
     if "LAST_REQUEST_TIME" in current_app.config:
         LAST_REQUEST_TIME = time.time()
         current_app.config.update(LAST_REQUEST_TIME=LAST_REQUEST_TIME)
 
 
-def before_request(current_app):
+def before_request(current_app: flask.Flask) -> None:
     increment_request_counter(current_app)
 
 
-def teardown_request(current_app):
+def teardown_request(current_app: flask.Flask) -> None:
     decrement_request_counter(current_app)
     update_last_request_time(current_app)
 
 
-def kill_task(current_app):
-    REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER"))
-    LAST_PING_TIME = float(current_app.config.get("LAST_PING_TIME"))
-    LAST_REQUEST_TIME = float(current_app.config.get("LAST_REQUEST_TIME"))
-    MINUTES_BEFORE_TIMEOUT = float(current_app.config.get("MINUTES_BEFORE_TIMEOUT"))
+def kill_task(current_app: flask.Flask) -> None:
+    REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER", 0))
+    LAST_PING_TIME = float(current_app.config.get("LAST_PING_TIME", 0))
+    LAST_REQUEST_TIME = float(current_app.config.get("LAST_REQUEST_TIME", 0))
+    MINUTES_BEFORE_TIMEOUT = float(current_app.config.get("MINUTES_BEFORE_TIMEOUT", 0))
     current_time = time.time()
     minutes_since_last_request = (current_time - LAST_REQUEST_TIME) / 60
     minutes_since_last_ping = (current_time - LAST_PING_TIME) / 60
@@ -66,12 +68,12 @@ def kill_task(current_app):
         kill_server()
 
 
-def kill_server():
+def kill_server() -> None:
     print("Server timed out due to inactivity, shutting down...", flush=True)
     os._exit(0)
 
 
-def versions(list_packages: list):
+def versions(list_packages: list[str]) -> list[dict[str, str]]:
     list_with_versions = []
     for package in list_packages:
         list_with_versions.append(
@@ -80,7 +82,7 @@ def versions(list_packages: list):
     return list_with_versions
 
 
-def validate_request(request, schema):
+def validate_request(request: flask.Request, schema: dict[str, str]) -> None:
     json_data = request.get_json(force=True, silent=True)
 
     if json_data is None:
@@ -94,22 +96,26 @@ def validate_request(request, schema):
         flask.abort(400, error_msg)
 
 
-def set_interval(func, sec, args=None):
-    def func_wrapper():
-        set_interval(func, sec, args)
-        func(args)
+def set_interval(
+    function: Callable[[Any], None], seconds: float, args: Any
+) -> threading.Timer:
+    def function_wrapper() -> None:
+        set_interval(function, seconds, args)
+        function(args)
 
-    t = threading.Timer(sec, func_wrapper)
-    t.daemon = True
-    t.start()
-    return t
+    timer = threading.Timer(seconds, function_wrapper)
+    timer.daemon = True
+    timer.start()
+    return timer
 
 
-def extension_from_filename(filename):
+def extension_from_filename(filename: str) -> str:
     return os.path.splitext(filename)[1][1:]
 
 
-def send_file(upload_folder, saved_files, new_file_name):
+def send_file(
+    upload_folder: str, saved_files: str, new_file_name: str
+) -> flask.Response:
     if len(saved_files) == 1:
         mimetype = "application/octet-binary"
     else:
@@ -134,13 +140,13 @@ def send_file(upload_folder, saved_files, new_file_name):
     return response
 
 
-def handle_exception(e):
-    response = e.get_response()
+def handle_exception(exception: HTTPException) -> flask.Response:
+    response = exception.get_response()
     response.data = flask.json.dumps(
         {
-            "code": e.code,
-            "name": e.name,
-            "description": e.description,
+            "code": exception.code,
+            "name": exception.name,
+            "description": exception.description,
         }
     )
     response.content_type = "application/json"

@@ -2,8 +2,8 @@
 import os
 
 # Third party imports
-import opengeode_geosciences as og_gs
-import opengeode as og
+import opengeode_geosciences as og_gs  # type: ignore
+import opengeode as og  # type: ignore
 import werkzeug
 import flask
 
