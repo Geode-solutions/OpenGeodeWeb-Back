@@ -10,6 +10,7 @@ import flask
 # Local application imports
 from .geode_objects import geode_objects_dict
 from . import utils_functions
+from .data import Data
 
 
 def geode_object_value(geode_object: str):
@@ -41,17 +42,35 @@ def object_priority(geode_object: str, file_absolute_path: str) -> int:
     return geode_object_value(geode_object)["object_priority"](file_absolute_path)
 
 
-def load(geode_object: str, file_absolute_path: str): # La fonction n'est plus utile
+def load(geode_object: str, file_absolute_path: str):
     return geode_object_value(geode_object)["load"](file_absolute_path)
 
 
-# c'est le point d'entrée après l'upload et l'inscription dans la database, virer les paramètres de fonctions réutilisants l'id de data afin de simplifier les appels et virer les params également dans les schemas. Corriger ensuite les erreurs dans les routes
-def data_file_path(data_id: str) -> str:
+def data_file_path(data_id: str, filename: str = None) -> str:
     data_folder_path = flask.current_app.config["DATA_FOLDER_PATH"]
-    return os.path.join(
-        data_folder_path,
-        data_id,
-    )
+    if filename:
+        return os.path.join(data_folder_path, data_id, filename)
+    return os.path.join(data_folder_path, data_id)
+
+
+# Get data from database using data_id
+def get_data_info(data_id: str):
+    data_entry = Data.query.get(data_id)
+    if not data_entry:
+        flask.abort(404, f"Data with id {data_id} not found")
+    return data_entry
+
+
+# Using data_id, load data directly
+def load_data_by_id(data_id: str):
+    data_entry = Data.query.get(data_id)
+    if not data_entry:
+        flask.abort(404, f"Data with id {data_id} not found")
+    
+    file_absolute_path = data_file_path(data_id, data_entry.native_file_name)
+    
+    return load(data_entry.geode_object, file_absolute_path)
+
 
 def load_data(geode_object: str, data_id: str, filename: str):
     file_absolute_path = data_file_path(data_id, filename)
