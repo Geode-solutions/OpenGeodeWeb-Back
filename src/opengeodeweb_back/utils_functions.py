@@ -2,54 +2,58 @@
 import os
 import threading
 import time
-import uuid
 import zipfile
+from collections.abc import Callable
+from typing import Any
 
 # Third party imports
 import flask
-import fastjsonschema
+import fastjsonschema  # type: ignore
 import importlib.metadata as metadata
 import shutil
+from werkzeug.exceptions import HTTPException
 import werkzeug
 
 # Local application imports
 from . import geode_functions
+from .data import Data
+from .database import database
 
 
-def increment_request_counter(current_app):
+def increment_request_counter(current_app: flask.Flask) -> None:
     if "REQUEST_COUNTER" in current_app.config:
-        REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER"))
+        REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER", 0))
         REQUEST_COUNTER += 1
         current_app.config.update(REQUEST_COUNTER=REQUEST_COUNTER)
 
 
-def decrement_request_counter(current_app):
+def decrement_request_counter(current_app: flask.Flask) -> None:
     if "REQUEST_COUNTER" in current_app.config:
-        REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER"))
+        REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER", 0))
         REQUEST_COUNTER -= 1
         current_app.config.update(REQUEST_COUNTER=REQUEST_COUNTER)
 
 
-def update_last_request_time(current_app):
+def update_last_request_time(current_app: flask.Flask) -> None:
     if "LAST_REQUEST_TIME" in current_app.config:
         LAST_REQUEST_TIME = time.time()
         current_app.config.update(LAST_REQUEST_TIME=LAST_REQUEST_TIME)
 
 
-def before_request(current_app):
+def before_request(current_app: flask.Flask) -> None:
     increment_request_counter(current_app)
 
 
-def teardown_request(current_app):
+def teardown_request(current_app: flask.Flask) -> None:
     decrement_request_counter(current_app)
     update_last_request_time(current_app)
 
 
-def kill_task(current_app):
-    REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER"))
-    LAST_PING_TIME = float(current_app.config.get("LAST_PING_TIME"))
-    LAST_REQUEST_TIME = float(current_app.config.get("LAST_REQUEST_TIME"))
-    MINUTES_BEFORE_TIMEOUT = float(current_app.config.get("MINUTES_BEFORE_TIMEOUT"))
+def kill_task(current_app: flask.Flask) -> None:
+    REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER", 0))
+    LAST_PING_TIME = float(current_app.config.get("LAST_PING_TIME", 0))
+    LAST_REQUEST_TIME = float(current_app.config.get("LAST_REQUEST_TIME", 0))
+    MINUTES_BEFORE_TIMEOUT = float(current_app.config.get("MINUTES_BEFORE_TIMEOUT", 0))
     current_time = time.time()
     minutes_since_last_request = (current_time - LAST_REQUEST_TIME) / 60
     minutes_since_last_ping = (current_time - LAST_PING_TIME) / 60
@@ -64,12 +68,12 @@ def kill_task(current_app):
         kill_server()
 
 
-def kill_server():
+def kill_server() -> None:
     print("Server timed out due to inactivity, shutting down...", flush=True)
     os._exit(0)
 
 
-def versions(list_packages: list):
+def versions(list_packages: list[str]) -> list[dict[str, str]]:
     list_with_versions = []
     for package in list_packages:
         list_with_versions.append(
@@ -78,7 +82,7 @@ def versions(list_packages: list):
     return list_with_versions
 
 
-def validate_request(request, schema):
+def validate_request(request: flask.Request, schema: dict[str, str]) -> None:
     json_data = request.get_json(force=True, silent=True)
 
     if json_data is None:
@@ -92,22 +96,26 @@ def validate_request(request, schema):
         flask.abort(400, error_msg)
 
 
-def set_interval(func, sec, args=None):
-    def func_wrapper():
-        set_interval(func, sec, args)
-        func(args)
+def set_interval(
+    function: Callable[[Any], None], seconds: float, args: Any
+) -> threading.Timer:
+    def function_wrapper() -> None:
+        set_interval(function, seconds, args)
+        function(args)
 
-    t = threading.Timer(sec, func_wrapper)
-    t.daemon = True
-    t.start()
-    return t
+    timer = threading.Timer(seconds, function_wrapper)
+    timer.daemon = True
+    timer.start()
+    return timer
 
 
-def extension_from_filename(filename):
+def extension_from_filename(filename: str) -> str:
     return os.path.splitext(filename)[1][1:]
 
 
-def send_file(upload_folder, saved_files, new_file_name):
+def send_file(
+    upload_folder: str, saved_files: str, new_file_name: str
+) -> flask.Response:
     if len(saved_files) == 1:
         mimetype = "application/octet-binary"
     else:
@@ -132,30 +140,42 @@ def send_file(upload_folder, saved_files, new_file_name):
     return response
 
 
-def handle_exception(e):
-    response = e.get_response()
+def handle_exception(exception: HTTPException) -> flask.Response:
+    response = exception.get_response()
     response.data = flask.json.dumps(
         {
-            "code": e.code,
-            "name": e.name,
-            "description": e.description,
+            "code": exception.code,
+            "name": exception.name,
+            "description": exception.description,
         }
     )
     response.content_type = "application/json"
     return response
 
 
-def create_unique_data_folder() -> tuple[str, str]:
+def create_data_folder_from_id(data_id: str) -> str:
     base_data_folder = flask.current_app.config["DATA_FOLDER_PATH"]
-    generated_id = str(uuid.uuid4()).replace("-", "")
-    data_path = os.path.join(base_data_folder, generated_id)
+    data_path = os.path.join(base_data_folder, data_id)
     os.makedirs(data_path, exist_ok=True)
-    return generated_id, data_path
+    return data_path
 
 
 def save_all_viewables_and_return_info(
-    geode_object, data, generated_id, data_path, additional_files=None
-):
+    geode_object: str,
+    data: Any,
+    input_file: str,
+    additional_files: list[str] | None = None,
+) -> dict[str, Any]:
+    if additional_files is None:
+        additional_files = []
+
+    data_entry = Data.create(
+        name=data.name(),
+        geode_object=geode_object,
+        input_file=input_file,
+        additional_files=additional_files,
+    )
+    data_path = create_data_folder_from_id(data_entry.id)
     saved_native_file_path = geode_functions.save(
         geode_object,
         data,
@@ -170,28 +190,42 @@ def save_all_viewables_and_return_info(
     )
     with open(saved_light_viewable_file_path, "rb") as f:
         binary_light_viewable = f.read()
+    data_entry.native_file_name = os.path.basename(saved_native_file_path[0])
+    data_entry.viewable_file_name = os.path.basename(saved_viewable_file_path)
+    data_entry.light_viewable = os.path.basename(saved_light_viewable_file_path)
+
+    database.session.commit()
 
     return {
-        "name": data.name(),
-        "native_file_name": os.path.basename(saved_native_file_path[0]),
-        "viewable_file_name": os.path.basename(saved_viewable_file_path),
-        "id": generated_id,
+        "name": data_entry.name,
+        "native_file_name": data_entry.native_file_name,
+        "viewable_file_name": data_entry.viewable_file_name,
+        "id": data_entry.id,
         "object_type": geode_functions.get_object_type(geode_object),
         "binary_light_viewable": binary_light_viewable.decode("utf-8"),
-        "geode_object": geode_object,
-        "input_files": additional_files or [],
+        "geode_object": data_entry.geode_object,
+        "input_files": data_entry.input_file,
+        "additional_files": data_entry.additional_files,
     }
 
 
-def generate_native_viewable_and_light_viewable_from_object(geode_object, data):
-    generated_id, data_path = create_unique_data_folder()
-    return save_all_viewables_and_return_info(
-        geode_object, data, generated_id, data_path
+def generate_native_viewable_and_light_viewable_from_object(
+    geode_object: str, data: Any
+) -> dict[str, Any]:
+    return save_all_viewables_and_return_info(geode_object, data, input_file="")
+
+
+def generate_native_viewable_and_light_viewable_from_file(
+    geode_object: str, input_filename: str
+) -> dict[str, Any]:
+    temp_data_entry = Data.create(
+        name="temp",
+        geode_object=geode_object,
+        input_file=input_filename,
+        additional_files=[],
     )
 
-
-def generate_native_viewable_and_light_viewable_from_file(geode_object, input_filename):
-    generated_id, data_path = create_unique_data_folder()
+    data_path = create_data_folder_from_id(temp_data_entry.id)
 
     full_input_filename = geode_functions.upload_file_path(input_filename)
     copied_full_path = os.path.join(
@@ -199,7 +233,7 @@ def generate_native_viewable_and_light_viewable_from_file(geode_object, input_fi
     )
     shutil.copy2(full_input_filename, copied_full_path)
 
-    additional_files_copied = []
+    additional_files_copied: list[str] = []
     additional = geode_functions.additional_files(geode_object, full_input_filename)
     for additional_file in additional.mandatory_files + additional.optional_files:
         if additional_file.is_missing:
@@ -214,12 +248,14 @@ def generate_native_viewable_and_light_viewable_from_file(geode_object, input_fi
         shutil.copy2(source_path, dest_path)
         additional_files_copied.append(additional_file.filename)
 
-    data = geode_functions.load_data(geode_object, generated_id, input_filename)
+    data = geode_functions.load_data(geode_object, temp_data_entry.id, input_filename)
+
+    database.session.delete(temp_data_entry)
+    database.session.flush()
 
     return save_all_viewables_and_return_info(
         geode_object,
         data,
-        generated_id,
-        data_path,
+        input_file=input_filename,
         additional_files=additional_files_copied,
     )
