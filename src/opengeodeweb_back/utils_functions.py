@@ -248,7 +248,7 @@ def generate_native_viewable_and_light_viewable_from_file(
         shutil.copy2(source_path, dest_path)
         additional_files_copied.append(additional_file.filename)
 
-    data = geode_functions.load_data(geode_object, temp_data_entry.id, input_filename)
+    data = geode_functions.load(geode_object, copied_full_path)
 
     database.session.delete(temp_data_entry)
     database.session.flush()

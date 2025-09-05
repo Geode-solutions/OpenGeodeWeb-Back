@@ -7,6 +7,8 @@ from werkzeug.datastructures import FileStorage
 
 # Local application imports
 from src.opengeodeweb_back import geode_functions, geode_objects, test_utils
+from src.opengeodeweb_back.data import Data
+from src.opengeodeweb_back.database import database
 
 
 def test_allowed_files(client):
@@ -169,18 +171,25 @@ def test_save_viewable_file(client):
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_texture_coordinates(client, test_id):
+def test_texture_coordinates(client, test_id):    
     with client.application.app_context():
-        data_path = geode_functions.data_file_path(test_id, "hat.vtp")
+        data = Data.create(
+            name="hat",
+            geode_object="PolygonalSurface3D",
+            input_file="hat.vtp"
+        )
+        data.native_file_name = "hat.vtp"
+        database.session.commit()
+
+        data_path = geode_functions.data_file_path(data.id, "hat.vtp")
+        print(data_path)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
         shutil.copy("./tests/data/hat.vtp", data_path)
 
     response = client.post(
         "/texture_coordinates",
         json={
-            "input_geode_object": "PolygonalSurface3D",
-            "id": test_id,
-            "filename": "hat.vtp",
+            "id": data.id
         },
     )
     assert response.status_code == 200
@@ -211,9 +220,7 @@ def test_vertex_attribute_names(client, test_id):
 
                             def get_full_data():
                                 return {
-                                    "input_geode_object": geode_object,
                                     "id": test_id,
-                                    "filename": f"test.{input_extension}",
                                 }
 
                             response = client.post(route, json=get_full_data())
@@ -250,9 +257,7 @@ def test_polygon_attribute_names(client, test_id):
 
                             def get_full_data():
                                 return {
-                                    "input_geode_object": geode_object,
                                     "id": test_id,
-                                    "filename": f"test.{input_extension}",
                                 }
 
                             response = client.post(route, json=get_full_data())
@@ -289,9 +294,7 @@ def test_polyhedron_attribute_names(client, test_id):
 
                             def get_full_data():
                                 return {
-                                    "input_geode_object": geode_object,
                                     "id": test_id,
-                                    "filename": f"test.{input_extension}",
                                 }
 
                             response = client.post(route, json=get_full_data())

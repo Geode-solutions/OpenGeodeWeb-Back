@@ -11,6 +11,7 @@ import flask
 from .geode_objects import geode_objects_dict
 from . import utils_functions
 from .data import Data
+from .database import database
 
 
 def geode_object_value(geode_object: str):
@@ -53,17 +54,9 @@ def data_file_path(data_id: str, filename: str = None) -> str:
     return os.path.join(data_folder_path, data_id)
 
 
-# Get data from database using data_id
-def get_data_info(data_id: str):
-    data_entry = Data.query.get(data_id)
-    if not data_entry:
-        flask.abort(404, f"Data with id {data_id} not found")
-    return data_entry
-
-
-# Using data_id, load data directly
 def load_data_by_id(data_id: str):
-    data_entry = Data.query.get(data_id)
+    data_entry = database.session.get(Data, data_id)
+    print(data_entry.geode_object)
     if not data_entry:
         flask.abort(404, f"Data with id {data_id} not found")
     
@@ -72,9 +65,12 @@ def load_data_by_id(data_id: str):
     return load(data_entry.geode_object, file_absolute_path)
 
 
-def load_data(geode_object: str, data_id: str, filename: str):
-    file_absolute_path = data_file_path(data_id, filename)
-    return load(geode_object, file_absolute_path)
+def get_data_info(data_id: str):
+    from .data import Data
+    data_entry = database.session.get(Data, data_id)
+    if not data_entry:
+        flask.abort(404, f"Data with id {data_id} not found")
+    return data_entry
 
 
 def upload_file_path(filename):
