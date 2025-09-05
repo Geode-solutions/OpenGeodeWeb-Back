@@ -17,12 +17,17 @@ flask[async]==3.0.3
     #   -r requirements.in
     #   flask
     #   flask-cors
+    #   flask-sqlalchemy
 flask-cors==6.0.1
+    # via -r requirements.in
+flask-sqlalchemy==3.1.1
     # via -r requirements.in
 geode-common==33.9.0
     # via geode-viewables
 geode-viewables==3.2.0
     # via -r requirements.in
+greenlet==3.2.4
+    # via sqlalchemy
 itsdangerous==2.2.0
     # via flask
 jinja2==3.1.6
@@ -54,6 +59,10 @@ opengeode-io==7.3.2
     #   -r requirements.in
     #   geode-viewables
     #   opengeode-geosciencesio
+sqlalchemy==2.0.43
+    # via flask-sqlalchemy
+typing-extensions==4.15.0
+    # via sqlalchemy
 werkzeug==3.0.3
     # via
     #   -r requirements.in

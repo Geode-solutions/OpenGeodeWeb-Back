@@ -2,7 +2,6 @@
 import os
 import threading
 import time
-import uuid
 import zipfile
 from collections.abc import Callable
 from typing import Any
@@ -17,6 +16,8 @@ import werkzeug
 
 # Local application imports
 from . import geode_functions
+from .data import Data
+from .database import database
 
 
 def increment_request_counter(current_app: flask.Flask) -> None:
@@ -152,17 +153,29 @@ def handle_exception(exception: HTTPException) -> flask.Response:
     return response
 
 
-def create_unique_data_folder() -> tuple[str, str]:
+def create_data_folder_from_id(data_id: str) -> str:
     base_data_folder = flask.current_app.config["DATA_FOLDER_PATH"]
-    generated_id = str(uuid.uuid4()).replace("-", "")
-    data_path = os.path.join(base_data_folder, generated_id)
+    data_path = os.path.join(base_data_folder, data_id)
     os.makedirs(data_path, exist_ok=True)
-    return generated_id, data_path
+    return data_path
 
 
 def save_all_viewables_and_return_info(
-    geode_object, data, generated_id, data_path, additional_files=None
-):
+    geode_object: str,
+    data: Any,
+    input_file: str,
+    additional_files: list[str] | None = None,
+) -> dict[str, Any]:
+    if additional_files is None:
+        additional_files = []
+
+    data_entry = Data.create(
+        name=data.name(),
+        geode_object=geode_object,
+        input_file=input_file,
+        additional_files=additional_files,
+    )
+    data_path = create_data_folder_from_id(data_entry.id)
     saved_native_file_path = geode_functions.save(
         geode_object,
         data,
@@ -177,28 +190,42 @@ def save_all_viewables_and_return_info(
     )
     with open(saved_light_viewable_file_path, "rb") as f:
         binary_light_viewable = f.read()
+    data_entry.native_file_name = os.path.basename(saved_native_file_path[0])
+    data_entry.viewable_file_name = os.path.basename(saved_viewable_file_path)
+    data_entry.light_viewable = os.path.basename(saved_light_viewable_file_path)
+
+    database.session.commit()
 
     return {
-        "name": data.name(),
-        "native_file_name": os.path.basename(saved_native_file_path[0]),
-        "viewable_file_name": os.path.basename(saved_viewable_file_path),
-        "id": generated_id,
+        "name": data_entry.name,
+        "native_file_name": data_entry.native_file_name,
+        "viewable_file_name": data_entry.viewable_file_name,
+        "id": data_entry.id,
         "object_type": geode_functions.get_object_type(geode_object),
         "binary_light_viewable": binary_light_viewable.decode("utf-8"),
-        "geode_object": geode_object,
-        "input_files": additional_files or [],
+        "geode_object": data_entry.geode_object,
+        "input_files": data_entry.input_file,
+        "additional_files": data_entry.additional_files,
     }
 
 
-def generate_native_viewable_and_light_viewable_from_object(geode_object, data):
-    generated_id, data_path = create_unique_data_folder()
-    return save_all_viewables_and_return_info(
-        geode_object, data, generated_id, data_path
+def generate_native_viewable_and_light_viewable_from_object(
+    geode_object: str, data: Any
+) -> dict[str, Any]:
+    return save_all_viewables_and_return_info(geode_object, data, input_file="")
+
+
+def generate_native_viewable_and_light_viewable_from_file(
+    geode_object: str, input_filename: str
+) -> dict[str, Any]:
+    temp_data_entry = Data.create(
+        name="temp",
+        geode_object=geode_object,
+        input_file=input_filename,
+        additional_files=[],
     )
 
-
-def generate_native_viewable_and_light_viewable_from_file(geode_object, input_filename):
-    generated_id, data_path = create_unique_data_folder()
+    data_path = create_data_folder_from_id(temp_data_entry.id)
 
     full_input_filename = geode_functions.upload_file_path(input_filename)
     copied_full_path = os.path.join(
@@ -206,7 +233,7 @@ def generate_native_viewable_and_light_viewable_from_file(geode_object, input_fi
     )
     shutil.copy2(full_input_filename, copied_full_path)
 
-    additional_files_copied = []
+    additional_files_copied: list[str] = []
     additional = geode_functions.additional_files(geode_object, full_input_filename)
     for additional_file in additional.mandatory_files + additional.optional_files:
         if additional_file.is_missing:
@@ -221,12 +248,14 @@ def generate_native_viewable_and_light_viewable_from_file(geode_object, input_fi
         shutil.copy2(source_path, dest_path)
         additional_files_copied.append(additional_file.filename)
 
-    data = geode_functions.load_data(geode_object, generated_id, input_filename)
+    data = geode_functions.load_data(geode_object, temp_data_entry.id, input_filename)
+
+    database.session.delete(temp_data_entry)
+    database.session.flush()
 
     return save_all_viewables_and_return_info(
         geode_object,
         data,
-        generated_id,
-        data_path,
+        input_file=input_filename,
         additional_files=additional_files_copied,
     )

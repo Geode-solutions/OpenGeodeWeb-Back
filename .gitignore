@@ -11,3 +11,4 @@ uploads
 node_modules
 schemas.json
 .mypy_cache
+*.db
