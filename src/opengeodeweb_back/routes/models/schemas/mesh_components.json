@@ -8,20 +8,10 @@
     "id": {
       "type": "string",
       "minLength": 1      
-    },
-    "filename": {
-      "type": "string",
-      "minLength": 1
-    },
-    "geode_object": {
-      "type": "string",
-      "minLength": 1
     }
   },
   "required": [
-    "id",
-    "filename",
-    "geode_object"
+    "id"
   ],
   "additionalProperties": false
 }
