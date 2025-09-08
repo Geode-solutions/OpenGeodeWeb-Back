@@ -47,7 +47,7 @@ def load(geode_object: str, file_absolute_path: str):
     return geode_object_value(geode_object)["load"](file_absolute_path)
 
 
-def data_file_path(data_id: str, filename: str = None) -> str:
+def data_file_path(data_id: str, filename: str = "") -> str:
     data_folder_path = flask.current_app.config["DATA_FOLDER_PATH"]
     if filename:
         return os.path.join(data_folder_path, data_id, filename)
@@ -55,19 +55,19 @@ def data_file_path(data_id: str, filename: str = None) -> str:
 
 
 def load_data(data_id: str):
-    data_entry = Data.get(Data, data_id)
+    data_entry = Data.get(data_id)
     if not data_entry:
         flask.abort(404, f"Data with id {data_id} not found")
 
     file_absolute_path = data_file_path(data_id, data_entry.native_file_name)
-
     return load(data_entry.geode_object, file_absolute_path)
 
 
-def get_data_info(data_id: str):
+
+def get_data_info(data_id: str) -> Data:
     from .data import Data
 
-    data_entry = Data.get(data_id)
+    data_entry = Data.get(Data, data_id)
     if not data_entry:
         flask.abort(404, f"Data with id {data_id} not found")
     return data_entry
