@@ -49,6 +49,6 @@ with open(os.path.join(schemas, "mesh_components.json"), "r") as file:
 @routes.route(mesh_components_json["route"], methods=mesh_components_json["methods"])
 def extract_uuids_endpoint():
     utils_functions.validate_request(flask.request, mesh_components_json)
-    model = geode_functions.load_data_by_id(flask.request.json["id"])
+    model = geode_functions.load_data(flask.request.json["id"])
     uuid_dict = extract_model_uuids(model)
     return flask.make_response({"uuid_dict": uuid_dict}, 200)

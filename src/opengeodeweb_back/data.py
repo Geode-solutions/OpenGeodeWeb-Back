@@ -10,7 +10,6 @@ class Data(Base):
     id: Mapped[str] = mapped_column(
         String, primary_key=True, default=lambda: str(uuid.uuid4()).replace("-", "")
     )
-    # name: Mapped[str] = mapped_column(String, nullable=False)
     native_file_name: Mapped[str] = mapped_column(String, nullable=False)
     viewable_file_name: Mapped[str] = mapped_column(String, nullable=False)
     geode_object: Mapped[str] = mapped_column(String, nullable=False)
@@ -41,6 +40,6 @@ class Data(Base):
         database.session.flush()
         return data_entry
 
-    @classmethod
+    @staticmethod
     def get(cls, data_id: str) -> "Data | None":
         return database.session.get(cls, data_id)
