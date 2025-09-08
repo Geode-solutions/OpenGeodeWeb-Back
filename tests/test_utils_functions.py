@@ -119,7 +119,7 @@ def test_save_all_viewables_and_return_info(client):
         assert result["geode_object"] == geode_object
         assert result["input_files"] == input_file
 
-        db_entry = database.session.get(Data, result["id"])
+        db_entry = Data.get(result["id"])
         assert db_entry is not None
         assert db_entry.name == data.name()
         assert db_entry.native_file_name == result["native_file_name"]
@@ -132,7 +132,7 @@ def test_save_all_viewables_and_return_info(client):
         assert os.path.exists(expected_data_path)
 
 
-def test_save_all_viewables_commits_to_db_properly(client):
+def test_save_all_viewables_commits_to_db(client):
     app = client.application
     with app.app_context():
         geode_object = "BRep"
@@ -142,11 +142,11 @@ def test_save_all_viewables_commits_to_db_properly(client):
             geode_object, data, input_file
         )
         data_id = result["id"]
-        db_entry_before = database.session.get(Data, data_id)
+        db_entry_before = Data.get(data_id)
         assert db_entry_before is not None
         assert db_entry_before.native_file_name == result["native_file_name"]
         database.session.rollback()
-        db_entry_after = database.session.get(Data, data_id)
+        db_entry_after = Data.get(data_id)
         assert (
             db_entry_after is not None
         ), "database.session.commit() was not called - entry missing after rollback"
