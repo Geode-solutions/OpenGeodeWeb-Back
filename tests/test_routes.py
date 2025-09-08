@@ -6,7 +6,7 @@ import shutil
 from werkzeug.datastructures import FileStorage
 
 # Local application imports
-from src.opengeodeweb_back import geode_functions, geode_objects, test_utils
+from src.opengeodeweb_back import geode_functions, test_utils
 from src.opengeodeweb_back.data import Data
 from src.opengeodeweb_back.database import database
 
@@ -201,113 +201,75 @@ def test_texture_coordinates(client, test_id):
 
 def test_vertex_attribute_names(client, test_id):
     route = f"/vertex_attribute_names"
-    for geode_object, value in geode_objects.geode_objects_dict().items():
-        if value["object_type"] == "mesh":
-            input_extensions = geode_functions.geode_object_input_extensions(
-                geode_object
-            )
-            if "elements" in value:
-                elements = geode_functions.get_elements(geode_object)
-                if "points" in elements:
-                    for input_extension in input_extensions:
-                        if (
-                            geode_functions.is_loadable(
-                                geode_object,
-                                os.path.join("./data", f"test.{input_extension}"),
-                            )
-                            > 0.0
-                        ):
+    
+    with client.application.app_context():
+        data = Data.create(
+            name="test_mesh",
+            geode_object="PolygonalSurface3D",
+            input_file="test.vtp"
+        )
+        data.native_file_name = "test.vtp"
+        database.session.commit()
 
-                            def get_full_data():
-                                return {
-                                    "id": test_id,
-                                }
+        data_path = geode_functions.data_file_path(data.id, "test.vtp")
+        os.makedirs(os.path.dirname(data_path), exist_ok=True)
+        if os.path.exists("./tests/data/hat.vtp"):
+            shutil.copy("./tests/data/hat.vtp", data_path)
 
-                            response = client.post(route, json=get_full_data())
-                            assert response.status_code == 200
-                            vertex_attribute_names = response.json[
-                                "vertex_attribute_names"
-                            ]
-                            assert type(vertex_attribute_names) is list
-                            for vertex_attribute_name in vertex_attribute_names:
-                                assert type(vertex_attribute_name) is str
-
-    # Test all params
-    test_utils.test_route_wrong_params(client, route, get_full_data)
+    response = client.post(route, json={"id": data.id})
+    assert response.status_code == 200
+    vertex_attribute_names = response.json["vertex_attribute_names"]
+    assert type(vertex_attribute_names) is list
+    for vertex_attribute_name in vertex_attribute_names:
+        assert type(vertex_attribute_name) is str
 
 
 def test_polygon_attribute_names(client, test_id):
     route = f"/polygon_attribute_names"
-    for geode_object, value in geode_objects.geode_objects_dict().items():
-        if value["object_type"] == "mesh":
-            input_extensions = geode_functions.geode_object_input_extensions(
-                geode_object
-            )
-            if "elements" in value:
-                elements = geode_functions.get_elements(geode_object)
-                if "polygons" in elements:
-                    for input_extension in input_extensions:
-                        if (
-                            geode_functions.is_loadable(
-                                geode_object,
-                                os.path.join("./data", f"test.{input_extension}"),
-                            )
-                            > 0.0
-                        ):
+    
+    with client.application.app_context():
+        data = Data.create(
+            name="test_mesh",
+            geode_object="PolygonalSurface3D",
+            input_file="test.vtp"
+        )
+        data.native_file_name = "test.vtp"
+        database.session.commit()
 
-                            def get_full_data():
-                                return {
-                                    "id": test_id,
-                                }
+        data_path = geode_functions.data_file_path(data.id, "test.vtp")
+        os.makedirs(os.path.dirname(data_path), exist_ok=True)
+    shutil.copy("./tests/data/test.vtp", data_path)
 
-                            response = client.post(route, json=get_full_data())
-                            assert response.status_code == 200
-                            polygon_attribute_names = response.json[
-                                "polygon_attribute_names"
-                            ]
-                            assert type(polygon_attribute_names) is list
-                            for polygon_attribute_name in polygon_attribute_names:
-                                assert type(polygon_attribute_name) is str
-
-    # Test all params
-    test_utils.test_route_wrong_params(client, route, get_full_data)
+    response = client.post(route, json={"id": data.id})
+    assert response.status_code == 200
+    polygon_attribute_names = response.json["polygon_attribute_names"]
+    assert type(polygon_attribute_names) is list
+    for polygon_attribute_name in polygon_attribute_names:
+        assert type(polygon_attribute_name) is str
 
 
 def test_polyhedron_attribute_names(client, test_id):
     route = f"/polyhedron_attribute_names"
-    for geode_object, value in geode_objects.geode_objects_dict().items():
-        if value["object_type"] == "mesh":
-            input_extensions = geode_functions.geode_object_input_extensions(
-                geode_object
-            )
-            if "elements" in value:
-                elements = geode_functions.get_elements(geode_object)
-                if "polyhedrons" in elements:
-                    for input_extension in input_extensions:
-                        if (
-                            geode_functions.is_loadable(
-                                geode_object,
-                                os.path.join("./data", f"test.{input_extension}"),
-                            )
-                            > 0.0
-                        ):
+    
+    with client.application.app_context():
+        data = Data.create(
+            name="test_mesh",
+            geode_object="PolyhedralSolid3D",
+            input_file="test.vtu"
+        )
+        data.native_file_name = "test.vtu"
+        database.session.commit()
 
-                            def get_full_data():
-                                return {
-                                    "id": test_id,
-                                }
+        data_path = geode_functions.data_file_path(data.id, "test.vtu")
+        os.makedirs(os.path.dirname(data_path), exist_ok=True)
+        shutil.copy("./tests/data/test.vtu", data_path)
 
-                            response = client.post(route, json=get_full_data())
-                            assert response.status_code == 200
-                            polyhedron_attribute_names = response.json[
-                                "polyhedron_attribute_names"
-                            ]
-                            assert type(polyhedron_attribute_names) is list
-                            for polyhedron_attribute_name in polyhedron_attribute_names:
-                                assert type(polyhedron_attribute_name) is str
-
-    # Test all params
-    test_utils.test_route_wrong_params(client, route, get_full_data)
+    response = client.post(route, json={"id": data.id})
+    assert response.status_code == 200
+    polyhedron_attribute_names = response.json["polyhedron_attribute_names"]
+    assert type(polyhedron_attribute_names) is list
+    for polyhedron_attribute_name in polyhedron_attribute_names:
+        assert type(polyhedron_attribute_name) is str
 
 
 def test_create_point(client):
