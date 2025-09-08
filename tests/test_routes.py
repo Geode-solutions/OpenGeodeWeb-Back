@@ -169,12 +169,9 @@ def test_save_viewable_file(client):
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_texture_coordinates(client, test_id):    
+def test_texture_coordinates(client, test_id):
     with client.application.app_context():
-        data = Data.create(
-            geode_object="PolygonalSurface3D",
-            input_file="hat.vtp"
-        )
+        data = Data.create(geode_object="PolygonalSurface3D", input_file="hat.vtp")
         data.native_file_name = "hat.vtp"
         database.session.commit()
 
@@ -185,9 +182,7 @@ def test_texture_coordinates(client, test_id):
 
     response = client.post(
         "/texture_coordinates",
-        json={
-            "id": data.id
-        },
+        json={"id": data.id},
     )
     assert response.status_code == 200
     texture_coordinates = response.json["texture_coordinates"]
@@ -198,12 +193,9 @@ def test_texture_coordinates(client, test_id):
 
 def test_vertex_attribute_names(client, test_id):
     route = f"/vertex_attribute_names"
-    
+
     with client.application.app_context():
-        data = Data.create(
-            geode_object="PolygonalSurface3D",
-            input_file="test.vtp"
-        )
+        data = Data.create(geode_object="PolygonalSurface3D", input_file="test.vtp")
         data.native_file_name = "test.vtp"
         database.session.commit()
 
@@ -222,12 +214,9 @@ def test_vertex_attribute_names(client, test_id):
 
 def test_polygon_attribute_names(client, test_id):
     route = f"/polygon_attribute_names"
-    
+
     with client.application.app_context():
-        data = Data.create(
-            geode_object="PolygonalSurface3D",
-            input_file="test.vtp"
-        )
+        data = Data.create(geode_object="PolygonalSurface3D", input_file="test.vtp")
         data.native_file_name = "test.vtp"
         database.session.commit()
 
@@ -245,12 +234,9 @@ def test_polygon_attribute_names(client, test_id):
 
 def test_polyhedron_attribute_names(client, test_id):
     route = f"/polyhedron_attribute_names"
-    
+
     with client.application.app_context():
-        data = Data.create(
-            geode_object="PolyhedralSolid3D",
-            input_file="test.vtu"
-        )
+        data = Data.create(geode_object="PolyhedralSolid3D", input_file="test.vtu")
         data.native_file_name = "test.vtu"
         database.session.commit()
 

@@ -41,7 +41,6 @@ class Data(Base):
         database.session.flush()
         return data_entry
 
-
     @classmethod
     def get(cls, data_id: str) -> "Data | None":
         return database.session.get(cls, data_id)

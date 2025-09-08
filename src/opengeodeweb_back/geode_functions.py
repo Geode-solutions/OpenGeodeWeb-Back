@@ -58,14 +58,15 @@ def load_data_by_id(data_id: str):
     data_entry = Data.get(data_id)
     if not data_entry:
         flask.abort(404, f"Data with id {data_id} not found")
-    
+
     file_absolute_path = data_file_path(data_id, data_entry.native_file_name)
-    
+
     return load(data_entry.geode_object, file_absolute_path)
 
 
 def get_data_info(data_id: str):
     from .data import Data
+
     data_entry = Data.get(data_id)
     if not data_entry:
         flask.abort(404, f"Data with id {data_id} not found")
