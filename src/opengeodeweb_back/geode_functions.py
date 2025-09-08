@@ -6,6 +6,7 @@ import opengeode_geosciences as og_gs  # type: ignore
 import opengeode as og  # type: ignore
 import werkzeug
 import flask
+from typing import Any
 
 # Local application imports
 from .geode_objects import geode_objects_dict
@@ -54,7 +55,7 @@ def data_file_path(data_id: str, filename: str = "") -> str:
     return os.path.join(data_folder_path, data_id)
 
 
-def load_data(data_id: str) -> og.GeodeObject:
+def load_data(data_id: str) -> Any:
     data_entry = Data.get(data_id)
     if not data_entry:
         flask.abort(404, f"Data with id {data_id} not found")

@@ -157,7 +157,7 @@ def test_save_viewable_file(client):
     assert type(native_file_name) is str
     viewable_file_name = response.json["viewable_file_name"]
     assert type(viewable_file_name) is str
-    id = response.json["id"]
+    id = response.json("id")
     assert type(id) is str
     object_type = response.json["object_type"]
     assert type(object_type) is str
@@ -261,7 +261,7 @@ def test_create_point(client):
     assert response.status_code == 200
     viewable_file_name = response.json["viewable_file_name"]
     assert type(viewable_file_name) is str
-    id = response.json["id"]
+    id = response.json("id")
     assert type(id) is str
 
     # Test all params
