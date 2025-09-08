@@ -290,7 +290,7 @@ with open(os.path.join(schemas, "texture_coordinates.json"), "r") as file:
 )
 def texture_coordinates():
     utils_functions.validate_request(flask.request, texture_coordinates_json)
-    data = geode_functions.load_data(flask.request.json.get("id"))
+    data = geode_functions.load_data(flask.request.get_json().get("id"))
     texture_coordinates = data.texture_manager().texture_names()
     return flask.make_response({"texture_coordinates": texture_coordinates}, 200)
 
