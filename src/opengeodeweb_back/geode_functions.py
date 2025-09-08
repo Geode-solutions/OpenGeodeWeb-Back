@@ -63,7 +63,6 @@ def load_data(data_id: str):
     return load(data_entry.geode_object, file_absolute_path)
 
 
-
 def get_data_info(data_id: str) -> Data:
     from .data import Data
 
