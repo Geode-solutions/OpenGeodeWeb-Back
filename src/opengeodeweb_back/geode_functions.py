@@ -54,7 +54,7 @@ def data_file_path(data_id: str, filename: str = "") -> str:
     return os.path.join(data_folder_path, data_id)
 
 
-def load_data(data_id: str):
+def load_data(data_id: str) -> og.GeodeObject:
     data_entry = Data.get(data_id)
     if not data_entry:
         flask.abort(404, f"Data with id {data_id} not found")
