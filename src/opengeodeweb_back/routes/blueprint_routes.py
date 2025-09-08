@@ -195,7 +195,9 @@ def inspect_file():
     utils_functions.validate_request(flask.request, inspect_file_json)
 
     file_path = geode_functions.upload_file_path(flask.request.get_json()["filename"])
-    data = geode_functions.load(flask.request.get_json()["input_geode_object"], file_path)
+    data = geode_functions.load(
+        flask.request.get_json()["input_geode_object"], file_path
+    )
     class_inspector = geode_functions.inspect(
         flask.request.get_json()["input_geode_object"], data
     )
