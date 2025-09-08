@@ -108,7 +108,6 @@ def test_save_all_viewables_and_return_info(client):
         )
 
         assert isinstance(result, dict)
-        assert result["name"] == data.name()
         assert result["native_file_name"].startswith("native.")
         assert result["viewable_file_name"].endswith(".vtm")
         assert isinstance(result["id"], str)
@@ -121,7 +120,6 @@ def test_save_all_viewables_and_return_info(client):
 
         db_entry = Data.get(result["id"])
         assert db_entry is not None
-        assert db_entry.name == data.name()
         assert db_entry.native_file_name == result["native_file_name"]
         assert db_entry.viewable_file_name == result["viewable_file_name"]
         assert db_entry.geode_object == geode_object
@@ -166,7 +164,6 @@ def test_generate_native_viewable_and_light_viewable_from_object(client):
         )
 
     assert isinstance(result, dict)
-    assert isinstance(result["name"], str)
     assert isinstance(result["native_file_name"], str)
     assert result["native_file_name"].startswith("native.")
     assert isinstance(result["viewable_file_name"], str)
@@ -189,7 +186,6 @@ def test_generate_native_viewable_and_light_viewable_from_file(client):
         )
 
     assert isinstance(result, dict)
-    assert isinstance(result["name"], str)
     assert isinstance(result["native_file_name"], str)
     assert result["native_file_name"].startswith("native.")
     assert isinstance(result["viewable_file_name"], str)

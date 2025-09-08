@@ -56,7 +56,6 @@ def data_file_path(data_id: str, filename: str = None) -> str:
 
 def load_data_by_id(data_id: str):
     data_entry = Data.get(data_id)
-    print(data_entry.geode_object)
     if not data_entry:
         flask.abort(404, f"Data with id {data_id} not found")
     

@@ -170,7 +170,6 @@ def save_all_viewables_and_return_info(
         additional_files = []
 
     data_entry = Data.create(
-        name=data.name(),
         geode_object=geode_object,
         input_file=input_file,
         additional_files=additional_files,
@@ -197,7 +196,6 @@ def save_all_viewables_and_return_info(
     database.session.commit()
 
     return {
-        "name": data_entry.name,
         "native_file_name": data_entry.native_file_name,
         "viewable_file_name": data_entry.viewable_file_name,
         "id": data_entry.id,
@@ -219,7 +217,6 @@ def generate_native_viewable_and_light_viewable_from_file(
     geode_object: str, input_filename: str
 ) -> dict[str, Any]:
     temp_data_entry = Data.create(
-        name="temp",
         geode_object=geode_object,
         input_file=input_filename,
         additional_files=[],

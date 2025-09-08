@@ -153,8 +153,6 @@ def test_save_viewable_file(client):
     # Normal test with filename 'corbi.og_brep'
     response = client.post(route, json=get_full_data())
     assert response.status_code == 200
-    name = response.json["name"]
-    assert type(name) is str
     native_file_name = response.json["native_file_name"]
     assert type(native_file_name) is str
     viewable_file_name = response.json["viewable_file_name"]
@@ -174,7 +172,6 @@ def test_save_viewable_file(client):
 def test_texture_coordinates(client, test_id):    
     with client.application.app_context():
         data = Data.create(
-            name="hat",
             geode_object="PolygonalSurface3D",
             input_file="hat.vtp"
         )
@@ -204,7 +201,6 @@ def test_vertex_attribute_names(client, test_id):
     
     with client.application.app_context():
         data = Data.create(
-            name="test_mesh",
             geode_object="PolygonalSurface3D",
             input_file="test.vtp"
         )
@@ -229,7 +225,6 @@ def test_polygon_attribute_names(client, test_id):
     
     with client.application.app_context():
         data = Data.create(
-            name="test_mesh",
             geode_object="PolygonalSurface3D",
             input_file="test.vtp"
         )
@@ -253,7 +248,6 @@ def test_polyhedron_attribute_names(client, test_id):
     
     with client.application.app_context():
         data = Data.create(
-            name="test_mesh",
             geode_object="PolyhedralSolid3D",
             input_file="test.vtu"
         )
