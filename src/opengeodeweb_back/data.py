@@ -21,7 +21,6 @@ class Data(Base):
 
     @staticmethod
     def create(
-        # name: str,
         geode_object: str,
         input_file: str | None = None,
         additional_files: list[str] | None = None,
@@ -30,7 +29,6 @@ class Data(Base):
         additional_files = additional_files if additional_files is not None else []
 
         data_entry = Data(
-            # name=name,
             geode_object=geode_object,
             input_file=input_file,
             additional_files=additional_files,
