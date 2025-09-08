@@ -308,7 +308,7 @@ with open(
 )
 def vertex_attribute_names():
     utils_functions.validate_request(flask.request, vertex_attribute_names_json)
-    data = geode_functions.load_data(flask.request.json("id"))
+    data = geode_functions.load_data(flask.request.json.get("id"))
     vertex_attribute_names = data.vertex_attribute_manager().attribute_names()
     return flask.make_response(
         {
@@ -331,7 +331,7 @@ with open(
 )
 def polygon_attribute_names():
     utils_functions.validate_request(flask.request, polygon_attribute_names_json)
-    data = geode_functions.load_data(flask.request.json("id"))
+    data = geode_functions.load_data(flask.request.json.get("id"))
     polygon_attribute_names = data.polygon_attribute_manager().attribute_names()
     return flask.make_response(
         {
@@ -354,7 +354,7 @@ with open(
 )
 def polyhedron_attribute_names():
     utils_functions.validate_request(flask.request, polyhedron_attribute_names_json)
-    data = geode_functions.load_data(flask.request.json("id"))
+    data = geode_functions.load_data(flask.request.json.get("id"))
     polyhedron_attribute_names = data.polyhedron_attribute_manager().attribute_names()
     return flask.make_response(
         {
