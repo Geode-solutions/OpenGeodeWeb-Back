@@ -41,5 +41,5 @@ class Data(Base):
         return data_entry
 
     @staticmethod
-    def get(cls, data_id: str) -> "Data | None":
-        return database.session.get(cls, data_id)
+    def get(data_id: str) -> "Data | None":
+        return database.session.get(Data, data_id)

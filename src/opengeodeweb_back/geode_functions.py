@@ -55,7 +55,7 @@ def data_file_path(data_id: str, filename: str = "") -> str:
 
 
 def load_data(data_id: str):
-    data_entry = Data.get(Data, data_id)
+    data_entry = Data.get(data_id)
     if not data_entry:
         flask.abort(404, f"Data with id {data_id} not found")
 
@@ -66,7 +66,7 @@ def load_data(data_id: str):
 def get_data_info(data_id: str) -> Data:
     from .data import Data
 
-    data_entry = Data.get(Data, data_id)
+    data_entry = Data.get(data_id)
     if not data_entry:
         flask.abort(404, f"Data with id {data_id} not found")
     return data_entry
