@@ -53,7 +53,7 @@ with open(
 def allowed_files():
     utils_functions.validate_request(flask.request, allowed_files_json)
     extensions = geode_functions.list_input_extensions(
-        flask.request.json["supported_feature"]
+        flask.request.get_json()["supported_feature"]
     )
     return flask.make_response({"extensions": extensions}, 200)
 
@@ -99,10 +99,10 @@ def allowed_objects():
 
     utils_functions.validate_request(flask.request, allowed_objects_json)
     file_absolute_path = geode_functions.upload_file_path(
-        flask.request.json["filename"]
+        flask.request.get_json()["filename"]
     )
     allowed_objects = geode_functions.list_geode_objects(
-        file_absolute_path, flask.request.json["supported_feature"]
+        file_absolute_path, flask.request.get_json()["supported_feature"]
     )
     return flask.make_response({"allowed_objects": allowed_objects}, 200)
 
@@ -120,10 +120,10 @@ with open(
 )
 def missing_files():
     utils_functions.validate_request(flask.request, missing_files_json)
-    file_path = geode_functions.upload_file_path(flask.request.json["filename"])
+    file_path = geode_functions.upload_file_path(flask.request.get_json()["filename"])
 
     additional_files = geode_functions.additional_files(
-        flask.request.json["input_geode_object"],
+        flask.request.get_json()["input_geode_object"],
         file_path,
     )
 
@@ -167,7 +167,7 @@ with open(
 def crs_converter_geographic_coordinate_systems():
     utils_functions.validate_request(flask.request, geographic_coordinate_systems_json)
     infos = geode_functions.geographic_coordinate_systems(
-        flask.request.json["input_geode_object"]
+        flask.request.get_json()["input_geode_object"]
     )
     crs_list = []
     for info in infos:
@@ -194,10 +194,12 @@ with open(
 def inspect_file():
     utils_functions.validate_request(flask.request, inspect_file_json)
 
-    file_path = geode_functions.upload_file_path(flask.request.json["filename"])
-    data = geode_functions.load(flask.request.json["input_geode_object"], file_path)
+    file_path = geode_functions.upload_file_path(flask.request.get_json()["filename"])
+    data = geode_functions.load(
+        flask.request.get_json()["input_geode_object"], file_path
+    )
     class_inspector = geode_functions.inspect(
-        flask.request.json["input_geode_object"], data
+        flask.request.get_json()["input_geode_object"], data
     )
     inspection_result = geode_functions.get_inspector_children(class_inspector)
     return flask.make_response({"inspection_result": inspection_result}, 200)
@@ -218,14 +220,14 @@ def geode_objects_and_output_extensions():
     utils_functions.validate_request(
         flask.request, geode_objects_and_output_extensions_json
     )
-    file_path = geode_functions.upload_file_path(flask.request.json["filename"])
+    file_path = geode_functions.upload_file_path(flask.request.get_json()["filename"])
     data = geode_functions.load(
-        flask.request.json["input_geode_object"],
+        flask.request.get_json()["input_geode_object"],
         file_path,
     )
     geode_objects_and_output_extensions = (
         geode_functions.geode_objects_output_extensions(
-            flask.request.json["input_geode_object"], data
+            flask.request.get_json()["input_geode_object"], data
         )
     )
     return flask.make_response(
@@ -249,8 +251,8 @@ def save_viewable_file():
     utils_functions.validate_request(flask.request, save_viewable_file_json)
     return flask.make_response(
         utils_functions.generate_native_viewable_and_light_viewable_from_file(
-            geode_object=flask.request.json["input_geode_object"],
-            input_filename=flask.request.json["filename"],
+            geode_object=flask.request.get_json()["input_geode_object"],
+            input_filename=flask.request.get_json()["filename"],
         ),
         200,
     )
@@ -263,10 +265,10 @@ with open(os.path.join(schemas, "create_point.json"), "r") as file:
 @routes.route(create_point_json["route"], methods=create_point_json["methods"])
 def create_point():
     utils_functions.validate_request(flask.request, create_point_json)
-    title = flask.request.json["title"]
-    x = flask.request.json["x"]
-    y = flask.request.json["y"]
-    z = flask.request.json["z"]
+    title = flask.request.get_json()["title"]
+    x = flask.request.get_json()["x"]
+    y = flask.request.get_json()["y"]
+    z = flask.request.get_json()["z"]
     class_ = geode_functions.geode_object_class("PointSet3D")
     PointSet3D = class_.create()
     builder = geode_functions.create_builder("PointSet3D", PointSet3D)
@@ -290,14 +292,8 @@ with open(os.path.join(schemas, "texture_coordinates.json"), "r") as file:
 )
 def texture_coordinates():
     utils_functions.validate_request(flask.request, texture_coordinates_json)
-    data = geode_functions.load_data(
-        flask.request.json["input_geode_object"],
-        flask.request.json["id"],
-        flask.request.json["filename"],
-    )
-
+    data = geode_functions.load_data(flask.request.get_json().get("id"))
     texture_coordinates = data.texture_manager().texture_names()
-
     return flask.make_response({"texture_coordinates": texture_coordinates}, 200)
 
 
@@ -314,14 +310,8 @@ with open(
 )
 def vertex_attribute_names():
     utils_functions.validate_request(flask.request, vertex_attribute_names_json)
-    data = geode_functions.load_data(
-        flask.request.json["input_geode_object"],
-        flask.request.json["id"],
-        flask.request.json["filename"],
-    )
-
+    data = geode_functions.load_data(flask.request.get_json().get("id"))
     vertex_attribute_names = data.vertex_attribute_manager().attribute_names()
-
     return flask.make_response(
         {
             "vertex_attribute_names": vertex_attribute_names,
@@ -343,14 +333,8 @@ with open(
 )
 def polygon_attribute_names():
     utils_functions.validate_request(flask.request, polygon_attribute_names_json)
-    data = geode_functions.load_data(
-        flask.request.json["input_geode_object"],
-        flask.request.json["id"],
-        flask.request.json["filename"],
-    )
-
+    data = geode_functions.load_data(flask.request.get_json().get("id"))
     polygon_attribute_names = data.polygon_attribute_manager().attribute_names()
-
     return flask.make_response(
         {
             "polygon_attribute_names": polygon_attribute_names,
@@ -372,14 +356,8 @@ with open(
 )
 def polyhedron_attribute_names():
     utils_functions.validate_request(flask.request, polyhedron_attribute_names_json)
-    data = geode_functions.load_data(
-        flask.request.json["input_geode_object"],
-        flask.request.json["id"],
-        flask.request.json["filename"],
-    )
-
+    data = geode_functions.load_data(flask.request.get_json().get("id"))
     polyhedron_attribute_names = data.polyhedron_attribute_manager().attribute_names()
-
     return flask.make_response(
         {
             "polyhedron_attribute_names": polyhedron_attribute_names,
