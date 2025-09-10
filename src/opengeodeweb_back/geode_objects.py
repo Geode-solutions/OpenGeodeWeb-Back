@@ -217,7 +217,7 @@ def geode_objects_dict():
             "elements": [points, polygons],
             "is_3D": False,
             "is_viewable": True,
-            "save_viewable": g_v.save_light_viewable_light_regular_grid2D,
+            "save_viewable": g_v.save_viewable_light_regular_grid2D,
             "save_light_viewable": g_v.save_light_viewable_light_regular_grid2D,
         },
         "LightRegularGrid3D": {
