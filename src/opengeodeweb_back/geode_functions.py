@@ -11,8 +11,8 @@ from typing import Any
 # Local application imports
 from .geode_objects import geode_objects_dict
 from . import utils_functions
-from .data import Data
-from .database import database
+from opengeodeweb_microservice.microservice.data import Data
+from opengeodeweb_microservice.database.connection import get_session
 
 
 def geode_object_value(geode_object: str):
@@ -65,8 +65,6 @@ def load_data(data_id: str) -> Any:
 
 
 def get_data_info(data_id: str) -> Data:
-    from .data import Data
-
     data_entry = Data.get(data_id)
     if not data_entry:
         flask.abort(404, f"Data with id {data_id} not found")

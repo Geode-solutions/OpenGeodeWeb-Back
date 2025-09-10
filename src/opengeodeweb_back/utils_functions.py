@@ -16,8 +16,8 @@ import werkzeug
 
 # Local application imports
 from . import geode_functions
-from .data import Data
-from .database import database
+from opengeodeweb_microservice.microservice.data import Data
+from opengeodeweb_microservice.database.connection import get_session
 
 
 def increment_request_counter(current_app: flask.Flask) -> None:
@@ -256,3 +256,9 @@ def generate_native_viewable_and_light_viewable_from_file(
         input_file=input_filename,
         additional_files=additional_files_copied,
     )
+
+# Modifier toutes les utilisations de database.session par :
+# database.session.add() -> get_session().session.add()
+# database.session.commit() -> get_session().session.commit()
+# database.session.delete() -> get_session().session.delete()
+# database.session.flush() -> get_session().session.flush()
