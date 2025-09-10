@@ -193,7 +193,9 @@ def save_all_viewables_and_return_info(
     data_entry.viewable_file_name = os.path.basename(saved_viewable_file_path)
     data_entry.light_viewable = os.path.basename(saved_light_viewable_file_path)
 
-    database.session.commit()
+    session = get_session()
+    if session:
+        session.commit()
 
     return {
         "native_file_name": data_entry.native_file_name,
@@ -247,8 +249,14 @@ def generate_native_viewable_and_light_viewable_from_file(
 
     data = geode_functions.load(geode_object, copied_full_path)
 
-    database.session.delete(temp_data_entry)
-    database.session.flush()
+    # Remplacer :
+    # database.session.delete(temp_data_entry)
+    # database.session.flush()
+    # Par :
+    session = get_session()
+    if session:
+        session.delete(temp_data_entry)
+        session.flush()
 
     return save_all_viewables_and_return_info(
         geode_object,
@@ -256,9 +264,3 @@ def generate_native_viewable_and_light_viewable_from_file(
         input_file=input_filename,
         additional_files=additional_files_copied,
     )
-
-# Modifier toutes les utilisations de database.session par :
-# database.session.add() -> get_session().session.add()
-# database.session.commit() -> get_session().session.commit()
-# database.session.delete() -> get_session().session.delete()
-# database.session.flush() -> get_session().session.flush()

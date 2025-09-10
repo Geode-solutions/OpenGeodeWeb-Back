@@ -3,9 +3,8 @@ import shutil
 import flask
 
 from src.opengeodeweb_back import geode_functions
-from src.opengeodeweb_back.data import Data
-from src.opengeodeweb_back.database import database
-
+from opengeodeweb_microservice.microservice.data import Data
+from opengeodeweb_microservice.database.connection import get_session
 
 def test_model_mesh_components(client, test_id):
     route = f"/models/vtm_component_indices"
@@ -35,7 +34,6 @@ def test_extract_brep_uuids(client, test_id):
     with client.application.app_context():
         data_entry = Data.create(geode_object="BRep", input_file=brep_filename)
         data_entry.native_file_name = brep_filename
-        database.session.commit()
 
         data_path = geode_functions.data_file_path(data_entry.id, brep_filename)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)

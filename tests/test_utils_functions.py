@@ -8,8 +8,8 @@ import shutil
 import uuid
 
 # Local application imports
-from src.opengeodeweb_back.database import database
-from src.opengeodeweb_back.data import Data
+from opengeodeweb_microservice.microservice.data import Data
+from opengeodeweb_microservice.database.connection import get_session
 from src.opengeodeweb_back import geode_functions, utils_functions
 
 
@@ -143,7 +143,8 @@ def test_save_all_viewables_commits_to_db(client):
         db_entry_before = Data.get(data_id)
         assert db_entry_before is not None
         assert db_entry_before.native_file_name == result["native_file_name"]
-        database.session.rollback()
+        session = get_session()
+        session.rollback()
         db_entry_after = Data.get(data_id)
         assert (
             db_entry_after is not None

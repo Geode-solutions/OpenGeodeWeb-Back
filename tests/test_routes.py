@@ -7,8 +7,6 @@ from werkzeug.datastructures import FileStorage
 
 # Local application imports
 from src.opengeodeweb_back import geode_functions, test_utils
-from src.opengeodeweb_back.data import Data
-from src.opengeodeweb_back.database import database
 
 
 def test_allowed_files(client):
@@ -173,7 +171,6 @@ def test_texture_coordinates(client, test_id):
     with client.application.app_context():
         data = Data.create(geode_object="PolygonalSurface3D", input_file="hat.vtp")
         data.native_file_name = "hat.vtp"
-        database.session.commit()
 
         data_path = geode_functions.data_file_path(data.id, "hat.vtp")
         print(data_path)
@@ -197,7 +194,6 @@ def test_vertex_attribute_names(client, test_id):
     with client.application.app_context():
         data = Data.create(geode_object="PolygonalSurface3D", input_file="test.vtp")
         data.native_file_name = "test.vtp"
-        database.session.commit()
 
         data_path = geode_functions.data_file_path(data.id, "test.vtp")
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
@@ -218,7 +214,6 @@ def test_polygon_attribute_names(client, test_id):
     with client.application.app_context():
         data = Data.create(geode_object="PolygonalSurface3D", input_file="test.vtp")
         data.native_file_name = "test.vtp"
-        database.session.commit()
 
         data_path = geode_functions.data_file_path(data.id, "test.vtp")
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
@@ -238,7 +233,6 @@ def test_polyhedron_attribute_names(client, test_id):
     with client.application.app_context():
         data = Data.create(geode_object="PolyhedralSolid3D", input_file="test.vtu")
         data.native_file_name = "test.vtu"
-        database.session.commit()
 
         data_path = geode_functions.data_file_path(data.id, "test.vtu")
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
