@@ -61,6 +61,8 @@ def load_data(data_id: str) -> Any:
         flask.abort(404, f"Data with id {data_id} not found")
 
     file_absolute_path = data_file_path(data_id, data_entry.native_file_name)
+    print("Loading file: ", file_absolute_path)
+    print("File exists: ", os.path.exists(file_absolute_path))
     return load(data_entry.geode_object, file_absolute_path)
 
 

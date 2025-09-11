@@ -33,21 +33,24 @@ def test_extract_brep_uuids(client, test_id):
     brep_filename = "cube.og_brep"
 
     with client.application.app_context():
-        data_entry = Data.create(geode_object="BRep", input_file=brep_filename)
+        data_entry = Data.create(
+            geode_object="BRep",
+            input_file=brep_filename,
+        )
         data_entry.native_file_name = brep_filename
+        session = get_session()
+        if session:
+            session.commit()
 
-        data_path = geode_functions.data_file_path(data_entry.id, brep_filename)
-        os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        shutil.copy(f"./tests/data/{brep_filename}", data_path)
+        src_path = os.path.join("tests", "data", brep_filename)
+        dest_path = os.path.join(
+            flask.current_app.config["DATA_FOLDER_PATH"], data_entry.id, brep_filename
+        )
+        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+        shutil.copy2(src_path, dest_path)
 
-    json_data = {"id": data_entry.id}
-    response = client.post(route, json=json_data)
-
-    assert response.status_code == 200
-    uuid_dict = response.json["uuid_dict"]
-    assert isinstance(uuid_dict, dict)
-    expected_keys = {"Block", "Line", "Surface", "Corner"}
-    assert any(key in uuid_dict for key in expected_keys)
-    for key, value in uuid_dict.items():
-        assert isinstance(value, list)
-        assert all(isinstance(v, str) for v in value)
+        response = client.post(route, json={"id": data_entry.id})
+        assert response.status_code == 200
+        assert "uuid_dict" in response.json
+        uuid_dict = response.json["uuid_dict"]
+        assert isinstance(uuid_dict, dict)

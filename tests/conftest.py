@@ -29,6 +29,9 @@ def copy_data():
     print("Directory contents:", os.listdir("."))
 
     init_database(app)
+    # print(list(app.blueprints.keys()))
+    # for rule in app.url_map.iter_rules():
+    #     print(f"Route: {rule.rule} -> {rule.endpoint}")
 
 
 @pytest.fixture
