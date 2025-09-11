@@ -30,6 +30,7 @@ def copy_data():
 
     init_database(app)
 
+
 @pytest.fixture
 def client():
     app.config["REQUEST_COUNTER"] = 0
