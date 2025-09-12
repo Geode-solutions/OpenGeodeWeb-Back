@@ -8,7 +8,7 @@ import pytest
 
 # Local application imports
 from app import app
-from src.opengeodeweb_back.database import initialize_database
+from opengeodeweb_microservice.database.connection import init_database
 
 TEST_ID = "1"
 
@@ -28,7 +28,10 @@ def copy_data():
     print("Current working directory:", os.getcwd())
     print("Directory contents:", os.listdir("."))
 
-    initialize_database(app)
+    init_database(app)
+    # print(list(app.blueprints.keys()))
+    # for rule in app.url_map.iter_rules():
+    #     print(f"Route: {rule.rule} -> {rule.endpoint}")
 
 
 @pytest.fixture

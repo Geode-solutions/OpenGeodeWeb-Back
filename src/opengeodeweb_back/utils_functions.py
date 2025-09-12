@@ -16,8 +16,8 @@ import werkzeug
 
 # Local application imports
 from . import geode_functions
-from .data import Data
-from .database import database
+from opengeodeweb_microservice.database.data import Data
+from opengeodeweb_microservice.database.connection import get_session
 
 
 def increment_request_counter(current_app: flask.Flask) -> None:
@@ -193,7 +193,9 @@ def save_all_viewables_and_return_info(
     data_entry.viewable_file_name = os.path.basename(saved_viewable_file_path)
     data_entry.light_viewable = os.path.basename(saved_light_viewable_file_path)
 
-    database.session.commit()
+    session = get_session()
+    if session:
+        session.commit()
 
     return {
         "native_file_name": data_entry.native_file_name,
@@ -247,8 +249,14 @@ def generate_native_viewable_and_light_viewable_from_file(
 
     data = geode_functions.load(geode_object, copied_full_path)
 
-    database.session.delete(temp_data_entry)
-    database.session.flush()
+    # Remplacer :
+    # database.session.delete(temp_data_entry)
+    # database.session.flush()
+    # Par :
+    session = get_session()
+    if session:
+        session.delete(temp_data_entry)
+        session.flush()
 
     return save_all_viewables_and_return_info(
         geode_object,

@@ -7,16 +7,14 @@ build-backend = "setuptools.build_meta"
 name = "OpenGeodeWeb-Back"
 version = "0.0.0"
 dynamic = ["dependencies"]
-authors = [
-  { name="Geode-solutions", email="team-web@geode-solutions.com" },
-]
+authors = [{ name = "Geode-solutions", email = "team-web@geode-solutions.com" }]
 description = "OpenGeodeWeb-Back is an open source framework that proposes handy python functions and wrappers for the OpenGeode ecosystem"
 readme = "README.md"
 requires-python = ">=3.9, <3.13"
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
 ]
 
 [project.urls]
@@ -24,7 +22,7 @@ classifiers = [
 "Bug Tracker" = "https://github.com/Geode-solutions/OpenGeodeWeb-Back/issues"
 
 [tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
+dependencies = { file = ["requirements.txt"] }
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -32,3 +30,4 @@ where = ["src"]
 [tool.setuptools.package-data]
 "opengeodeweb_back.routes.schemas" = ["*.json"]
 "opengeodeweb_back.routes.models.schemas" = ["*.json"]
+opengeodeweb_microservice = ["py.typed"]

@@ -6,9 +6,9 @@ import shutil
 from werkzeug.datastructures import FileStorage
 
 # Local application imports
+from opengeodeweb_microservice.database.data import Data
+from opengeodeweb_microservice.database.connection import get_session
 from src.opengeodeweb_back import geode_functions, test_utils
-from src.opengeodeweb_back.data import Data
-from src.opengeodeweb_back.database import database
 
 
 def test_allowed_files(client):
@@ -173,17 +173,15 @@ def test_texture_coordinates(client, test_id):
     with client.application.app_context():
         data = Data.create(geode_object="PolygonalSurface3D", input_file="hat.vtp")
         data.native_file_name = "hat.vtp"
-        database.session.commit()
+        session = get_session()
+        if session:
+            session.commit()
 
-        data_path = geode_functions.data_file_path(data.id, "hat.vtp")
-        print(data_path)
+        data_path = geode_functions.data_file_path(data.id, data.native_file_name)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
         shutil.copy("./tests/data/hat.vtp", data_path)
-
-    response = client.post(
-        "/texture_coordinates",
-        json={"id": data.id},
-    )
+        assert os.path.exists(data_path), f"File not found at {data_path}"
+    response = client.post("/texture_coordinates", json={"id": data.id})
     assert response.status_code == 200
     texture_coordinates = response.json["texture_coordinates"]
     assert type(texture_coordinates) is list
@@ -197,13 +195,14 @@ def test_vertex_attribute_names(client, test_id):
     with client.application.app_context():
         data = Data.create(geode_object="PolygonalSurface3D", input_file="test.vtp")
         data.native_file_name = "test.vtp"
-        database.session.commit()
+        session = get_session()
+        if session:
+            session.commit()
 
-        data_path = geode_functions.data_file_path(data.id, "test.vtp")
+        data_path = geode_functions.data_file_path(data.id, data.native_file_name)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        if os.path.exists("./tests/data/hat.vtp"):
-            shutil.copy("./tests/data/hat.vtp", data_path)
-
+        shutil.copy("./tests/data/test.vtp", data_path)
+        assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     assert response.status_code == 200
     vertex_attribute_names = response.json["vertex_attribute_names"]
@@ -218,12 +217,14 @@ def test_polygon_attribute_names(client, test_id):
     with client.application.app_context():
         data = Data.create(geode_object="PolygonalSurface3D", input_file="test.vtp")
         data.native_file_name = "test.vtp"
-        database.session.commit()
+        session = get_session()
+        if session:
+            session.commit()
 
-        data_path = geode_functions.data_file_path(data.id, "test.vtp")
+        data_path = geode_functions.data_file_path(data.id, data.native_file_name)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
-    shutil.copy("./tests/data/test.vtp", data_path)
-
+        shutil.copy("./tests/data/test.vtp", data_path)
+        assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     assert response.status_code == 200
     polygon_attribute_names = response.json["polygon_attribute_names"]
@@ -238,13 +239,16 @@ def test_polyhedron_attribute_names(client, test_id):
     with client.application.app_context():
         data = Data.create(geode_object="PolyhedralSolid3D", input_file="test.vtu")
         data.native_file_name = "test.vtu"
-        database.session.commit()
+        session = get_session()
+        if session:
+            session.commit()
 
-        data_path = geode_functions.data_file_path(data.id, "test.vtu")
+        data_path = geode_functions.data_file_path(data.id, data.native_file_name)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
         shutil.copy("./tests/data/test.vtu", data_path)
-
+        assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
+    print(response.json)
     assert response.status_code == 200
     polyhedron_attribute_names = response.json["polyhedron_attribute_names"]
     assert type(polyhedron_attribute_names) is list
