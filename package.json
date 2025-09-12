@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "",
   "scripts": {
-    "json": "ogw-generate-schemas opengeodeweb_back routes route /",
+    "json": "node ./node_modules/@geode/opengeodeweb-microservice/generate_schemas.js opengeodeweb_back routes route /",
     "test": "npm run json",
     "build": "npm run json"
   },
