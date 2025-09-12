@@ -3,12 +3,12 @@
   "version": "0.0.0",
   "description": "",
   "scripts": {
-    "json": "node generate_schemas.js opengeodeweb_back routes route /",
+    "json": "ogw-generate-schemas opengeodeweb_back routes route /",
     "test": "npm run json",
     "build": "npm run json"
   },
   "dependencies": {
-    "glob": "^11.0.3"
+    "@geode/opengeodeweb-microservice": "^1.0.0"
   },
   "exports": {
     "./opengeodeweb_back_schemas.json": {
@@ -16,7 +16,6 @@
       "require": "./opengeodeweb_back_schemas.json"
     }
   },
-  "main": "generate_schemas.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Geode-solutions/OpenGeodeWeb-Back.git"
