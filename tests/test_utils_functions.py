@@ -8,7 +8,7 @@ import shutil
 import uuid
 
 # Local application imports
-from opengeodeweb_microservice.microservice.data import Data
+from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
 from src.opengeodeweb_back import geode_functions, utils_functions
 

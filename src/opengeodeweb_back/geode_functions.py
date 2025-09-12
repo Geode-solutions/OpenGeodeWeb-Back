@@ -11,7 +11,7 @@ from typing import Any
 # Local application imports
 from .geode_objects import geode_objects_dict
 from . import utils_functions
-from opengeodeweb_microservice.microservice.data import Data
+from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
 
 

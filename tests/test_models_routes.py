@@ -3,7 +3,7 @@ import shutil
 import flask
 
 from src.opengeodeweb_back import geode_functions
-from opengeodeweb_microservice.microservice.data import Data
+from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
 
 
