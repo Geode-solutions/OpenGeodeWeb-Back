@@ -11,5 +11,4 @@ jobs:
     uses: Geode-solutions/actions/.github/workflows/py-test.yml@master
     with:
       repos: ${{ vars.REPOS }}
-      node: true
     secrets: inherit
