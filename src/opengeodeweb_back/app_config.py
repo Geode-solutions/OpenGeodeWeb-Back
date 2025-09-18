@@ -4,9 +4,8 @@ import time
 
 # Third party imports
 # Local application imports
-from opengeodeweb_microservice.database.connection import get_database
 
-DATABASE_FILENAME = "project.db"
+DATABASE_FILENAME = "project.db"  # Should be declared only once.
 
 
 class Config(object):
