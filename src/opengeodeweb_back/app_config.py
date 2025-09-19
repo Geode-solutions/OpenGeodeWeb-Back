@@ -5,7 +5,7 @@ import time
 # Third party imports
 # Local application imports
 
-DATABASE_FILENAME = "project.db"  # Should be declared only once.
+DATABASE_FILENAME = "project.db"
 
 
 class Config(object):
