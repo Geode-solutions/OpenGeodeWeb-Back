@@ -8,7 +8,7 @@ asgiref==3.9.1
     # via flask
 blinker==1.9.0
     # via flask
-click==8.2.1
+click==8.3.0
     # via flask
 fastjsonschema==2.21.1
     # via opengeodeweb-microservice
