@@ -249,10 +249,6 @@ def generate_native_viewable_and_light_viewable_from_file(
 
     data = geode_functions.load(geode_object, copied_full_path)
 
-    # Remplacer :
-    # database.session.delete(temp_data_entry)
-    # database.session.flush()
-    # Par :
     session = get_session()
     if session:
         session.delete(temp_data_entry)

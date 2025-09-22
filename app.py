@@ -56,8 +56,18 @@ def return_error():
     flask.abort(500, f"Test")
 
 
+def get_db_path_from_config():
+    database_uri = app.config.get("SQLALCHEMY_DATABASE_URI", "")
+    if database_uri.startswith("sqlite:///"):
+        return database_uri.replace("sqlite:///", "")
+    return None
+
+
 # ''' Main '''
 if __name__ == "__main__":
-    init_database(app)
+    db_path = get_db_path_from_config()
+    if db_path:
+        init_database(db_path)
+
     print(f"Python is running in {FLASK_DEBUG} mode")
     app.run(debug=FLASK_DEBUG, host=DEFAULT_HOST, port=PORT, ssl_context=SSL)
