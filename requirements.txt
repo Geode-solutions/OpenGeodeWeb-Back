@@ -24,9 +24,9 @@ flask-sqlalchemy==3.1.1
     # via
     #   -r requirements.in
     #   opengeodeweb-microservice
-geode-common==33.9.0
+geode-common==33.*,>=33.9.0
     # via geode-viewables
-geode-viewables==3.2.0
+geode-viewables==3.*,>=3.2.0
     # via -r requirements.in
 greenlet==3.2.4
     # via sqlalchemy
@@ -38,7 +38,7 @@ markupsafe==3.0.2
     # via
     #   jinja2
     #   werkzeug
-opengeode-core==15.24.2
+opengeode-core==15.*,>=15.24.2
     # via
     #   -r requirements.in
     #   geode-common
@@ -47,16 +47,16 @@ opengeode-core==15.24.2
     #   opengeode-geosciencesio
     #   opengeode-inspector
     #   opengeode-io
-opengeode-geosciences==9.2.2
+opengeode-geosciences==9.*,>=9.2.2
     # via
     #   -r requirements.in
     #   geode-viewables
     #   opengeode-geosciencesio
-opengeode-geosciencesio==5.7.2
+opengeode-geosciencesio==5.*,>=5.7.2
     # via -r requirements.in
-opengeode-inspector==6.7.0
+opengeode-inspector==6.*,>=6.7.0
     # via -r requirements.in
-opengeode-io==7.3.2
+opengeode-io==7.*,>=7.3.2
     # via
     #   -r requirements.in
     #   geode-viewables
