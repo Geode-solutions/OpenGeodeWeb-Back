@@ -54,7 +54,7 @@ opengeode-geosciences==9.4.1
     #   -r requirements.in
     #   geode-viewables
     #   opengeode-geosciencesio
-opengeode-geosciencesio==5.7.2
+opengeode-geosciencesio==5.8.0
     # via -r requirements.in
 opengeode-inspector==6.7.0
     # via -r requirements.in
