@@ -8,7 +8,7 @@
     "build": "npm run json"
   },
   "dependencies": {
-    "@geode/opengeodeweb-microservice": ">=0.0.0-0"
+    "@geode/opengeodeweb-microservice": "latest"
   },
   "exports": {
     "./opengeodeweb_back_schemas.json": {
