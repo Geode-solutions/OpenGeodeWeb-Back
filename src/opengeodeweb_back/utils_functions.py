@@ -87,7 +87,6 @@ def validate_request(request: flask.Request, schema: dict[str, str]) -> None:
 
     if json_data is None:
         json_data = {}
-
     try:
         validate = fastjsonschema.compile(schema)
         validate(json_data)
