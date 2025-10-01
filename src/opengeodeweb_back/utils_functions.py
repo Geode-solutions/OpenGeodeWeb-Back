@@ -5,6 +5,7 @@ import time
 import zipfile
 from collections.abc import Callable
 from typing import Any
+from concurrent.futures import ThreadPoolExecutor
 
 # Third party imports
 import flask
@@ -175,38 +176,47 @@ def save_all_viewables_and_return_info(
         additional_files=additional_files,
     )
     data_path = create_data_folder_from_id(data_entry.id)
-    saved_native_file_path = geode_functions.save(
-        geode_object,
-        data,
-        data_path,
-        "native." + data.native_extension(),
-    )
-    saved_viewable_file_path = geode_functions.save_viewable(
-        geode_object, data, data_path, "viewable"
-    )
-    saved_light_viewable_file_path = geode_functions.save_light_viewable(
-        geode_object, data, data_path, "light_viewable"
-    )
-    with open(saved_light_viewable_file_path, "rb") as f:
-        binary_light_viewable = f.read()
-    data_entry.native_file_name = os.path.basename(saved_native_file_path[0])
-    data_entry.viewable_file_name = os.path.basename(saved_viewable_file_path)
-    data_entry.light_viewable = os.path.basename(saved_light_viewable_file_path)
+    with ThreadPoolExecutor() as executor:
+        native_future = executor.submit(
+            geode_functions.save,
+            geode_object,
+            data,
+            data_path,
+            "native." + data.native_extension(),
+        )
+        viewable_future = executor.submit(
+            geode_functions.save_viewable, geode_object, data, data_path, "viewable"
+        )
+        light_viewable_future = executor.submit(
+            geode_functions.save_light_viewable,
+            geode_object,
+            data,
+            data_path,
+            "light_viewable",
+        )
+        saved_light_viewable_file_path = light_viewable_future.result()
+        with open(saved_light_viewable_file_path, "rb") as f:
+            binary_light_viewable = f.read()
+        saved_native_file_path = native_future.result()
+        saved_viewable_file_path = viewable_future.result()
+        data_entry.native_file_name = os.path.basename(saved_native_file_path[0])
+        data_entry.viewable_file_name = os.path.basename(saved_viewable_file_path)
+        data_entry.light_viewable = os.path.basename(saved_light_viewable_file_path)
 
-    session = get_session()
-    if session:
-        session.commit()
+        session = get_session()
+        if session:
+            session.commit()
 
-    return {
-        "native_file_name": data_entry.native_file_name,
-        "viewable_file_name": data_entry.viewable_file_name,
-        "id": data_entry.id,
-        "object_type": geode_functions.get_object_type(geode_object),
-        "binary_light_viewable": binary_light_viewable.decode("utf-8"),
-        "geode_object": data_entry.geode_object,
-        "input_files": data_entry.input_file,
-        "additional_files": data_entry.additional_files,
-    }
+        return {
+            "native_file_name": data_entry.native_file_name,
+            "viewable_file_name": data_entry.viewable_file_name,
+            "id": data_entry.id,
+            "object_type": geode_functions.get_object_type(geode_object),
+            "binary_light_viewable": binary_light_viewable.decode("utf-8"),
+            "geode_object": data_entry.geode_object,
+            "input_files": data_entry.input_file,
+            "additional_files": data_entry.additional_files,
+        }
 
 
 def generate_native_viewable_and_light_viewable_from_object(
