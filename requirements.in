@@ -8,4 +8,3 @@ geode-viewables==3.3.0
 Flask[async]==3.0.3
 Flask-Cors==6.0.1
 werkzeug==3.0.3
-Flask-SQLAlchemy==3.1.1

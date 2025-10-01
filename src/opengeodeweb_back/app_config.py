@@ -15,7 +15,6 @@ class Config(object):
     REQUEST_COUNTER = 0
     LAST_REQUEST_TIME = time.time()
     LAST_PING_TIME = time.time()
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
     DATABASE_FILENAME = "project.db"
 
 
