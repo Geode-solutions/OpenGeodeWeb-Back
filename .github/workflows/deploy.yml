@@ -7,6 +7,5 @@ jobs:
   deploy:
     uses: Geode-solutions/actions/.github/workflows/py-deploy.yml@master
     with:
-      node: true
+      repos: ${{ vars.REPOS }}
     secrets: inherit
-    
