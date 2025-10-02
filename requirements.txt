@@ -4,23 +4,28 @@
 #
 #    pip-compile --output-file=./requirements.txt --pre ./requirements-internal.in ./requirements.in
 #
-asgiref==3.*,>=3.9.2
+asgiref==3.*
     # via flask
-blinker==1.*,>=1.9.0
-    # via flask
-click==8.*,>=8.3.0
-    # via flask
-fastjsonschema==2.*,>=2.21.1
+blinker==1.*
+    # via
+    #   flask
+    #   opengeodeweb-microservice
+click==8.*
+    # via
+    #   flask
+    #   opengeodeweb-microservice
+fastjsonschema==2.*
     # via opengeodeweb-microservice
-flask[async]==3.*,>=3.0.3
+flask[async]==3.*
     # via
     #   -r requirements.in
     #   flask
     #   flask-cors
     #   flask-sqlalchemy
-flask-cors==6.*,>=6.0.1
+    #   opengeodeweb-microservice
+flask-cors==6.*
     # via -r requirements.in
-flask-sqlalchemy==3.*,>=3.1.1
+flask-sqlalchemy==3.*
     # via
     #   -r requirements.in
     #   opengeodeweb-microservice
@@ -30,15 +35,22 @@ geode-common==33.11.0
     #   geode-viewables
 geode-viewables==3.3.0
     # via -r requirements.in
-greenlet==3.*,>=3.2.4
-    # via sqlalchemy
-itsdangerous==2.*,>=2.2.0
-    # via flask
-jinja2==3.*,>=3.1.6
-    # via flask
-markupsafe==3.*,>=3.0.3
+greenlet==3.*
+    # via
+    #   opengeodeweb-microservice
+    #   sqlalchemy
+itsdangerous==2.*
+    # via
+    #   flask
+    #   opengeodeweb-microservice
+jinja2==3.*
+    # via
+    #   flask
+    #   opengeodeweb-microservice
+markupsafe==3.*
     # via
     #   jinja2
+    #   opengeodeweb-microservice
     #   werkzeug
 opengeode-core==15.27.4
     # via
@@ -63,16 +75,19 @@ opengeode-io==7.4.0
     #   -r requirements.in
     #   geode-viewables
     #   opengeode-geosciencesio
-opengeodeweb-microservice==1.*,>=1.0.0
+opengeodeweb-microservice==1.0.1rc2
     # via -r requirements-internal.in
-sqlalchemy==2.*,>=2.0.43
+sqlalchemy==2.*
     # via
     #   flask-sqlalchemy
     #   opengeodeweb-microservice
-typing-extensions==4.*,>=4.15.0
-    # via sqlalchemy
+typing-extensions==4.*
+    # via
+    #   opengeodeweb-microservice
+    #   sqlalchemy
 werkzeug==3.0.3
     # via
     #   -r requirements.in
     #   flask
     #   flask-cors
+    #   opengeodeweb-microservice
