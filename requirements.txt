@@ -6,16 +6,16 @@
 #
 asgiref~=3.0
     # via flask
-blinker==1.*,>=1.9.0
+blinker~=1.0
     # via flask
-click==8.*,>=8.3.0
+click~=8.0
     # via flask
-flask[async]==3.*,>=3.0.3
+flask[async]~=3.0
     # via
     #   -r requirements.in
     #   flask
     #   flask-cors
-flask-cors==6.*,>=6.0.1
+flask-cors~=6.0
     # via -r requirements.in
 geode-common==33.11.0
     # via
@@ -23,14 +23,13 @@ geode-common==33.11.0
     #   geode-viewables
 geode-viewables==3.3.0
     # via -r requirements.in
-itsdangerous==2.*,>=2.2.0
+itsdangerous~=2.0
     # via flask
-jinja2==3.*,>=3.1.6
+jinja2~=3.0
     # via flask
-markupsafe==3.*,>=3.0.3
+markupsafe~=3.0
     # via
     #   jinja2
-    #   opengeodeweb-microservice
     #   werkzeug
 opengeode-core==15.27.4
     # via
@@ -60,4 +59,3 @@ werkzeug==3.0.3
     #   -r requirements.in
     #   flask
     #   flask-cors
-    #   opengeodeweb-microservice
