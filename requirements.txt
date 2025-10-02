@@ -4,28 +4,28 @@
 #
 #    pip-compile --output-file=./requirements.txt --pre ./requirements-internal.in ./requirements.in
 #
-asgiref==3.*
+asgiref~=3.0
     # via flask
-blinker==1.*
+blinker~=1.0
     # via
     #   flask
     #   opengeodeweb-microservice
-click==8.*
+click~=8.0
     # via
     #   flask
     #   opengeodeweb-microservice
-fastjsonschema==2.*
+fastjsonschema~=2.0
     # via opengeodeweb-microservice
-flask[async]==3.*
+flask[async]~=3.0
     # via
     #   -r requirements.in
     #   flask
     #   flask-cors
     #   flask-sqlalchemy
     #   opengeodeweb-microservice
-flask-cors==6.*
+flask-cors~=6.0
     # via -r requirements.in
-flask-sqlalchemy==3.*
+flask-sqlalchemy~=3.0
     # via
     #   -r requirements.in
     #   opengeodeweb-microservice
@@ -35,19 +35,19 @@ geode-common==33.11.0
     #   geode-viewables
 geode-viewables==3.3.0
     # via -r requirements.in
-greenlet==3.*
+greenlet~=3.0
     # via
     #   opengeodeweb-microservice
     #   sqlalchemy
-itsdangerous==2.*
+itsdangerous~=2.0
     # via
     #   flask
     #   opengeodeweb-microservice
-jinja2==3.*
+jinja2~=3.0
     # via
     #   flask
     #   opengeodeweb-microservice
-markupsafe==3.*
+markupsafe~=3.0
     # via
     #   jinja2
     #   opengeodeweb-microservice
@@ -75,13 +75,13 @@ opengeode-io==7.4.0
     #   -r requirements.in
     #   geode-viewables
     #   opengeode-geosciencesio
-opengeodeweb-microservice==1.0.1rc2
+opengeodeweb-microservice==1.0.1rc3
     # via -r requirements-internal.in
-sqlalchemy==2.*
+sqlalchemy~=2.0
     # via
     #   flask-sqlalchemy
     #   opengeodeweb-microservice
-typing-extensions==4.*
+typing-extensions~=4.0
     # via
     #   opengeodeweb-microservice
     #   sqlalchemy
