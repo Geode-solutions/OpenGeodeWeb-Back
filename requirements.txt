@@ -12,7 +12,7 @@ click==8.*,>=8.3.0
     # via flask
 fastjsonschema==2.*,>=2.21.1
     # via opengeodeweb-microservice
-flask[async]==3.0.3
+flask[async]==3.*,>=3.0.3
     # via
     #   -r requirements.in
     #   flask
@@ -36,7 +36,7 @@ itsdangerous==2.*,>=2.2.0
     # via flask
 jinja2==3.*,>=3.1.6
     # via flask
-markupsafe==3.*,>=3.0.2
+markupsafe==3.*,>=3.0.3
     # via
     #   jinja2
     #   werkzeug
