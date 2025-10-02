@@ -2,7 +2,6 @@
 import json
 import os
 import time
-from typing import Callable
 
 # Third party imports
 import flask
@@ -392,6 +391,7 @@ with open(
 
 
 @routes.route(kill_json["route"], methods=kill_json["methods"])
-def kill() -> Callable[[], None]:
+def kill() -> flask.Response:
     print("Manual server kill, shutting down...", flush=True)
     os._exit(0)
+    return flask.make_response({"message": "Flask server is dead"}, 200)
