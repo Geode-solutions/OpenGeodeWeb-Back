@@ -59,8 +59,6 @@ opengeode-io==7.4.0
     #   -r requirements.in
     #   geode-viewables
     #   opengeode-geosciencesio
-opengeodeweb-microservice~=1.0
-    # via -r requirements-internal.in
 sqlalchemy~=2.0
     # via flask-sqlalchemy
 typing-extensions~=4.0
