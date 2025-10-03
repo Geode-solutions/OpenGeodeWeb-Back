@@ -9,9 +9,9 @@ import flask_cors
 from flask_cors import cross_origin
 from werkzeug.exceptions import HTTPException
 
-from src.opengeodeweb_back import utils_functions, app_config
-from src.opengeodeweb_back.routes import blueprint_routes
-from src.opengeodeweb_back.routes.models import blueprint_models
+from opengeodeweb_back import utils_functions, app_config
+from opengeodeweb_back.routes import blueprint_routes
+from opengeodeweb_back.routes.models import blueprint_models
 from opengeodeweb_microservice.database.connection import init_database
 
 
