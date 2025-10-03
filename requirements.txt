@@ -4,7 +4,7 @@
 #
 #    pip-compile --output-file=./requirements.txt --pre ./requirements.in
 #
-asgiref~=3.0
+asgiref~=3.9
     # via flask
 blinker~=1.0
     # via flask
@@ -13,7 +13,6 @@ click~=8.0
 flask[async]~=3.0
     # via
     #   -r requirements.in
-    #   flask
     #   flask-cors
 flask-cors~=6.0
     # via -r requirements.in
@@ -29,6 +28,7 @@ jinja2~=3.0
     # via flask
 markupsafe~=3.0
     # via
+    #   flask
     #   jinja2
     #   werkzeug
 opengeode-core==15.27.4
@@ -56,6 +56,5 @@ opengeode-io==7.4.0
     #   opengeode-geosciencesio
 werkzeug==3.0.3
     # via
-    #   -r requirements.in
     #   flask
     #   flask-cors
