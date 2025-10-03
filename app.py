@@ -29,6 +29,22 @@ PORT = int(app.config.get("DEFAULT_PORT"))
 ORIGINS = app.config.get("ORIGINS")
 SSL = app.config.get("SSL")
 
+
+def get_db_path_from_config():
+    database_uri = app.config.get("SQLALCHEMY_DATABASE_URI", "")
+    if database_uri.startswith("sqlite:///"):
+        return database_uri.replace("sqlite:///", "")
+    return None
+
+
+db_path = get_db_path_from_config()
+if db_path:
+    db_dir = os.path.dirname(db_path)
+    if db_dir and not os.path.exists(db_dir):
+        os.makedirs(db_dir, exist_ok=True)
+    init_database(db_path)
+    print(f"Database initialized at: {db_path}")
+
 flask_cors.CORS(app, origins=ORIGINS)
 app.register_blueprint(
     blueprint_routes.routes,
@@ -58,6 +74,6 @@ def return_error():
 
 # ''' Main '''
 if __name__ == "__main__":
-    init_database(app)
-    print(f"Python is running in {FLASK_DEBUG} mode")
+    data_folder = app.config.get("DATA_FOLDER_PATH")
+    upload_folder = app.config.get("UPLOAD_FOLDER")
     app.run(debug=FLASK_DEBUG, host=DEFAULT_HOST, port=PORT, ssl_context=SSL)

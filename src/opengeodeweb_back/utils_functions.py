@@ -88,7 +88,6 @@ def validate_request(request: flask.Request, schema: dict[str, str]) -> None:
 
     if json_data is None:
         json_data = {}
-
     try:
         validate = fastjsonschema.compile(schema)
         validate(json_data)
@@ -259,10 +258,6 @@ def generate_native_viewable_and_light_viewable_from_file(
 
     data = geode_functions.load(geode_object, copied_full_path)
 
-    # Remplacer :
-    # database.session.delete(temp_data_entry)
-    # database.session.flush()
-    # Par :
     session = get_session()
     if session:
         session.delete(temp_data_entry)
