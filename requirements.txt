@@ -16,16 +16,16 @@ click~=8.0
     #   opengeodeweb-microservice
 fastjsonschema~=2.0
     # via opengeodeweb-microservice
-flask[async]==3.0.3
+flask[async]~=3.0
     # via
     #   -r requirements.in
     #   flask
     #   flask-cors
     #   flask-sqlalchemy
     #   opengeodeweb-microservice
-flask-cors==6.0.1
+flask-cors~=6.0
     # via -r requirements.in
-flask-sqlalchemy==3.1.1
+flask-sqlalchemy~=3.0
     # via
     #   -r requirements.in
     #   opengeodeweb-microservice
@@ -75,17 +75,17 @@ opengeode-io==7.4.0
     #   -r requirements.in
     #   geode-viewables
     #   opengeode-geosciencesio
-opengeodeweb-microservice==1.0.1rc4
+opengeodeweb-microservice~=1.0
     # via -r requirements-internal.in
 sqlalchemy~=2.0
     # via
     #   flask-sqlalchemy
     #   opengeodeweb-microservice
-typing-extensions==4.15.0
+typing-extensions~=4.0
     # via
     #   opengeodeweb-microservice
     #   sqlalchemy
-werkzeug~=3.0
+werkzeug==3.0.3
     # via
     #   -r requirements.in
     #   flask
