@@ -24,7 +24,8 @@ def configure_test_environment() -> Generator[None, None, None]:
 
     # Clean up any existing test data
     shutil.rmtree("./data", ignore_errors=True)
-    shutil.copytree(test_data_path, f"./data/{TEST_ID}/", dirs_exist_ok=True)
+    if test_data_path.exists():
+        shutil.copytree(test_data_path, f"./data/{TEST_ID}/", dirs_exist_ok=True)
 
     # Configure app for testing
     app.config["TESTING"] = True
@@ -39,7 +40,7 @@ def configure_test_environment() -> Generator[None, None, None]:
     print("Current working directory:", os.getcwd())
     print("Directory contents:", os.listdir("."))
 
-    init_database(db_path)
+    init_database(app, db_path)
     os.environ["TEST_DB_PATH"] = str(db_path)
 
     yield
