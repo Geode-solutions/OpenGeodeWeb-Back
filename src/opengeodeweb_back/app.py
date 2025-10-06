@@ -66,8 +66,9 @@ def errorhandler(e: HTTPException) -> tuple[dict[str, Any], int] | Response:
     "/error",
     methods=["POST"],
 )
-def return_error() -> None:
+def return_error() -> Response:
     flask.abort(500, f"Test")
+    return flask.make_response({}, 500)
 
 
 @app.route("/", methods=["POST"])
@@ -142,7 +143,9 @@ def run_server() -> None:
     db_filename: str = app.config.get("DATABASE_FILENAME") or "database.db"
     db_path = os.path.join(args.data_folder_path, db_filename)
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
-    init_database(db_path)
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    init_database(app, db_filename)
     print(f"Database initialized at: {db_path}", flush=True)
 
     app.run(debug=args.debug, host=args.host, port=args.port, ssl_context=SSL)
