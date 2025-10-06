@@ -10,7 +10,7 @@ import uuid
 # Local application imports
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
-from src.opengeodeweb_back import geode_functions, utils_functions
+from opengeodeweb_back import geode_functions, utils_functions
 
 
 def test_increment_request_counter(app_context):

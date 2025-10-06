@@ -2,7 +2,6 @@
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
-
 [project]
 name = "OpenGeodeWeb-Back"
 version = "0.0.0"
@@ -20,6 +19,9 @@ classifiers = [
 [project.urls]
 "Homepage" = "https://github.com/Geode-solutions/OpenGeodeWeb-Back"
 "Bug Tracker" = "https://github.com/Geode-solutions/OpenGeodeWeb-Back/issues"
+
+[project.scripts]
+opengeodeweb-back = "opengeodeweb_back.app:run_server"
 
 [tool.setuptools.dynamic]
 dependencies = { file = ["requirements.txt"] }
