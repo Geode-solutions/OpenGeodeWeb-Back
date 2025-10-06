@@ -50,7 +50,7 @@ def test_allowed_objects(client):
 def test_upload_file(client, filename="test.og_brep"):
     response = client.put(
         f"/opengeodeweb_back/upload_file",
-        data={"file": FileStorage(open(f"./src/tests/data/{filename}", "rb"))},
+        data={"file": FileStorage(open(f"./tests/data/{filename}", "rb"))},
     )
     assert response.status_code == 201
 
@@ -179,7 +179,7 @@ def test_texture_coordinates(client, test_id):
 
         data_path = geode_functions.data_file_path(data.id, data.native_file_name)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        shutil.copy("./src/tests/data/hat.vtp", data_path)
+        shutil.copy("./tests/data/hat.vtp", data_path)
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(
         "/opengeodeweb_back/texture_coordinates", json={"id": data.id}
@@ -203,7 +203,7 @@ def test_vertex_attribute_names(client, test_id):
 
         data_path = geode_functions.data_file_path(data.id, data.native_file_name)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        shutil.copy("./src/tests/data/test.vtp", data_path)
+        shutil.copy("./tests/data/test.vtp", data_path)
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     assert response.status_code == 200
@@ -225,7 +225,7 @@ def test_polygon_attribute_names(client, test_id):
 
         data_path = geode_functions.data_file_path(data.id, data.native_file_name)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        shutil.copy("./src/tests/data/test.vtp", data_path)
+        shutil.copy("./tests/data/test.vtp", data_path)
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     assert response.status_code == 200
@@ -247,7 +247,7 @@ def test_polyhedron_attribute_names(client, test_id):
 
         data_path = geode_functions.data_file_path(data.id, data.native_file_name)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        shutil.copy("./src/tests/data/test.vtu", data_path)
+        shutil.copy("./tests/data/test.vtu", data_path)
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     print(response.json)

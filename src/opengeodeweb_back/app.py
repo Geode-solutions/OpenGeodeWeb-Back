@@ -35,13 +35,6 @@ SSL = app.config.get("SSL")
 SECONDS_BETWEEN_SHUTDOWNS = float(app.config.get("SECONDS_BETWEEN_SHUTDOWNS"))
 
 
-def get_db_path_from_config():
-    database_uri = f"{os.path.abspath(
-        os.path.join(app.config.get('DATA_FOLDER_PATH'), app.config.get('DATABASE_FILENAME'))
-    )}"
-    return database_uri
-
-
 app.register_blueprint(
     blueprint_routes.routes,
     url_prefix="/opengeodeweb_back",
@@ -142,14 +135,10 @@ def run_server():
         flush=True,
     )
 
-    db_path = get_db_path_from_config()
-    print("db_path", db_path, flush=True)
-    if db_path:
-        db_dir = os.path.dirname(db_path)
-        if db_dir and not os.path.exists(db_dir):
-            os.makedirs(db_dir, exist_ok=True)
-        init_database(db_path)
-        print(f"Database initialized at: {db_path}")
+    db_path = os.path.join(args.data_folder_path, app.config.get("DATABASE_FILENAME"))
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    init_database(db_path)
+    print(f"Database initialized at: {db_path}", flush=True)
 
     app.run(debug=args.debug, host=args.host, port=args.port, ssl_context=SSL)
 

@@ -99,7 +99,7 @@ def test_save_all_viewables_and_return_info(client):
         assert os.path.exists(expected_db_path)
 
         geode_object = "BRep"
-        data = geode_functions.load(geode_object, "./src/tests/data/test.og_brep")
+        data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
         input_file = "test.og_brep"
         additional_files = ["additional_file.txt"]
 
@@ -134,7 +134,7 @@ def test_save_all_viewables_commits_to_db(client):
     app = client.application
     with app.app_context():
         geode_object = "BRep"
-        data = geode_functions.load(geode_object, "./src/tests/data/test.og_brep")
+        data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
         input_file = "test.og_brep"
         result = utils_functions.save_all_viewables_and_return_info(
             geode_object, data, input_file
@@ -156,7 +156,7 @@ def test_generate_native_viewable_and_light_viewable_from_object(client):
     app = client.application
     with app.app_context():
         geode_object = "BRep"
-        data = geode_functions.load(geode_object, "./src/tests/data/test.og_brep")
+        data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
 
         result = (
             utils_functions.generate_native_viewable_and_light_viewable_from_object(

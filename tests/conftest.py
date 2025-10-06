@@ -28,7 +28,7 @@ def configure_test_environment() -> Generator[None, None, None]:
     app.config["TESTING"] = True
     app.config["SERVER_NAME"] = "TEST"
     app.config["DATA_FOLDER_PATH"] = "./data/"
-    app.config["UPLOAD_FOLDER"] = "./src/tests/data/"
+    app.config["UPLOAD_FOLDER"] = "./tests/data/"
 
     db_path = os.path.join(base_path, "data", "project.db")
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
