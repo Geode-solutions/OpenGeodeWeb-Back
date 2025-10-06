@@ -163,7 +163,7 @@ def create_data_folder_from_id(data_id: str) -> str:
 def save_all_viewables_and_return_info(
     geode_object: str,
     data: Any,
-    input_file: str,
+    input_file: str | None = None,
     additional_files: list[str] | None = None,
 ) -> dict[str, Any]:
     if additional_files is None:
