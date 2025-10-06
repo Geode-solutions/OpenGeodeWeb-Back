@@ -3,9 +3,11 @@
 import argparse
 import os
 import time
+from typing import Any
 
 import flask
-import flask_cors
+import flask_cors  # type: ignore
+from flask import Flask, Response
 from flask_cors import cross_origin
 from werkzeug.exceptions import HTTPException
 
@@ -16,7 +18,7 @@ from opengeodeweb_microservice.database.connection import init_database
 
 
 """ Global config """
-app = flask.Flask(__name__)
+app: Flask = flask.Flask(__name__)
 
 """ Config variables """
 FLASK_DEBUG = True if os.environ.get("FLASK_DEBUG", default=None) == "True" else False
@@ -26,13 +28,15 @@ if FLASK_DEBUG == False:
 else:
     app.config.from_object(app_config.DevConfig)
 
-DEFAULT_HOST = app.config.get("DEFAULT_HOST")
-DEFAULT_PORT = int(app.config.get("DEFAULT_PORT"))
-DEFAULT_DATA_FOLDER_PATH = app.config.get("DEFAULT_DATA_FOLDER_PATH")
-ORIGINS = app.config.get("ORIGINS")
-TIMEOUT = int(app.config.get("MINUTES_BEFORE_TIMEOUT"))
-SSL = app.config.get("SSL")
-SECONDS_BETWEEN_SHUTDOWNS = float(app.config.get("SECONDS_BETWEEN_SHUTDOWNS"))
+DEFAULT_HOST: str = app.config.get("DEFAULT_HOST") or "localhost"
+DEFAULT_PORT: int = int(app.config.get("DEFAULT_PORT") or 5000)
+DEFAULT_DATA_FOLDER_PATH: str = app.config.get("DEFAULT_DATA_FOLDER_PATH") or "./data"
+ORIGINS: Any = app.config.get("ORIGINS")
+TIMEOUT: int = int(app.config.get("MINUTES_BEFORE_TIMEOUT") or 30)
+SSL: Any = app.config.get("SSL")
+SECONDS_BETWEEN_SHUTDOWNS: float = float(
+    app.config.get("SECONDS_BETWEEN_SHUTDOWNS") or 60.0
+)
 
 
 app.register_blueprint(
@@ -54,7 +58,7 @@ if FLASK_DEBUG == False:
 
 
 @app.errorhandler(HTTPException)
-def errorhandler(e):
+def errorhandler(e: HTTPException) -> tuple[dict[str, Any], int] | Response:
     return utils_functions.handle_exception(e)
 
 
@@ -62,13 +66,13 @@ def errorhandler(e):
     "/error",
     methods=["POST"],
 )
-def return_error():
+def return_error() -> None:
     flask.abort(500, f"Test")
 
 
 @app.route("/", methods=["POST"])
 @cross_origin()
-def root():
+def root() -> Response:
     return flask.make_response({}, 200)
 
 
@@ -79,7 +83,7 @@ def kill() -> None:
     os._exit(0)
 
 
-def run_server():
+def run_server() -> None:
     parser = argparse.ArgumentParser(
         prog="OpenGeodeWeb-Back", description="Backend server for OpenGeodeWeb"
     )
@@ -135,7 +139,8 @@ def run_server():
         flush=True,
     )
 
-    db_path = os.path.join(args.data_folder_path, app.config.get("DATABASE_FILENAME"))
+    db_filename: str = app.config.get("DATABASE_FILENAME") or "database.db"
+    db_path = os.path.join(args.data_folder_path, db_filename)
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     init_database(db_path)
     print(f"Database initialized at: {db_path}", flush=True)
