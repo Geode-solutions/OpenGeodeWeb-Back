@@ -65,6 +65,14 @@ def errorhandler(e):
     return utils_functions.handle_exception(e)
 
 
+@app.route(
+    "/error",
+    methods=["POST"],
+)
+def return_error():
+    flask.abort(500, f"Test")
+
+
 @app.route("/", methods=["POST"])
 @cross_origin()
 def root():

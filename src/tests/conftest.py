@@ -22,18 +22,14 @@ def configure_test_environment() -> Generator[None, None, None]:
     base_path = Path(__file__).parent
     test_data_path = base_path / "data"
 
-    # Clean up any existing test data
     shutil.rmtree("./data", ignore_errors=True)
-    if test_data_path.exists():
-        shutil.copytree(test_data_path, f"./data/{TEST_ID}/", dirs_exist_ok=True)
+    shutil.copytree(test_data_path, f"./data/{TEST_ID}/", dirs_exist_ok=True)
 
-    # Configure app for testing
     app.config["TESTING"] = True
     app.config["SERVER_NAME"] = "TEST"
     app.config["DATA_FOLDER_PATH"] = "./data/"
-    app.config["UPLOAD_FOLDER"] = "./tests/data/"
+    app.config["UPLOAD_FOLDER"] = "./src/tests/data/"
 
-    # Setup database
     db_path = os.path.join(base_path, "data", "project.db")
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 
@@ -45,7 +41,6 @@ def configure_test_environment() -> Generator[None, None, None]:
 
     yield
 
-    # Cleanup after tests
     tmp_data_path = app.config.get("DATA_FOLDER_PATH")
     if tmp_data_path and os.path.exists(tmp_data_path):
         shutil.rmtree(tmp_data_path, ignore_errors=True)

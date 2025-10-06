@@ -8,11 +8,11 @@ from werkzeug.datastructures import FileStorage
 # Local application imports
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
-from src.opengeodeweb_back import geode_functions, test_utils
+from opengeodeweb_back import geode_functions, test_utils
 
 
 def test_allowed_files(client):
-    route = f"/allowed_files"
+    route = f"/opengeodeweb_back/allowed_files"
     get_full_data = lambda: {"supported_feature": "None"}
     json = get_full_data()
     response = client.post(route, json=json)
@@ -27,7 +27,7 @@ def test_allowed_files(client):
 
 
 def test_allowed_objects(client):
-    route = f"/allowed_objects"
+    route = f"/opengeodeweb_back/allowed_objects"
 
     def get_full_data():
         return {
@@ -49,14 +49,14 @@ def test_allowed_objects(client):
 
 def test_upload_file(client, filename="test.og_brep"):
     response = client.put(
-        f"/upload_file",
-        data={"file": FileStorage(open(f"./tests/data/{filename}", "rb"))},
+        f"/opengeodeweb_back/upload_file",
+        data={"file": FileStorage(open(f"./src/tests/data/{filename}", "rb"))},
     )
     assert response.status_code == 201
 
 
 def test_missing_files(client):
-    route = f"/missing_files"
+    route = f"/opengeodeweb_back/missing_files"
 
     def get_full_data():
         return {
@@ -79,7 +79,7 @@ def test_missing_files(client):
 
 
 def test_geographic_coordinate_systems(client):
-    route = f"/geographic_coordinate_systems"
+    route = f"/opengeodeweb_back/geographic_coordinate_systems"
     get_full_data = lambda: {"input_geode_object": "BRep"}
     # Normal test with geode_object 'BRep'
     response = client.post(route, json=get_full_data())
@@ -94,7 +94,7 @@ def test_geographic_coordinate_systems(client):
 
 
 def test_inspect_file(client):
-    route = f"/inspect_file"
+    route = f"/opengeodeweb_back/inspect_file"
 
     def get_full_data():
         return {
@@ -115,7 +115,7 @@ def test_inspect_file(client):
 
 
 def test_geode_objects_and_output_extensions(client):
-    route = "/geode_objects_and_output_extensions"
+    route = "/opengeodeweb_back/geode_objects_and_output_extensions"
 
     def get_full_data():
         return {
@@ -142,7 +142,7 @@ def test_geode_objects_and_output_extensions(client):
 
 def test_save_viewable_file(client):
     test_upload_file(client, filename="corbi.og_brep")
-    route = f"/save_viewable_file"
+    route = f"/opengeodeweb_back/save_viewable_file"
 
     def get_full_data():
         return {
@@ -179,9 +179,11 @@ def test_texture_coordinates(client, test_id):
 
         data_path = geode_functions.data_file_path(data.id, data.native_file_name)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        shutil.copy("./tests/data/hat.vtp", data_path)
+        shutil.copy("./src/tests/data/hat.vtp", data_path)
         assert os.path.exists(data_path), f"File not found at {data_path}"
-    response = client.post("/texture_coordinates", json={"id": data.id})
+    response = client.post(
+        "/opengeodeweb_back/texture_coordinates", json={"id": data.id}
+    )
     assert response.status_code == 200
     texture_coordinates = response.json["texture_coordinates"]
     assert type(texture_coordinates) is list
@@ -190,7 +192,7 @@ def test_texture_coordinates(client, test_id):
 
 
 def test_vertex_attribute_names(client, test_id):
-    route = f"/vertex_attribute_names"
+    route = f"/opengeodeweb_back/vertex_attribute_names"
 
     with client.application.app_context():
         data = Data.create(geode_object="PolygonalSurface3D", input_file="test.vtp")
@@ -201,7 +203,7 @@ def test_vertex_attribute_names(client, test_id):
 
         data_path = geode_functions.data_file_path(data.id, data.native_file_name)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        shutil.copy("./tests/data/test.vtp", data_path)
+        shutil.copy("./src/tests/data/test.vtp", data_path)
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     assert response.status_code == 200
@@ -212,7 +214,7 @@ def test_vertex_attribute_names(client, test_id):
 
 
 def test_polygon_attribute_names(client, test_id):
-    route = f"/polygon_attribute_names"
+    route = f"/opengeodeweb_back/polygon_attribute_names"
 
     with client.application.app_context():
         data = Data.create(geode_object="PolygonalSurface3D", input_file="test.vtp")
@@ -223,7 +225,7 @@ def test_polygon_attribute_names(client, test_id):
 
         data_path = geode_functions.data_file_path(data.id, data.native_file_name)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        shutil.copy("./tests/data/test.vtp", data_path)
+        shutil.copy("./src/tests/data/test.vtp", data_path)
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     assert response.status_code == 200
@@ -234,7 +236,7 @@ def test_polygon_attribute_names(client, test_id):
 
 
 def test_polyhedron_attribute_names(client, test_id):
-    route = f"/polyhedron_attribute_names"
+    route = f"/opengeodeweb_back/polyhedron_attribute_names"
 
     with client.application.app_context():
         data = Data.create(geode_object="PolyhedralSolid3D", input_file="test.vtu")
@@ -245,7 +247,7 @@ def test_polyhedron_attribute_names(client, test_id):
 
         data_path = geode_functions.data_file_path(data.id, data.native_file_name)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        shutil.copy("./tests/data/test.vtu", data_path)
+        shutil.copy("./src/tests/data/test.vtu", data_path)
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     print(response.json)
@@ -257,7 +259,7 @@ def test_polyhedron_attribute_names(client, test_id):
 
 
 def test_create_point(client):
-    route = f"/create_point"
+    route = f"/opengeodeweb_back/create_point"
     get_full_data = lambda: {"title": "test_point", "x": 1, "y": 2, "z": 3}
 
     # Normal test with all keys
