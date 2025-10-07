@@ -9,7 +9,7 @@ from typing import Generator
 import pytest
 
 # Local application imports
-from opengeodeweb_back.app import app
+from src.opengeodeweb_back.app import app
 
 # from opengeodeweb_back import app_config
 from opengeodeweb_microservice.database.connection import init_database

@@ -1,0 +1,46 @@
+{
+    "route": "/create_aoi",
+    "methods": [
+        "POST"
+    ],
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "Name of the AOI"
+        },
+        "points": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "x": {
+                        "type": "number"
+                    },
+                    "y": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "x",
+                    "y"
+                ],
+                "additionalProperties": false
+            },
+            "minItems": 4,
+            "maxItems": 4
+        },
+        "z": {
+            "type": "number"
+        },
+        "id": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "name",
+        "points",
+        "z"
+    ],
+    "additionalProperties": false
+}

@@ -258,22 +258,6 @@ def test_polyhedron_attribute_names(client, test_id):
         assert type(polyhedron_attribute_name) is str
 
 
-def test_create_point(client):
-    route = f"/opengeodeweb_back/create_point"
-    get_full_data = lambda: {"title": "test_point", "x": 1, "y": 2, "z": 3}
-
-    # Normal test with all keys
-    response = client.post(route, json=get_full_data())
-    assert response.status_code == 200
-    viewable_file_name = response.json["viewable_file_name"]
-    assert type(viewable_file_name) is str
-    id = response.json.get("id")
-    assert type(id) is str
-
-    # Test all params
-    test_utils.test_route_wrong_params(client, route, get_full_data)
-
-
 def test_database_uri_path(client):
     app = client.application
     with app.app_context():

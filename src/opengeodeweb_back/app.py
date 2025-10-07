@@ -14,6 +14,7 @@ from werkzeug.exceptions import HTTPException
 from opengeodeweb_back import utils_functions, app_config
 from opengeodeweb_back.routes import blueprint_routes
 from opengeodeweb_back.routes.models import blueprint_models
+from opengeodeweb_back.routes.create import blueprint_create
 from opengeodeweb_microservice.database.connection import init_database
 
 
@@ -49,6 +50,12 @@ app.register_blueprint(
     blueprint_models.routes,
     url_prefix="/opengeodeweb_back/models",
     name="opengeodeweb_models",
+)
+
+app.register_blueprint(
+    blueprint_create.routes,
+    url_prefix="/opengeodeweb_back/create",
+    name="opengeodeweb_create",
 )
 
 if FLASK_DEBUG == False:
