@@ -37,7 +37,6 @@ routes.register_blueprint(
     name=blueprint_models.routes.name,
 )
 
-
 schemas = os.path.join(os.path.dirname(__file__), "schemas")
 
 with open(
