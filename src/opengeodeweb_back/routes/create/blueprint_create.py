@@ -22,10 +22,8 @@ schemas = os.path.join(os.path.dirname(__file__), "schemas")
 with open(os.path.join(schemas, "create_point.json"), "r") as file:
     create_point_json = json.load(file)
 
-@routes.route(
-    create_point_json["route"],
-    methods=create_point_json["methods"]
-)
+
+@routes.route(create_point_json["route"], methods=create_point_json["methods"])
 def create_point():
     """Endpoint to create a single point in 3D space."""
     print(f"create_point : {flask.request=}", flush=True)
@@ -47,10 +45,7 @@ def create_point():
 
     # Save and get info
     result = save_all_viewables_and_return_info(
-        geode_object="PointSet3D",
-        data=point_set,
-        input_file=None,
-        additional_files=[]
+        geode_object="PointSet3D", data=point_set, input_file=None, additional_files=[]
     )
 
     # Prepare response with the title
@@ -62,7 +57,7 @@ def create_point():
         "object_type": result["object_type"],
         "geode_object": result["geode_object"],
     }
-    
+
     # Add binary_light_viewable if it exists
     if "binary_light_viewable" in result:
         response["binary_light_viewable"] = result["binary_light_viewable"]
@@ -74,10 +69,8 @@ def create_point():
 with open(os.path.join(schemas, "create_aoi.json"), "r") as file:
     create_aoi_json = json.load(file)
 
-@routes.route(
-    create_aoi_json["route"],
-    methods=create_aoi_json["methods"]
-)
+
+@routes.route(create_aoi_json["route"], methods=create_aoi_json["methods"])
 def create_aoi():
     """Endpoint to create an Area of Interest (AOI) as an EdgedCurve3D."""
     print(f"create_aoi : {flask.request=}", flush=True)
@@ -106,9 +99,7 @@ def create_aoi():
     for i in range(num_vertices):
         edge_id = builder.create_edge()
         next_i = (i + 1) % num_vertices  # Wrap around to close the loop
-        builder.set_edge_vertex(
-            opengeode.EdgeVertex(edge_id, 0), vertex_indices[i]
-        )
+        builder.set_edge_vertex(opengeode.EdgeVertex(edge_id, 0), vertex_indices[i])
         builder.set_edge_vertex(
             opengeode.EdgeVertex(edge_id, 1), vertex_indices[next_i]
         )
@@ -118,7 +109,7 @@ def create_aoi():
         geode_object="EdgedCurve3D",
         data=edged_curve,
         input_file=None,
-        additional_files=[]
+        additional_files=[],
     )
 
     # Prepare response
@@ -130,7 +121,7 @@ def create_aoi():
         "object_type": result["object_type"],
         "geode_object": result["geode_object"],
     }
-    
+
     # Add binary_light_viewable if it exists
     if "binary_light_viewable" in result:
         response["binary_light_viewable"] = result["binary_light_viewable"]

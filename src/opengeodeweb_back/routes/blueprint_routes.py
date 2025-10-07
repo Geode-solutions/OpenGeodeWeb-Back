@@ -257,6 +257,7 @@ def save_viewable_file():
         200,
     )
 
+
 with open(os.path.join(schemas, "texture_coordinates.json"), "r") as file:
     texture_coordinates_json = json.load(file)
 

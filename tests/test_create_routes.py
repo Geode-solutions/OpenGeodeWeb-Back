@@ -8,14 +8,11 @@ import pytest
 # Local application imports
 from src.opengeodeweb_back import test_utils
 
+
 @pytest.fixture
 def point_data():
-    return {
-        "title": "test_point",
-        "x": 1.0,
-        "y": 2.0,
-        "z": 3.0
-    }
+    return {"title": "test_point", "x": 1.0, "y": 2.0, "z": 3.0}
+
 
 @pytest.fixture
 def aoi_data():
@@ -25,10 +22,11 @@ def aoi_data():
             {"x": 0.0, "y": 0.0},
             {"x": 1.0, "y": 0.0},
             {"x": 1.0, "y": 1.0},
-            {"x": 0.0, "y": 1.0}
+            {"x": 0.0, "y": 1.0},
         ],
-        "z": 0.0
+        "z": 0.0,
     }
+
 
 def test_create_point(client, point_data):
     """Test the creation of a point with valid data."""
@@ -54,6 +52,7 @@ def test_create_point(client, point_data):
     # Test with missing parameters - IMPORTANT: use .copy() to avoid mutation
     test_utils.test_route_wrong_params(client, route, lambda: point_data.copy())
 
+
 def test_create_aoi(client, aoi_data):
     """Test the creation of an AOI with valid data."""
     route = "/opengeodeweb_back/create/create_aoi"
@@ -78,28 +77,21 @@ def test_create_aoi(client, aoi_data):
     # Test with missing parameters - IMPORTANT: use .copy() to avoid mutation
     test_utils.test_route_wrong_params(client, route, lambda: aoi_data.copy())
 
+
 def test_create_point_with_invalid_data(client):
     """Test the point creation endpoint with invalid data."""
     route = "/opengeodeweb_back/create/create_point"
 
     # Test with non-numeric coordinates
-    invalid_data = {
-        "title": "invalid_point",
-        "x": "not_a_number",
-        "y": 2.0,
-        "z": 3.0
-    }
+    invalid_data = {"title": "invalid_point", "x": "not_a_number", "y": 2.0, "z": 3.0}
     response = client.post(route, json=invalid_data)
     assert response.status_code == 400
 
     # Test with missing coordinates
-    invalid_data = {
-        "title": "invalid_point",
-        "y": 2.0,
-        "z": 3.0
-    }
+    invalid_data = {"title": "invalid_point", "y": 2.0, "z": 3.0}
     response = client.post(route, json=invalid_data)
     assert response.status_code == 400
+
 
 def test_create_aoi_with_invalid_data(client, aoi_data):
     """Test the AOI creation endpoint with invalid data."""
@@ -112,30 +104,22 @@ def test_create_aoi_with_invalid_data(client, aoi_data):
             {"x": "not_a_number", "y": 0.0},
             {"x": 1.0, "y": 0.0},
             {"x": 1.0, "y": 1.0},
-            {"x": 0.0, "y": 1.0}
-        ]
+            {"x": 0.0, "y": 1.0},
+        ],
     }
     response = client.post(route, json=invalid_data)
     assert response.status_code == 400
 
     # Test with too few points
-    invalid_data = {
-        **aoi_data,
-        "points": [
-            {"x": 0.0, "y": 0.0},
-            {"x": 1.0, "y": 0.0}
-        ]
-    }
+    invalid_data = {**aoi_data, "points": [{"x": 0.0, "y": 0.0}, {"x": 1.0, "y": 0.0}]}
     response = client.post(route, json=invalid_data)
     assert response.status_code == 400
 
     # Test with invalid z value
-    invalid_data = {
-        **aoi_data,
-        "z": "not_a_number"
-    }
+    invalid_data = {**aoi_data, "z": "not_a_number"}
     response = client.post(route, json=invalid_data)
     assert response.status_code == 400
+
 
 def test_create_point_file_generation(client, point_data):
     """Test that the point creation generates the correct files."""
@@ -171,6 +155,7 @@ def test_create_point_file_generation(client, point_data):
     # Verify file extensions
     assert response_data["native_file_name"].endswith(".og_pts3d")
     assert response_data["viewable_file_name"].endswith(".vtp")
+
 
 def test_create_aoi_file_generation(client, aoi_data):
     """Test that the AOI creation generates the correct files."""
