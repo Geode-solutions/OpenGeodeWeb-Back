@@ -8,4 +8,4 @@ geode-viewables==3.3.0
 flask[async]==3.1.2
 flask-cors==6.0.1
 werkzeug==3.1.2
-flask-sqlalchemy==3.1.1
+flask-sqlalchemy==3.1.1opengeodeweb-microservice~=1.0.4rc2
