@@ -1,37 +1,50 @@
 # Standard library imports
 import time
 import shutil
+import os
+from pathlib import Path
+from typing import Generator
 
 # Third party imports
-import os
 import pytest
 
 # Local application imports
-from app import app
+from opengeodeweb_back.app import app
+
+# from opengeodeweb_back import app_config
 from opengeodeweb_microservice.database.connection import init_database
 
 TEST_ID = "1"
 
 
 @pytest.fixture(scope="session", autouse=True)
-def copy_data():
+def configure_test_environment() -> Generator[None, None, None]:
+    base_path = Path(__file__).parent
+    test_data_path = base_path / "data"
+
     shutil.rmtree("./data", ignore_errors=True)
-    shutil.copytree("./tests/data/", f"./data/{TEST_ID}/", dirs_exist_ok=True)
+    shutil.copytree(test_data_path, f"./data/{TEST_ID}/", dirs_exist_ok=True)
+
     app.config["TESTING"] = True
     app.config["SERVER_NAME"] = "TEST"
     app.config["DATA_FOLDER_PATH"] = "./data/"
     app.config["UPLOAD_FOLDER"] = "./tests/data/"
-    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-    db_path = os.path.join(BASE_DIR, "data", "project.db")
+
+    db_path = os.path.join(base_path, "data", "project.db")
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 
     print("Current working directory:", os.getcwd())
     print("Directory contents:", os.listdir("."))
 
-    init_database(app)
-    # print(list(app.blueprints.keys()))
-    # for rule in app.url_map.iter_rules():
-    #     print(f"Route: {rule.rule} -> {rule.endpoint}")
+    init_database(app, db_path)
+    os.environ["TEST_DB_PATH"] = str(db_path)
+
+    yield
+
+    tmp_data_path = app.config.get("DATA_FOLDER_PATH")
+    if tmp_data_path and os.path.exists(tmp_data_path):
+        shutil.rmtree(tmp_data_path, ignore_errors=True)
+        print(f"Cleaned up test data folder: {tmp_data_path}", flush=True)
 
 
 @pytest.fixture

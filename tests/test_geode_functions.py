@@ -5,7 +5,7 @@ import uuid
 # Third party imports
 
 # Local application imports
-from src.opengeodeweb_back import geode_functions, geode_objects
+from opengeodeweb_back import geode_functions, geode_objects
 
 
 data_folder = os.path.join(os.path.dirname(__file__), "data")
