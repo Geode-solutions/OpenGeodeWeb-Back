@@ -36,7 +36,7 @@ markupsafe~=3.0
     #   flask
     #   jinja2
     #   werkzeug
-opengeode-core==15.27.4
+opengeode-core==15.29.0
     # via
     #   -r requirements.in
     #   geode-common
