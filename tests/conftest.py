@@ -36,7 +36,7 @@ def configure_test_environment() -> Generator[None, None, None]:
     print("Current working directory:", os.getcwd())
     print("Directory contents:", os.listdir("."))
 
-    init_database(app, db_path)
+    init_database(db_path)
     os.environ["TEST_DB_PATH"] = str(db_path)
 
     yield
