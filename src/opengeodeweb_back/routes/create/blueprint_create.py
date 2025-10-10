@@ -1,39 +1,31 @@
 # Standard library imports
 import json
 import os
-from typing import Any, TypedDict, cast
+from typing import cast, Any
 # Third party imports
 import flask
 import opengeode
-import werkzeug
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
-from opengeodeweb_microservice.database.data import Data
-from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_back.utils_functions import save_all_viewables_and_return_info
 
 routes = flask.Blueprint("create", __name__, url_prefix="/opengeodeweb_back/create")
 schemas = os.path.join(os.path.dirname(__file__), "schemas")
 
-# --- Type definitions for request validation ---
-class Point(TypedDict):
-    x: float
-    y: float
+# --- Type definitions for JSON and RPC ---
+type JsonPrimitive = str | int | float | bool
+type JsonValue = JsonPrimitive | dict[str, JsonValue] | list[JsonValue]
+type RpcParams = dict[str, JsonValue]
+type SchemaDict = dict[str, Any]  # Changé pour éviter cast sur json.load
 
-class CreatePointRequest(TypedDict):
-    name: str
-    x: float
-    y: float
-    z: float
-
-class CreateAOIRequest(TypedDict):
-    name: str
-    points: list[Point]
-    z: float
+# --- Specialized type aliases for each RPC endpoint ---
+type PointDict = dict[str, float]  # {"x": float, "y": float}
+type CreatePointParams = dict[str, str | float]  # {"name": str, "x": float, "y": float, "z": float}
+type CreateAOIParams = dict[str, str | float | list[PointDict]]  # {"name": str, "points": list[PointDict], "z": float}
 
 # Load schema for point creation
 with open(os.path.join(schemas, "create_point.json"), "r") as file:
-    create_point_json = cast(dict[str, Any], json.load(file))
+    create_point_json: SchemaDict = json.load(file)
 
 @routes.route(
     create_point_json["route"],
@@ -45,23 +37,23 @@ def create_point() -> flask.Response:
     utils_functions.validate_request(flask.request, create_point_json)
 
     # Extract and validate data from request
-    request_data = cast(CreatePointRequest, flask.request.json)
-    name: str = request_data["name"]
-    x: float = request_data["x"]
-    y: float = request_data["y"]
-    z: float = request_data["z"]
+    params: CreatePointParams = flask.request.get_json()  # type: ignore
+    name: str = params["name"]  # type: ignore
+    x: float = params["x"]  # type: ignore
+    y: float = params["y"]  # type: ignore
+    z: float = params["z"]  # type: ignore
 
-    # Create the point set
+    # Create the point
     class_ = geode_functions.geode_object_class("PointSet3D")
-    point_set = class_.create()
-    builder = geode_functions.create_builder("PointSet3D", point_set)
-    builder.create_point(opengeode.Point3D([x, y, z]))
+    pointset = class_.create()
+    builder = geode_functions.create_builder("PointSet3D", pointset)
     builder.set_name(name)
+    builder.create_point(opengeode.Point3D([x, y, z]))
 
     # Save and get info
     result = save_all_viewables_and_return_info(
         geode_object="PointSet3D",
-        data=point_set,
+        data=pointset,
     )
     result["name"] = name
     if "binary_light_viewable" not in result:
@@ -70,7 +62,7 @@ def create_point() -> flask.Response:
 
 # Load schema for AOI creation
 with open(os.path.join(schemas, "create_aoi.json"), "r") as file:
-    create_aoi_json = cast(dict[str, Any], json.load(file))
+    create_aoi_json: SchemaDict = json.load(file)
 
 @routes.route(
     create_aoi_json["route"],
@@ -82,10 +74,10 @@ def create_aoi() -> flask.Response:
     utils_functions.validate_request(flask.request, create_aoi_json)
 
     # Extract and validate data from request
-    request_data = cast(CreateAOIRequest, flask.request.json)
-    name: str = request_data["name"]
-    points: list[Point] = request_data["points"]
-    z: float = request_data["z"]
+    params: CreateAOIParams = flask.request.get_json()  # type: ignore
+    name: str = params["name"]  # type: ignore
+    points: list[PointDict] = params["points"]  # type: ignore
+    z: float = params["z"]  # type: ignore
 
     # Create the edged curve
     class_ = geode_functions.geode_object_class("EdgedCurve3D")
