@@ -37,7 +37,7 @@ def create_point() -> flask.Response:
     utils_functions.validate_request(flask.request, create_point_json)
 
     # Extract and validate data from request
-    params: CreatePointParams = flask.request.get_json()  # type: ignore
+    params: CreatePointParams = flask.request.get_json()
     name: str = params["name"]  # type: ignore
     x: float = params["x"]  # type: ignore
     y: float = params["y"]  # type: ignore
@@ -74,7 +74,7 @@ def create_aoi() -> flask.Response:
     utils_functions.validate_request(flask.request, create_aoi_json)
 
     # Extract and validate data from request
-    params: CreateAOIParams = flask.request.get_json()  # type: ignore
+    params: CreateAOIParams = flask.request.get_json()
     name: str = params["name"]  # type: ignore
     points: list[PointDict] = params["points"]  # type: ignore
     z: float = params["z"]  # type: ignore
