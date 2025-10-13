@@ -381,3 +381,17 @@ def ping():
     utils_functions.validate_request(flask.request, ping_json)
     flask.current_app.config.update(LAST_PING_TIME=time.time())
     return flask.make_response({"message": "Flask server is running"}, 200)
+
+
+with open(
+    os.path.join(schemas, "kill.json"),
+    "r",
+) as file:
+    kill_json = json.load(file)
+
+
+@routes.route(kill_json["route"], methods=kill_json["methods"])
+def kill() -> flask.Response:
+    print("Manual server kill, shutting down...", flush=True)
+    os._exit(0)
+    return flask.make_response({"message": "Flask server is dead"}, 200)
