@@ -2,9 +2,11 @@
 import json
 import os
 from typing import Any, TypedDict
+
 # Third party imports
 import flask
 import opengeode
+
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
 from opengeodeweb_back.utils_functions import save_all_viewables_and_return_info
@@ -15,9 +17,11 @@ schemas = os.path.join(os.path.dirname(__file__), "schemas")
 # --- Type definitions ---
 type SchemaDict = dict[str, Any]
 
+
 class PointDict(TypedDict):
     x: float
     y: float
+
 
 class CreatePointParams(TypedDict):
     name: str
@@ -25,19 +29,19 @@ class CreatePointParams(TypedDict):
     y: float
     z: float
 
+
 class CreateAOIParams(TypedDict):
     name: str
     points: list[PointDict]
     z: float
 
+
 # Load schemas
 with open(os.path.join(schemas, "create_point.json"), "r") as file:
     create_point_json: SchemaDict = json.load(file)
 
-@routes.route(
-    create_point_json["route"],
-    methods=create_point_json["methods"]
-)
+
+@routes.route(create_point_json["route"], methods=create_point_json["methods"])
 def create_point() -> flask.Response:
     """Endpoint to create a single point in 3D space."""
     print(f"create_point : {flask.request=}", flush=True)
@@ -67,14 +71,13 @@ def create_point() -> flask.Response:
         raise ValueError("binary_light_viewable is missing in the result")
     return flask.make_response(result, 200)
 
+
 # Load schema for AOI creation
 with open(os.path.join(schemas, "create_aoi.json"), "r") as file:
     create_aoi_json: SchemaDict = json.load(file)
 
-@routes.route(
-    create_aoi_json["route"],
-    methods=create_aoi_json["methods"]
-)
+
+@routes.route(create_aoi_json["route"], methods=create_aoi_json["methods"])
 def create_aoi() -> flask.Response:
     """Endpoint to create an Area of Interest (AOI) as an EdgedCurve3D."""
     print(f"create_aoi : {flask.request=}", flush=True)
@@ -104,8 +107,10 @@ def create_aoi() -> flask.Response:
         next_i = (i + 1) % num_vertices
         edge_id = builder.create_edge()
         builder.set_edge_vertex(opengeode.EdgeVertex(edge_id, 0), vertex_indices[i])
-        builder.set_edge_vertex(opengeode.EdgeVertex(edge_id, 1), vertex_indices[next_i])
-        
+        builder.set_edge_vertex(
+            opengeode.EdgeVertex(edge_id, 1), vertex_indices[next_i]
+        )
+
     # Save and get info
     result = save_all_viewables_and_return_info(
         geode_object="EdgedCurve3D",

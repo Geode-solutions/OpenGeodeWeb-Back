@@ -1,4 +1,5 @@
 """Packages"""
+
 import argparse
 import os
 import time
@@ -54,13 +55,16 @@ if FLASK_DEBUG == False:
         utils_functions.kill_task, SECONDS_BETWEEN_SHUTDOWNS, app
     )
 
+
 @app.errorhandler(HTTPException)
 def errorhandler(e: HTTPException) -> tuple[dict[str, Any], int] | Response:
     return utils_functions.handle_exception(e)
 
+
 @app.errorhandler(Exception)
 def handle_generic_exception(e: Exception) -> Response:
     return flask.make_response({"error": str(e)}, 500)
+
 
 @app.route(
     "/error",
@@ -70,16 +74,19 @@ def return_error() -> Response:
     flask.abort(500, f"Test")
     return flask.make_response({}, 500)
 
+
 @app.route("/", methods=["POST"])
 @cross_origin()
 def root() -> Response:
     return flask.make_response({}, 200)
+
 
 @app.route("/kill", methods=["POST"])
 @cross_origin()
 def kill() -> None:
     print("Manual server kill, shutting down...", flush=True)
     os._exit(0)
+
 
 def run_server() -> None:
     parser = argparse.ArgumentParser(
@@ -141,6 +148,7 @@ def run_server() -> None:
     init_database(app, db_filename)
     print(f"Database initialized at: {db_path}", flush=True)
     app.run(debug=args.debug, host=args.host, port=args.port, ssl_context=SSL)
+
 
 # ''' Main '''
 if __name__ == "__main__":
