@@ -163,7 +163,7 @@ def create_data_folder_from_id(data_id: str) -> str:
 def save_all_viewables_and_return_info(
     geode_object: str,
     data: Any,
-    input_file: str,
+    input_file: str | None = None,
     additional_files: list[str] | None = None,
 ) -> dict[str, Any]:
     if additional_files is None:
@@ -227,6 +227,8 @@ def generate_native_viewable_and_light_viewable_from_object(
 def generate_native_viewable_and_light_viewable_from_file(
     geode_object: str, input_filename: str
 ) -> dict[str, Any]:
+
+    session = get_session()
     temp_data_entry = Data.create(
         geode_object=geode_object,
         input_file=input_filename,
@@ -258,10 +260,10 @@ def generate_native_viewable_and_light_viewable_from_file(
 
     data = geode_functions.load(geode_object, copied_full_path)
 
-    session = get_session()
     if session:
         session.delete(temp_data_entry)
         session.flush()
+        session.commit()
 
     return save_all_viewables_and_return_info(
         geode_object,

@@ -140,12 +140,13 @@ def run_server() -> None:
         flush=True,
     )
 
-    db_filename: str = app.config.get("DATABASE_FILENAME") or "database.db"
+    db_filename: str = app.config.get("DATABASE_FILENAME") or "project.db"
     db_path = os.path.join(args.data_folder_path, db_filename)
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    init_database(app, db_filename)
+
+    init_database(db_path)
     print(f"Database initialized at: {db_path}", flush=True)
 
     app.run(debug=args.debug, host=args.host, port=args.port, ssl_context=SSL)
