@@ -240,7 +240,7 @@ def generate_native_viewable_and_light_viewable_from_file(
         input_file=input_filename,
         additional_files=[],
     )
-    
+
     data_path = create_data_folder_from_id(data_entry.id)
 
     full_input_filename = geode_functions.upload_file_path(input_filename)
