@@ -116,7 +116,7 @@ def test_save_all_viewables_and_return_info(client):
         assert isinstance(result["object_type"], str)
         assert isinstance(result["binary_light_viewable"], str)
         assert result["geode_object"] == geode_object
-        assert result["input_files"] == input_file
+        assert result["input_file"] == input_file
 
         db_entry = Data.get(result["id"])
         assert db_entry is not None
@@ -173,7 +173,7 @@ def test_generate_native_viewable_and_light_viewable_from_object(client):
     assert re.match(r"[0-9a-f]{32}", result["id"])
     assert isinstance(result["object_type"], str)
     assert isinstance(result["binary_light_viewable"], str)
-    assert result["input_files"] == ""
+    assert result["input_file"] == ""
 
 
 def test_generate_native_viewable_and_light_viewable_from_file(client):
@@ -195,4 +195,4 @@ def test_generate_native_viewable_and_light_viewable_from_file(client):
     assert re.match(r"[0-9a-f]{32}", result["id"])
     assert isinstance(result["object_type"], str)
     assert isinstance(result["binary_light_viewable"], str)
-    assert isinstance(result["input_files"], str)
+    assert isinstance(result["input_file"], str)

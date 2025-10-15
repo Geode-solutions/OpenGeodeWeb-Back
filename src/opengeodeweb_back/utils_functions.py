@@ -213,7 +213,7 @@ def save_all_viewables_and_return_info(
             "object_type": geode_functions.get_object_type(geode_object),
             "binary_light_viewable": binary_light_viewable.decode("utf-8"),
             "geode_object": data_entry.geode_object,
-            "input_files": data_entry.input_file,
+            "input_file": data_entry.input_file,
             "additional_files": data_entry.additional_files,
         }
 
