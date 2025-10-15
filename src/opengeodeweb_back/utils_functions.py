@@ -163,18 +163,9 @@ def create_data_folder_from_id(data_id: str) -> str:
 def save_all_viewables_and_return_info(
     geode_object: str,
     data: Any,
-    input_file: str | None = None,
-    additional_files: list[str] | None = None,
+    data_entry: Any,
+    data_path: str,
 ) -> dict[str, Any]:
-    if additional_files is None:
-        additional_files = []
-
-    data_entry = Data.create(
-        geode_object=geode_object,
-        input_file=input_file,
-        additional_files=additional_files,
-    )
-    data_path = create_data_folder_from_id(data_entry.id)
     with ThreadPoolExecutor() as executor:
         native_future = executor.submit(
             geode_functions.save,
@@ -221,21 +212,25 @@ def save_all_viewables_and_return_info(
 def generate_native_viewable_and_light_viewable_from_object(
     geode_object: str, data: Any
 ) -> dict[str, Any]:
-    return save_all_viewables_and_return_info(geode_object, data, input_file="")
+    data_entry = Data.create(
+        geode_object=geode_object,
+        input_file="",
+        additional_files=[],
+    )
+    data_path = create_data_folder_from_id(data_entry.id)
+    return save_all_viewables_and_return_info(geode_object, data, data_entry, data_path)
 
 
 def generate_native_viewable_and_light_viewable_from_file(
     geode_object: str, input_filename: str
 ) -> dict[str, Any]:
-
-    session = get_session()
-    temp_data_entry = Data.create(
+    data_entry = Data.create(
         geode_object=geode_object,
         input_file=input_filename,
         additional_files=[],
     )
-
-    data_path = create_data_folder_from_id(temp_data_entry.id)
+    
+    data_path = create_data_folder_from_id(data_entry.id)
 
     full_input_filename = geode_functions.upload_file_path(input_filename)
     copied_full_path = os.path.join(
@@ -260,14 +255,10 @@ def generate_native_viewable_and_light_viewable_from_file(
 
     data = geode_functions.load(geode_object, copied_full_path)
 
-    if session:
-        session.delete(temp_data_entry)
-        session.flush()
-        session.commit()
-
+    data_entry.additional_files = additional_files_copied
     return save_all_viewables_and_return_info(
         geode_object,
         data,
-        input_file=input_filename,
-        additional_files=additional_files_copied,
+        data_entry,
+        data_path,
     )
