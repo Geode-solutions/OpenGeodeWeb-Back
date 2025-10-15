@@ -186,6 +186,7 @@ def save_all_viewables_and_return_info(
 
     data_entry = Data.create(
         geode_object=geode_object,
+        viewer_object=geode_functions.get_object_type(geode_object),
         input_file=input_file,
         additional_files=additional_files,
     )
@@ -241,6 +242,7 @@ def generate_native_viewable_and_light_viewable_from_file(
 
     temp_data_entry = Data.create(
         geode_object=geode_object,
+        viewer_object=geode_functions.get_object_type(geode_object),
         input_file=input_filename,
         additional_files=[],
     )

@@ -35,6 +35,7 @@ def test_extract_brep_uuids(client, test_id):
     with client.application.app_context():
         data_entry = Data.create(
             geode_object="BRep",
+            viewer_object=geode_functions.get_object_type("BRep"),
             input_file=brep_filename,
         )
         data_entry.native_file_name = brep_filename
