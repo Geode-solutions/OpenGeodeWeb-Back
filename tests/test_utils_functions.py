@@ -103,8 +103,15 @@ def test_save_all_viewables_and_return_info(client):
         input_file = "test.og_brep"
         additional_files = ["additional_file.txt"]
 
+        data_entry = Data.create(
+            geode_object=geode_object,
+            input_file=input_file,
+            additional_files=additional_files,
+        )
+        data_path = utils_functions.create_data_folder_from_id(data_entry.id)
+
         result = utils_functions.save_all_viewables_and_return_info(
-            geode_object, data, input_file, additional_files
+            geode_object, data, data_entry, data_path
         )
 
         assert isinstance(result, dict)
@@ -136,8 +143,16 @@ def test_save_all_viewables_commits_to_db(client):
         geode_object = "BRep"
         data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
         input_file = "test.og_brep"
+        
+        data_entry = Data.create(
+            geode_object=geode_object,
+            input_file=input_file,
+            additional_files=[],
+        )
+        data_path = utils_functions.create_data_folder_from_id(data_entry.id)
+        
         result = utils_functions.save_all_viewables_and_return_info(
-            geode_object, data, input_file
+            geode_object, data, data_entry, data_path
         )
         data_id = result["id"]
         db_entry_before = Data.get(data_id)
