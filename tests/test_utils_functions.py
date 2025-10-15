@@ -143,13 +143,6 @@ def test_save_all_viewables_commits_to_db(client):
         db_entry_before = Data.get(data_id)
         assert db_entry_before is not None
         assert db_entry_before.native_file_name == result["native_file_name"]
-        session = get_session()
-        session.rollback()
-        db_entry_after = Data.get(data_id)
-        assert (
-            db_entry_after is not None
-        ), "database.session.commit() was not called - entry missing after rollback"
-        assert db_entry_after.native_file_name == result["native_file_name"]
 
 
 def test_generate_native_viewable_and_light_viewable_from_object(client):

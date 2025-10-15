@@ -41,13 +41,28 @@ def update_last_request_time(current_app: flask.Flask) -> None:
         current_app.config.update(LAST_REQUEST_TIME=LAST_REQUEST_TIME)
 
 
+def terminate_session(exception: BaseException | None) -> None:
+    session = flask.g.pop("session", None)
+    if session is None:
+        return
+    if exception is None:
+        session.commit()
+    else:
+        session.rollback()
+    session.close()
+
+
 def before_request(current_app: flask.Flask) -> None:
     increment_request_counter(current_app)
+    flask.g.session = get_session()
 
 
-def teardown_request(current_app: flask.Flask) -> None:
+def teardown_request(
+    current_app: flask.Flask, exception: BaseException | None = None
+) -> None:
     decrement_request_counter(current_app)
     update_last_request_time(current_app)
+    terminate_session(exception)
 
 
 def kill_task(current_app: flask.Flask) -> None:
@@ -202,10 +217,6 @@ def save_all_viewables_and_return_info(
         data_entry.viewable_file_name = os.path.basename(saved_viewable_file_path)
         data_entry.light_viewable = os.path.basename(saved_light_viewable_file_path)
 
-        session = get_session()
-        if session:
-            session.commit()
-
         return {
             "native_file_name": data_entry.native_file_name,
             "viewable_file_name": data_entry.viewable_file_name,
@@ -228,7 +239,6 @@ def generate_native_viewable_and_light_viewable_from_file(
     geode_object: str, input_filename: str
 ) -> dict[str, Any]:
 
-    session = get_session()
     temp_data_entry = Data.create(
         geode_object=geode_object,
         input_file=input_filename,
@@ -259,11 +269,6 @@ def generate_native_viewable_and_light_viewable_from_file(
         additional_files_copied.append(additional_file.filename)
 
     data = geode_functions.load(geode_object, copied_full_path)
-
-    if session:
-        session.delete(temp_data_entry)
-        session.flush()
-        session.commit()
 
     return save_all_viewables_and_return_info(
         geode_object,
