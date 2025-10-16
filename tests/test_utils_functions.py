@@ -105,6 +105,7 @@ def test_save_all_viewables_and_return_info(client):
 
         data_entry = Data.create(
             geode_object=geode_object,
+            viewer_object=geode_functions.get_object_type(geode_object),
             input_file=input_file,
             additional_files=additional_files,
         )
@@ -146,6 +147,7 @@ def test_save_all_viewables_commits_to_db(client):
 
         data_entry = Data.create(
             geode_object=geode_object,
+            viewer_object=geode_functions.get_object_type(geode_object),
             input_file=input_file,
             additional_files=[],
         )
