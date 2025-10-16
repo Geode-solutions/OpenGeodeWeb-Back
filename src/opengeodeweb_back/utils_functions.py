@@ -4,7 +4,6 @@ import threading
 import time
 import zipfile
 from collections.abc import Callable
-from typing import Any
 from concurrent.futures import ThreadPoolExecutor
 
 # Third party imports
@@ -112,7 +111,7 @@ def validate_request(request: flask.Request, schema: dict[str, str]) -> None:
 
 
 def set_interval(
-    function: Callable[[Any], None], seconds: float, args: Any
+    function: Callable[[flask.Flask], None], seconds: float, args: flask.Flask
 ) -> threading.Timer:
     def function_wrapper() -> None:
         set_interval(function, seconds, args)
@@ -129,7 +128,7 @@ def extension_from_filename(filename: str) -> str:
 
 
 def send_file(
-    upload_folder: str, saved_files: str, new_file_name: str
+    upload_folder: str, saved_files: list[str], new_file_name: str
 ) -> flask.Response:
     if len(saved_files) == 1:
         mimetype = "application/octet-binary"
@@ -177,10 +176,10 @@ def create_data_folder_from_id(data_id: str) -> str:
 
 def save_all_viewables_and_return_info(
     geode_object: str,
-    data: Any,
-    data_entry: Any,
+    data: object,
+    data_entry: Data,
     data_path: str,
-) -> dict[str, Any]:
+) -> dict[str, str | list[str]]:
     with ThreadPoolExecutor() as executor:
         native_future = executor.submit(
             geode_functions.save,
@@ -221,8 +220,8 @@ def save_all_viewables_and_return_info(
 
 
 def generate_native_viewable_and_light_viewable_from_object(
-    geode_object: str, data: Any
-) -> dict[str, Any]:
+    geode_object: str, data: object
+) -> dict[str, str | list[str]]:
     data_entry = Data.create(
         geode_object=geode_object,
         input_file="",
@@ -234,7 +233,7 @@ def generate_native_viewable_and_light_viewable_from_object(
 
 def generate_native_viewable_and_light_viewable_from_file(
     geode_object: str, input_filename: str
-) -> dict[str, Any]:
+) -> dict[str, str | list[str]]:
     data_entry = Data.create(
         geode_object=geode_object,
         input_file=input_filename,
