@@ -11,7 +11,7 @@ import opengeode
 from opengeodeweb_back import geode_functions, utils_functions
 from opengeodeweb_back.utils_functions import save_all_viewables_and_return_info
 
-routes = flask.Blueprint("create", __name__, url_prefix="/opengeodeweb_back/create")
+routes = flask.Blueprint("create", __name__, url_prefix="/create")
 schemas = os.path.join(os.path.dirname(__file__), "schemas")
 
 # --- Type definitions ---
