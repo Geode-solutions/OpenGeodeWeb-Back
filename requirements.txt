@@ -4,34 +4,29 @@
 #
 #    pip-compile
 #
-asgiref==3.10.0
+asgiref>=3
     # via flask
-blinker==1.9.0
+blinker>=1
     # via flask
-click==8.3.0
+click>=8
     # via flask
-flask[async]==3.1.2
+flask[async]>=3
     # via
     #   -r requirements.in
     #   flask-cors
-    #   flask-sqlalchemy
 flask-cors==6.0.1
     # via -r requirements.in
-flask-sqlalchemy==3.1.1
-    # via -r requirements.in
-geode-common==33.11.3
+geode-common==33.11.0
     # via
     #   -r requirements.in
     #   geode-viewables
 geode-viewables==3.3.2
     # via -r requirements.in
-greenlet==3.2.4
-    # via sqlalchemy
-itsdangerous==2.2.0
+itsdangerous>=2
     # via flask
-jinja2==3.1.6
+jinja2>=3
     # via flask
-markupsafe==3.0.3
+markupsafe>=3
     # via
     #   flask
     #   jinja2
@@ -59,12 +54,9 @@ opengeode-io==7.4.2
     #   -r requirements.in
     #   geode-viewables
     #   opengeode-geosciencesio
-sqlalchemy==2.0.44
-    # via flask-sqlalchemy
-typing-extensions==4.15.0
-    # via sqlalchemy
 werkzeug==3.1.2
     # via
     #   -r requirements.in
     #   flask
     #   flask-cors
+

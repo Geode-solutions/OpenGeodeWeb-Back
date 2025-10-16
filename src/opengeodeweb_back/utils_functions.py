@@ -4,7 +4,6 @@ import threading
 import time
 import zipfile
 from collections.abc import Callable
-from typing import Any
 from concurrent.futures import ThreadPoolExecutor
 
 # Third party imports
@@ -41,13 +40,28 @@ def update_last_request_time(current_app: flask.Flask) -> None:
         current_app.config.update(LAST_REQUEST_TIME=LAST_REQUEST_TIME)
 
 
+def terminate_session(exception: BaseException | None) -> None:
+    session = flask.g.pop("session", None)
+    if session is None:
+        return
+    if exception is None:
+        session.commit()
+    else:
+        session.rollback()
+    session.close()
+
+
 def before_request(current_app: flask.Flask) -> None:
     increment_request_counter(current_app)
+    flask.g.session = get_session()
 
 
-def teardown_request(current_app: flask.Flask) -> None:
+def teardown_request(
+    current_app: flask.Flask, exception: BaseException | None = None
+) -> None:
     decrement_request_counter(current_app)
     update_last_request_time(current_app)
+    terminate_session(exception)
 
 
 def kill_task(current_app: flask.Flask) -> None:
@@ -97,7 +111,7 @@ def validate_request(request: flask.Request, schema: dict[str, str]) -> None:
 
 
 def set_interval(
-    function: Callable[[Any], None], seconds: float, args: Any
+    function: Callable[[flask.Flask], None], seconds: float, args: flask.Flask
 ) -> threading.Timer:
     def function_wrapper() -> None:
         set_interval(function, seconds, args)
@@ -114,7 +128,7 @@ def extension_from_filename(filename: str) -> str:
 
 
 def send_file(
-    upload_folder: str, saved_files: str, new_file_name: str
+    upload_folder: str, saved_files: list[str], new_file_name: str
 ) -> flask.Response:
     if len(saved_files) == 1:
         mimetype = "application/octet-binary"
@@ -162,19 +176,10 @@ def create_data_folder_from_id(data_id: str) -> str:
 
 def save_all_viewables_and_return_info(
     geode_object: str,
-    data: Any,
-    input_file: str | None = None,
-    additional_files: list[str] | None = None,
-) -> dict[str, Any]:
-    if additional_files is None:
-        additional_files = []
-
-    data_entry = Data.create(
-        geode_object=geode_object,
-        input_file=input_file,
-        additional_files=additional_files,
-    )
-    data_path = create_data_folder_from_id(data_entry.id)
+    data: object,
+    data_entry: Data,
+    data_path: str,
+) -> dict[str, str | list[str]]:
     with ThreadPoolExecutor() as executor:
         native_future = executor.submit(
             geode_functions.save,
@@ -202,10 +207,6 @@ def save_all_viewables_and_return_info(
         data_entry.viewable_file_name = os.path.basename(saved_viewable_file_path)
         data_entry.light_viewable = os.path.basename(saved_light_viewable_file_path)
 
-        session = get_session()
-        if session:
-            session.commit()
-
         return {
             "native_file_name": data_entry.native_file_name,
             "viewable_file_name": data_entry.viewable_file_name,
@@ -213,27 +214,33 @@ def save_all_viewables_and_return_info(
             "object_type": geode_functions.get_object_type(geode_object),
             "binary_light_viewable": binary_light_viewable.decode("utf-8"),
             "geode_object": data_entry.geode_object,
-            "input_files": data_entry.input_file,
+            "input_file": data_entry.input_file,
             "additional_files": data_entry.additional_files,
         }
 
 
 def generate_native_viewable_and_light_viewable_from_object(
-    geode_object: str, data: Any
-) -> dict[str, Any]:
-    return save_all_viewables_and_return_info(geode_object, data, input_file="")
+    geode_object: str, data: object
+) -> dict[str, str | list[str]]:
+    data_entry = Data.create(
+        geode_object=geode_object,
+        input_file="",
+        additional_files=[],
+    )
+    data_path = create_data_folder_from_id(data_entry.id)
+    return save_all_viewables_and_return_info(geode_object, data, data_entry, data_path)
 
 
 def generate_native_viewable_and_light_viewable_from_file(
     geode_object: str, input_filename: str
-) -> dict[str, Any]:
-    temp_data_entry = Data.create(
+) -> dict[str, str | list[str]]:
+    data_entry = Data.create(
         geode_object=geode_object,
         input_file=input_filename,
         additional_files=[],
     )
 
-    data_path = create_data_folder_from_id(temp_data_entry.id)
+    data_path = create_data_folder_from_id(data_entry.id)
 
     full_input_filename = geode_functions.upload_file_path(input_filename)
     copied_full_path = os.path.join(
@@ -258,14 +265,10 @@ def generate_native_viewable_and_light_viewable_from_file(
 
     data = geode_functions.load(geode_object, copied_full_path)
 
-    session = get_session()
-    if session:
-        session.delete(temp_data_entry)
-        session.flush()
-
+    data_entry.additional_files = additional_files_copied
     return save_all_viewables_and_return_info(
         geode_object,
         data,
-        input_file=input_filename,
-        additional_files=additional_files_copied,
+        data_entry,
+        data_path,
     )

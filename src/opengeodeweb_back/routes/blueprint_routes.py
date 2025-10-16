@@ -17,20 +17,6 @@ from .models import blueprint_models
 routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
 
 
-@routes.before_request
-def before_request():
-    if "ping" not in flask.request.path:
-        utils_functions.increment_request_counter(flask.current_app)
-
-
-@routes.teardown_request
-def teardown_request(exception):
-
-    if "ping" not in flask.request.path:
-        utils_functions.decrement_request_counter(flask.current_app)
-        utils_functions.update_last_request_time(flask.current_app)
-
-
 routes.register_blueprint(
     blueprint_models.routes,
     url_prefix=blueprint_models.routes.url_prefix,
@@ -357,3 +343,17 @@ def ping():
     utils_functions.validate_request(flask.request, ping_json)
     flask.current_app.config.update(LAST_PING_TIME=time.time())
     return flask.make_response({"message": "Flask server is running"}, 200)
+
+
+with open(
+    os.path.join(schemas, "kill.json"),
+    "r",
+) as file:
+    kill_json = json.load(file)
+
+
+@routes.route(kill_json["route"], methods=kill_json["methods"])
+def kill() -> flask.Response:
+    print("Manual server kill, shutting down...", flush=True)
+    os._exit(0)
+    return flask.make_response({"message": "Flask server is dead"}, 200)

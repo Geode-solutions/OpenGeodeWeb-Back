@@ -13,7 +13,7 @@ from opengeodeweb_back import utils_functions, app_config
 from opengeodeweb_back.routes import blueprint_routes
 from opengeodeweb_back.routes.models import blueprint_models
 from opengeodeweb_back.routes.create import blueprint_create
-from opengeodeweb_microservice.database.connection import init_database
+from opengeodeweb_microservice.database import connection
 
 """ Global config """
 app: Flask = flask.Flask(__name__)
@@ -33,6 +33,17 @@ SSL: Any = app.config.get("SSL")
 SECONDS_BETWEEN_SHUTDOWNS: float = float(
     app.config.get("SECONDS_BETWEEN_SHUTDOWNS") or 60.0
 )
+
+
+@app.before_request
+def before_request() -> None:
+    utils_functions.before_request(flask.current_app)
+
+
+@app.teardown_request
+def teardown_request(exception: BaseException | None) -> None:
+    utils_functions.teardown_request(flask.current_app, exception)
+
 
 app.register_blueprint(
     blueprint_routes.routes,
@@ -140,12 +151,14 @@ def run_server() -> None:
         f"Origins: {args.allowed_origins}",
         flush=True,
     )
-    db_filename: str = app.config.get("DATABASE_FILENAME") or "database.db"
+
+    db_filename: str = app.config.get("DATABASE_FILENAME") or "project.db"
     db_path = os.path.join(args.data_folder_path, db_filename)
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    init_database(app, db_filename)
+
+    connection.init_database(db_path)
     print(f"Database initialized at: {db_path}", flush=True)
     app.run(debug=args.debug, host=args.host, port=args.port, ssl_context=SSL)
 
