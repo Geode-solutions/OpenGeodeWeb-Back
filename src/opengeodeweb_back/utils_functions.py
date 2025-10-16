@@ -224,6 +224,7 @@ def generate_native_viewable_and_light_viewable_from_object(
 ) -> dict[str, str | list[str]]:
     data_entry = Data.create(
         geode_object=geode_object,
+        viewer_object=geode_functions.get_object_type(geode_object),
         input_file="",
         additional_files=[],
     )
@@ -236,6 +237,7 @@ def generate_native_viewable_and_light_viewable_from_file(
 ) -> dict[str, str | list[str]]:
     data_entry = Data.create(
         geode_object=geode_object,
+        viewer_object=geode_functions.get_object_type(geode_object),
         input_file=input_filename,
         additional_files=[],
     )

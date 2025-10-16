@@ -171,7 +171,11 @@ def test_save_viewable_file(client):
 
 def test_texture_coordinates(client, test_id):
     with client.application.app_context():
-        data = Data.create(geode_object="PolygonalSurface3D", input_file="hat.vtp")
+        data = Data.create(
+            geode_object="PolygonalSurface3D",
+            viewer_object=geode_functions.get_object_type("PolygonalSurface3D"),
+            input_file="hat.vtp",
+        )
         data.native_file_name = "hat.vtp"
         session = get_session()
         if session:
@@ -195,7 +199,11 @@ def test_vertex_attribute_names(client, test_id):
     route = f"/opengeodeweb_back/vertex_attribute_names"
 
     with client.application.app_context():
-        data = Data.create(geode_object="PolygonalSurface3D", input_file="test.vtp")
+        data = Data.create(
+            geode_object="PolygonalSurface3D",
+            viewer_object=geode_functions.get_object_type("PolygonalSurface3D"),
+            input_file="test.vtp",
+        )
         data.native_file_name = "test.vtp"
         session = get_session()
         if session:
@@ -217,7 +225,11 @@ def test_polygon_attribute_names(client, test_id):
     route = f"/opengeodeweb_back/polygon_attribute_names"
 
     with client.application.app_context():
-        data = Data.create(geode_object="PolygonalSurface3D", input_file="test.vtp")
+        data = Data.create(
+            geode_object="PolygonalSurface3D",
+            viewer_object=geode_functions.get_object_type("PolygonalSurface3D"),
+            input_file="test.vtp",
+        )
         data.native_file_name = "test.vtp"
         session = get_session()
         if session:
@@ -239,7 +251,11 @@ def test_polyhedron_attribute_names(client, test_id):
     route = f"/opengeodeweb_back/polyhedron_attribute_names"
 
     with client.application.app_context():
-        data = Data.create(geode_object="PolyhedralSolid3D", input_file="test.vtu")
+        data = Data.create(
+            geode_object="PolyhedralSolid3D",
+            viewer_object=geode_functions.get_object_type("PolyhedralSolid3D"),
+            input_file="test.vtu",
+        )
         data.native_file_name = "test.vtu"
         session = get_session()
         if session:
