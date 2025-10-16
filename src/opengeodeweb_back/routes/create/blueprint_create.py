@@ -9,7 +9,6 @@ import opengeode
 
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
-from opengeodeweb_back.utils_functions import save_all_viewables_and_return_info
 
 routes = flask.Blueprint("create", __name__, url_prefix="/create")
 schemas = os.path.join(os.path.dirname(__file__), "schemas")
@@ -62,7 +61,7 @@ def create_point() -> flask.Response:
     builder.create_point(opengeode.Point3D([x, y, z]))
 
     # Save and get info
-    result = save_all_viewables_and_return_info(
+    result = utils_functions.generate_native_viewable_and_light_viewable_from_object(
         geode_object="PointSet3D",
         data=pointset,
     )
@@ -112,7 +111,7 @@ def create_aoi() -> flask.Response:
         )
 
     # Save and get info
-    result = save_all_viewables_and_return_info(
+    result = utils_functions.generate_native_viewable_and_light_viewable_from_object(
         geode_object="EdgedCurve3D",
         data=edged_curve,
     )
