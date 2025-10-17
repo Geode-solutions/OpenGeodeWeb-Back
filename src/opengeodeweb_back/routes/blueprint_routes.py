@@ -10,7 +10,8 @@ import werkzeug
 
 # Local application imports
 from .. import geode_functions, utils_functions
-
+from opengeodeweb_microservice.database.data import Data
+from opengeodeweb_microservice.database.connection import get_session
 from .models import blueprint_models
 
 routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
@@ -21,7 +22,6 @@ routes.register_blueprint(
     url_prefix=blueprint_models.routes.url_prefix,
     name=blueprint_models.routes.name,
 )
-
 
 schemas = os.path.join(os.path.dirname(__file__), "schemas")
 
@@ -239,30 +239,6 @@ def save_viewable_file():
         utils_functions.generate_native_viewable_and_light_viewable_from_file(
             geode_object=flask.request.get_json()["input_geode_object"],
             input_filename=flask.request.get_json()["filename"],
-        ),
-        200,
-    )
-
-
-with open(os.path.join(schemas, "create_point.json"), "r") as file:
-    create_point_json = json.load(file)
-
-
-@routes.route(create_point_json["route"], methods=create_point_json["methods"])
-def create_point():
-    utils_functions.validate_request(flask.request, create_point_json)
-    title = flask.request.get_json()["title"]
-    x = flask.request.get_json()["x"]
-    y = flask.request.get_json()["y"]
-    z = flask.request.get_json()["z"]
-    class_ = geode_functions.geode_object_class("PointSet3D")
-    PointSet3D = class_.create()
-    builder = geode_functions.create_builder("PointSet3D", PointSet3D)
-    builder.create_point(opengeode.Point3D([x, y, z]))
-    builder.set_name(title)
-    return flask.make_response(
-        utils_functions.generate_native_viewable_and_light_viewable_from_object(
-            "PointSet3D", PointSet3D
         ),
         200,
     )
