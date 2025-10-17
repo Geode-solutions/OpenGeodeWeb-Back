@@ -211,7 +211,7 @@ def save_all_viewables_and_return_info(
             "native_file_name": data_entry.native_file_name,
             "viewable_file_name": data_entry.viewable_file_name,
             "id": data_entry.id,
-            "name": data.name(),
+            "name": data.name(),  # type: ignore
             "object_type": geode_functions.get_object_type(geode_object),
             "binary_light_viewable": binary_light_viewable.decode("utf-8"),
             "geode_object": data_entry.geode_object,
