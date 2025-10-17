@@ -66,8 +66,6 @@ def create_point() -> flask.Response:
         data=pointset,
     )
     result["name"] = name
-    if "binary_light_viewable" not in result:
-        raise ValueError("binary_light_viewable is missing in the result")
     return flask.make_response(result, 200)
 
 
@@ -116,6 +114,4 @@ def create_aoi() -> flask.Response:
         data=edged_curve,
     )
     result["name"] = name
-    if "binary_light_viewable" not in result:
-        raise ValueError("binary_light_viewable is missing in the result")
     return flask.make_response(result, 200)
