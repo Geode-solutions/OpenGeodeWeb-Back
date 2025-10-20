@@ -19,6 +19,8 @@ from . import geode_functions
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
 
+type SchemaDict = dict[str, str]
+
 
 def increment_request_counter(current_app: flask.Flask) -> None:
     if "REQUEST_COUNTER" in current_app.config:
@@ -97,7 +99,7 @@ def versions(list_packages: list[str]) -> list[dict[str, str]]:
     return list_with_versions
 
 
-def validate_request(request: flask.Request, schema: dict[str, str]) -> None:
+def validate_request(request: flask.Request, schema: SchemaDict) -> None:
     json_data = request.get_json(force=True, silent=True)
 
     if json_data is None:

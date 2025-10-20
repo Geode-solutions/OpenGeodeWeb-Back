@@ -9,19 +9,15 @@ import opengeode
 
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
-from opengeodeweb_back.routes.create.schemas.create_aoi import CreateAoi
-from opengeodeweb_back.routes.create.schemas.create_point import CreatePoint
+from . import schemas
 
 routes = flask.Blueprint("create", __name__, url_prefix="/create")
-schemas = os.path.join(os.path.dirname(__file__), "schemas")
-
-# --- Type definitions ---
-type SchemaDict = dict[str, Any]
+schemas_folder = os.path.join(os.path.dirname(__file__), "schemas")
 
 
 # Load schemas
-with open(os.path.join(schemas, "create_point.json"), "r") as file:
-    create_point_json: SchemaDict = json.load(file)
+with open(os.path.join(schemas_folder, "create_point.json"), "r") as file:
+    create_point_json: utils_functions.SchemaDict = json.load(file)
 
 
 @routes.route(create_point_json["route"], methods=create_point_json["methods"])
@@ -29,7 +25,7 @@ def create_point() -> flask.Response:
     """Endpoint to create a single point in 3D space."""
     print(f"create_point : {flask.request=}", flush=True)
     utils_functions.validate_request(flask.request, create_point_json)
-    params = CreatePoint(**flask.request.get_json())
+    params = schemas.CreatePoint(**flask.request.get_json())
 
     # Create the point
     class_ = geode_functions.geode_object_class("PointSet3D")
@@ -47,8 +43,8 @@ def create_point() -> flask.Response:
 
 
 # Load schema for AOI creation
-with open(os.path.join(schemas, "create_aoi.json"), "r") as file:
-    create_aoi_json: SchemaDict = json.load(file)
+with open(os.path.join(schemas_folder, "create_aoi.json"), "r") as file:
+    create_aoi_json: utils_functions.SchemaDict = json.load(file)
 
 
 @routes.route(create_aoi_json["route"], methods=create_aoi_json["methods"])
@@ -56,7 +52,7 @@ def create_aoi() -> flask.Response:
     """Endpoint to create an Area of Interest (AOI) as an EdgedCurve3D."""
     print(f"create_aoi : {flask.request=}", flush=True)
     utils_functions.validate_request(flask.request, create_aoi_json)
-    params = CreateAoi(**flask.request.get_json())
+    params = schemas.CreateAoi(**flask.request.get_json())
 
     # Create the edged curve
     class_ = geode_functions.geode_object_class("EdgedCurve3D")
