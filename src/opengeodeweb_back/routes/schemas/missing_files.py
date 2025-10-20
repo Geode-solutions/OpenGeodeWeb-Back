@@ -24,7 +24,7 @@ class MissingFiles:
         self.input_geode_object = input_geode_object
 
     @staticmethod
-    def from_dict(obj: Any) -> 'MissingFiles':
+    def from_dict(obj: Any) -> "MissingFiles":
         assert isinstance(obj, dict)
         filename = from_str(obj.get("filename"))
         input_geode_object = from_str(obj.get("input_geode_object"))

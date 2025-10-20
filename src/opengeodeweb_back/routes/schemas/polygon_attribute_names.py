@@ -22,7 +22,7 @@ class PolygonAttributeNames:
         self.id = id
 
     @staticmethod
-    def from_dict(obj: Any) -> 'PolygonAttributeNames':
+    def from_dict(obj: Any) -> "PolygonAttributeNames":
         assert isinstance(obj, dict)
         id = from_str(obj.get("id"))
         return PolygonAttributeNames(id)

@@ -22,7 +22,7 @@ class VtmComponentIndices:
         self.id = id
 
     @staticmethod
-    def from_dict(obj: Any) -> 'VtmComponentIndices':
+    def from_dict(obj: Any) -> "VtmComponentIndices":
         assert isinstance(obj, dict)
         id = from_str(obj.get("id"))
         return VtmComponentIndices(id)
