@@ -24,7 +24,7 @@ class GeodeObjectsAndOutputExtensions:
         self.input_geode_object = input_geode_object
 
     @staticmethod
-    def from_dict(obj: Any) -> "GeodeObjectsAndOutputExtensions":
+    def from_dict(obj: Any) -> 'GeodeObjectsAndOutputExtensions':
         assert isinstance(obj, dict)
         filename = from_str(obj.get("filename"))
         input_geode_object = from_str(obj.get("input_geode_object"))
@@ -37,13 +37,9 @@ class GeodeObjectsAndOutputExtensions:
         return result
 
 
-def geode_objects_and_output_extensions_from_dict(
-    s: Any,
-) -> GeodeObjectsAndOutputExtensions:
+def geode_objects_and_output_extensions_from_dict(s: Any) -> GeodeObjectsAndOutputExtensions:
     return GeodeObjectsAndOutputExtensions.from_dict(s)
 
 
-def geode_objects_and_output_extensions_to_dict(
-    x: GeodeObjectsAndOutputExtensions,
-) -> Any:
+def geode_objects_and_output_extensions_to_dict(x: GeodeObjectsAndOutputExtensions) -> Any:
     return to_class(GeodeObjectsAndOutputExtensions, x)

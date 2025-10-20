@@ -38,7 +38,7 @@ class CreatePoint:
         self.z = z
 
     @staticmethod
-    def from_dict(obj: Any) -> "CreatePoint":
+    def from_dict(obj: Any) -> 'CreatePoint':
         assert isinstance(obj, dict)
         name = from_str(obj.get("name"))
         x = from_float(obj.get("x"))

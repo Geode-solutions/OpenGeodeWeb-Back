@@ -9,8 +9,8 @@ import opengeode
 
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
-from .schemas.create_aoi import CreateAoi
-from .schemas.create_point import CreatePoint
+from opengeodeweb_back.routes.create.schemas.create_aoi import CreateAoi
+from opengeodeweb_back.routes.create.schemas.create_point import CreatePoint
 
 routes = flask.Blueprint("create", __name__, url_prefix="/create")
 schemas = os.path.join(os.path.dirname(__file__), "schemas")

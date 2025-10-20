@@ -22,7 +22,7 @@ class GeographicCoordinateSystems:
         self.input_geode_object = input_geode_object
 
     @staticmethod
-    def from_dict(obj: Any) -> "GeographicCoordinateSystems":
+    def from_dict(obj: Any) -> 'GeographicCoordinateSystems':
         assert isinstance(obj, dict)
         input_geode_object = from_str(obj.get("input_geode_object"))
         return GeographicCoordinateSystems(input_geode_object)

@@ -1,4 +1,3 @@
-# type: ignore
 from typing import Any, Optional, List, TypeVar, Callable, Type, cast
 
 

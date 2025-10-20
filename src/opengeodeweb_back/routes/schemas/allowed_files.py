@@ -36,18 +36,14 @@ class AllowedFiles:
         self.supported_feature = supported_feature
 
     @staticmethod
-    def from_dict(obj: Any) -> "AllowedFiles":
+    def from_dict(obj: Any) -> 'AllowedFiles':
         assert isinstance(obj, dict)
-        supported_feature = from_union(
-            [from_none, from_str], obj.get("supported_feature")
-        )
+        supported_feature = from_union([from_none, from_str], obj.get("supported_feature"))
         return AllowedFiles(supported_feature)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["supported_feature"] = from_union(
-            [from_none, from_str], self.supported_feature
-        )
+        result["supported_feature"] = from_union([from_none, from_str], self.supported_feature)
         return result
 
 
