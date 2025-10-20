@@ -175,7 +175,7 @@ def filter_geode_objects(key: str = None):
     return geode_objects_filtered_list
 
 
-def list_input_extensions(key: str | None = None):
+def list_input_extensions(key: str | None = None) -> list[str]:
     extensions_list = []
     geode_objects_filtered_list = filter_geode_objects(key)
     for geode_object in geode_objects_filtered_list:
