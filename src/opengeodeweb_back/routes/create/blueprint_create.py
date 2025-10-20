@@ -9,30 +9,14 @@ import opengeode
 
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
+from .schemas.create_aoi import CreateAoi
+from .schemas.create_point import CreatePoint
 
 routes = flask.Blueprint("create", __name__, url_prefix="/create")
 schemas = os.path.join(os.path.dirname(__file__), "schemas")
 
 # --- Type definitions ---
 type SchemaDict = dict[str, Any]
-
-
-class PointDict(TypedDict):
-    x: float
-    y: float
-
-
-class CreatePointParams(TypedDict):
-    name: str
-    x: float
-    y: float
-    z: float
-
-
-class CreateAOIParams(TypedDict):
-    name: str
-    points: list[PointDict]
-    z: float
 
 
 # Load schemas
@@ -45,27 +29,20 @@ def create_point() -> flask.Response:
     """Endpoint to create a single point in 3D space."""
     print(f"create_point : {flask.request=}", flush=True)
     utils_functions.validate_request(flask.request, create_point_json)
-
-    # Extract and validate data from request
-    params: CreatePointParams = flask.request.get_json()
-    name = params["name"]
-    x = params["x"]
-    y = params["y"]
-    z = params["z"]
+    params = CreatePoint.from_dict(flask.request.get_json())
 
     # Create the point
     class_ = geode_functions.geode_object_class("PointSet3D")
     pointset = class_.create()
     builder = geode_functions.create_builder("PointSet3D", pointset)
-    builder.set_name(name)
-    builder.create_point(opengeode.Point3D([x, y, z]))
+    builder.set_name(params.name)
+    builder.create_point(opengeode.Point3D([params.x, params.y, params.z]))
 
     # Save and get info
     result = utils_functions.generate_native_viewable_and_light_viewable_from_object(
         geode_object="PointSet3D",
         data=pointset,
     )
-    result["name"] = name
     return flask.make_response(result, 200)
 
 
@@ -79,23 +56,20 @@ def create_aoi() -> flask.Response:
     """Endpoint to create an Area of Interest (AOI) as an EdgedCurve3D."""
     print(f"create_aoi : {flask.request=}", flush=True)
     utils_functions.validate_request(flask.request, create_aoi_json)
-
-    # Extract and validate data from request
-    params: CreateAOIParams = flask.request.get_json()
-    name = params["name"]
-    points = params["points"]
-    z = params["z"]
+    params = CreateAoi.from_dict(flask.request.get_json())
 
     # Create the edged curve
     class_ = geode_functions.geode_object_class("EdgedCurve3D")
     edged_curve = class_.create()
     builder = geode_functions.create_builder("EdgedCurve3D", edged_curve)
-    builder.set_name(name)
+    builder.set_name(params.name)
 
     # Create vertices first
     vertex_indices: list[int] = []
-    for point in points:
-        vertex_id = builder.create_point(opengeode.Point3D([point["x"], point["y"], z]))
+    for point in params.points:
+        vertex_id = builder.create_point(
+            opengeode.Point3D([point["x"], point["y"], params.z])
+        )
         vertex_indices.append(vertex_id)
 
     # Create edges between consecutive vertices and close the loop
@@ -113,5 +87,4 @@ def create_aoi() -> flask.Response:
         geode_object="EdgedCurve3D",
         data=edged_curve,
     )
-    result["name"] = name
     return flask.make_response(result, 200)
