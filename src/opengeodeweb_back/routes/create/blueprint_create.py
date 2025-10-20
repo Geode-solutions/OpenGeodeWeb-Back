@@ -29,7 +29,7 @@ def create_point() -> flask.Response:
     """Endpoint to create a single point in 3D space."""
     print(f"create_point : {flask.request=}", flush=True)
     utils_functions.validate_request(flask.request, create_point_json)
-    params = CreatePoint.from_dict(flask.request.get_json())
+    params = CreatePoint(**flask.request.get_json())
 
     # Create the point
     class_ = geode_functions.geode_object_class("PointSet3D")
@@ -56,7 +56,7 @@ def create_aoi() -> flask.Response:
     """Endpoint to create an Area of Interest (AOI) as an EdgedCurve3D."""
     print(f"create_aoi : {flask.request=}", flush=True)
     utils_functions.validate_request(flask.request, create_aoi_json)
-    params = CreateAoi.from_dict(flask.request.get_json())
+    params = CreateAoi(**flask.request.get_json())
 
     # Create the edged curve
     class_ = geode_functions.geode_object_class("EdgedCurve3D")
@@ -68,7 +68,7 @@ def create_aoi() -> flask.Response:
     vertex_indices: list[int] = []
     for point in params.points:
         vertex_id = builder.create_point(
-            opengeode.Point3D([point["x"], point["y"], params.z])
+            opengeode.Point3D([point.x, point.y, params.z])
         )
         vertex_indices.append(vertex_id)
 
