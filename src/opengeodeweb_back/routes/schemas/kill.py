@@ -13,11 +13,13 @@ def to_class(c: Type[T], x: Any) -> dict:
 class Kill:
     pass
 
-    def __init__(self, ) -> None:
+    def __init__(
+        self,
+    ) -> None:
         pass
 
     @staticmethod
-    def from_dict(obj: Any) -> 'Kill':
+    def from_dict(obj: Any) -> "Kill":
         assert isinstance(obj, dict)
         return Kill()
 

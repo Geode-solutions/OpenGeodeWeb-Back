@@ -53,7 +53,7 @@ class Point:
         self.y = y
 
     @staticmethod
-    def from_dict(obj: Any) -> 'Point':
+    def from_dict(obj: Any) -> "Point":
         assert isinstance(obj, dict)
         x = from_float(obj.get("x"))
         y = from_float(obj.get("y"))
@@ -74,14 +74,16 @@ class CreateAoi:
     points: List[Point]
     z: float
 
-    def __init__(self, id: Optional[str], name: str, points: List[Point], z: float) -> None:
+    def __init__(
+        self, id: Optional[str], name: str, points: List[Point], z: float
+    ) -> None:
         self.id = id
         self.name = name
         self.points = points
         self.z = z
 
     @staticmethod
-    def from_dict(obj: Any) -> 'CreateAoi':
+    def from_dict(obj: Any) -> "CreateAoi":
         assert isinstance(obj, dict)
         id = from_union([from_str, from_none], obj.get("id"))
         name = from_str(obj.get("name"))

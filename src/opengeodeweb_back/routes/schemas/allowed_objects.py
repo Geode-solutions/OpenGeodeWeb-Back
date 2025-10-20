@@ -38,16 +38,20 @@ class AllowedObjects:
         self.supported_feature = supported_feature
 
     @staticmethod
-    def from_dict(obj: Any) -> 'AllowedObjects':
+    def from_dict(obj: Any) -> "AllowedObjects":
         assert isinstance(obj, dict)
         filename = from_str(obj.get("filename"))
-        supported_feature = from_union([from_none, from_str], obj.get("supported_feature"))
+        supported_feature = from_union(
+            [from_none, from_str], obj.get("supported_feature")
+        )
         return AllowedObjects(filename, supported_feature)
 
     def to_dict(self) -> dict:
         result: dict = {}
         result["filename"] = from_str(self.filename)
-        result["supported_feature"] = from_union([from_none, from_str], self.supported_feature)
+        result["supported_feature"] = from_union(
+            [from_none, from_str], self.supported_feature
+        )
         return result
 
 

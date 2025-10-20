@@ -22,7 +22,7 @@ class MeshComponents:
         self.id = id
 
     @staticmethod
-    def from_dict(obj: Any) -> 'MeshComponents':
+    def from_dict(obj: Any) -> "MeshComponents":
         assert isinstance(obj, dict)
         id = from_str(obj.get("id"))
         return MeshComponents(id)

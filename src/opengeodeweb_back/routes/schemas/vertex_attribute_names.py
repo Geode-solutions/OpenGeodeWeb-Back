@@ -22,7 +22,7 @@ class VertexAttributeNames:
         self.id = id
 
     @staticmethod
-    def from_dict(obj: Any) -> 'VertexAttributeNames':
+    def from_dict(obj: Any) -> "VertexAttributeNames":
         assert isinstance(obj, dict)
         id = from_str(obj.get("id"))
         return VertexAttributeNames(id)

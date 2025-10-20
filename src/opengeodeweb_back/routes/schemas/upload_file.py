@@ -36,7 +36,7 @@ class UploadFile:
         self.filename = filename
 
     @staticmethod
-    def from_dict(obj: Any) -> 'UploadFile':
+    def from_dict(obj: Any) -> "UploadFile":
         assert isinstance(obj, dict)
         filename = from_union([from_str, from_none], obj.get("filename"))
         return UploadFile(filename)

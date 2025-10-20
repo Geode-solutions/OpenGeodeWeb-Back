@@ -13,11 +13,13 @@ def to_class(c: Type[T], x: Any) -> dict:
 class Ping:
     pass
 
-    def __init__(self, ) -> None:
+    def __init__(
+        self,
+    ) -> None:
         pass
 
     @staticmethod
-    def from_dict(obj: Any) -> 'Ping':
+    def from_dict(obj: Any) -> "Ping":
         assert isinstance(obj, dict)
         return Ping()
 

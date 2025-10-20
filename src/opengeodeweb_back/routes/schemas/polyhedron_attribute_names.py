@@ -22,7 +22,7 @@ class PolyhedronAttributeNames:
         self.id = id
 
     @staticmethod
-    def from_dict(obj: Any) -> 'PolyhedronAttributeNames':
+    def from_dict(obj: Any) -> "PolyhedronAttributeNames":
         assert isinstance(obj, dict)
         id = from_str(obj.get("id"))
         return PolyhedronAttributeNames(id)
