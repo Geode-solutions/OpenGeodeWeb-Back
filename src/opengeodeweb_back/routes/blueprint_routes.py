@@ -1,5 +1,4 @@
 # Standard library imports
-import json
 import os
 import time
 

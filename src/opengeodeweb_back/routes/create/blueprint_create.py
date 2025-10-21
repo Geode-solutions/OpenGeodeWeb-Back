@@ -1,7 +1,5 @@
 # Standard library imports
-import json
 import os
-from typing import Any, TypedDict
 
 # Third party imports
 import flask
