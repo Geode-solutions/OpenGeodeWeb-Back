@@ -12,19 +12,19 @@ from opengeodeweb_back import geode_functions, utils_functions
 from . import schemas
 
 routes = flask.Blueprint("create", __name__, url_prefix="/create")
-schemas_folder = os.path.join(os.path.dirname(__file__), "schemas")
+schemas_dict = utils_functions.get_schemas_dict(
+    os.path.join(os.path.dirname(__file__), "schemas")
+)
 
 
-# Load schemas
-with open(os.path.join(schemas_folder, "create_point.json"), "r") as file:
-    create_point_json: utils_functions.SchemaDict = json.load(file)
-
-
-@routes.route(create_point_json["route"], methods=create_point_json["methods"])
+@routes.route(
+    schemas_dict["create_point"]["route"],
+    methods=schemas_dict["create_point"]["methods"],
+)
 def create_point() -> flask.Response:
     """Endpoint to create a single point in 3D space."""
     print(f"create_point : {flask.request=}", flush=True)
-    utils_functions.validate_request(flask.request, create_point_json)
+    utils_functions.validate_request(flask.request, schemas_dict["create_point"])
     params = schemas.CreatePoint(**flask.request.get_json())
 
     # Create the point
@@ -42,16 +42,13 @@ def create_point() -> flask.Response:
     return flask.make_response(result, 200)
 
 
-# Load schema for AOI creation
-with open(os.path.join(schemas_folder, "create_aoi.json"), "r") as file:
-    create_aoi_json: utils_functions.SchemaDict = json.load(file)
-
-
-@routes.route(create_aoi_json["route"], methods=create_aoi_json["methods"])
+@routes.route(
+    schemas_dict["create_aoi"]["route"], methods=schemas_dict["create_aoi"]["methods"]
+)
 def create_aoi() -> flask.Response:
     """Endpoint to create an Area of Interest (AOI) as an EdgedCurve3D."""
     print(f"create_aoi : {flask.request=}", flush=True)
-    utils_functions.validate_request(flask.request, create_aoi_json)
+    utils_functions.validate_request(flask.request, schemas_dict["create_aoi"])
     params = schemas.CreateAoi(**flask.request.get_json())
 
     # Create the edged curve

@@ -1,5 +1,7 @@
 # Standard library imports
 import os
+import glob
+import json
 import threading
 import time
 import zipfile
@@ -20,6 +22,17 @@ from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
 
 type SchemaDict = dict[str, str]
+
+
+def get_schemas_dict(path: str) -> dict[str, SchemaDict]:
+    schemas_dict: dict[str, SchemaDict] = {}
+    for json_file in glob.glob(os.path.join(path, "*.json")):
+        last_point = json_file.rfind(".")
+        filename = json_file[: -len(json_file) + last_point]
+        with open(os.path.join(path, json_file), "r") as file:
+            file_content = json.load(file)
+            schemas_dict[filename] = file_content
+    return schemas_dict
 
 
 def increment_request_counter(current_app: flask.Flask) -> None:

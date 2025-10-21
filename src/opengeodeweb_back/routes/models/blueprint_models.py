@@ -7,22 +7,24 @@ from opengeodeweb_back import geode_functions, utils_functions
 from . import schemas
 
 routes = flask.Blueprint("models", __name__, url_prefix="/models")
-schemas_folder = os.path.join(os.path.dirname(__file__), "schemas")
-
-with open(os.path.join(schemas_folder, "vtm_component_indices.json"), "r") as file:
-    vtm_component_indices_json: utils_functions.SchemaDict = json.load(file)
+schemas_dict = utils_functions.get_schemas_dict(
+    os.path.join(os.path.dirname(__file__), "schemas")
+)
 
 
 @routes.route(
-    vtm_component_indices_json["route"], methods=vtm_component_indices_json["methods"]
+    schemas_dict["vtm_component_indices"]["route"],
+    methods=schemas_dict["vtm_component_indices"]["methods"],
 )
 def uuid_to_flat_index() -> flask.Response:
-    utils_functions.validate_request(flask.request, vtm_component_indices_json)
+    utils_functions.validate_request(
+        flask.request, schemas_dict["vtm_component_indices"]
+    )
     params = schemas.VtmComponentIndices(**flask.request.get_json())
     vtm_file_path = geode_functions.data_file_path(params.id, "viewable.vtm")
     tree = ET.parse(vtm_file_path)
     root = tree.find("vtkMultiBlockDataSet")
-    if not root:
+    if root is None:
         raise Exception("Failed to read viewable file")
     uuid_to_flat_index = {}
     current_index = 0
@@ -33,13 +35,12 @@ def uuid_to_flat_index() -> flask.Response:
     return flask.make_response({"uuid_to_flat_index": uuid_to_flat_index}, 200)
 
 
-with open(os.path.join(schemas_folder, "mesh_components.json"), "r") as file:
-    mesh_components_json: utils_functions.SchemaDict = json.load(file)
-
-
-@routes.route(mesh_components_json["route"], methods=mesh_components_json["methods"])
+@routes.route(
+    schemas_dict["mesh_components"]["route"],
+    methods=schemas_dict["mesh_components"]["methods"],
+)
 def extract_uuids_endpoint() -> flask.Response:
-    utils_functions.validate_request(flask.request, mesh_components_json)
+    utils_functions.validate_request(flask.request, schemas_dict["mesh_components"])
     params = schemas.MeshComponents(**flask.request.get_json())
     model = geode_functions.load_data(params.id)
     mesh_components = model.mesh_components()
