@@ -1,15 +1,16 @@
+from dataclasses_json import DataClassJsonMixin
 from dataclasses import dataclass
 from typing import List, Optional
 
 
 @dataclass
-class Point:
+class Point(DataClassJsonMixin):
     x: float
     y: float
 
 
 @dataclass
-class CreateAoi:
+class CreateAoi(DataClassJsonMixin):
     name: str
     """Name of the AOI"""
 

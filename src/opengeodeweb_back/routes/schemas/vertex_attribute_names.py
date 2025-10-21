@@ -1,6 +1,7 @@
+from dataclasses_json import DataClassJsonMixin
 from dataclasses import dataclass
 
 
 @dataclass
-class VertexAttributeNames:
+class VertexAttributeNames(DataClassJsonMixin):
     id: str

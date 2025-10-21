@@ -27,11 +27,10 @@ type SchemaDict = dict[str, str]
 def get_schemas_dict(path: str) -> dict[str, SchemaDict]:
     schemas_dict: dict[str, SchemaDict] = {}
     for json_file in glob.glob(os.path.join(path, "*.json")):
-        last_point = json_file.rfind(".")
-        filename = json_file[: -len(json_file) + last_point]
+        filename = os.path.basename(json_file)
         with open(os.path.join(path, json_file), "r") as file:
             file_content = json.load(file)
-            schemas_dict[filename] = file_content
+            schemas_dict[os.path.splitext(filename)[0]] = file_content
     return schemas_dict
 
 
@@ -241,8 +240,6 @@ def generate_native_viewable_and_light_viewable_from_object(
     data_entry = Data.create(
         geode_object=geode_object,
         viewer_object=geode_functions.get_object_type(geode_object),
-        input_file="",
-        additional_files=[],
     )
     data_path = create_data_folder_from_id(data_entry.id)
     return save_all_viewables_and_return_info(geode_object, data, data_entry, data_path)
@@ -255,7 +252,6 @@ def generate_native_viewable_and_light_viewable_from_file(
         geode_object=geode_object,
         viewer_object=geode_functions.get_object_type(geode_object),
         input_file=input_filename,
-        additional_files=[],
     )
 
     data_path = create_data_folder_from_id(data_entry.id)

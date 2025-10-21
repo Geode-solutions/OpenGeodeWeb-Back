@@ -183,7 +183,7 @@ def test_generate_native_viewable_and_light_viewable_from_object(client):
     assert re.match(r"[0-9a-f]{32}", result["id"])
     assert isinstance(result["object_type"], str)
     assert isinstance(result["binary_light_viewable"], str)
-    assert result["input_file"] == ""
+    assert result["input_file"] == None
 
 
 def test_generate_native_viewable_and_light_viewable_from_file(client):

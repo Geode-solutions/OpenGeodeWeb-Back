@@ -25,11 +25,10 @@ def create_point() -> flask.Response:
     """Endpoint to create a single point in 3D space."""
     print(f"create_point : {flask.request=}", flush=True)
     utils_functions.validate_request(flask.request, schemas_dict["create_point"])
-    params = schemas.CreatePoint(**flask.request.get_json())
+    params = schemas.CreatePoint.from_dict(flask.request.get_json())
 
     # Create the point
-    class_ = geode_functions.geode_object_class("PointSet3D")
-    pointset = class_.create()
+    pointset = geode_functions.geode_object_class("PointSet3D").create()
     builder = geode_functions.create_builder("PointSet3D", pointset)
     builder.set_name(params.name)
     builder.create_point(opengeode.Point3D([params.x, params.y, params.z]))
@@ -49,31 +48,23 @@ def create_aoi() -> flask.Response:
     """Endpoint to create an Area of Interest (AOI) as an EdgedCurve3D."""
     print(f"create_aoi : {flask.request=}", flush=True)
     utils_functions.validate_request(flask.request, schemas_dict["create_aoi"])
-    params = schemas.CreateAoi(**flask.request.get_json())
+    params = schemas.CreateAoi.from_dict(flask.request.get_json())
 
     # Create the edged curve
-    class_ = geode_functions.geode_object_class("EdgedCurve3D")
-    edged_curve = class_.create()
+    edged_curve = geode_functions.geode_object_class("EdgedCurve3D").create()
     builder = geode_functions.create_builder("EdgedCurve3D", edged_curve)
     builder.set_name(params.name)
 
     # Create vertices first
-    vertex_indices: list[int] = []
     for point in params.points:
-        vertex_id = builder.create_point(
-            opengeode.Point3D([point.x, point.y, params.z])
-        )
-        vertex_indices.append(vertex_id)
+        pp = opengeode.Point3D([point.x, point.y, params.z])
+        builder.create_point(opengeode.Point3D([point.x, point.y, params.z]))
 
     # Create edges between consecutive vertices and close the loop
-    num_vertices = len(vertex_indices)
+    num_vertices = len(params.points)
     for i in range(num_vertices):
         next_i = (i + 1) % num_vertices
-        edge_id = builder.create_edge()
-        builder.set_edge_vertex(opengeode.EdgeVertex(edge_id, 0), vertex_indices[i])
-        builder.set_edge_vertex(
-            opengeode.EdgeVertex(edge_id, 1), vertex_indices[next_i]
-        )
+        builder.create_edge_with_vertices(i, next_i)
 
     # Save and get info
     result = utils_functions.generate_native_viewable_and_light_viewable_from_object(
