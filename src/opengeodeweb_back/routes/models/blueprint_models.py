@@ -1,14 +1,13 @@
 import os
 import xml.etree.ElementTree as ET
 import flask
+from opengeodeweb_microservice.schemas import get_schemas_dict
 
 from opengeodeweb_back import geode_functions, utils_functions
 from . import schemas
 
 routes = flask.Blueprint("models", __name__, url_prefix="/models")
-schemas_dict = utils_functions.get_schemas_dict(
-    os.path.join(os.path.dirname(__file__), "schemas")
-)
+schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas"))
 
 
 @routes.route(

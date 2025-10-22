@@ -4,15 +4,14 @@ import os
 # Third party imports
 import flask
 import opengeode
+from opengeodeweb_microservice.schemas import get_schemas_dict
 
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
 from . import schemas
 
 routes = flask.Blueprint("create", __name__, url_prefix="/create")
-schemas_dict = utils_functions.get_schemas_dict(
-    os.path.join(os.path.dirname(__file__), "schemas")
-)
+schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas"))
 
 
 @routes.route(
