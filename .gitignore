@@ -11,4 +11,3 @@ uploads
 node_modules
 .mypy_cache
 *.db
-opengeodeweb_back_schemas.json

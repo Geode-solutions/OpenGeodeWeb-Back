@@ -1,18 +1,16 @@
 # Standard library imports
-import json
 import os
 import time
 
 # Third party imports
 import flask
-import opengeode
 import werkzeug
+from opengeodeweb_microservice.schemas import get_schemas_dict
 
 # Local application imports
-from .. import geode_functions, utils_functions
-from opengeodeweb_microservice.database.data import Data
-from opengeodeweb_microservice.database.connection import get_session
+from opengeodeweb_back import geode_functions, utils_functions
 from .models import blueprint_models
+from . import schemas
 
 routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
 
@@ -23,39 +21,25 @@ routes.register_blueprint(
     name=blueprint_models.routes.name,
 )
 
-schemas = os.path.join(os.path.dirname(__file__), "schemas")
-
-with open(
-    os.path.join(schemas, "allowed_files.json"),
-    "r",
-) as file:
-    allowed_files_json = json.load(file)
+schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas"))
 
 
 @routes.route(
-    allowed_files_json["route"],
-    methods=allowed_files_json["methods"],
+    schemas_dict["allowed_files"]["route"],
+    methods=schemas_dict["allowed_files"]["methods"],
 )
-def allowed_files():
-    utils_functions.validate_request(flask.request, allowed_files_json)
-    extensions = geode_functions.list_input_extensions(
-        flask.request.get_json()["supported_feature"]
-    )
+def allowed_files() -> flask.Response:
+    utils_functions.validate_request(flask.request, schemas_dict["allowed_files"])
+    params = schemas.AllowedFiles.from_dict(flask.request.get_json())
+    extensions = geode_functions.list_input_extensions(params.supported_feature)
     return flask.make_response({"extensions": extensions}, 200)
 
 
-with open(
-    os.path.join(schemas, "upload_file.json"),
-    "r",
-) as file:
-    upload_file_json = json.load(file)
-
-
 @routes.route(
-    upload_file_json["route"],
-    methods=upload_file_json["methods"],
+    schemas_dict["upload_file"]["route"],
+    methods=schemas_dict["upload_file"]["methods"],
 )
-def upload_file():
+def upload_file() -> flask.Response:
     if flask.request.method == "OPTIONS":
         return flask.make_response({}, 200)
 
@@ -68,48 +52,34 @@ def upload_file():
     return flask.make_response({"message": "File uploaded"}, 201)
 
 
-with open(
-    os.path.join(schemas, "allowed_objects.json"),
-    "r",
-) as file:
-    allowed_objects_json = json.load(file)
-
-
 @routes.route(
-    allowed_objects_json["route"],
-    methods=allowed_objects_json["methods"],
+    schemas_dict["allowed_objects"]["route"],
+    methods=schemas_dict["allowed_objects"]["methods"],
 )
-def allowed_objects():
+def allowed_objects() -> flask.Response:
     if flask.request.method == "OPTIONS":
         return flask.make_response({}, 200)
 
-    utils_functions.validate_request(flask.request, allowed_objects_json)
-    file_absolute_path = geode_functions.upload_file_path(
-        flask.request.get_json()["filename"]
-    )
+    utils_functions.validate_request(flask.request, schemas_dict["allowed_objects"])
+    params = schemas.AllowedObjects.from_dict(flask.request.get_json())
+    file_absolute_path = geode_functions.upload_file_path(params.filename)
     allowed_objects = geode_functions.list_geode_objects(
-        file_absolute_path, flask.request.get_json()["supported_feature"]
+        file_absolute_path, params.supported_feature
     )
     return flask.make_response({"allowed_objects": allowed_objects}, 200)
 
 
-with open(
-    os.path.join(schemas, "missing_files.json"),
-    "r",
-) as file:
-    missing_files_json = json.load(file)
-
-
 @routes.route(
-    missing_files_json["route"],
-    methods=missing_files_json["methods"],
+    schemas_dict["missing_files"]["route"],
+    methods=schemas_dict["missing_files"]["methods"],
 )
-def missing_files():
-    utils_functions.validate_request(flask.request, missing_files_json)
-    file_path = geode_functions.upload_file_path(flask.request.get_json()["filename"])
+def missing_files() -> flask.Response:
+    utils_functions.validate_request(flask.request, schemas_dict["missing_files"])
+    params = schemas.MissingFiles.from_dict(flask.request.get_json())
+    file_path = geode_functions.upload_file_path(params.filename)
 
     additional_files = geode_functions.additional_files(
-        flask.request.get_json()["input_geode_object"],
+        params.input_geode_object,
         file_path,
     )
 
@@ -139,22 +109,16 @@ def missing_files():
     )
 
 
-with open(
-    os.path.join(schemas, "geographic_coordinate_systems.json"),
-    "r",
-) as file:
-    geographic_coordinate_systems_json = json.load(file)
-
-
 @routes.route(
-    geographic_coordinate_systems_json["route"],
-    methods=geographic_coordinate_systems_json["methods"],
+    schemas_dict["geographic_coordinate_systems"]["route"],
+    methods=schemas_dict["geographic_coordinate_systems"]["methods"],
 )
-def crs_converter_geographic_coordinate_systems():
-    utils_functions.validate_request(flask.request, geographic_coordinate_systems_json)
-    infos = geode_functions.geographic_coordinate_systems(
-        flask.request.get_json()["input_geode_object"]
+def crs_converter_geographic_coordinate_systems() -> flask.Response:
+    utils_functions.validate_request(
+        flask.request, schemas_dict["geographic_coordinate_systems"]
     )
+    params = schemas.GeographicCoordinateSystems.from_dict(flask.request.get_json())
+    infos = geode_functions.geographic_coordinate_systems(params.input_geode_object)
     crs_list = []
     for info in infos:
         crs = {}
@@ -166,55 +130,36 @@ def crs_converter_geographic_coordinate_systems():
     return flask.make_response({"crs_list": crs_list}, 200)
 
 
-with open(
-    os.path.join(schemas, "inspect_file.json"),
-    "r",
-) as file:
-    inspect_file_json = json.load(file)
-
-
 @routes.route(
-    inspect_file_json["route"],
-    methods=inspect_file_json["methods"],
+    schemas_dict["inspect_file"]["route"],
+    methods=schemas_dict["inspect_file"]["methods"],
 )
-def inspect_file():
-    utils_functions.validate_request(flask.request, inspect_file_json)
-
-    file_path = geode_functions.upload_file_path(flask.request.get_json()["filename"])
-    data = geode_functions.load(
-        flask.request.get_json()["input_geode_object"], file_path
-    )
-    class_inspector = geode_functions.inspect(
-        flask.request.get_json()["input_geode_object"], data
-    )
+def inspect_file() -> flask.Response:
+    utils_functions.validate_request(flask.request, schemas_dict["inspect_file"])
+    params = schemas.InspectFile.from_dict(flask.request.get_json())
+    file_path = geode_functions.upload_file_path(params.filename)
+    data = geode_functions.load(params.input_geode_object, file_path)
+    class_inspector = geode_functions.inspect(params.input_geode_object, data)
     inspection_result = geode_functions.get_inspector_children(class_inspector)
     return flask.make_response({"inspection_result": inspection_result}, 200)
 
 
-with open(
-    os.path.join(schemas, "geode_objects_and_output_extensions.json"),
-    "r",
-) as file:
-    geode_objects_and_output_extensions_json = json.load(file)
-
-
 @routes.route(
-    geode_objects_and_output_extensions_json["route"],
-    methods=geode_objects_and_output_extensions_json["methods"],
+    schemas_dict["geode_objects_and_output_extensions"]["route"],
+    methods=schemas_dict["geode_objects_and_output_extensions"]["methods"],
 )
-def geode_objects_and_output_extensions():
+def geode_objects_and_output_extensions() -> flask.Response:
     utils_functions.validate_request(
-        flask.request, geode_objects_and_output_extensions_json
+        flask.request, schemas_dict["geode_objects_and_output_extensions"]
     )
-    file_path = geode_functions.upload_file_path(flask.request.get_json()["filename"])
+    params = schemas.GeodeObjectsAndOutputExtensions.from_dict(flask.request.get_json())
+    file_path = geode_functions.upload_file_path(params.filename)
     data = geode_functions.load(
-        flask.request.get_json()["input_geode_object"],
+        params.input_geode_object,
         file_path,
     )
     geode_objects_and_output_extensions = (
-        geode_functions.geode_objects_output_extensions(
-            flask.request.get_json()["input_geode_object"], data
-        )
+        geode_functions.geode_objects_output_extensions(params.input_geode_object, data)
     )
     return flask.make_response(
         {"geode_objects_and_output_extensions": geode_objects_and_output_extensions},
@@ -222,57 +167,44 @@ def geode_objects_and_output_extensions():
     )
 
 
-with open(
-    os.path.join(schemas, "save_viewable_file.json"),
-    "r",
-) as file:
-    save_viewable_file_json = json.load(file)
-
-
 @routes.route(
-    save_viewable_file_json["route"],
-    methods=save_viewable_file_json["methods"],
+    schemas_dict["save_viewable_file"]["route"],
+    methods=schemas_dict["save_viewable_file"]["methods"],
 )
-def save_viewable_file():
-    utils_functions.validate_request(flask.request, save_viewable_file_json)
+def save_viewable_file() -> flask.Response:
+    utils_functions.validate_request(flask.request, schemas_dict["save_viewable_file"])
+    params = schemas.SaveViewableFile.from_dict(flask.request.get_json())
     return flask.make_response(
         utils_functions.generate_native_viewable_and_light_viewable_from_file(
-            geode_object=flask.request.get_json()["input_geode_object"],
-            input_filename=flask.request.get_json()["filename"],
+            geode_object=params.input_geode_object,
+            input_filename=params.filename,
         ),
         200,
     )
 
 
-with open(os.path.join(schemas, "texture_coordinates.json"), "r") as file:
-    texture_coordinates_json = json.load(file)
-
-
 @routes.route(
-    texture_coordinates_json["route"],
-    methods=texture_coordinates_json["methods"],
+    schemas_dict["texture_coordinates"]["route"],
+    methods=schemas_dict["texture_coordinates"]["methods"],
 )
-def texture_coordinates():
-    utils_functions.validate_request(flask.request, texture_coordinates_json)
-    data = geode_functions.load_data(flask.request.get_json().get("id"))
+def texture_coordinates() -> flask.Response:
+    utils_functions.validate_request(flask.request, schemas_dict["texture_coordinates"])
+    params = schemas.TextureCoordinates.from_dict(flask.request.get_json())
+    data = geode_functions.load_data(params.id)
     texture_coordinates = data.texture_manager().texture_names()
     return flask.make_response({"texture_coordinates": texture_coordinates}, 200)
 
 
-with open(
-    os.path.join(schemas, "vertex_attribute_names.json"),
-    "r",
-) as file:
-    vertex_attribute_names_json = json.load(file)
-
-
 @routes.route(
-    vertex_attribute_names_json["route"],
-    methods=vertex_attribute_names_json["methods"],
+    schemas_dict["vertex_attribute_names"]["route"],
+    methods=schemas_dict["vertex_attribute_names"]["methods"],
 )
-def vertex_attribute_names():
-    utils_functions.validate_request(flask.request, vertex_attribute_names_json)
-    data = geode_functions.load_data(flask.request.get_json().get("id"))
+def vertex_attribute_names() -> flask.Response:
+    utils_functions.validate_request(
+        flask.request, schemas_dict["vertex_attribute_names"]
+    )
+    params = schemas.VertexAttributeNames.from_dict(flask.request.get_json())
+    data = geode_functions.load_data(params.id)
     vertex_attribute_names = data.vertex_attribute_manager().attribute_names()
     return flask.make_response(
         {
@@ -282,20 +214,16 @@ def vertex_attribute_names():
     )
 
 
-with open(
-    os.path.join(schemas, "polygon_attribute_names.json"),
-    "r",
-) as file:
-    polygon_attribute_names_json = json.load(file)
-
-
 @routes.route(
-    polygon_attribute_names_json["route"],
-    methods=polygon_attribute_names_json["methods"],
+    schemas_dict["polygon_attribute_names"]["route"],
+    methods=schemas_dict["polygon_attribute_names"]["methods"],
 )
-def polygon_attribute_names():
-    utils_functions.validate_request(flask.request, polygon_attribute_names_json)
-    data = geode_functions.load_data(flask.request.get_json().get("id"))
+def polygon_attribute_names() -> flask.Response:
+    utils_functions.validate_request(
+        flask.request, schemas_dict["polygon_attribute_names"]
+    )
+    params = schemas.PolygonAttributeNames.from_dict(flask.request.get_json())
+    data = geode_functions.load_data(params.id)
     polygon_attribute_names = data.polygon_attribute_manager().attribute_names()
     return flask.make_response(
         {
@@ -305,20 +233,16 @@ def polygon_attribute_names():
     )
 
 
-with open(
-    os.path.join(schemas, "polyhedron_attribute_names.json"),
-    "r",
-) as file:
-    polyhedron_attribute_names_json = json.load(file)
-
-
 @routes.route(
-    polyhedron_attribute_names_json["route"],
-    methods=polyhedron_attribute_names_json["methods"],
+    schemas_dict["polyhedron_attribute_names"]["route"],
+    methods=schemas_dict["polyhedron_attribute_names"]["methods"],
 )
-def polyhedron_attribute_names():
-    utils_functions.validate_request(flask.request, polyhedron_attribute_names_json)
-    data = geode_functions.load_data(flask.request.get_json().get("id"))
+def polyhedron_attribute_names() -> flask.Response:
+    utils_functions.validate_request(
+        flask.request, schemas_dict["polyhedron_attribute_names"]
+    )
+    params = schemas.PolyhedronAttributeNames.from_dict(flask.request.get_json())
+    data = geode_functions.load_data(params.id)
     polyhedron_attribute_names = data.polyhedron_attribute_manager().attribute_names()
     return flask.make_response(
         {
@@ -328,31 +252,17 @@ def polyhedron_attribute_names():
     )
 
 
-with open(
-    os.path.join(schemas, "ping.json"),
-    "r",
-) as file:
-    ping_json = json.load(file)
-
-
 @routes.route(
-    ping_json["route"],
-    methods=ping_json["methods"],
+    schemas_dict["ping"]["route"],
+    methods=schemas_dict["ping"]["methods"],
 )
-def ping():
-    utils_functions.validate_request(flask.request, ping_json)
+def ping() -> flask.Response:
+    utils_functions.validate_request(flask.request, schemas_dict["ping"])
     flask.current_app.config.update(LAST_PING_TIME=time.time())
     return flask.make_response({"message": "Flask server is running"}, 200)
 
 
-with open(
-    os.path.join(schemas, "kill.json"),
-    "r",
-) as file:
-    kill_json = json.load(file)
-
-
-@routes.route(kill_json["route"], methods=kill_json["methods"])
+@routes.route(schemas_dict["kill"]["route"], methods=schemas_dict["kill"]["methods"])
 def kill() -> flask.Response:
     print("Manual server kill, shutting down...", flush=True)
     os._exit(0)

@@ -16,6 +16,7 @@ import werkzeug
 
 # Local application imports
 from . import geode_functions
+from opengeodeweb_microservice.schemas import SchemaDict
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
 
@@ -97,7 +98,7 @@ def versions(list_packages: list[str]) -> list[dict[str, str]]:
     return list_with_versions
 
 
-def validate_request(request: flask.Request, schema: dict[str, str]) -> None:
+def validate_request(request: flask.Request, schema: SchemaDict) -> None:
     json_data = request.get_json(force=True, silent=True)
 
     if json_data is None:
@@ -226,8 +227,6 @@ def generate_native_viewable_and_light_viewable_from_object(
     data_entry = Data.create(
         geode_object=geode_object,
         viewer_object=geode_functions.get_object_type(geode_object),
-        input_file="",
-        additional_files=[],
     )
     data_path = create_data_folder_from_id(data_entry.id)
     return save_all_viewables_and_return_info(geode_object, data, data_entry, data_path)
@@ -240,7 +239,6 @@ def generate_native_viewable_and_light_viewable_from_file(
         geode_object=geode_object,
         viewer_object=geode_functions.get_object_type(geode_object),
         input_file=input_filename,
-        additional_files=[],
     )
 
     data_path = create_data_folder_from_id(data_entry.id)

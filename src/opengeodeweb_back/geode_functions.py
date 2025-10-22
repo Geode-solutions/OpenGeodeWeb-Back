@@ -175,7 +175,7 @@ def filter_geode_objects(key: str = None):
     return geode_objects_filtered_list
 
 
-def list_input_extensions(key: str = None):
+def list_input_extensions(key: str | None = None) -> list[str]:
     extensions_list = []
     geode_objects_filtered_list = filter_geode_objects(key)
     for geode_object in geode_objects_filtered_list:
@@ -192,7 +192,7 @@ def has_creator(geode_object: str, extension: str):
 
 def list_geode_objects(
     file_absolute_path: str,
-    key: str = None,
+    key: str | None = None,
 ):
     return_dict = {}
     file_extension = utils_functions.extension_from_filename(
