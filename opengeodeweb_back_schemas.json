@@ -1,3 +1,386 @@
 {
-  "opengeodeweb_back": {}
+  "opengeodeweb_back": {
+    "create": {
+      "create_point": {
+        "$id": "opengeodeweb_back/create/create_point",
+        "route": "/create_point",
+        "methods": [
+          "POST"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "z": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "name",
+          "x",
+          "y",
+          "z"
+        ],
+        "additionalProperties": false
+      },
+      "create_aoi": {
+        "$id": "opengeodeweb_back/create/create_aoi",
+        "route": "/create_aoi",
+        "methods": [
+          "POST"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the AOI"
+          },
+          "points": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "x",
+                "y"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "z": {
+            "type": "number"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "points",
+          "z"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "models": {
+      "vtm_component_indices": {
+        "$id": "opengeodeweb_back/models/vtm_component_indices",
+        "route": "/vtm_component_indices",
+        "methods": [
+          "POST"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "mesh_components": {
+        "$id": "opengeodeweb_back/models/mesh_components",
+        "route": "/mesh_components",
+        "methods": [
+          "POST"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "vertex_attribute_names": {
+      "$id": "opengeodeweb_back/vertex_attribute_names",
+      "route": "/vertex_attribute_names",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "upload_file": {
+      "$id": "opengeodeweb_back/upload_file",
+      "route": "/upload_file",
+      "methods": [
+        "OPTIONS",
+        "PUT"
+      ],
+      "type": "object",
+      "properties": {
+        "filename": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "texture_coordinates": {
+      "$id": "opengeodeweb_back/texture_coordinates",
+      "route": "/texture_coordinates",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "save_viewable_file": {
+      "$id": "opengeodeweb_back/save_viewable_file",
+      "route": "/save_viewable_file",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "input_geode_object": {
+          "type": "string",
+          "minLength": 1
+        },
+        "filename": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "input_geode_object",
+        "filename"
+      ],
+      "additionalProperties": false
+    },
+    "polyhedron_attribute_names": {
+      "$id": "opengeodeweb_back/polyhedron_attribute_names",
+      "route": "/polyhedron_attribute_names",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "polygon_attribute_names": {
+      "$id": "opengeodeweb_back/polygon_attribute_names",
+      "route": "/polygon_attribute_names",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "ping": {
+      "$id": "opengeodeweb_back/ping",
+      "route": "/ping",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "missing_files": {
+      "$id": "opengeodeweb_back/missing_files",
+      "route": "/missing_files",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "input_geode_object": {
+          "type": "string",
+          "minLength": 1
+        },
+        "filename": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "input_geode_object",
+        "filename"
+      ],
+      "additionalProperties": false
+    },
+    "kill": {
+      "$id": "opengeodeweb_back/kill",
+      "route": "/kill",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "inspect_file": {
+      "$id": "opengeodeweb_back/inspect_file",
+      "route": "/inspect_file",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "filename": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input_geode_object": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "filename",
+        "input_geode_object"
+      ],
+      "additionalProperties": false
+    },
+    "geographic_coordinate_systems": {
+      "$id": "opengeodeweb_back/geographic_coordinate_systems",
+      "route": "/geographic_coordinate_systems",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "input_geode_object": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "input_geode_object"
+      ],
+      "additionalProperties": false
+    },
+    "geode_objects_and_output_extensions": {
+      "$id": "opengeodeweb_back/geode_objects_and_output_extensions",
+      "route": "/geode_objects_and_output_extensions",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "input_geode_object": {
+          "type": "string",
+          "minLength": 1
+        },
+        "filename": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "input_geode_object",
+        "filename"
+      ],
+      "additionalProperties": false
+    },
+    "allowed_objects": {
+      "$id": "opengeodeweb_back/allowed_objects",
+      "route": "/allowed_objects",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "filename": {
+          "type": "string",
+          "minLength": 1
+        },
+        "supported_feature": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "filename",
+        "supported_feature"
+      ],
+      "additionalProperties": false
+    },
+    "allowed_files": {
+      "$id": "opengeodeweb_back/allowed_files",
+      "route": "/allowed_files",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "supported_feature": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "supported_feature"
+      ],
+      "additionalProperties": false
+    }
+  }
 }
