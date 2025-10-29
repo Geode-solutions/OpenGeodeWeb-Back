@@ -5,6 +5,8 @@ import time
 # Third party imports
 import flask
 import werkzeug
+import zipfile
+import glob
 from opengeodeweb_microservice.schemas import get_schemas_dict
 
 # Local application imports
@@ -267,3 +269,29 @@ def kill() -> flask.Response:
     print("Manual server kill, shutting down...", flush=True)
     os._exit(0)
     return flask.make_response({"message": "Flask server is dead"}, 200)
+
+
+@routes.route(
+    schemas_dict["export_project"]["route"],
+    methods=schemas_dict["export_project"]["methods"],
+)
+def export_project() -> flask.Response:
+    utils_functions.validate_request(flask.request, schemas_dict["export_project"])
+    params = schemas.ExportProject.from_dict(flask.request.get_json())
+
+    data_folder_path: str = flask.current_app.config["DATA_FOLDER_PATH"]
+    upload_folder: str = flask.current_app.config["UPLOAD_FOLDER"]
+    os.makedirs(upload_folder, exist_ok=True)
+
+    filename: str = params.filename or f"project_{int(time.time())}.zip"
+    export_zip_path = os.path.join(upload_folder, filename)
+
+    with zipfile.ZipFile(export_zip_path, "w", compression=8) as zipf:
+        pattern = os.path.join(data_folder_path, "**", "*")
+        for full_path in glob.glob(pattern, recursive=True):
+            if os.path.isfile(full_path):
+                archive_name = os.path.relpath(full_path, start=data_folder_path)
+                zipf.write(full_path, archive_name)
+        zipf.writestr("snapshot.json", flask.json.dumps(params.snapshot))
+
+    return utils_functions.send_file(upload_folder, [export_zip_path], filename)

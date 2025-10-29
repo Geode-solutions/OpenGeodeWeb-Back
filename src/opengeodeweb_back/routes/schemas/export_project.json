@@ -1,0 +1,20 @@
+{
+  "route": "/export_project",
+  "methods": [
+    "POST"
+  ],
+  "type": "object",
+  "properties": {
+    "snapshot": {
+      "type": "object"
+    },
+    "filename": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "snapshot"
+  ],
+  "additionalProperties": false
+}

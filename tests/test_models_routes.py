@@ -5,6 +5,9 @@ import flask
 from opengeodeweb_back import geode_functions
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
+import zipfile
+import json
+import io
 
 
 def test_model_mesh_components(client, test_id):
@@ -55,3 +58,26 @@ def test_extract_brep_uuids(client, test_id):
         assert "uuid_dict" in response.json
         uuid_dict = response.json["uuid_dict"]
         assert isinstance(uuid_dict, dict)
+
+
+def test_export_project_route(client):
+    route = "/opengeodeweb_back/export_project"
+    snapshot = {"styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}}
+    filename = "export_project_test.zip"
+    response = client.post(route, json={"snapshot": snapshot, "filename": filename})
+    assert response.status_code == 200
+    assert response.headers.get("new-file-name") == filename
+    assert response.mimetype == "application/octet-binary"
+    response.direct_passthrough = False
+    data = response.get_data()
+    with zipfile.ZipFile(io.BytesIO(data), "r") as zf:
+        names = zf.namelist()
+        assert "snapshot.json" in names
+        parsed = json.loads(zf.read("snapshot.json").decode("utf-8"))
+        assert parsed == snapshot
+        assert "1/project.db" in names
+    response.close()
+    upload_folder = client.application.config["UPLOAD_FOLDER"]
+    export_path = os.path.join(upload_folder, filename)
+    if os.path.exists(export_path):
+        os.remove(export_path)

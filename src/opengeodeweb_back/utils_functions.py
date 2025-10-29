@@ -136,7 +136,9 @@ def send_file(
     else:
         mimetype = "application/zip"
         new_file_name = os.path.splitext(new_file_name)[0] + ".zip"
-        with zipfile.ZipFile(os.path.join(upload_folder, new_file_name), "w") as zipObj:
+        with zipfile.ZipFile(
+            os.path.join(os.path.abspath(upload_folder), new_file_name), "w"
+        ) as zipObj:
             for saved_file_path in saved_files:
                 zipObj.write(
                     saved_file_path,
@@ -144,7 +146,7 @@ def send_file(
                 )
 
     response = flask.send_from_directory(
-        directory=upload_folder,
+        directory=os.path.abspath(upload_folder),
         path=new_file_name,
         as_attachment=True,
         mimetype=mimetype,
