@@ -296,6 +296,17 @@
       ],
       "additionalProperties": false
     },
+    "import_project": {
+      "$id": "opengeodeweb_back/import_project",
+      "route": "/import_project",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
     "geographic_coordinate_systems": {
       "$id": "opengeodeweb_back/geographic_coordinate_systems",
       "route": "/geographic_coordinate_systems",
@@ -334,6 +345,27 @@
       "required": [
         "input_geode_object",
         "filename"
+      ],
+      "additionalProperties": false
+    },
+    "export_project": {
+      "$id": "opengeodeweb_back/export_project",
+      "route": "/export_project",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "snapshot": {
+          "type": "object"
+        },
+        "filename": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "snapshot"
       ],
       "additionalProperties": false
     },

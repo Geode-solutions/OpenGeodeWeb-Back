@@ -221,7 +221,9 @@ def test_send_file_multiple_returns_zip(client, tmp_path):
             file_path.write_bytes(content)
             file_paths.append(str(file_path))
         with app.test_request_context():
-            response = utils_functions.send_file(app.config["UPLOAD_FOLDER"], file_paths, "bundle")
+            response = utils_functions.send_file(
+                app.config["UPLOAD_FOLDER"], file_paths, "bundle"
+            )
             assert response.status_code == 200
             assert response.mimetype == "application/zip"
             assert response.headers.get("new-file-name") == "bundle.zip"
@@ -242,7 +244,9 @@ def test_send_file_single_returns_octet_binary(client, tmp_path):
         file_path = tmp_path / "tmp_send_file_1.txt"
         file_path.write_bytes(b"hello 1")
         with app.test_request_context():
-            response = utils_functions.send_file(app.config["UPLOAD_FOLDER"], [str(file_path)], "tmp_send_file_1.txt")
+            response = utils_functions.send_file(
+                app.config["UPLOAD_FOLDER"], [str(file_path)], "tmp_send_file_1.txt"
+            )
             assert response.status_code == 200
             assert response.mimetype == "application/octet-binary"
             assert response.headers.get("new-file-name") == "tmp_send_file_1.txt"

@@ -62,7 +62,9 @@ def test_extract_brep_uuids(client, test_id):
 
 def test_export_project_route(client, tmp_path):
     route = "/opengeodeweb_back/export_project"
-    snapshot = {"styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}}
+    snapshot = {
+        "styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}
+    }
     filename = "export_project_test.zip"
     response = client.post(route, json={"snapshot": snapshot, "filename": filename})
     assert response.status_code == 200
@@ -87,7 +89,9 @@ def test_export_project_route(client, tmp_path):
 
 def test_import_project_route(client, tmp_path):
     route = "/opengeodeweb_back/import_project"
-    snapshot = {"styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}}
+    snapshot = {
+        "styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}
+    }
 
     data_folder = client.application.config["DATA_FOLDER_PATH"]
     pre_existing_db_path = os.path.join(data_folder, "1", "project.db")
