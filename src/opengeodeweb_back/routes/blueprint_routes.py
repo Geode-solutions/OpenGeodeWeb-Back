@@ -331,9 +331,7 @@ def import_project() -> flask.Response:
     with zipfile.ZipFile(zip_file.stream) as zf:
         base = os.path.abspath(data_folder_path)
         for member in zf.namelist():
-            target = os.path.abspath(
-                os.path.normpath(os.path.join(base, member))
-            )
+            target = os.path.abspath(os.path.normpath(os.path.join(base, member)))
             if not (target == base or target.startswith(base + os.sep)):
                 flask.abort(400, "Zip contains unsafe paths")
         zf.extractall(data_folder_path)
