@@ -1,6 +1,7 @@
 # Standard library imports
 import os
 import time
+import shutil
 
 # Third party imports
 import flask
@@ -286,12 +287,61 @@ def export_project() -> flask.Response:
     filename: str = params.filename or f"project_{int(time.time())}.zip"
     export_zip_path = os.path.join(upload_folder, filename)
 
-    with zipfile.ZipFile(export_zip_path, "w", compression=8) as zipf:
+    with zipfile.ZipFile(export_zip_path, "w", compression=8) as zip_file:
         pattern = os.path.join(data_folder_path, "**", "*")
         for full_path in glob.glob(pattern, recursive=True):
             if os.path.isfile(full_path):
                 archive_name = os.path.relpath(full_path, start=data_folder_path)
-                zipf.write(full_path, archive_name)
-        zipf.writestr("snapshot.json", flask.json.dumps(params.snapshot))
+                zip_file.write(full_path, archive_name)
+        zip_file.writestr("snapshot.json", flask.json.dumps(params.snapshot))
 
     return utils_functions.send_file(upload_folder, [export_zip_path], filename)
+
+
+@routes.route(
+    schemas_dict["import_project"]["route"],
+    methods=schemas_dict["import_project"]["methods"],
+)
+def import_project() -> flask.Response:
+    if flask.request.method == "OPTIONS":
+        return flask.make_response({}, 200)
+    if "file" not in flask.request.files:
+        flask.abort(400, "No zip file provided under 'file'")
+
+    zip_file = flask.request.files["file"]
+    filename = werkzeug.utils.secure_filename(os.path.basename(zip_file.filename))
+    if not filename.lower().endswith(".zip"):
+        flask.abort(400, "Uploaded file must be a .zip")
+
+    data_folder_path: str = flask.current_app.config["DATA_FOLDER_PATH"]
+    os.makedirs(data_folder_path, exist_ok=True)
+    for entry in os.listdir(data_folder_path):
+        entry_path = os.path.join(data_folder_path, entry)
+        try:
+            if os.path.isdir(entry_path):
+                shutil.rmtree(entry_path, ignore_errors=True)
+            else:
+                os.remove(entry_path)
+        except FileNotFoundError:
+            pass
+        except PermissionError:
+            flask.abort(423, "Project files are locked; cannot overwrite")
+
+    zip_file.stream.seek(0)
+    with zipfile.ZipFile(zip_file.stream) as zf:
+        base = os.path.abspath(data_folder_path)
+        for member in zf.namelist():
+            target = os.path.abspath(
+                os.path.normpath(os.path.join(base, member))
+            )
+            if not (target == base or target.startswith(base + os.sep)):
+                flask.abort(400, "Zip contains unsafe paths")
+        zf.extractall(data_folder_path)
+        snapshot = {}
+        try:
+            raw = zf.read("snapshot.json").decode("utf-8")
+            snapshot = flask.json.loads(raw)
+        except KeyError:
+            snapshot = {}
+
+    return flask.make_response({"snapshot": snapshot}, 200)
