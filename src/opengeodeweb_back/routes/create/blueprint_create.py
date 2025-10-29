@@ -54,7 +54,7 @@ def create_aoi() -> flask.Response:
 
     # Create vertices first
     for point in params.points:
-        pp = opengeode.Point3D([point.x, point.y, params.z])
+        # pp = opengeode.Point3D([point.x, point.y, params.z])
         builder.create_point(opengeode.Point3D([point.x, point.y, params.z]))
 
     # Create edges between consecutive vertices and close the loop
@@ -68,4 +68,70 @@ def create_aoi() -> flask.Response:
         geode_object="EdgedCurve3D",
         data=edged_curve,
     )
+    return flask.make_response(result, 200)
+
+
+@routes.route(
+    schemas_dict["create_voi"]["route"], methods=schemas_dict["create_voi"]["methods"]
+)
+def create_voi() -> flask.Response:
+    """Endpoint to create a Volume of Interest (VOI) as an EdgedCurve3D (a bounding box)."""
+    print(f"create_voi : {flask.request=}", flush=True)
+    utils_functions.validate_request(flask.request, schemas_dict["create_voi"])
+    params = schemas.CreateVoi.from_dict(flask.request.get_json())
+    
+    # 1. Simuler la récupération des coordonnées (X, Y) de l'AOI
+    # ATTENTION : En l'absence de `utils_functions.get_data`, nous utilisons des
+    # points de simulation pour construire la VOI. L'ID de l'AOI (params.aoi_id) est ignoré.
+    aoi_vertices = [
+        (0.0, 0.0),
+        (10.0, 0.0),
+        (10.0, 10.0),
+        (0.0, 10.0),
+    ]
+
+    # 2. Créer le VOI (EdgedCurve3D)
+    edged_curve = geode_functions.geode_object_class("EdgedCurve3D").create()
+    builder = geode_functions.create_builder("EdgedCurve3D", edged_curve)
+    builder.set_name(params.name)
+    
+    z_min = params.z_min
+    z_max = params.z_max
+
+    # 3. Créer les 8 vertices de la boîte (VOI)
+    # Indices 0-3 (face inférieure Z_min), Indices 4-7 (face supérieure Z_max)
+    
+    # Bottom face (Z_min) indices 0, 1, 2, 3
+    for x, y in aoi_vertices:
+        builder.create_point(opengeode.Point3D([x, y, z_min]))
+    
+    # Top face (Z_max) indices 4, 5, 6, 7
+    for x, y in aoi_vertices:
+        builder.create_point(opengeode.Point3D([x, y, z_max]))
+
+    # 4. Créer les 12 arêtes
+    
+    # Arêtes de la face inférieure: 0-1, 1-2, 2-3, 3-0
+    bottom_edges = [(i, (i + 1) % 4) for i in range(4)]
+    
+    # Arêtes de la face supérieure: 4-5, 5-6, 6-7, 7-4
+    top_edges = [(i + 4, (i + 1) % 4 + 4) for i in range(4)]
+    
+    # Arêtes verticales: 0-4, 1-5, 2-6, 3-7
+    vertical_edges = [(i, i + 4) for i in range(4)]
+    
+    all_edges = bottom_edges + top_edges + vertical_edges
+    
+    for v1, v2 in all_edges:
+        builder.create_edge_with_vertices(v1, v2)
+
+    # 5. Sauvegarder et obtenir les informations
+    # Utilise generate_native_viewable... car update_native_viewable... n'est pas disponible.
+    # L'ID optionnel (params.id) est donc ignoré, et une NOUVELLE entrée Data est créée.
+    result = utils_functions.generate_native_viewable_and_light_viewable_from_object(
+        geode_object="EdgedCurve3D",
+        data=edged_curve,
+    )
+
+    # Retourne l'ID de la nouvelle entrée Data créée
     return flask.make_response(result, 200)
