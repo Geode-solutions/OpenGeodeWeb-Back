@@ -7,7 +7,6 @@ from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
 import zipfile
 import json
-import io
 
 
 def test_model_mesh_components(client, test_id):

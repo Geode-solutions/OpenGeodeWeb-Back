@@ -8,7 +8,6 @@ import shutil
 import flask
 import werkzeug
 import zipfile
-import glob
 from opengeodeweb_microservice.schemas import get_schemas_dict
 
 # Local application imports
@@ -292,14 +291,7 @@ def export_project() -> flask.Response:
     export_zip_path = os.path.join(project_folder, filename)
 
     with get_session() as session:
-        entries = [
-            {
-                "id": entry.id,
-                "input_file": entry.input_file,
-                "additional_files": entry.additional_files,
-            }
-            for entry in session.query(Data).all()
-        ]
+        rows = session.query(Data.id, Data.input_file, Data.additional_files).all()
 
     with zipfile.ZipFile(
         export_zip_path, "w", compression=zipfile.ZIP_DEFLATED
@@ -308,19 +300,18 @@ def export_project() -> flask.Response:
         if os.path.isfile(database_root_path):
             zip_file.write(database_root_path, "project.db")
 
-        for entry in entries:
-            base_dir = os.path.join(project_folder, entry["id"])
+        for data_id, input_file, additional_files in rows:
+            base_dir = os.path.join(project_folder, data_id)
 
-            input_file = entry["input_file"]
-            if input_file:
-                in_path = os.path.join(base_dir, input_file)
-                if os.path.isfile(in_path):
-                    zip_file.write(in_path, os.path.join(entry["id"], input_file))
+            if isinstance(input_file, str):
+                input_path = os.path.join(base_dir, input_file)
+                if os.path.isfile(input_path):
+                    zip_file.write(input_path, os.path.join(data_id, input_file))
 
-            for relative_path in entry["additional_files"] or []:
-                add_path = os.path.join(base_dir, relative_path)
-                if os.path.isfile(add_path):
-                    zip_file.write(add_path, os.path.join(entry["id"], relative_path))
+            for relative_path in (additional_files or []):
+                additional_path = os.path.join(base_dir, relative_path)
+                if os.path.isfile(additional_path):
+                    zip_file.write(additional_path, os.path.join(data_id, relative_path))
 
         zip_file.writestr("snapshot.json", flask.json.dumps(params.snapshot))
 
@@ -338,6 +329,7 @@ def import_project() -> flask.Response:
         flask.abort(400, "No zip file provided under 'file'")
 
     zip_file = flask.request.files["file"]
+    assert zip_file.filename is not None
     filename = werkzeug.utils.secure_filename(os.path.basename(zip_file.filename))
     if not filename.lower().endswith(".zip"):
         flask.abort(400, "Uploaded file must be a .zip")
