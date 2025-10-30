@@ -66,6 +66,11 @@ def test_export_project_route(client, tmp_path):
         "styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}
     }
     filename = "export_project_test.zip"
+    project_folder = client.application.config["DATA_FOLDER_PATH"]
+    os.makedirs(project_folder, exist_ok=True)
+    database_root_path = os.path.join(project_folder, "project.db")
+    with open(database_root_path, "wb") as f:
+        f.write(b"test_project_db")
     response = client.post(route, json={"snapshot": snapshot, "filename": filename})
     assert response.status_code == 200
     assert response.headers.get("new-file-name") == filename
@@ -79,10 +84,9 @@ def test_export_project_route(client, tmp_path):
         assert "snapshot.json" in names
         parsed = json.loads(zip_file.read("snapshot.json").decode("utf-8"))
         assert parsed == snapshot
-        assert "1/project.db" in names
+        assert "project.db" in names
     response.close()
-    upload_folder = client.application.config["UPLOAD_FOLDER"]
-    export_path = os.path.join(upload_folder, filename)
+    export_path = os.path.join(project_folder, filename)
     if os.path.exists(export_path):
         os.remove(export_path)
 
@@ -93,17 +97,15 @@ def test_import_project_route(client, tmp_path):
         "styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}
     }
 
+    client.application.config["DATA_FOLDER_PATH"] = os.path.join(str(tmp_path), "project_data")
     data_folder = client.application.config["DATA_FOLDER_PATH"]
-    pre_existing_db_path = os.path.join(data_folder, "1", "project.db")
-    os.makedirs(os.path.dirname(pre_existing_db_path), exist_ok=True)
-    with open(pre_existing_db_path, "wb") as file:
-        file.write(b"old_db_content")
+    pre_existing_db_path = os.path.join(data_folder, "project.db")
 
     tmp_zip = tmp_path / "import_project_test.zip"
     new_database_bytes = b"new_db_content"
     with zipfile.ZipFile(tmp_zip, "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
         zip_file.writestr("snapshot.json", json.dumps(snapshot))
-        zip_file.writestr("1/project.db", new_database_bytes)
+        zip_file.writestr("project.db", new_database_bytes)
 
     with open(tmp_zip, "rb") as file:
         response = client.post(

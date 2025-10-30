@@ -340,17 +340,17 @@ def import_project() -> flask.Response:
     if not filename.lower().endswith(".zip"):
         flask.abort(400, "Uploaded file must be a .zip")
 
-    project_folder_path: str = flask.current_app.config["DATA_FOLDER_PATH"]
+    data_folder_path: str = flask.current_app.config["DATA_FOLDER_PATH"]
     try:
-        if os.path.exists(project_folder_path):
-            shutil.rmtree(project_folder_path)
-        os.makedirs(project_folder_path, exist_ok=True)
+        if os.path.exists(data_folder_path):
+            shutil.rmtree(data_folder_path)
+        os.makedirs(data_folder_path, exist_ok=True)
     except PermissionError:
         flask.abort(423, "Project files are locked; cannot overwrite")
 
     zip_file.stream.seek(0)
     with zipfile.ZipFile(zip_file.stream) as zip_archive:
-        project_folder = os.path.abspath(project_folder_path)
+        project_folder = os.path.abspath(data_folder_path)
         for member in zip_archive.namelist():
             target = os.path.abspath(os.path.normpath(os.path.join(project_folder, member)))
             if not (target == project_folder or target.startswith(project_folder + os.sep)):
