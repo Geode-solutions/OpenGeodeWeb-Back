@@ -301,7 +301,9 @@ def export_project() -> flask.Response:
             for entry in session.query(Data).all()
         ]
 
-    with zipfile.ZipFile(export_zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
+    with zipfile.ZipFile(
+        export_zip_path, "w", compression=zipfile.ZIP_DEFLATED
+    ) as zip_file:
         database_root_path = os.path.join(project_folder, "project.db")
         if os.path.isfile(database_root_path):
             zip_file.write(database_root_path, "project.db")
@@ -352,8 +354,12 @@ def import_project() -> flask.Response:
     with zipfile.ZipFile(zip_file.stream) as zip_archive:
         project_folder = os.path.abspath(data_folder_path)
         for member in zip_archive.namelist():
-            target = os.path.abspath(os.path.normpath(os.path.join(project_folder, member)))
-            if not (target == project_folder or target.startswith(project_folder + os.sep)):
+            target = os.path.abspath(
+                os.path.normpath(os.path.join(project_folder, member))
+            )
+            if not (
+                target == project_folder or target.startswith(project_folder + os.sep)
+            ):
                 flask.abort(400, "Zip contains unsafe paths")
         zip_archive.extractall(project_folder)
 
