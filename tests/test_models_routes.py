@@ -97,7 +97,9 @@ def test_import_project_route(client, tmp_path):
         "styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}
     }
 
-    client.application.config["DATA_FOLDER_PATH"] = os.path.join(str(tmp_path), "project_data")
+    client.application.config["DATA_FOLDER_PATH"] = os.path.join(
+        str(tmp_path), "project_data"
+    )
     data_folder = client.application.config["DATA_FOLDER_PATH"]
     pre_existing_db_path = os.path.join(data_folder, "project.db")
 
