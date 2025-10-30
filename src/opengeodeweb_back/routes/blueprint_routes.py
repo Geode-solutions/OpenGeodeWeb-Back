@@ -303,10 +303,9 @@ def export_project() -> flask.Response:
         for data_id, input_file, additional_files in rows:
             base_dir = os.path.join(project_folder, data_id)
 
-            if isinstance(input_file, str):
-                input_path = os.path.join(base_dir, input_file)
-                if os.path.isfile(input_path):
-                    zip_file.write(input_path, os.path.join(data_id, input_file))
+            input_path = os.path.join(base_dir, input_file)
+            if os.path.isfile(input_path):
+                zip_file.write(input_path, os.path.join(data_id, input_file))
 
             for relative_path in (additional_files or []):
                 additional_path = os.path.join(base_dir, relative_path)
@@ -325,6 +324,7 @@ def export_project() -> flask.Response:
 def import_project() -> flask.Response:
     if flask.request.method == "OPTIONS":
         return flask.make_response({}, 200)
+    utils_functions.validate_request(flask.request, schemas_dict["import_project"])
     if "file" not in flask.request.files:
         flask.abort(400, "No zip file provided under 'file'")
 
