@@ -307,10 +307,14 @@ def export_project() -> flask.Response:
             if os.path.isfile(input_path):
                 zip_file.write(input_path, os.path.join(data_id, str(input_file)))
 
-            for relative_path in additional_files if isinstance(additional_files, list) else []:
+            for relative_path in (
+                additional_files if isinstance(additional_files, list) else []
+            ):
                 additional_path = os.path.join(base_dir, relative_path)
                 if os.path.isfile(additional_path):
-                    zip_file.write(additional_path, os.path.join(data_id, relative_path))
+                    zip_file.write(
+                        additional_path, os.path.join(data_id, relative_path)
+                    )
 
         zip_file.writestr("snapshot.json", flask.json.dumps(params.snapshot))
 
