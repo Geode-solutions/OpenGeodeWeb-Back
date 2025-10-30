@@ -1,4 +1,5 @@
 # Standard library imports
+from posixpath import relpath
 import os
 import time
 import shutil
@@ -14,6 +15,8 @@ from opengeodeweb_microservice.schemas import get_schemas_dict
 from opengeodeweb_back import geode_functions, utils_functions
 from .models import blueprint_models
 from . import schemas
+from opengeodeweb_microservice.database.data import Data
+from opengeodeweb_microservice.database.connection import get_session
 
 routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
 
@@ -280,22 +283,46 @@ def export_project() -> flask.Response:
     utils_functions.validate_request(flask.request, schemas_dict["export_project"])
     params = schemas.ExportProject.from_dict(flask.request.get_json())
 
-    data_folder_path: str = flask.current_app.config["DATA_FOLDER_PATH"]
-    upload_folder: str = flask.current_app.config["UPLOAD_FOLDER"]
-    os.makedirs(upload_folder, exist_ok=True)
+    project_folder: str = flask.current_app.config["DATA_FOLDER_PATH"]
+    os.makedirs(project_folder, exist_ok=True)
 
-    filename: str = params.filename or f"project_{int(time.time())}.zip"
-    export_zip_path = os.path.join(upload_folder, filename)
+    if not params.filename:
+        flask.abort(400, "filename is required")
+    filename: str = werkzeug.utils.secure_filename(os.path.basename(params.filename))
+    export_zip_path = os.path.join(project_folder, filename)
 
-    with zipfile.ZipFile(export_zip_path, "w", compression=8) as zip_file:
-        pattern = os.path.join(data_folder_path, "**", "*")
-        for full_path in glob.glob(pattern, recursive=True):
-            if os.path.isfile(full_path):
-                archive_name = os.path.relpath(full_path, start=data_folder_path)
-                zip_file.write(full_path, archive_name)
+    with get_session() as session:
+        entries = [
+            {
+                "id": entry.id,
+                "input_file": entry.input_file,
+                "additional_files": entry.additional_files,
+            }
+            for entry in session.query(Data).all()
+        ]
+
+    with zipfile.ZipFile(export_zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
+        database_root_path = os.path.join(project_folder, "project.db")
+        if os.path.isfile(database_root_path):
+            zip_file.write(database_root_path, "project.db")
+
+        for entry in entries:
+            base_dir = os.path.join(project_folder, entry["id"])
+
+            input_file = entry["input_file"]
+            if input_file:
+                in_path = os.path.join(base_dir, input_file)
+                if os.path.isfile(in_path):
+                    zip_file.write(in_path, os.path.join(entry["id"], input_file))
+
+            for relative_path in entry["additional_files"] or []:
+                add_path = os.path.join(base_dir, relative_path)
+                if os.path.isfile(add_path):
+                    zip_file.write(add_path, os.path.join(entry["id"], relative_path))
+
         zip_file.writestr("snapshot.json", flask.json.dumps(params.snapshot))
 
-    return utils_functions.send_file(upload_folder, [export_zip_path], filename)
+    return utils_functions.send_file(project_folder, [export_zip_path], filename)
 
 
 @routes.route(
@@ -313,31 +340,30 @@ def import_project() -> flask.Response:
     if not filename.lower().endswith(".zip"):
         flask.abort(400, "Uploaded file must be a .zip")
 
-    data_folder_path: str = flask.current_app.config["DATA_FOLDER_PATH"]
-    os.makedirs(data_folder_path, exist_ok=True)
-    for entry in os.listdir(data_folder_path):
-        entry_path = os.path.join(data_folder_path, entry)
-        try:
-            if os.path.isdir(entry_path):
-                shutil.rmtree(entry_path, ignore_errors=True)
-            else:
-                os.remove(entry_path)
-        except FileNotFoundError:
-            pass
-        except PermissionError:
-            flask.abort(423, "Project files are locked; cannot overwrite")
+    project_folder_path: str = flask.current_app.config["DATA_FOLDER_PATH"]
+    try:
+        if os.path.exists(project_folder_path):
+            shutil.rmtree(project_folder_path)
+        os.makedirs(project_folder_path, exist_ok=True)
+    except PermissionError:
+        flask.abort(423, "Project files are locked; cannot overwrite")
 
     zip_file.stream.seek(0)
-    with zipfile.ZipFile(zip_file.stream) as zf:
-        base = os.path.abspath(data_folder_path)
-        for member in zf.namelist():
-            target = os.path.abspath(os.path.normpath(os.path.join(base, member)))
-            if not (target == base or target.startswith(base + os.sep)):
+    with zipfile.ZipFile(zip_file.stream) as zip_archive:
+        project_folder = os.path.abspath(project_folder_path)
+        for member in zip_archive.namelist():
+            target = os.path.abspath(os.path.normpath(os.path.join(project_folder, member)))
+            if not (target == project_folder or target.startswith(project_folder + os.sep)):
                 flask.abort(400, "Zip contains unsafe paths")
-        zf.extractall(data_folder_path)
+        zip_archive.extractall(project_folder)
+
+        database_root_path = os.path.join(project_folder, "project.db")
+        if not os.path.isfile(database_root_path):
+            flask.abort(400, "Missing project.db at project root")
+
         snapshot = {}
         try:
-            raw = zf.read("snapshot.json").decode("utf-8")
+            raw = zip_archive.read("snapshot.json").decode("utf-8")
             snapshot = flask.json.loads(raw)
         except KeyError:
             snapshot = {}
