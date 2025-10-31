@@ -11,23 +11,44 @@
         },
         "aoi_id": {
             "type": "string",
-            "description": "ID of the corresponding AOI from which to take X and Y coordinates"
+            "description": "ID of the corresponding AOI"
+        },
+        "min_x": {
+            "type": "number",
+            "description": "Minimum X coordinate from AOI"
+        },
+        "min_y": {
+            "type": "number",
+            "description": "Minimum Y coordinate from AOI"
+        },
+        "max_x": {
+            "type": "number",
+            "description": "Maximum X coordinate from AOI"
+        },
+        "max_y": {
+            "type": "number",
+            "description": "Maximum Y coordinate from AOI"
         },
         "z_min": {
             "type": "number",
-            "description": "Minimum Z coordinate for the VOI"
+            "description": "Minimum Z coordinate"
         },
         "z_max": {
             "type": "number",
-            "description": "Maximum Z coordinate for the VOI"
+            "description": "Maximum Z coordinate"
         },
         "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Optional ID for updating existing VOI"
         }
     },
     "required": [
         "name",
         "aoi_id",
+        "min_x",
+        "min_y",
+        "max_x",
+        "max_y",
         "z_min",
         "z_max"
     ],
