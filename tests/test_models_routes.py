@@ -5,6 +5,8 @@ import flask
 from opengeodeweb_back import geode_functions
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
+import zipfile
+import json
 
 
 def test_model_mesh_components(client, test_id):
@@ -55,3 +57,115 @@ def test_extract_brep_uuids(client, test_id):
         assert "uuid_dict" in response.json
         uuid_dict = response.json["uuid_dict"]
         assert isinstance(uuid_dict, dict)
+
+
+def test_export_project_route(client, tmp_path):
+    route = "/opengeodeweb_back/export_project"
+    snapshot = {
+        "styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}
+    }
+    filename = "export_project_test.zip"
+    project_folder = client.application.config["DATA_FOLDER_PATH"]
+    os.makedirs(project_folder, exist_ok=True)
+    database_root_path = os.path.join(project_folder, "project.db")
+    with open(database_root_path, "wb") as f:
+        f.write(b"test_project_db")
+    response = client.post(route, json={"snapshot": snapshot, "filename": filename})
+    assert response.status_code == 200
+    assert response.headers.get("new-file-name") == filename
+    assert response.mimetype == "application/octet-binary"
+    response.direct_passthrough = False
+    zip_bytes = response.get_data()
+    tmp_zip_path = tmp_path / filename
+    tmp_zip_path.write_bytes(zip_bytes)
+    with zipfile.ZipFile(tmp_zip_path, "r") as zip_file:
+        names = zip_file.namelist()
+        assert "snapshot.json" in names
+        parsed = json.loads(zip_file.read("snapshot.json").decode("utf-8"))
+        assert parsed == snapshot
+        assert "project.db" in names
+    response.close()
+    export_path = os.path.join(project_folder, filename)
+    if os.path.exists(export_path):
+        os.remove(export_path)
+
+
+def test_import_project_route(client, tmp_path):
+    route = "/opengeodeweb_back/import_project"
+    snapshot = {
+        "styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}
+    }
+
+    client.application.config["DATA_FOLDER_PATH"] = os.path.join(
+        str(tmp_path), "project_data"
+    )
+    data_folder = client.application.config["DATA_FOLDER_PATH"]
+    pre_existing_db_path = os.path.join(data_folder, "project.db")
+
+    tmp_zip = tmp_path / "import_project_test.zip"
+    new_database_bytes = b"new_db_content"
+    with zipfile.ZipFile(tmp_zip, "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
+        zip_file.writestr("snapshot.json", json.dumps(snapshot))
+        zip_file.writestr("project.db", new_database_bytes)
+
+    with open(tmp_zip, "rb") as file:
+        response = client.post(
+            route,
+            data={"file": (file, "import_project_test.zip")},
+            content_type="multipart/form-data",
+        )
+
+    assert response.status_code == 200
+    assert response.json.get("snapshot") == snapshot
+
+    assert os.path.exists(pre_existing_db_path)
+    with open(pre_existing_db_path, "rb") as file:
+        assert file.read() == new_database_bytes
+
+
+def test_save_viewable_workflow_from_file(client):
+    route = "/opengeodeweb_back/save_viewable_file"
+    payload = {"input_geode_object": "BRep", "filename": "cube.og_brep"}
+
+    response = client.post(route, json=payload)
+    assert response.status_code == 200
+
+    data_id = response.json["id"]
+    assert isinstance(data_id, str) and len(data_id) > 0
+    assert response.json["viewable_file_name"].endswith(".vtm")
+
+    comp_resp = client.post(
+        "/opengeodeweb_back/models/vtm_component_indices", json={"id": data_id}
+    )
+    assert comp_resp.status_code == 200
+
+    refreshed = Data.get(data_id)
+    assert refreshed is not None
+
+
+def test_save_viewable_workflow_from_object(client):
+    route = "/opengeodeweb_back/create/create_aoi"
+    aoi_data = {
+        "name": "workflow_aoi",
+        "points": [
+            {"x": 0.0, "y": 0.0},
+            {"x": 1.0, "y": 0.0},
+            {"x": 1.0, "y": 1.0},
+            {"x": 0.0, "y": 1.0},
+        ],
+        "z": 0.0,
+    }
+
+    response = client.post(route, json=aoi_data)
+    assert response.status_code == 200
+
+    data_id = response.json["id"]
+    assert isinstance(data_id, str) and len(data_id) > 0
+    assert response.json["geode_object"] == "EdgedCurve3D"
+    assert response.json["viewable_file_name"].endswith(".vtp")
+
+    attr_resp = client.post(
+        "/opengeodeweb_back/vertex_attribute_names", json={"id": data_id}
+    )
+    assert attr_resp.status_code == 200
+    assert isinstance(attr_resp.json.get("vertex_attribute_names", []), list)
