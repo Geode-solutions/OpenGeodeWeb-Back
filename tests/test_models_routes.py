@@ -144,7 +144,6 @@ def test_save_viewable_workflow_from_file(client):
 
 
 def test_save_viewable_workflow_from_object(client):
-    # Chemin “from object” : passe par un endpoint de création qui génère/sauvegarde via save_viewable.
     route = "/opengeodeweb_back/create/create_aoi"
     aoi_data = {
         "name": "workflow_aoi",
