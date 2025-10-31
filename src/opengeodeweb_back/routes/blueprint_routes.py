@@ -1,5 +1,4 @@
 # Standard library imports
-from posixpath import relpath
 import os
 import time
 import shutil
