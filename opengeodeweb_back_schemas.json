@@ -365,7 +365,8 @@
         }
       },
       "required": [
-        "snapshot"
+        "snapshot",
+        "filename"
       ],
       "additionalProperties": false
     },
