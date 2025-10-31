@@ -165,6 +165,8 @@ def test_save_viewable_workflow_from_object(client):
     assert response.json["geode_object"] == "EdgedCurve3D"
     assert response.json["viewable_file_name"].endswith(".vtp")
 
-    attr_resp = client.post("/opengeodeweb_back/vertex_attribute_names", json={"id": data_id})
+    attr_resp = client.post(
+        "/opengeodeweb_back/vertex_attribute_names", json={"id": data_id}
+    )
     assert attr_resp.status_code == 200
     assert isinstance(attr_resp.json.get("vertex_attribute_names", []), list)
