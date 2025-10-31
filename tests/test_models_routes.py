@@ -121,3 +121,50 @@ def test_import_project_route(client, tmp_path):
     assert os.path.exists(pre_existing_db_path)
     with open(pre_existing_db_path, "rb") as file:
         assert file.read() == new_database_bytes
+
+
+def test_save_viewable_workflow_from_file(client):
+    route = "/opengeodeweb_back/save_viewable_file"
+    payload = {"input_geode_object": "BRep", "filename": "cube.og_brep"}
+
+    response = client.post(route, json=payload)
+    assert response.status_code == 200
+
+    data_id = response.json["id"]
+    assert isinstance(data_id, str) and len(data_id) > 0
+    assert response.json["viewable_file_name"].endswith(".vtm")
+
+    comp_resp = client.post(
+        "/opengeodeweb_back/models/vtm_component_indices", json={"id": data_id}
+    )
+    assert comp_resp.status_code == 200
+
+    refreshed = Data.get(data_id)
+    assert refreshed is not None
+
+
+def test_save_viewable_workflow_from_object(client):
+    # Chemin “from object” : passe par un endpoint de création qui génère/sauvegarde via save_viewable.
+    route = "/opengeodeweb_back/create/create_aoi"
+    aoi_data = {
+        "name": "workflow_aoi",
+        "points": [
+            {"x": 0.0, "y": 0.0},
+            {"x": 1.0, "y": 0.0},
+            {"x": 1.0, "y": 1.0},
+            {"x": 0.0, "y": 1.0},
+        ],
+        "z": 0.0,
+    }
+
+    response = client.post(route, json=aoi_data)
+    assert response.status_code == 200
+
+    data_id = response.json["id"]
+    assert isinstance(data_id, str) and len(data_id) > 0
+    assert response.json["geode_object"] == "EdgedCurve3D"
+    assert response.json["viewable_file_name"].endswith(".vtp")
+
+    attr_resp = client.post("/opengeodeweb_back/vertex_attribute_names", json={"id": data_id})
+    assert attr_resp.status_code == 200
+    assert isinstance(attr_resp.json.get("vertex_attribute_names", []), list)

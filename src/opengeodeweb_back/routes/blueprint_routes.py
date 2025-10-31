@@ -285,8 +285,6 @@ def export_project() -> flask.Response:
     project_folder: str = flask.current_app.config["DATA_FOLDER_PATH"]
     os.makedirs(project_folder, exist_ok=True)
 
-    if not params.filename:
-        flask.abort(400, "filename is required")
     filename: str = werkzeug.utils.secure_filename(os.path.basename(params.filename))
     export_zip_path = os.path.join(project_folder, filename)
 
