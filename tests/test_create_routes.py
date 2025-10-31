@@ -29,15 +29,16 @@ def aoi_data() -> Dict[str, Any]:
         "z": 0.0,
     }
 
+
 @pytest.fixture
 def voi_data() -> Dict[str, Any]:
     """Fixture for Volume of Interest (VOI) test data."""
     return {
         "name": "test_voi",
-        "aoi_id": str(uuid.uuid4()), 
+        "aoi_id": str(uuid.uuid4()),
         "z_min": -50.0,
         "z_max": 100.0,
-        "id": str(uuid.uuid4()), 
+        "id": str(uuid.uuid4()),
     }
 
 
@@ -113,9 +114,8 @@ def test_create_voi(client: FlaskClient, voi_data: Dict[str, Any]) -> None:
 
     voi_data_required_only = voi_data.copy()
     del voi_data_required_only["id"]
-    
-    test_utils.test_route_wrong_params(client, route, lambda: voi_data_required_only.copy()) # type: ignore
 
+    test_utils.test_route_wrong_params(client, route, lambda: voi_data_required_only.copy())  # type: ignore
 
 
 def test_create_point_with_invalid_data(client: FlaskClient) -> None:
@@ -183,7 +183,7 @@ def test_create_voi_with_invalid_data(
     invalid_data = {**voi_data, "z_max": "not_a_number"}
     response = client.post(route, json=invalid_data)
     assert response.status_code == 400
-    
+
     # Test with invalid aoi_id format (e.g., not a string/uuid)
     invalid_data = {**voi_data, "aoi_id": 12345}
     response = client.post(route, json=invalid_data)
