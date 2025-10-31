@@ -54,7 +54,7 @@ def create_aoi() -> flask.Response:
 
     # Create vertices first
     for point in params.points:
-        pp = opengeode.Point3D([point.x, point.y, params.z])
+        # pp = opengeode.Point3D([point.x, point.y, params.z])
         builder.create_point(opengeode.Point3D([point.x, point.y, params.z]))
 
     # Create edges between consecutive vertices and close the loop
@@ -62,6 +62,69 @@ def create_aoi() -> flask.Response:
     for i in range(num_vertices):
         next_i = (i + 1) % num_vertices
         builder.create_edge_with_vertices(i, next_i)
+
+    # Save and get info
+    result = utils_functions.generate_native_viewable_and_light_viewable_from_object(
+        geode_object="EdgedCurve3D",
+        data=edged_curve,
+    )
+    return flask.make_response(result, 200)
+
+
+@routes.route(
+    schemas_dict["create_voi"]["route"], methods=schemas_dict["create_voi"]["methods"]
+)
+def create_voi() -> flask.Response:
+    """Endpoint to create a Volume of Interest (VOI) as an EdgedCurve3D (a bounding box)."""
+    print(f"create_voi : {flask.request=}", flush=True)
+    utils_functions.validate_request(flask.request, schemas_dict["create_voi"])
+    params = schemas.CreateVoi.from_dict(flask.request.get_json())
+
+    # Define the 4 vertices of the AOI (bottom face in the XY plane)
+    aoi_vertices = [
+        (params.min_x, params.min_y),
+        (params.max_x, params.min_y),
+        (params.max_x, params.max_y),
+        (params.min_x, params.max_y),
+    ]
+
+    # Create the EdgedCurve object and its builder
+    edged_curve = geode_functions.geode_object_class("EdgedCurve3D").create()
+    builder = geode_functions.create_builder("EdgedCurve3D", edged_curve)
+    builder.set_name(params.name)
+
+    # Extract Z bounds
+    z_min = params.z_min
+    z_max = params.z_max
+
+    # --- 1. Create the 8 vertices of the bounding box ---
+
+    # Create the 4 bottom vertices (indices 0 to 3)
+    for x, y in aoi_vertices:
+        builder.create_point(opengeode.Point3D([x, y, z_min]))
+
+    # Create the 4 top vertices (indices 4 to 7)
+    for x, y in aoi_vertices:
+        builder.create_point(opengeode.Point3D([x, y, z_max]))
+
+    # --- 2. Define and create the 12 edges of the bounding box ---
+
+    # Edges of the bottom face (connecting vertices 0-1, 1-2, 2-3, 3-0)
+    bottom_edges = [(i, (i + 1) % 4) for i in range(4)]
+
+    # Edges of the top face (connecting vertices 4-5, 5-6, 6-7, 7-4)
+    # The (i + 4) and ((i + 1) % 4 + 4) ensure we use indices 4, 5, 6, 7
+    top_edges = [(i + 4, (i + 1) % 4 + 4) for i in range(4)]
+
+    # Vertical edges (connecting bottom (0-3) to top (4-7) vertices: 0-4, 1-5, 2-6, 3-7)
+    vertical_edges = [(i, i + 4) for i in range(4)]
+
+    # Combine all edges
+    all_edges = bottom_edges + top_edges + vertical_edges
+
+    # Create the edges in the EdgedCurve
+    for v1, v2 in all_edges:
+        builder.create_edge_with_vertices(v1, v2)
 
     # Save and get info
     result = utils_functions.generate_native_viewable_and_light_viewable_from_object(
