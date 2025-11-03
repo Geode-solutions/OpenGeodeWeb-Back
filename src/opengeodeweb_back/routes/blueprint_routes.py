@@ -390,19 +390,15 @@ def import_project() -> flask.Response:
                     if os.path.isfile(vpath):
                         continue
 
-
                 input_file = str(data_entry.input_file or "")
                 if not input_file:
                     continue
-
 
                 input_full = geode_functions.data_file_path(data_entry.id, input_file)
                 if not os.path.isfile(input_full):
                     continue
 
-                data_object = geode_functions.load(
-                    data_entry.geode_object, input_full
-                )
+                data_object = geode_functions.load(data_entry.geode_object, input_full)
                 utils_functions.save_all_viewables_and_return_info(
                     data_entry.geode_object, data_object, data_entry, data_path
                 )

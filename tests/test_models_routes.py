@@ -92,20 +92,26 @@ def test_export_project_route(client, tmp_path):
 
 def test_import_project_route(client, tmp_path):
     route = "/opengeodeweb_back/import_project"
-    snapshot = {"styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}}
+    snapshot = {
+        "styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}
+    }
 
     original_data_folder = client.application.config["DATA_FOLDER_PATH"]
-    client.application.config["DATA_FOLDER_PATH"] = os.path.join(str(tmp_path), "project_data")
+    client.application.config["DATA_FOLDER_PATH"] = os.path.join(
+        str(tmp_path), "project_data"
+    )
     db_path = os.path.join(client.application.config["DATA_FOLDER_PATH"], "project.db")
 
     import sqlite3, zipfile, json
+
     temp_db = tmp_path / "temp_project.db"
     conn = sqlite3.connect(str(temp_db))
     conn.execute(
         "CREATE TABLE datas (id TEXT PRIMARY KEY, geode_object TEXT, viewer_object TEXT, native_file_name TEXT, "
         "viewable_file_name TEXT, light_viewable TEXT, input_file TEXT, additional_files TEXT)"
     )
-    conn.commit(); conn.close()
+    conn.commit()
+    conn.close()
 
     z = tmp_path / "import_project_test.zip"
     with zipfile.ZipFile(z, "w", compression=zipfile.ZIP_DEFLATED) as zipf:
@@ -114,7 +120,9 @@ def test_import_project_route(client, tmp_path):
 
     with open(z, "rb") as f:
         resp = client.post(
-            route, data={"file": (f, "import_project_test.zip")}, content_type="multipart/form-data"
+            route,
+            data={"file": (f, "import_project_test.zip")},
+            content_type="multipart/form-data",
         )
 
     assert resp.status_code == 200
@@ -122,12 +130,14 @@ def test_import_project_route(client, tmp_path):
     assert os.path.exists(db_path)
 
     from opengeodeweb_microservice.database import connection
+
     client.application.config["DATA_FOLDER_PATH"] = original_data_folder
     test_db_path = os.environ.get("TEST_DB_PATH")
     if test_db_path:
         connection.init_database(test_db_path, create_tables=True)
 
     client.application.config["DATA_FOLDER_PATH"] = original_data_folder
+
 
 def test_save_viewable_workflow_from_file(client):
     route = "/opengeodeweb_back/save_viewable_file"
