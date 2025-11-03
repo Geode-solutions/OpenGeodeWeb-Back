@@ -343,7 +343,9 @@ def import_project() -> flask.Response:
         connection.scoped_session_registry.remove()
     if connection.engine:
         connection.engine.dispose()
-    connection.engine = connection.session_factory = connection.scoped_session_registry = None
+    connection.engine = connection.session_factory = (
+        connection.scoped_session_registry
+    ) = None
 
     try:
         if os.path.exists(data_folder_path):
@@ -375,21 +377,21 @@ def import_project() -> flask.Response:
         with get_session() as session:
             for data_entry in session.query(Data).all():
                 data_path = geode_functions.data_file_path(data_entry.id)
-            
+
                 viewable_name = data_entry.viewable_file_name
                 if viewable_name:
                     vpath = geode_functions.data_file_path(data_entry.id, viewable_name)
                     if os.path.isfile(vpath):
                         continue
-            
+
                 input_file = str(data_entry.input_file or "")
                 if not input_file:
                     continue
-            
+
                 input_full = geode_functions.data_file_path(data_entry.id, input_file)
                 if not os.path.isfile(input_full):
                     continue
-            
+
                 data_object = geode_functions.load(data_entry.geode_object, input_full)
                 utils_functions.save_all_viewables_and_return_info(
                     data_entry.geode_object, data_object, data_entry, data_path
