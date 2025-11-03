@@ -15,6 +15,7 @@ from .models import blueprint_models
 from . import schemas
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
+from opengeodeweb_microservice.database import connection
 
 routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
 
@@ -336,6 +337,14 @@ def import_project() -> flask.Response:
         flask.abort(400, "Uploaded file must be a .zip")
 
     data_folder_path: str = flask.current_app.config["DATA_FOLDER_PATH"]
+
+    # 423 Locked bypass : remove stopped requests
+    if connection.scoped_session_registry:
+        connection.scoped_session_registry.remove()
+    if connection.engine:
+        connection.engine.dispose()
+    connection.engine = connection.session_factory = connection.scoped_session_registry = None
+
     try:
         if os.path.exists(data_folder_path):
             shutil.rmtree(data_folder_path)
@@ -360,11 +369,37 @@ def import_project() -> flask.Response:
         if not os.path.isfile(database_root_path):
             flask.abort(400, "Missing project.db at project root")
 
+        # Reset database to the imported project.db
+        connection.init_database(database_root_path, create_tables=False)
+
+        with get_session() as session:
+            for data_entry in session.query(Data).all():
+                data_path = geode_functions.data_file_path(data_entry.id)
+            
+                viewable_name = data_entry.viewable_file_name
+                if viewable_name:
+                    vpath = geode_functions.data_file_path(data_entry.id, viewable_name)
+                    if os.path.isfile(vpath):
+                        continue
+            
+                input_file = str(data_entry.input_file or "")
+                if not input_file:
+                    continue
+            
+                input_full = geode_functions.data_file_path(data_entry.id, input_file)
+                if not os.path.isfile(input_full):
+                    continue
+            
+                data_object = geode_functions.load(data_entry.geode_object, input_full)
+                utils_functions.save_all_viewables_and_return_info(
+                    data_entry.geode_object, data_object, data_entry, data_path
+                )
+            session.commit()
+
         snapshot = {}
         try:
             raw = zip_archive.read("snapshot.json").decode("utf-8")
             snapshot = flask.json.loads(raw)
         except KeyError:
             snapshot = {}
-
     return flask.make_response({"snapshot": snapshot}, 200)
