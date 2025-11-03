@@ -369,28 +369,36 @@ def import_project() -> flask.Response:
         if not os.path.isfile(database_root_path):
             flask.abort(400, "Missing project.db at project root")
 
-        # Reset database to the imported project.db
         connection.init_database(database_root_path, create_tables=False)
 
+        try:
+            with get_session() as session:
+                rows = session.query(Data).all()
+        except Exception:
+            connection.init_database(database_root_path, create_tables=True)
+            with get_session() as session:
+                rows = session.query(Data).all()
+
         with get_session() as session:
-            for data_entry in session.query(Data).all():
+            for data_entry in rows:
                 data_path = geode_functions.data_file_path(data_entry.id)
-            
                 viewable_name = data_entry.viewable_file_name
                 if viewable_name:
                     vpath = geode_functions.data_file_path(data_entry.id, viewable_name)
                     if os.path.isfile(vpath):
                         continue
-            
+
                 input_file = str(data_entry.input_file or "")
                 if not input_file:
                     continue
-            
+
                 input_full = geode_functions.data_file_path(data_entry.id, input_file)
                 if not os.path.isfile(input_full):
                     continue
-            
-                data_object = geode_functions.load(data_entry.geode_object, input_full)
+
+                data_object = geode_functions.load(
+                    data_entry.geode_object, input_full
+                )
                 utils_functions.save_all_viewables_and_return_info(
                     data_entry.geode_object, data_object, data_entry, data_path
                 )

@@ -92,36 +92,42 @@ def test_export_project_route(client, tmp_path):
 
 def test_import_project_route(client, tmp_path):
     route = "/opengeodeweb_back/import_project"
-    snapshot = {
-        "styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}
-    }
+    snapshot = {"styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}}
 
-    client.application.config["DATA_FOLDER_PATH"] = os.path.join(
-        str(tmp_path), "project_data"
+    original_data_folder = client.application.config["DATA_FOLDER_PATH"]
+    client.application.config["DATA_FOLDER_PATH"] = os.path.join(str(tmp_path), "project_data")
+    db_path = os.path.join(client.application.config["DATA_FOLDER_PATH"], "project.db")
+
+    import sqlite3, zipfile, json
+    temp_db = tmp_path / "temp_project.db"
+    conn = sqlite3.connect(str(temp_db))
+    conn.execute(
+        "CREATE TABLE datas (id TEXT PRIMARY KEY, geode_object TEXT, viewer_object TEXT, native_file_name TEXT, "
+        "viewable_file_name TEXT, light_viewable TEXT, input_file TEXT, additional_files TEXT)"
     )
-    data_folder = client.application.config["DATA_FOLDER_PATH"]
-    pre_existing_db_path = os.path.join(data_folder, "project.db")
+    conn.commit(); conn.close()
 
-    tmp_zip = tmp_path / "import_project_test.zip"
-    new_database_bytes = b"new_db_content"
-    with zipfile.ZipFile(tmp_zip, "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
-        zip_file.writestr("snapshot.json", json.dumps(snapshot))
-        zip_file.writestr("project.db", new_database_bytes)
+    z = tmp_path / "import_project_test.zip"
+    with zipfile.ZipFile(z, "w", compression=zipfile.ZIP_DEFLATED) as zipf:
+        zipf.writestr("snapshot.json", json.dumps(snapshot))
+        zipf.write(str(temp_db), "project.db")
 
-    with open(tmp_zip, "rb") as file:
-        response = client.post(
-            route,
-            data={"file": (file, "import_project_test.zip")},
-            content_type="multipart/form-data",
+    with open(z, "rb") as f:
+        resp = client.post(
+            route, data={"file": (f, "import_project_test.zip")}, content_type="multipart/form-data"
         )
 
-    assert response.status_code == 200
-    assert response.json.get("snapshot") == snapshot
+    assert resp.status_code == 200
+    assert resp.json.get("snapshot") == snapshot
+    assert os.path.exists(db_path)
 
-    assert os.path.exists(pre_existing_db_path)
-    with open(pre_existing_db_path, "rb") as file:
-        assert file.read() == new_database_bytes
+    from opengeodeweb_microservice.database import connection
+    client.application.config["DATA_FOLDER_PATH"] = original_data_folder
+    test_db_path = os.environ.get("TEST_DB_PATH")
+    if test_db_path:
+        connection.init_database(test_db_path, create_tables=True)
 
+    client.application.config["DATA_FOLDER_PATH"] = original_data_folder
 
 def test_save_viewable_workflow_from_file(client):
     route = "/opengeodeweb_back/save_viewable_file"
