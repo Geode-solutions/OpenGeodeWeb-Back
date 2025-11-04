@@ -13,22 +13,6 @@
             "type": "string",
             "description": "ID of the corresponding AOI"
         },
-        "min_x": {
-            "type": "number",
-            "description": "Minimum X coordinate from AOI"
-        },
-        "min_y": {
-            "type": "number",
-            "description": "Minimum Y coordinate from AOI"
-        },
-        "max_x": {
-            "type": "number",
-            "description": "Maximum X coordinate from AOI"
-        },
-        "max_y": {
-            "type": "number",
-            "description": "Maximum Y coordinate from AOI"
-        },
         "z_min": {
             "type": "number",
             "description": "Minimum Z coordinate"
@@ -45,10 +29,6 @@
     "required": [
         "name",
         "aoi_id",
-        "min_x",
-        "min_y",
-        "max_x",
-        "max_y",
         "z_min",
         "z_max"
     ],

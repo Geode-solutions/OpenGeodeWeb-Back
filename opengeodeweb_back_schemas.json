@@ -61,8 +61,7 @@
               ],
               "additionalProperties": false
             },
-            "minItems": 4,
-            "maxItems": 4
+            "minItems": 3
           },
           "z": {
             "type": "number"
@@ -92,18 +91,19 @@
           },
           "aoi_id": {
             "type": "string",
-            "description": "ID of the corresponding AOI from which to take X and Y coordinates"
+            "description": "ID of the corresponding AOI"
           },
           "z_min": {
             "type": "number",
-            "description": "Minimum Z coordinate for the VOI"
+            "description": "Minimum Z coordinate"
           },
           "z_max": {
             "type": "number",
-            "description": "Maximum Z coordinate for the VOI"
+            "description": "Maximum Z coordinate"
           },
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Optional ID for updating existing VOI"
           }
         },
         "required": [
