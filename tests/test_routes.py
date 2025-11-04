@@ -1,6 +1,5 @@
 # Standard library imports
 import os
-import shutil
 
 # Third party imports
 from werkzeug.datastructures import FileStorage
@@ -9,6 +8,9 @@ from werkzeug.datastructures import FileStorage
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_back import geode_functions, test_utils
+
+base_dir = os.path.abspath(os.path.dirname(__file__))
+data_dir = os.path.join(base_dir, "data")
 
 
 def test_allowed_files(client):
@@ -48,9 +50,11 @@ def test_allowed_objects(client):
 
 
 def test_upload_file(client, filename="test.og_brep"):
+    file = os.path.join(data_dir, filename)
+    print(f"{file=}", flush=True)
     response = client.put(
         f"/opengeodeweb_back/upload_file",
-        data={"file": FileStorage(open(f"./tests/data/{filename}", "rb"))},
+        data={"file": FileStorage(open(file, "rb"))},
     )
     assert response.status_code == 201
 
@@ -171,19 +175,19 @@ def test_save_viewable_file(client):
 
 def test_texture_coordinates(client, test_id):
     with client.application.app_context():
+        file = os.path.join(data_dir, "hat.vtp")
         data = Data.create(
             geode_object="PolygonalSurface3D",
             viewer_object=geode_functions.get_object_type("PolygonalSurface3D"),
-            input_file="hat.vtp",
+            input_file=file,
         )
-        data.native_file_name = "hat.vtp"
+        data.native_file_name = file
         session = get_session()
         if session:
             session.commit()
 
         data_path = geode_functions.data_file_path(data.id, data.native_file_name)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        shutil.copy("./tests/data/hat.vtp", data_path)
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(
         "/opengeodeweb_back/texture_coordinates", json={"id": data.id}
@@ -199,19 +203,19 @@ def test_vertex_attribute_names(client, test_id):
     route = f"/opengeodeweb_back/vertex_attribute_names"
 
     with client.application.app_context():
+        file = os.path.join(data_dir, "test.vtp")
         data = Data.create(
             geode_object="PolygonalSurface3D",
             viewer_object=geode_functions.get_object_type("PolygonalSurface3D"),
-            input_file="test.vtp",
+            input_file=file,
         )
-        data.native_file_name = "test.vtp"
+        data.native_file_name = file
         session = get_session()
         if session:
             session.commit()
 
         data_path = geode_functions.data_file_path(data.id, data.native_file_name)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        shutil.copy("./tests/data/test.vtp", data_path)
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     assert response.status_code == 200
@@ -225,19 +229,19 @@ def test_polygon_attribute_names(client, test_id):
     route = f"/opengeodeweb_back/polygon_attribute_names"
 
     with client.application.app_context():
+        file = os.path.join(data_dir, "test.vtp")
         data = Data.create(
             geode_object="PolygonalSurface3D",
             viewer_object=geode_functions.get_object_type("PolygonalSurface3D"),
-            input_file="test.vtp",
+            input_file=file,
         )
-        data.native_file_name = "test.vtp"
+        data.native_file_name = file
         session = get_session()
         if session:
             session.commit()
 
         data_path = geode_functions.data_file_path(data.id, data.native_file_name)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        shutil.copy("./tests/data/test.vtp", data_path)
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     assert response.status_code == 200
@@ -251,19 +255,19 @@ def test_polyhedron_attribute_names(client, test_id):
     route = f"/opengeodeweb_back/polyhedron_attribute_names"
 
     with client.application.app_context():
+        file = os.path.join(data_dir, "test.vtu")
         data = Data.create(
             geode_object="PolyhedralSolid3D",
             viewer_object=geode_functions.get_object_type("PolyhedralSolid3D"),
-            input_file="test.vtu",
+            input_file=file,
         )
-        data.native_file_name = "test.vtu"
+        data.native_file_name = file
         session = get_session()
         if session:
             session.commit()
 
         data_path = geode_functions.data_file_path(data.id, data.native_file_name)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        shutil.copy("./tests/data/test.vtu", data_path)
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     print(response.json)
