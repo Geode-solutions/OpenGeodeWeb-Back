@@ -6,6 +6,9 @@ from opengeodeweb_back import geode_functions
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
 
+base_dir = os.path.abspath(os.path.dirname(__file__))
+data_dir = os.path.join(base_dir, "data")
+
 
 def test_model_mesh_components(client, test_id):
     route = "/opengeodeweb_back/models/vtm_component_indices"
@@ -13,7 +16,7 @@ def test_model_mesh_components(client, test_id):
     with client.application.app_context():
         data_path = geode_functions.data_file_path(test_id, "viewable.vtm")
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        shutil.copy("./tests/data/cube.vtm", data_path)
+        shutil.copy(os.path.join(data_dir, "cube.vtm"), data_path)
 
     response = client.post(route, json={"id": test_id})
     assert response.status_code == 200
@@ -30,7 +33,7 @@ def test_model_mesh_components(client, test_id):
 
 def test_extract_brep_uuids(client, test_id):
     route = "/opengeodeweb_back/models/mesh_components"
-    brep_filename = "cube.og_brep"
+    brep_filename = os.path.join(data_dir, "cube.og_brep")
 
     with client.application.app_context():
         data_entry = Data.create(
@@ -42,13 +45,6 @@ def test_extract_brep_uuids(client, test_id):
         session = get_session()
         if session:
             session.commit()
-
-        src_path = os.path.join("tests", "data", brep_filename)
-        dest_path = os.path.join(
-            flask.current_app.config["DATA_FOLDER_PATH"], data_entry.id, brep_filename
-        )
-        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-        shutil.copy2(src_path, dest_path)
 
         response = client.post(route, json={"id": data_entry.id})
         assert response.status_code == 200
