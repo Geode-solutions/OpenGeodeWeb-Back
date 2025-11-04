@@ -8,7 +8,7 @@ import pytest
 from flask.testing import FlaskClient
 
 # Local application imports
-from src.opengeodeweb_back import test_utils
+from opengeodeweb_back import test_utils
 
 
 @pytest.fixture
