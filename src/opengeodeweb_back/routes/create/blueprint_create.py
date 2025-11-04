@@ -20,7 +20,6 @@ schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas
 )
 def create_point() -> flask.Response:
     """Endpoint to create a single point in 3D space."""
-    print(f"create_point : {flask.request=}", flush=True)
     utils_functions.validate_request(flask.request, schemas_dict["create_point"])
     params = schemas.CreatePoint.from_dict(flask.request.get_json())
 
@@ -43,7 +42,6 @@ def create_point() -> flask.Response:
 )
 def create_aoi() -> flask.Response:
     """Endpoint to create an Area of Interest (AOI) as an EdgedCurve3D."""
-    print(f"create_aoi : {flask.request=}", flush=True)
     utils_functions.validate_request(flask.request, schemas_dict["create_aoi"])
     params = schemas.CreateAoi.from_dict(flask.request.get_json())
 
@@ -54,7 +52,6 @@ def create_aoi() -> flask.Response:
 
     # Create vertices first
     for point in params.points:
-        # pp = opengeode.Point3D([point.x, point.y, params.z])
         builder.create_point(opengeode.Point3D([point.x, point.y, params.z]))
 
     # Create edges between consecutive vertices and close the loop
@@ -70,13 +67,12 @@ def create_aoi() -> flask.Response:
     )
     return flask.make_response(result, 200)
 
-
 @routes.route(
-    schemas_dict["create_voi"]["route"], methods=schemas_dict["create_voi"]["methods"]
+    schemas_dict["create_voi"]["route"],
+    methods=schemas_dict["create_voi"]["methods"],
 )
 def create_voi() -> flask.Response:
-    """Endpoint to create a Volume of Interest (VOI) as an EdgedCurve3D (a bounding box)."""
-    print(f"create_voi : {flask.request=}", flush=True)
+    """Endpoint to create a Volume of Interest (VOI) as an EdgedCurve3D (a bounding box/prism)."""
     utils_functions.validate_request(flask.request, schemas_dict["create_voi"])
     params = schemas.CreateVoi.from_dict(flask.request.get_json())
 
@@ -84,52 +80,30 @@ def create_voi() -> flask.Response:
     if not aoi_data:
         flask.abort(404, f"AOI with id {params.aoi_id} not found")
 
-    edged_curve_aoi = geode_functions.load_data(params.aoi_id)
-    if not isinstance(edged_curve_aoi, opengeode.EdgedCurve3D):
-        flask.abort(400, "Referenced object is not an EdgedCurve3D (AOI)")
-
-    bbox_aoi = edged_curve_aoi.bounding_box()
-    min_x = bbox_aoi.min().value(0)
-    min_y = bbox_aoi.min().value(1)
-    max_x = bbox_aoi.max().value(0)
-    max_y = bbox_aoi.max().value(1)
-
-    aoi_vertices = [
-        (min_x, min_y),
-        (max_x, min_y),
-        (max_x, max_y),
-        (min_x, max_y),
-    ]
+    aoi_object = geode_functions.load_data(params.aoi_id)
+    
+    nb_points = aoi_object.nb_vertices()
 
     edged_curve = geode_functions.geode_object_class("EdgedCurve3D").create()
     builder = geode_functions.create_builder("EdgedCurve3D", edged_curve)
     builder.set_name(params.name)
 
-    z_min = params.z_min
-    z_max = params.z_max
+    for point_id in range(nb_points):
+        aoi_point= aoi_object.point(point_id)
+        builder.create_point(opengeode.Point3D([aoi_point.value(0), aoi_point.value(1), params.z_min]))
+    
+    for point_id in range(nb_points):
+        aoi_point= aoi_object.point(point_id)
+        builder.create_point(opengeode.Point3D([aoi_point.value(0), aoi_point.value(1), params.z_max]))
 
-
-    for x, y in aoi_vertices:
-        builder.create_point(opengeode.Point3D([x, y, z_min]))
-
-    for x, y in aoi_vertices:
-        builder.create_point(opengeode.Point3D([x, y, z_max]))
-
-
-    bottom_edges = [(i, (i + 1) % 4) for i in range(4)]
-
-    top_edges = [(i + 4, (i + 1) % 4 + 4) for i in range(4)]
-
-    vertical_edges = [(i, i + 4) for i in range(4)]
-
-    all_edges = bottom_edges + top_edges + vertical_edges
-
-    for v1, v2 in all_edges:
-        builder.create_edge_with_vertices(v1, v2)
+    for point_id in range(nb_points):
+        next_point = (point_id + 1) % nb_points
+        builder.create_edge_with_vertices(point_id, next_point)
+        builder.create_edge_with_vertices(point_id+nb_points, next_point+nb_points)
+        builder.create_edge_with_vertices(point_id, point_id+nb_points)
 
     result = utils_functions.generate_native_viewable_and_light_viewable_from_object(
         geode_object="EdgedCurve3D",
         data=edged_curve,
     )
-    result["aoi_id"] = params.aoi_id  
     return flask.make_response(result, 200)
