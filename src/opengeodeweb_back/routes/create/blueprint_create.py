@@ -13,7 +13,6 @@ from . import schemas
 routes = flask.Blueprint("create", __name__, url_prefix="/create")
 schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas"))
 
-
 @routes.route(
     schemas_dict["create_point"]["route"],
     methods=schemas_dict["create_point"]["methods"],
@@ -38,7 +37,8 @@ def create_point() -> flask.Response:
 
 
 @routes.route(
-    schemas_dict["create_aoi"]["route"], methods=schemas_dict["create_aoi"]["methods"]
+    schemas_dict["create_aoi"]["route"], 
+    methods=schemas_dict["create_aoi"]["methods"]
 )
 def create_aoi() -> flask.Response:
     """Endpoint to create an Area of Interest (AOI) as an EdgedCurve3D."""
@@ -70,7 +70,7 @@ def create_aoi() -> flask.Response:
 
 @routes.route(
     schemas_dict["create_voi"]["route"],
-    methods=schemas_dict["create_voi"]["methods"],
+    methods=schemas_dict["create_voi"]["methods"]
 )
 def create_voi() -> flask.Response:
     """Endpoint to create a Volume of Interest (VOI) as an EdgedCurve3D (a bounding box/prism)."""
