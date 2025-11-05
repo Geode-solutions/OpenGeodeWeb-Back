@@ -91,9 +91,12 @@ def test_create_aoi(client: FlaskClient, aoi_data: Dict[str, Any]) -> None:
     # Test with missing parameters
     test_utils.test_route_wrong_params(client, route, lambda: aoi_data.copy())  # type: ignore
 
-def test_create_voi(client: FlaskClient, aoi_data: Dict[str, Any], voi_data: Dict[str, Any]) -> None:
+
+def test_create_voi(
+    client: FlaskClient, aoi_data: Dict[str, Any], voi_data: Dict[str, Any]
+) -> None:
     """Test the creation of a VOI with valid data (including optional id)."""
-    aoi_route = "/opengeodeweb_back/create/create_aoi" 
+    aoi_route = "/opengeodeweb_back/create/create_aoi"
     aoi_response = client.post(aoi_route, json=aoi_data)
     assert aoi_response.status_code == 200
     aoi_id = aoi_response.json["id"]
@@ -110,6 +113,7 @@ def test_create_voi(client: FlaskClient, aoi_data: Dict[str, Any], voi_data: Dic
     assert response_data["name"] == voi_data["name"]
     assert response_data["object_type"] == "mesh"
     assert response_data["geode_object"] == "EdgedCurve3D"
+
 
 def test_create_point_with_invalid_data(client: FlaskClient) -> None:
     """Test the point creation endpoint with invalid data."""
@@ -167,7 +171,7 @@ def test_create_voi_with_invalid_data(
     assert aoi_response.status_code == 200
     aoi_id = aoi_response.json["id"]
 
-    route = "/opengeodeweb_back/create/create_aoi"  
+    route = "/opengeodeweb_back/create/create_aoi"
 
     invalid_data = {**voi_data, "aoi_id": aoi_id, "z_min": "not_a_number"}
     response = client.post(route, json=invalid_data)
