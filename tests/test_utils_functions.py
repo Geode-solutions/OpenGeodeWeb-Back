@@ -14,6 +14,9 @@ from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_back import geode_functions, utils_functions
 
+base_dir = os.path.abspath(os.path.dirname(__file__))
+data_dir = os.path.join(base_dir, "data")
+
 
 def test_increment_request_counter(app_context):
     assert flask.current_app.config.get("REQUEST_COUNTER") == 0
@@ -93,15 +96,16 @@ def test_create_data_folder_from_id(client):
 def test_save_all_viewables_and_return_info(client):
     app = client.application
     with app.app_context():
-        base_dir = os.path.abspath(os.path.dirname(__file__))
-        expected_db_path = os.path.join(base_dir, "data", "project.db")
+        expected_db_path = os.path.join(data_dir, "project.db")
         expected_uri = f"sqlite:///{expected_db_path}"
 
         assert app.config["SQLALCHEMY_DATABASE_URI"] == expected_uri
         assert os.path.exists(expected_db_path)
 
         geode_object = "BRep"
-        data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
+        data = geode_functions.load(
+            geode_object, os.path.join(data_dir, "test.og_brep")
+        )
         input_file = "test.og_brep"
         additional_files = ["additional_file.txt"]
 
@@ -144,7 +148,9 @@ def test_save_all_viewables_commits_to_db(client):
     app = client.application
     with app.app_context():
         geode_object = "BRep"
-        data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
+        data = geode_functions.load(
+            geode_object, os.path.join(data_dir, "test.og_brep")
+        )
         input_file = "test.og_brep"
 
         data_entry = Data.create(
@@ -168,7 +174,9 @@ def test_generate_native_viewable_and_light_viewable_from_object(client):
     app = client.application
     with app.app_context():
         geode_object = "BRep"
-        data = geode_functions.load(geode_object, "./tests/data/test.og_brep")
+        data = geode_functions.load(
+            geode_object, os.path.join(data_dir, "test.og_brep")
+        )
 
         result = (
             utils_functions.generate_native_viewable_and_light_viewable_from_object(

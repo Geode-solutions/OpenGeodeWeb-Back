@@ -27,8 +27,7 @@
                 ],
                 "additionalProperties": false
             },
-            "minItems": 4,
-            "maxItems": 4
+            "minItems": 3
         },
         "z": {
             "type": "number"
