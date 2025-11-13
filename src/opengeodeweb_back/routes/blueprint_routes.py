@@ -327,8 +327,6 @@ def export_project() -> flask.Response:
     methods=schemas_dict["import_project"]["methods"],
 )
 def import_project() -> flask.Response:
-    # if flask.request.method == "OPTIONS":
-    #     return flask.make_response({}, 200)
     utils_functions.validate_request(flask.request, schemas_dict["import_project"])
     if "file" not in flask.request.files:
         flask.abort(400, "No .vease file provided under 'file'")
@@ -366,7 +364,7 @@ def import_project() -> flask.Response:
             if not (
                 target == project_folder or target.startswith(project_folder + os.sep)
             ):
-                flask.abort(400, "Zip contains unsafe paths")
+                flask.abort(400, "Vease file contains unsafe paths")
         zip_archive.extractall(project_folder)
 
         database_root_path = os.path.join(project_folder, "project.db")
