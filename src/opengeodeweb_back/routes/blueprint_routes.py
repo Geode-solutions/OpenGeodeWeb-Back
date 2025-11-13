@@ -287,13 +287,15 @@ def export_project() -> flask.Response:
     os.makedirs(project_folder, exist_ok=True)
 
     filename: str = werkzeug.utils.secure_filename(os.path.basename(params.filename))
-    export_zip_path = os.path.join(project_folder, filename)
+    if not filename.lower().endswith(".vease"):
+        flask.abort(400, "Requested filename must end with .vease")
+    export_vease_path = os.path.join(project_folder, filename)
 
     with get_session() as session:
         rows = session.query(Data.id, Data.input_file, Data.additional_files).all()
 
     with zipfile.ZipFile(
-        export_zip_path, "w", compression=zipfile.ZIP_DEFLATED
+        export_vease_path, "w", compression=zipfile.ZIP_DEFLATED
     ) as zip_file:
         database_root_path = os.path.join(project_folder, "project.db")
         if os.path.isfile(database_root_path):
@@ -317,7 +319,7 @@ def export_project() -> flask.Response:
 
         zip_file.writestr("snapshot.json", flask.json.dumps(params.snapshot))
 
-    return utils_functions.send_file(project_folder, [export_zip_path], filename)
+    return utils_functions.send_file(project_folder, [export_vease_path], filename)
 
 
 @routes.route(
@@ -325,17 +327,16 @@ def export_project() -> flask.Response:
     methods=schemas_dict["import_project"]["methods"],
 )
 def import_project() -> flask.Response:
-    if flask.request.method == "OPTIONS":
-        return flask.make_response({}, 200)
+    # if flask.request.method == "OPTIONS":
+    #     return flask.make_response({}, 200)
     utils_functions.validate_request(flask.request, schemas_dict["import_project"])
     if "file" not in flask.request.files:
-        flask.abort(400, "No zip file provided under 'file'")
-
+        flask.abort(400, "No .vease file provided under 'file'")
     zip_file = flask.request.files["file"]
     assert zip_file.filename is not None
     filename = werkzeug.utils.secure_filename(os.path.basename(zip_file.filename))
-    if not filename.lower().endswith(".zip"):
-        flask.abort(400, "Uploaded file must be a .zip")
+    if not filename.lower().endswith(".vease"):
+        flask.abort(400, "Uploaded file must be a .vease")
 
     data_folder_path: str = flask.current_app.config["DATA_FOLDER_PATH"]
 
