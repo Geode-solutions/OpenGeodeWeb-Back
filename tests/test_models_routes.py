@@ -1,10 +1,10 @@
 import os
 import shutil
-import flask
 
 from opengeodeweb_back import geode_functions
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
+from werkzeug.datastructures import FileStorage
 import zipfile
 import json
 
@@ -60,7 +60,7 @@ def test_export_project_route(client, tmp_path):
     snapshot = {
         "styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}
     }
-    filename = "export_project_test.zip"
+    filename = "export_project_test.vease"
     project_folder = client.application.config["DATA_FOLDER_PATH"]
     os.makedirs(project_folder, exist_ok=True)
     database_root_path = os.path.join(project_folder, "project.db")
@@ -109,7 +109,7 @@ def test_import_project_route(client, tmp_path):
     conn.commit()
     conn.close()
 
-    z = tmp_path / "import_project_test.zip"
+    z = tmp_path / "import_project_test.vease"
     with zipfile.ZipFile(z, "w", compression=zipfile.ZIP_DEFLATED) as zipf:
         zipf.writestr("snapshot.json", json.dumps(snapshot))
         zipf.write(str(temp_db), "project.db")
@@ -117,7 +117,7 @@ def test_import_project_route(client, tmp_path):
     with open(z, "rb") as f:
         resp = client.post(
             route,
-            data={"file": (f, "import_project_test.zip")},
+            data={"file": (f, "import_project_test.vease")},
             content_type="multipart/form-data",
         )
 
@@ -136,6 +136,13 @@ def test_import_project_route(client, tmp_path):
 
 
 def test_save_viewable_workflow_from_file(client):
+    file = os.path.join(data_dir, "cube.og_brep")
+    upload_resp = client.put(
+        "/opengeodeweb_back/upload_file",
+        data={"file": FileStorage(open(file, "rb"))},
+    )
+    assert upload_resp.status_code == 201
+
     route = "/opengeodeweb_back/save_viewable_file"
     payload = {"input_geode_object": "BRep", "filename": "cube.og_brep"}
 
