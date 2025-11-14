@@ -5,12 +5,18 @@ from typing import List, Optional
 
 @dataclass
 class Point(DataClassJsonMixin):
+    def __post_init__(self):
+        print(self, flush=True)
+
     x: float
     y: float
 
 
 @dataclass
 class CreateAoi(DataClassJsonMixin):
+    def __post_init__(self):
+        print(self, flush=True)
+
     name: str
     """Name of the AOI"""
 

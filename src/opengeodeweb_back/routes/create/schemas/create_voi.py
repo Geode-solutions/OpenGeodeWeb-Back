@@ -5,6 +5,9 @@ from typing import Optional
 
 @dataclass
 class CreateVoi(DataClassJsonMixin):
+    def __post_init__(self):
+        print(self, flush=True)
+
     aoi_id: str
     """ID of the corresponding AOI"""
 

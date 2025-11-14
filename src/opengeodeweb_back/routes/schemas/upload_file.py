@@ -5,4 +5,7 @@ from typing import Optional
 
 @dataclass
 class UploadFile(DataClassJsonMixin):
+    def __post_init__(self):
+        print(self, flush=True)
+
     filename: Optional[str] = None

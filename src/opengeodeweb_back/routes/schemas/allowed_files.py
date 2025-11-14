@@ -5,4 +5,7 @@ from typing import Optional
 
 @dataclass
 class AllowedFiles(DataClassJsonMixin):
+    def __post_init__(self):
+        print(self, flush=True)
+
     supported_feature: Optional[str] = None
