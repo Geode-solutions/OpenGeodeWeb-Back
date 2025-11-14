@@ -7,4 +7,4 @@ class GeographicCoordinateSystems(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print(self, flush=True)
 
-    input_geode_object: str
+    input_geode_type: GeodeType

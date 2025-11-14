@@ -178,7 +178,7 @@ def create_data_folder_from_id(data_id: str) -> str:
 
 
 def save_all_viewables_and_return_info(
-    geode_object: str,
+    geode_type: GeodeType,
     data: object,
     data_entry: Data,
     data_path: str,
@@ -224,7 +224,7 @@ def save_all_viewables_and_return_info(
 
 
 def generate_native_viewable_and_light_viewable_from_object(
-    geode_object: str, data: object
+    geode_type: GeodeType, data: object
 ) -> dict[str, str | list[str]]:
     data_entry = Data.create(
         geode_object=geode_object,
@@ -235,7 +235,7 @@ def generate_native_viewable_and_light_viewable_from_object(
 
 
 def generate_native_viewable_and_light_viewable_from_file(
-    geode_object: str, input_filename: str
+    geode_type: GeodeType, input_filename: str
 ) -> dict[str, str | list[str]]:
     data_entry = Data.create(
         geode_object=geode_object,

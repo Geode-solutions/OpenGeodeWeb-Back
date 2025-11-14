@@ -8,4 +8,4 @@ class GeodeObjectsAndOutputExtensions(DataClassJsonMixin):
         print(self, flush=True)
 
     filename: str
-    input_geode_object: str
+    input_geode_type: GeodeType
