@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 @dataclass
 class InspectFile(DataClassJsonMixin):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         print(self, flush=True)
 
     filename: str

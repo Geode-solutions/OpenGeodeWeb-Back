@@ -5,7 +5,7 @@ from typing import List, Optional
 
 @dataclass
 class Point(DataClassJsonMixin):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         print(self, flush=True)
 
     x: float
@@ -14,7 +14,7 @@ class Point(DataClassJsonMixin):
 
 @dataclass
 class CreateAoi(DataClassJsonMixin):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         print(self, flush=True)
 
     name: str
