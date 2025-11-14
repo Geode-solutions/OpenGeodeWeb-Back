@@ -6,6 +6,8 @@ import os
 import flask
 import shutil
 import uuid
+import zipfile
+import io
 
 # Local application imports
 from opengeodeweb_microservice.database.data import Data
@@ -214,3 +216,49 @@ def test_generate_native_viewable_and_light_viewable_from_file(client):
     assert isinstance(result["object_type"], str)
     assert isinstance(result["binary_light_viewable"], str)
     assert isinstance(result["input_file"], str)
+
+
+def test_send_file_multiple_returns_zip(client, tmp_path):
+    app = client.application
+    with app.app_context():
+        app.config["UPLOAD_FOLDER"] = str(tmp_path)
+        file_paths = []
+        for i, content in [(1, b"hello 1"), (2, b"hello 2")]:
+            file_path = tmp_path / f"tmp_send_file_{i}.txt"
+            file_path.write_bytes(content)
+            file_paths.append(str(file_path))
+        with app.test_request_context():
+            response = utils_functions.send_file(
+                app.config["UPLOAD_FOLDER"], file_paths, "bundle"
+            )
+            assert response.status_code == 200
+            assert response.mimetype == "application/zip"
+            new_file_name = response.headers.get("new-file-name")
+            assert new_file_name == "bundle.zip"
+            zip_path = os.path.join(app.config["UPLOAD_FOLDER"], new_file_name)
+            with zipfile.ZipFile(zip_path, "r") as zip_file:
+                zip_entries = zip_file.namelist()
+                assert "tmp_send_file_1.txt" in zip_entries
+                assert "tmp_send_file_2.txt" in zip_entries
+            response.close()
+
+
+def test_send_file_single_returns_octet_binary(client, tmp_path):
+    app = client.application
+    with app.app_context():
+        app.config["UPLOAD_FOLDER"] = str(tmp_path)
+        file_path = tmp_path / "tmp_send_file_1.txt"
+        file_path.write_bytes(b"hello 1")
+        with app.test_request_context():
+            response = utils_functions.send_file(
+                app.config["UPLOAD_FOLDER"], [str(file_path)], "tmp_send_file_1.txt"
+            )
+            assert response.status_code == 200
+            assert response.mimetype == "application/octet-binary"
+            new_file_name = response.headers.get("new-file-name")
+            assert new_file_name == "tmp_send_file_1.txt"
+            zip_path = os.path.join(app.config["UPLOAD_FOLDER"], new_file_name)
+            with open(zip_path, "rb") as f:
+                file_bytes = f.read()
+            assert file_bytes == b"hello 1"
+            response.close()
