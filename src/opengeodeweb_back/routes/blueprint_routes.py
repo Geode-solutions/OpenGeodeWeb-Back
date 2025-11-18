@@ -45,9 +45,6 @@ def allowed_files() -> flask.Response:
     methods=schemas_dict["upload_file"]["methods"],
 )
 def upload_file() -> flask.Response:
-    if flask.request.method == "OPTIONS":
-        return flask.make_response({}, 200)
-
     UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -63,9 +60,6 @@ def upload_file() -> flask.Response:
     methods=schemas_dict["allowed_objects"]["methods"],
 )
 def allowed_objects() -> flask.Response:
-    if flask.request.method == "OPTIONS":
-        return flask.make_response({}, 200)
-
     utils_functions.validate_request(flask.request, schemas_dict["allowed_objects"])
     params = schemas.AllowedObjects.from_dict(flask.request.get_json())
     file_absolute_path = geode_functions.upload_file_path(params.filename)
@@ -73,6 +67,26 @@ def allowed_objects() -> flask.Response:
         file_absolute_path, params.supported_feature
     )
     return flask.make_response({"allowed_objects": allowed_objects}, 200)
+
+
+# def list_geode_objects(
+#     file_absolute_path: str,
+#     key: str | None = None,
+# ):
+#     return_dict = {}
+#     file_extension = utils_functions.extension_from_filename(
+#         os.path.basename(file_absolute_path)
+#     )
+#     geode_objects_filtered_list = filter_geode_objects(key)
+#     for geode_object in geode_objects_filtered_list:
+#         if has_creator(geode_object, file_extension):
+#             loadability_score = is_loadable(geode_object, file_absolute_path)
+#             priority_score = object_priority(geode_object, file_absolute_path)
+#             return_dict[geode_object] = {
+#                 "is_loadable": loadability_score,
+#                 "object_priority": priority_score,
+#             }
+#     return return_dict
 
 
 @routes.route(
@@ -136,6 +150,13 @@ def crs_converter_geographic_coordinate_systems() -> flask.Response:
     return flask.make_response({"crs_list": crs_list}, 200)
 
 
+# def geographic_coordinate_systems(geode_type: GeodeType):
+#     if is_3D(geode_object):
+#         return og_gs.GeographicCoordinateSystem3D.geographic_coordinate_systems()
+#     else:
+#         return og_gs.GeographicCoordinateSystem2D.geographic_coordinate_systems()
+
+
 @routes.route(
     schemas_dict["inspect_file"]["route"],
     methods=schemas_dict["inspect_file"]["methods"],
@@ -148,6 +169,32 @@ def inspect_file() -> flask.Response:
     class_inspector = geode_functions.inspect(params.input_geode_object, data)
     inspection_result = geode_functions.get_inspector_children(class_inspector)
     return flask.make_response({"inspection_result": inspection_result}, 200)
+
+
+# def get_inspector_children(obj):
+#     new_object = {}
+
+#     if "inspection_type" in dir(obj):
+#         new_object["title"] = obj.inspection_type()
+#         new_object["nb_issues"] = 0
+#         new_object["children"] = []
+#         for child in dir(obj):
+#             if not child.startswith("__") and not child in [
+#                 "inspection_type",
+#                 "string",
+#             ]:
+#                 child_instance = obj.__getattribute__(child)
+#                 child_object = get_inspector_children(child_instance)
+#                 new_object["children"].append(child_object)
+#                 new_object["nb_issues"] += child_object["nb_issues"]
+#     else:
+#         new_object["title"] = obj.description()
+#         nb_issues = obj.nb_issues()
+#         new_object["nb_issues"] = nb_issues
+#         if nb_issues > 0:
+#             issues = obj.string().split("\n")
+#             new_object["issues"] = issues
+#     return new_object
 
 
 @routes.route(
@@ -171,6 +218,23 @@ def geode_objects_and_output_extensions() -> flask.Response:
         {"geode_objects_and_output_extensions": geode_objects_and_output_extensions},
         200,
     )
+
+
+# def geode_objects_output_extensions(geode_type: GeodeType, data):
+#     geode_objects_output_extensions_dict = {}
+#     output_extensions = geode_object_output_extensions(geode_object)
+#     extensions_dict = {}
+#     for output_extension in output_extensions:
+#         bool_is_saveable = is_saveable(geode_object, data, f"test.{output_extension}")
+#         extensions_dict[output_extension] = {"is_saveable": bool_is_saveable}
+#     geode_objects_output_extensions_dict[geode_object] = extensions_dict
+
+#     if "parent" in geode_objects[geode_type].keys():
+#         parent_geode_object = geode_objects[geode_type]["parent"]
+#         geode_objects_output_extensions_dict.update(
+#             geode_objects_output_extensions(parent_geode_object, data)
+#         )
+#     return geode_objects_output_extensions_dict
 
 
 @routes.route(

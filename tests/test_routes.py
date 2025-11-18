@@ -3,6 +3,7 @@ import os
 
 # Third party imports
 from werkzeug.datastructures import FileStorage
+from flask.testing import FlaskClient
 
 # Local application imports
 from opengeodeweb_microservice.database.data import Data
@@ -13,7 +14,7 @@ base_dir = os.path.abspath(os.path.dirname(__file__))
 data_dir = os.path.join(base_dir, "data")
 
 
-def test_allowed_files(client):
+def test_allowed_files(client: FlaskClient) -> None:
     route = f"/opengeodeweb_back/allowed_files"
     get_full_data = lambda: {"supported_feature": "None"}
     json = get_full_data()
@@ -28,7 +29,7 @@ def test_allowed_files(client):
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_allowed_objects(client):
+def test_allowed_objects(client: FlaskClient) -> None:
     route = f"/opengeodeweb_back/allowed_objects"
 
     def get_full_data():
@@ -59,7 +60,7 @@ def test_upload_file(client, filename="test.og_brep"):
     assert response.status_code == 201
 
 
-def test_missing_files(client):
+def test_missing_files(client: FlaskClient) -> None:
     route = f"/opengeodeweb_back/missing_files"
 
     def get_full_data():
@@ -82,7 +83,7 @@ def test_missing_files(client):
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_geographic_coordinate_systems(client):
+def test_geographic_coordinate_systems(client: FlaskClient) -> None:
     route = f"/opengeodeweb_back/geographic_coordinate_systems"
     get_full_data = lambda: {"input_geode_object": "BRep"}
     # Normal test with geode_object 'BRep'
@@ -97,7 +98,7 @@ def test_geographic_coordinate_systems(client):
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_inspect_file(client):
+def test_inspect_file(client: FlaskClient) -> None:
     route = f"/opengeodeweb_back/inspect_file"
 
     def get_full_data():
@@ -118,7 +119,7 @@ def test_inspect_file(client):
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_geode_objects_and_output_extensions(client):
+def test_geode_objects_and_output_extensions(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/geode_objects_and_output_extensions"
 
     def get_full_data():
@@ -144,7 +145,7 @@ def test_geode_objects_and_output_extensions(client):
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_save_viewable_file(client):
+def test_save_viewable_file(client: FlaskClient) -> None:
     test_upload_file(client, filename="corbi.og_brep")
     route = f"/opengeodeweb_back/save_viewable_file"
 
@@ -278,7 +279,7 @@ def test_polyhedron_attribute_names(client, test_id):
         assert type(polyhedron_attribute_name) is str
 
 
-def test_database_uri_path(client):
+def test_database_uri_path(client: FlaskClient) -> None:
     app = client.application
     with app.app_context():
         base_dir = os.path.abspath(os.path.dirname(__file__))

@@ -1,95 +1,95 @@
 # Standard library imports
+from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Literal, Any, get_args, cast
-from __future__ import annotations
 
 # Third party imports
-import opengeode as og 
-import opengeode_io as og_io 
-import opengeode_inspector as og_inspector 
-import opengeode_geosciences as og_gs 
-import opengeode_geosciencesio as og_gs_io  
-import geode_viewables as viewables  
+import opengeode as og
+import opengeode_io as og_io
+import opengeode_inspector as og_inspector
+import opengeode_geosciences as og_gs
+import opengeode_geosciencesio as og_gs_io
+import geode_viewables as viewables
 
 # Local application imports
-from .geode_objects.geode_brep import GeodeBRep
 
 
 GeodeType = Literal["BRep"]
 
+
 def to_geode_type(value: str) -> GeodeType:
-    allowed = get_args(GeodeType) 
+    allowed = get_args(GeodeType)
     if value not in allowed:
         raise ValueError(f"Invalid GeodeType: {value!r}. Must be one of {allowed}")
     return cast(GeodeType, value)
+
 
 ViewerType = Literal["mesh", "model"]
 
 
 class GeodeObject(ABC):
-    geode_type: GeodeType
-    object_type: ViewerType
-    is_3D: bool
-    is_viewable: bool
+    identifier: og.Identifier
 
-    def __init__(self, geode_type: GeodeType, object_type: ViewerType, is_3D: bool = True, is_viewable: bool = True) -> None:
-        self.object_type = object_type
-        self.is_3D = is_3D
-        self.is_viewable = is_viewable
-
-    @abstractmethod
-    def builder(self) -> Any:
-        ...
+    def __init__(self, identifier: og.Identifier | None = None) -> None:
+        self.identifier = identifier if identifier is not None else og.Identifier()
 
     @classmethod
     @abstractmethod
-    def load(self, filename: str) -> GeodeObject:
-        ...
+    def geode_type(cls) -> GeodeType: ...
 
     @classmethod
     @abstractmethod
-    def additional_files(cls, filename: str) -> Any:
-        ...
+    def viewer_type(cls) -> ViewerType: ...
 
     @classmethod
     @abstractmethod
-    def is_loadable(cls, filename: str) -> og.Percentage:
-        ...
+    def is_3D(cls) -> bool: ...
 
     @classmethod
     @abstractmethod
-    def input_extensions(cls) -> list[str]:
-        ...
+    def is_viewable(cls) -> bool: ...
+
+    @abstractmethod
+    def builder(self) -> Any: ...
 
     @classmethod
     @abstractmethod
-    def object_priority(cls, filename: str) -> int:
-        ...
+    def is_loadable(cls, filename: str) -> og.Percentage: ...
 
     @classmethod
     @abstractmethod
-    def output_extensions(cls) -> list[str]:
-        ...
+    def load(cls, filename: str) -> GeodeObject: ...
+
+    @classmethod
+    @abstractmethod
+    def additional_files(cls, filename: str) -> og.AdditionalFiles: ...
 
     @abstractmethod
-    def is_saveable(self, filename: str) -> bool:
-        ...
+    def native_extension(cls) -> str: ...
+
+    @classmethod
+    @abstractmethod
+    def input_extensions(cls) -> list[str]: ...
+
+    @classmethod
+    @abstractmethod
+    def object_priority(cls, filename: str) -> int: ...
+
+    @classmethod
+    @abstractmethod
+    def output_extensions(cls) -> list[str]: ...
 
     @abstractmethod
-    def save(self, filename: str) -> list[str]:
-        ...
+    def is_saveable(self, filename: str) -> bool: ...
 
     @abstractmethod
-    def save_viewable(self, filename_without_extension: str) -> str:
-        ...
+    def save(self, filename: str) -> list[str]: ...
 
     @abstractmethod
-    def save_light_viewable(self, filename_without_extension: str) -> str:
-        ...
+    def save_viewable(self, filename_without_extension: str) -> str: ...
 
-
-geode_objects: dict[GeodeType, type[GeodeObject]] = {"BRep": GeodeBRep}
-
+    @abstractmethod
+    def save_light_viewable(self, filename_without_extension: str) -> str: ...
 
 
 mesh = "mesh"
@@ -99,7 +99,6 @@ points = "points"
 edges = "edges"
 polygons = "polygons"
 polyhedrons = "polyhedrons"
-
 
 
 # def geode_objects_dict():

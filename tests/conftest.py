@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Generator
 
 # Third party imports
+from flask.ctx import AppContext
+from flask.testing import FlaskClient
 import pytest
 
 # Local application imports
@@ -47,20 +49,20 @@ def configure_test_environment() -> Generator[None, None, None]:
 
 
 @pytest.fixture
-def client():
+def client() -> Generator[FlaskClient, None, None]:
     app.config["REQUEST_COUNTER"] = 0
     app.config["LAST_REQUEST_TIME"] = time.time()
     client = app.test_client()
-    client.headers = {"Content-type": "application/json", "Accept": "application/json"}
+    # client.headers = {"Content-type": "application/json", "Accept": "application/json"}
     yield client
 
 
 @pytest.fixture
-def app_context():
-    with app.app_context():
-        yield
+def app_context() -> Generator[AppContext, None, None]:
+    with app.app_context() as ctx:
+        yield ctx
 
 
 @pytest.fixture
-def test_id():
+def test_id() -> str:
     return TEST_ID
