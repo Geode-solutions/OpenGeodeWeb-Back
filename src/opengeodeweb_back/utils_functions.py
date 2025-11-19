@@ -20,7 +20,7 @@ from opengeodeweb_microservice.database.connection import get_session
 # Local application imports
 from . import geode_functions
 from .geode_objects import geode_objects
-from .geode_objects.geode_object import GeodeType, GeodeObject
+from .geode_objects.geode_object import GeodeObjectType, GeodeObject
 
 
 def increment_request_counter(current_app: flask.Flask) -> None:
@@ -210,7 +210,7 @@ def save_all_viewables_and_return_info(
             "name": geode_object.identifier.name(),
             "viewer_type": data.viewer_object,
             "binary_light_viewable": binary_light_viewable.decode("utf-8"),
-            "geode_type": data.geode_object,
+            "geode_object_type": data.geode_object,
             "input_file": data.input_file or "",
             "additional_files": data.additional_files or [],
         }
@@ -220,7 +220,7 @@ def generate_native_viewable_and_light_viewable_from_object(
     geode_object: GeodeObject,
 ) -> dict[str, str | list[str]]:
     data = Data.create(
-        geode_object=geode_object.geode_type(),
+        geode_object=geode_object.geode_object_type(),
         viewer_object=geode_object.viewer_type(),
     )
     data_path = create_data_folder_from_id(data.id)
@@ -228,11 +228,11 @@ def generate_native_viewable_and_light_viewable_from_object(
 
 
 def generate_native_viewable_and_light_viewable_from_file(
-    geode_type: GeodeType, input_filename: str
+    geode_object_type: GeodeObjectType, input_filename: str
 ) -> dict[str, str | list[str]]:
-    generic_geode_object = geode_objects[geode_type]
+    generic_geode_object = geode_objects[geode_object_type]
     data = Data.create(
-        geode_object=geode_type,
+        geode_object=geode_object_type,
         viewer_object=generic_geode_object.viewer_type(),
         input_file=input_filename,
     )

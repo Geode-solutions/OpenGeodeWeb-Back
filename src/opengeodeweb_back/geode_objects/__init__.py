@@ -12,11 +12,20 @@ import opengeode_geosciencesio as og_gs_io
 import geode_viewables as viewables
 
 # Local application imports
-from .geode_object import GeodeType, GeodeObject
+from .types import GeodeObjectType, GeodeMeshType, GeodeModelType
+from .geode_object import GeodeObject
+from .geode_model import GeodeModel
+from .geode_mesh import GeodeMesh
 from .geode_brep import GeodeBRep
 
 
-geode_objects: dict[GeodeType, type[GeodeObject]] = {"BRep": GeodeBRep}
+geode_meshes: dict[GeodeMeshType, type[GeodeMesh]] = {}
+geode_models: dict[GeodeModelType, type[GeodeModel]] = {"BRep": GeodeBRep}
+
+GeodeObjectsDict = dict[GeodeObjectType, type[GeodeObject]]
+geode_objects: GeodeObjectsDict = {}
+geode_objects.update(cast(GeodeObjectsDict, geode_meshes))
+geode_objects.update(cast(GeodeObjectsDict, geode_models))
 
 
 mesh = "mesh"

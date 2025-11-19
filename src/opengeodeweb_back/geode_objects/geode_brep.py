@@ -1,10 +1,17 @@
+# Standard library imports
+from __future__ import annotations
+
+# Third party imports
 import opengeode as og
+import opengeode_inspector as og_inspector
 import geode_viewables as viewables
 
-from .geode_object import GeodeObject, GeodeType, ViewerType
+# Local application imports
+from .types import GeodeModelType, ViewerType
+from .geode_model import GeodeModel, ComponentRegistry
 
 
-class GeodeBRep(GeodeObject):
+class GeodeBRep(GeodeModel):
     brep: og.BRep
 
     def __init__(self, brep: og.BRep | None = None) -> None:
@@ -12,12 +19,8 @@ class GeodeBRep(GeodeObject):
         super().__init__(self.brep)
 
     @classmethod
-    def geode_type(cls) -> GeodeType:
+    def geode_model_type(cls) -> GeodeModelType:
         return "BRep"
-
-    @classmethod
-    def viewer_type(cls) -> ViewerType:
-        return "model"
 
     def native_extension(self) -> str:
         return self.brep.native_extension()
@@ -34,7 +37,7 @@ class GeodeBRep(GeodeObject):
         return og.BRepBuilder(self.brep)
 
     @classmethod
-    def load(self, filename: str) -> "GeodeBRep":
+    def load_model(cls, filename: str) -> GeodeBRep:
         return GeodeBRep(og.load_brep(filename))
 
     @classmethod
@@ -68,3 +71,9 @@ class GeodeBRep(GeodeObject):
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_brep(self.brep, filename_without_extension)
+
+    def mesh_components(self) -> ComponentRegistry:
+        return self.brep.mesh_components()
+
+    def inspect(self) -> og_inspector.BRepInspectionResult:
+        return og_inspector.inspect_brep(self.brep)

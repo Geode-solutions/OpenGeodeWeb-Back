@@ -16,7 +16,6 @@ from pathlib import Path
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_back import geode_functions, utils_functions
-from opengeodeweb_back.geode_objects.geode_object import to_geode_type
 from opengeodeweb_back.geode_objects.geode_brep import GeodeBRep
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
@@ -112,7 +111,7 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
         additional_files = ["additional_file.txt"]
 
         data_entry = Data.create(
-            geode_object=geode_object.geode_type(),
+            geode_object=geode_object.geode_object_type(),
             viewer_object=geode_object.viewer_type(),
             input_file=input_file,
             additional_files=additional_files,
@@ -135,14 +134,14 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
         assert re.match(r"[0-9a-f]{32}", result["id"])
         assert isinstance(result["viewer_type"], str)
         assert isinstance(result["binary_light_viewable"], str)
-        assert result["geode_type"] == geode_object.geode_type()
+        assert result["geode_object_type"] == geode_object.geode_object_type()
         assert result["input_file"] == input_file
 
         db_entry = Data.get(result["id"])
         assert db_entry is not None
         assert db_entry.native_file_name == result["native_file_name"]
         assert db_entry.viewable_file_name == result["viewable_file_name"]
-        assert db_entry.geode_object == geode_object.geode_type()
+        assert db_entry.geode_object == geode_object.geode_object_type()
         assert db_entry.input_file == input_file
         assert db_entry.additional_files == additional_files
 
@@ -156,7 +155,7 @@ def test_save_all_viewables_commits_to_db(client: FlaskClient) -> None:
         geode_object = GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
         input_file = "test.og_brep"
         data_entry = Data.create(
-            geode_object=geode_object.geode_type(),
+            geode_object=geode_object.geode_object_type(),
             viewer_object=geode_object.viewer_type(),
             input_file=input_file,
             additional_files=[],
@@ -203,10 +202,8 @@ def test_generate_native_viewable_and_light_viewable_from_file(
 ) -> None:
     app = client.application
     with app.app_context():
-        geode_type = to_geode_type("BRep")
-        input_filename = "test.og_brep"
         result = utils_functions.generate_native_viewable_and_light_viewable_from_file(
-            geode_type, input_filename
+            GeodeBRep.geode_object_type(), "test.og_brep"
         )
 
     assert isinstance(result, dict)

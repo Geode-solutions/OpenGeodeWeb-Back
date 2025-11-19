@@ -2,20 +2,24 @@
 import os
 import time
 import shutil
+from typing import Any
 
 # Third party imports
 import flask
 import werkzeug
 import zipfile
+import opengeode_geosciences as og_geosciences
 from opengeodeweb_microservice.schemas import get_schemas_dict
-
-# Local application imports
-from opengeodeweb_back import geode_functions, utils_functions
-from .models import blueprint_models
-from . import schemas
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_microservice.database import connection
+
+# Local application imports
+from .models import blueprint_models
+from . import schemas
+from opengeodeweb_back import geode_functions, utils_functions
+from opengeodeweb_back.geode_objects import geode_objects
+from opengeodeweb_back.geode_objects.types import geode_object_type
 
 routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
 
@@ -36,7 +40,10 @@ schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas
 def allowed_files() -> flask.Response:
     utils_functions.validate_request(flask.request, schemas_dict["allowed_files"])
     params = schemas.AllowedFiles.from_dict(flask.request.get_json())
-    extensions = geode_functions.list_input_extensions(params.supported_feature)
+    extensions: set[str] = set()
+    for geode_object in geode_objects.values():
+        for extension in geode_object.input_extensions():
+            extensions.add(extension)
     return flask.make_response({"extensions": extensions}, 200)
 
 
@@ -63,30 +70,20 @@ def allowed_objects() -> flask.Response:
     utils_functions.validate_request(flask.request, schemas_dict["allowed_objects"])
     params = schemas.AllowedObjects.from_dict(flask.request.get_json())
     file_absolute_path = geode_functions.upload_file_path(params.filename)
-    allowed_objects = geode_functions.list_geode_objects(
-        file_absolute_path, params.supported_feature
+    file_extension = utils_functions.extension_from_filename(
+        os.path.basename(file_absolute_path)
     )
+    allowed_objects = {}
+    for geode_object_type, geode_object in geode_objects.items():
+        if file_extension not in geode_object.input_extensions():
+            continue
+        loadability_score = geode_object.is_loadable(file_absolute_path)
+        priority_score = geode_object.object_priority(file_absolute_path)
+        allowed_objects[geode_object] = {
+            "is_loadable": loadability_score,
+            "object_priority": priority_score,
+        }
     return flask.make_response({"allowed_objects": allowed_objects}, 200)
-
-
-# def list_geode_objects(
-#     file_absolute_path: str,
-#     key: str | None = None,
-# ):
-#     return_dict = {}
-#     file_extension = utils_functions.extension_from_filename(
-#         os.path.basename(file_absolute_path)
-#     )
-#     geode_objects_filtered_list = filter_geode_objects(key)
-#     for geode_object in geode_objects_filtered_list:
-#         if has_creator(geode_object, file_extension):
-#             loadability_score = is_loadable(geode_object, file_absolute_path)
-#             priority_score = object_priority(geode_object, file_absolute_path)
-#             return_dict[geode_object] = {
-#                 "is_loadable": loadability_score,
-#                 "object_priority": priority_score,
-#             }
-#     return return_dict
 
 
 @routes.route(
@@ -97,23 +94,20 @@ def missing_files() -> flask.Response:
     utils_functions.validate_request(flask.request, schemas_dict["missing_files"])
     params = schemas.MissingFiles.from_dict(flask.request.get_json())
     file_path = geode_functions.upload_file_path(params.filename)
-
-    additional_files = geode_functions.additional_files(
-        params.input_geode_object,
+    geode_object = geode_functions.geode_object_from_string(params.geode_object_type)
+    additional_files = geode_object.additional_files(
         file_path,
     )
-
     has_missing_files = any(
         file.is_missing
         for file in additional_files.mandatory_files + additional_files.optional_files
     )
-
     mandatory_files = [
         os.path.basename(file.filename)
         for file in additional_files.mandatory_files
         if file.is_missing
     ]
-    additional_files = [
+    additional_files_array = [
         os.path.basename(file.filename)
         for file in additional_files.optional_files
         if file.is_missing
@@ -123,7 +117,7 @@ def missing_files() -> flask.Response:
         {
             "has_missing_files": has_missing_files,
             "mandatory_files": mandatory_files,
-            "additional_files": additional_files,
+            "additional_files": additional_files_array,
         },
         200,
     )
@@ -138,7 +132,12 @@ def crs_converter_geographic_coordinate_systems() -> flask.Response:
         flask.request, schemas_dict["geographic_coordinate_systems"]
     )
     params = schemas.GeographicCoordinateSystems.from_dict(flask.request.get_json())
-    infos = geode_functions.geographic_coordinate_systems(params.input_geode_object)
+    geode_object = geode_functions.geode_object_from_string(params.geode_object_type)
+    infos = (
+        og_geosciences.GeographicCoordinateSystem3D.geographic_coordinate_systems()
+        if geode_object.is_3D()
+        else og_geosciences.GeographicCoordinateSystem2D.geographic_coordinate_systems()
+    )
     crs_list = []
     for info in infos:
         crs = {}
@@ -146,15 +145,7 @@ def crs_converter_geographic_coordinate_systems() -> flask.Response:
         crs["code"] = info.code
         crs["authority"] = info.authority
         crs_list.append(crs)
-
     return flask.make_response({"crs_list": crs_list}, 200)
-
-
-# def geographic_coordinate_systems(geode_type: GeodeType):
-#     if is_3D(geode_object):
-#         return og_gs.GeographicCoordinateSystem3D.geographic_coordinate_systems()
-#     else:
-#         return og_gs.GeographicCoordinateSystem2D.geographic_coordinate_systems()
 
 
 @routes.route(
@@ -165,36 +156,40 @@ def inspect_file() -> flask.Response:
     utils_functions.validate_request(flask.request, schemas_dict["inspect_file"])
     params = schemas.InspectFile.from_dict(flask.request.get_json())
     file_path = geode_functions.upload_file_path(params.filename)
-    data = geode_functions.load(params.input_geode_object, file_path)
-    class_inspector = geode_functions.inspect(params.input_geode_object, data)
-    inspection_result = geode_functions.get_inspector_children(class_inspector)
+    geode_object = geode_functions.geode_object_from_string(
+        params.geode_object_type
+    ).load(file_path)
+    inspection_data = geode_object.inspect()
+    inspection_result = extract_inspector_result(inspection_data)
     return flask.make_response({"inspection_result": inspection_result}, 200)
 
 
-# def get_inspector_children(obj):
-#     new_object = {}
+def extract_inspector_result(inspection_data: Any) -> object:
+    new_object = {}
 
-#     if "inspection_type" in dir(obj):
-#         new_object["title"] = obj.inspection_type()
-#         new_object["nb_issues"] = 0
-#         new_object["children"] = []
-#         for child in dir(obj):
-#             if not child.startswith("__") and not child in [
-#                 "inspection_type",
-#                 "string",
-#             ]:
-#                 child_instance = obj.__getattribute__(child)
-#                 child_object = get_inspector_children(child_instance)
-#                 new_object["children"].append(child_object)
-#                 new_object["nb_issues"] += child_object["nb_issues"]
-#     else:
-#         new_object["title"] = obj.description()
-#         nb_issues = obj.nb_issues()
-#         new_object["nb_issues"] = nb_issues
-#         if nb_issues > 0:
-#             issues = obj.string().split("\n")
-#             new_object["issues"] = issues
-#     return new_object
+    if hasattr(inspection_data, "inspection_type"):
+        new_object["title"] = inspection_data.inspection_type()
+        new_object["nb_issues"] = 0
+        new_object["children"] = []
+        for child in dir(inspection_data):
+            if child.startswith("__") or child in [
+                "inspection_type",
+                "string",
+            ]:
+                continue
+            child_instance = getattr(inspection_data, child)
+            child_object = extract_inspector_result(child_instance)
+            new_object["children"].append(child_object)
+            if hasattr(child_object, "nb_issues"):
+                new_object["nb_issues"] += child_object.nb_issues()
+    else:
+        new_object["title"] = inspection_data.description()
+        nb_issues = inspection_data.nb_issues()
+        new_object["nb_issues"] = nb_issues
+        if nb_issues > 0:
+            issues = inspection_data.string().split("\n")
+            new_object["issues"] = issues
+    return new_object
 
 
 @routes.route(
@@ -207,34 +202,16 @@ def geode_objects_and_output_extensions() -> flask.Response:
     )
     params = schemas.GeodeObjectsAndOutputExtensions.from_dict(flask.request.get_json())
     file_path = geode_functions.upload_file_path(params.filename)
-    data = geode_functions.load(
-        params.input_geode_object,
-        file_path,
-    )
+    geode_object = geode_functions.geode_object_from_string(
+        params.geode_object_type
+    ).load(file_path)
     geode_objects_and_output_extensions = (
-        geode_functions.geode_objects_output_extensions(params.input_geode_object, data)
+        geode_functions.geode_object_output_extensions(geode_object)
     )
     return flask.make_response(
         {"geode_objects_and_output_extensions": geode_objects_and_output_extensions},
         200,
     )
-
-
-# def geode_objects_output_extensions(geode_type: GeodeType, data):
-#     geode_objects_output_extensions_dict = {}
-#     output_extensions = geode_object_output_extensions(geode_object)
-#     extensions_dict = {}
-#     for output_extension in output_extensions:
-#         bool_is_saveable = is_saveable(geode_object, data, f"test.{output_extension}")
-#         extensions_dict[output_extension] = {"is_saveable": bool_is_saveable}
-#     geode_objects_output_extensions_dict[geode_object] = extensions_dict
-
-#     if "parent" in geode_objects[geode_type].keys():
-#         parent_geode_object = geode_objects[geode_type]["parent"]
-#         geode_objects_output_extensions_dict.update(
-#             geode_objects_output_extensions(parent_geode_object, data)
-#         )
-#     return geode_objects_output_extensions_dict
 
 
 @routes.route(
@@ -246,7 +223,7 @@ def save_viewable_file() -> flask.Response:
     params = schemas.SaveViewableFile.from_dict(flask.request.get_json())
     return flask.make_response(
         utils_functions.generate_native_viewable_and_light_viewable_from_file(
-            geode_object=params.input_geode_object,
+            geode_object_type=geode_object_type(params.geode_object_type),
             input_filename=params.filename,
         ),
         200,
@@ -260,7 +237,7 @@ def save_viewable_file() -> flask.Response:
 def texture_coordinates() -> flask.Response:
     utils_functions.validate_request(flask.request, schemas_dict["texture_coordinates"])
     params = schemas.TextureCoordinates.from_dict(flask.request.get_json())
-    data = geode_functions.load_data(params.id)
+    data = geode_functions.load_object_data(params.id)
     texture_coordinates = data.texture_manager().texture_names()
     return flask.make_response({"texture_coordinates": texture_coordinates}, 200)
 
@@ -274,7 +251,7 @@ def vertex_attribute_names() -> flask.Response:
         flask.request, schemas_dict["vertex_attribute_names"]
     )
     params = schemas.VertexAttributeNames.from_dict(flask.request.get_json())
-    data = geode_functions.load_data(params.id)
+    data = geode_functions.load_object_data(params.id)
     vertex_attribute_names = data.vertex_attribute_manager().attribute_names()
     return flask.make_response(
         {
@@ -293,7 +270,7 @@ def polygon_attribute_names() -> flask.Response:
         flask.request, schemas_dict["polygon_attribute_names"]
     )
     params = schemas.PolygonAttributeNames.from_dict(flask.request.get_json())
-    data = geode_functions.load_data(params.id)
+    data = geode_functions.load_object_data(params.id)
     polygon_attribute_names = data.polygon_attribute_manager().attribute_names()
     return flask.make_response(
         {
@@ -312,7 +289,7 @@ def polyhedron_attribute_names() -> flask.Response:
         flask.request, schemas_dict["polyhedron_attribute_names"]
     )
     params = schemas.PolyhedronAttributeNames.from_dict(flask.request.get_json())
-    data = geode_functions.load_data(params.id)
+    data = geode_functions.load_object_data(params.id)
     polyhedron_attribute_names = data.polyhedron_attribute_manager().attribute_names()
     return flask.make_response(
         {
@@ -446,25 +423,27 @@ def import_project() -> flask.Response:
                 rows = session.query(Data).all()
 
         with get_session() as session:
-            for data_entry in rows:
-                data_path = geode_functions.data_file_path(data_entry.id)
-                viewable_name = data_entry.viewable_file_name
+            for data in rows:
+                data_path = geode_functions.data_file_path(data.id)
+                viewable_name = data.viewable_file_name
                 if viewable_name:
-                    vpath = geode_functions.data_file_path(data_entry.id, viewable_name)
+                    vpath = geode_functions.data_file_path(data.id, viewable_name)
                     if os.path.isfile(vpath):
                         continue
 
-                input_file = str(data_entry.input_file or "")
+                input_file = str(data.input_file or "")
                 if not input_file:
                     continue
 
-                input_full = geode_functions.data_file_path(data_entry.id, input_file)
+                input_full = geode_functions.data_file_path(data.id, input_file)
                 if not os.path.isfile(input_full):
                     continue
 
-                data_object = geode_functions.load(data_entry.geode_object, input_full)
+                geode_object = geode_functions.geode_object_from_string(
+                    data.geode_object
+                ).load(input_full)
                 utils_functions.save_all_viewables_and_return_info(
-                    data_entry.geode_object, data_object, data_entry, data_path
+                    geode_object, data, data_path
                 )
             session.commit()
 

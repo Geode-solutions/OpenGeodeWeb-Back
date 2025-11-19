@@ -16,11 +16,16 @@ data_dir = os.path.join(base_dir, "data")
 
 def test_allowed_files(client: FlaskClient) -> None:
     route = f"/opengeodeweb_back/allowed_files"
-    get_full_data = lambda: {"supported_feature": "None"}
+
+    def get_full_data() -> test_utils.JsonData:
+        return {
+            "filename": "corbi.og_brep",
+        }
+
     json = get_full_data()
     response = client.post(route, json=json)
     assert response.status_code == 200
-    extensions = response.json["extensions"]
+    extensions = response.get_json()["extensions"]
     assert type(extensions) is list
     for extension in extensions:
         assert type(extension) is str
@@ -32,16 +37,15 @@ def test_allowed_files(client: FlaskClient) -> None:
 def test_allowed_objects(client: FlaskClient) -> None:
     route = f"/opengeodeweb_back/allowed_objects"
 
-    def get_full_data():
+    def get_full_data() -> test_utils.JsonData:
         return {
             "filename": "corbi.og_brep",
-            "supported_feature": None,
         }
 
     # Normal test with filename 'corbi.og_brep'
     response = client.post(route, json=get_full_data())
     assert response.status_code == 200
-    allowed_objects = response.json["allowed_objects"]
+    allowed_objects = response.get_json()["allowed_objects"]
     assert type(allowed_objects) is dict
     for allowed_object in allowed_objects:
         assert type(allowed_object) is str
@@ -50,7 +54,7 @@ def test_allowed_objects(client: FlaskClient) -> None:
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_upload_file(client, filename="test.og_brep"):
+def test_upload_file(client: FlaskClient, filename: str = "test.og_brep") -> None:
     file = os.path.join(data_dir, filename)
     print(f"{file=}", flush=True)
     response = client.put(
@@ -63,18 +67,18 @@ def test_upload_file(client, filename="test.og_brep"):
 def test_missing_files(client: FlaskClient) -> None:
     route = f"/opengeodeweb_back/missing_files"
 
-    def get_full_data():
+    def get_full_data() -> test_utils.JsonData:
         return {
-            "input_geode_object": "BRep",
+            "geode_object_type": "BRep",
             "filename": "test.og_brep",
         }
 
     json = get_full_data()
     response = client.post(route, json=json)
     assert response.status_code == 200
-    has_missing_files = response.json["has_missing_files"]
-    mandatory_files = response.json["mandatory_files"]
-    additional_files = response.json["additional_files"]
+    has_missing_files = response.get_json()["has_missing_files"]
+    mandatory_files = response.get_json()["mandatory_files"]
+    additional_files = response.get_json()["additional_files"]
     assert type(has_missing_files) is bool
     assert type(mandatory_files) is list
     assert type(additional_files) is list
@@ -85,11 +89,15 @@ def test_missing_files(client: FlaskClient) -> None:
 
 def test_geographic_coordinate_systems(client: FlaskClient) -> None:
     route = f"/opengeodeweb_back/geographic_coordinate_systems"
-    get_full_data = lambda: {"input_geode_object": "BRep"}
-    # Normal test with geode_object 'BRep'
+
+    def get_full_data() -> test_utils.JsonData:
+        return {
+            "geode_object_type": "BRep",
+        }
+
     response = client.post(route, json=get_full_data())
     assert response.status_code == 200
-    crs_list = response.json["crs_list"]
+    crs_list = response.get_json()["crs_list"]
     assert type(crs_list) is list
     for crs in crs_list:
         assert type(crs) is dict
@@ -101,9 +109,9 @@ def test_geographic_coordinate_systems(client: FlaskClient) -> None:
 def test_inspect_file(client: FlaskClient) -> None:
     route = f"/opengeodeweb_back/inspect_file"
 
-    def get_full_data():
+    def get_full_data() -> test_utils.JsonData:
         return {
-            "input_geode_object": "BRep",
+            "geode_object_type": "BRep",
             "filename": "corbi.og_brep",
         }
 
@@ -112,7 +120,7 @@ def test_inspect_file(client: FlaskClient) -> None:
     # Normal test with geode_object 'BRep'
     response = client.post(route, json=json)
     assert response.status_code == 200
-    inspection_result = response.json["inspection_result"]
+    inspection_result = response.get_json()["inspection_result"]
     assert type(inspection_result) is dict
 
     # Test all params
@@ -122,16 +130,16 @@ def test_inspect_file(client: FlaskClient) -> None:
 def test_geode_objects_and_output_extensions(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/geode_objects_and_output_extensions"
 
-    def get_full_data():
+    def get_full_data() -> test_utils.JsonData:
         return {
-            "input_geode_object": "BRep",
+            "geode_object_type": "BRep",
             "filename": "corbi.og_brep",
         }
 
     response = client.post(route, json=get_full_data())
 
     assert response.status_code == 200
-    geode_objects_and_output_extensions = response.json[
+    geode_objects_and_output_extensions = response.get_json()[
         "geode_objects_and_output_extensions"
     ]
     assert type(geode_objects_and_output_extensions) is dict
@@ -149,32 +157,32 @@ def test_save_viewable_file(client: FlaskClient) -> None:
     test_upload_file(client, filename="corbi.og_brep")
     route = f"/opengeodeweb_back/save_viewable_file"
 
-    def get_full_data():
+    def get_full_data() -> test_utils.JsonData:
         return {
-            "input_geode_object": "BRep",
+            "geode_object_type": "BRep",
             "filename": "corbi.og_brep",
         }
 
     # Normal test with filename 'corbi.og_brep'
     response = client.post(route, json=get_full_data())
     assert response.status_code == 200
-    native_file_name = response.json["native_file_name"]
+    native_file_name = response.get_json()["native_file_name"]
     assert type(native_file_name) is str
-    viewable_file_name = response.json["viewable_file_name"]
+    viewable_file_name = response.get_json()["viewable_file_name"]
     assert type(viewable_file_name) is str
-    id = response.json.get("id")
+    id = response.get_json().get("id")
     assert type(id) is str
-    object_type = response.json["object_type"]
+    object_type = response.get_json()["object_type"]
     assert type(object_type) is str
     assert object_type in ["model", "mesh"]
-    binary_light_viewable = response.json["binary_light_viewable"]
+    binary_light_viewable = response.get_json()["binary_light_viewable"]
     assert type(binary_light_viewable) is str
 
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_texture_coordinates(client, test_id):
+def test_texture_coordinates(client: FlaskClient, test_id: str) -> None:
     with client.application.app_context():
         file = os.path.join(data_dir, "hat.vtp")
         data = Data.create(
@@ -194,13 +202,13 @@ def test_texture_coordinates(client, test_id):
         "/opengeodeweb_back/texture_coordinates", json={"id": data.id}
     )
     assert response.status_code == 200
-    texture_coordinates = response.json["texture_coordinates"]
+    texture_coordinates = response.get_json()["texture_coordinates"]
     assert type(texture_coordinates) is list
     for texture_coordinate in texture_coordinates:
         assert type(texture_coordinate) is str
 
 
-def test_vertex_attribute_names(client, test_id):
+def test_vertex_attribute_names(client: FlaskClient, test_id: str) -> None:
     route = f"/opengeodeweb_back/vertex_attribute_names"
 
     with client.application.app_context():
@@ -220,13 +228,13 @@ def test_vertex_attribute_names(client, test_id):
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     assert response.status_code == 200
-    vertex_attribute_names = response.json["vertex_attribute_names"]
+    vertex_attribute_names = response.get_json()["vertex_attribute_names"]
     assert type(vertex_attribute_names) is list
     for vertex_attribute_name in vertex_attribute_names:
         assert type(vertex_attribute_name) is str
 
 
-def test_polygon_attribute_names(client, test_id):
+def test_polygon_attribute_names(client: FlaskClient, test_id: str) -> None:
     route = f"/opengeodeweb_back/polygon_attribute_names"
 
     with client.application.app_context():
@@ -246,13 +254,13 @@ def test_polygon_attribute_names(client, test_id):
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     assert response.status_code == 200
-    polygon_attribute_names = response.json["polygon_attribute_names"]
+    polygon_attribute_names = response.get_json()["polygon_attribute_names"]
     assert type(polygon_attribute_names) is list
     for polygon_attribute_name in polygon_attribute_names:
         assert type(polygon_attribute_name) is str
 
 
-def test_polyhedron_attribute_names(client, test_id):
+def test_polyhedron_attribute_names(client: FlaskClient, test_id: str) -> None:
     route = f"/opengeodeweb_back/polyhedron_attribute_names"
 
     with client.application.app_context():
@@ -271,9 +279,9 @@ def test_polyhedron_attribute_names(client, test_id):
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
-    print(response.json)
+    print(response.get_json())
     assert response.status_code == 200
-    polyhedron_attribute_names = response.json["polyhedron_attribute_names"]
+    polyhedron_attribute_names = response.get_json()["polyhedron_attribute_names"]
     assert type(polyhedron_attribute_names) is list
     for polyhedron_attribute_name in polyhedron_attribute_names:
         assert type(polyhedron_attribute_name) is str

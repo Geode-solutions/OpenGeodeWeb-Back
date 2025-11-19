@@ -1,27 +1,26 @@
 # Standard library imports
 import os
 import uuid
-from typing import get_args
 
 # Third party imports
 
 # Local application imports
 from opengeodeweb_back import geode_functions
 from opengeodeweb_back.geode_objects import geode_objects
-from opengeodeweb_back.geode_objects.geode_object import GeodeType
+from opengeodeweb_back.geode_objects.types import GeodeObjectType_values
 
 
 data_folder = os.path.join(os.path.dirname(__file__), "data")
 
 
 def test_geode_objects() -> None:
-    for geode_type in get_args(GeodeType):
-        assert geode_type in geode_objects
+    for geode_object_type in GeodeObjectType_values:
+        assert geode_object_type in geode_objects
 
 
 def test_input_output() -> None:
     for generic_geode_object in geode_objects.values():
-        print(f"\n{generic_geode_object.geode_type()=}")
+        print(f"\n{generic_geode_object.geode_object_type()=}")
         for input_extension in generic_geode_object.input_extensions():
             print(f"\t{input_extension=}")
             file_absolute_path = os.path.join(data_folder, f"test.{input_extension}")
@@ -44,10 +43,10 @@ def test_input_output() -> None:
             )
             assert type(geode_objects_output_extensions) is dict
             for (
-                output_geode_type,
+                output_geode_object_type,
                 output_geode_extensions,
             ) in geode_objects_output_extensions.items():
-                print(f"\t\t{output_geode_type=}")
+                print(f"\t\t{output_geode_object_type=}")
                 for (
                     output_extension,
                     output_is_saveable,
@@ -56,7 +55,7 @@ def test_input_output() -> None:
                     uu_id = str(uuid.uuid4()).replace("-", "")
                     filename = f"{uu_id}.{output_extension}"
                     if output_is_saveable:
-                        saved_files = geode_objects[output_geode_type].save(
+                        saved_files = geode_objects[output_geode_object_type].save(
                             geode_object,
                             os.path.join(os.path.abspath(f"./output"), filename),
                         )

@@ -5,26 +5,9 @@ from typing import Literal, Any, get_args, cast
 
 # Third party imports
 import opengeode as og
-import opengeode_io as og_io
-import opengeode_inspector as og_inspector
-import opengeode_geosciences as og_gs
-import opengeode_geosciencesio as og_gs_io
-import geode_viewables as viewables
 
 # Local application imports
-
-
-GeodeType = Literal["BRep"]
-
-
-def to_geode_type(value: str) -> GeodeType:
-    allowed = get_args(GeodeType)
-    if value not in allowed:
-        raise ValueError(f"Invalid GeodeType: {value!r}. Must be one of {allowed}")
-    return cast(GeodeType, value)
-
-
-ViewerType = Literal["mesh", "model"]
+from .types import GeodeObjectType, ViewerType
 
 
 class GeodeObject(ABC):
@@ -35,7 +18,7 @@ class GeodeObject(ABC):
 
     @classmethod
     @abstractmethod
-    def geode_type(cls) -> GeodeType: ...
+    def geode_object_type(cls) -> GeodeObjectType: ...
 
     @classmethod
     @abstractmethod
@@ -90,6 +73,9 @@ class GeodeObject(ABC):
 
     @abstractmethod
     def save_light_viewable(self, filename_without_extension: str) -> str: ...
+
+    @abstractmethod
+    def inspect(self) -> Any: ...
 
 
 mesh = "mesh"
