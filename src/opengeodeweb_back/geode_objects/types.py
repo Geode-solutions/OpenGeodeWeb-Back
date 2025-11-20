@@ -7,8 +7,27 @@ from typing import Literal, get_args, cast
 
 
 GeodeSurfaceMeshType = Literal["PolygonalSurface3D"]
-GeodeMeshType = Literal["VertexSet"] | GeodeSurfaceMeshType
-GeodeModelType = Literal["BRep"]
+GeodeMeshType = (
+    Literal[
+        "VertexSet",
+        "Graph",
+        "PointSet2D",
+        "PointSet3D",
+        "EdgeCurve2D",
+        "EdgeCurve3D",
+        "RasterImage2D",
+        "RasterImage3D",
+    ]
+    | GeodeSurfaceMeshType
+)
+GeodeModelType = Literal[
+    "BRep",
+    "Section",
+    "StructuralModel",
+    "CrossSection",
+    "ImplicitStructuralModel",
+    "ImplicitCrossSection",
+]
 GeodeObjectType = GeodeMeshType | GeodeModelType
 
 
@@ -31,20 +50,24 @@ GeodeObjectType_values = _flatten_literal_args(GeodeObjectType)
 def geode_object_type(value: str) -> GeodeObjectType:
     if value not in GeodeObjectType_values:
         raise ValueError(
-            f"Invalid GeodeObjectType: {value!r}. Must be one of {allowed}"
+            f"Invalid GeodeObjectType: {value!r}. Must be one of {GeodeObjectType_values}"
         )
     return cast(GeodeObjectType, value)
 
 
 def geode_mesh_type(value: str) -> GeodeMeshType:
     if value not in GeodeMeshType_values:
-        raise ValueError(f"Invalid GeodeMeshType: {value!r}. Must be one of {allowed}")
+        raise ValueError(
+            f"Invalid GeodeMeshType: {value!r}. Must be one of {GeodeMeshType_values}"
+        )
     return cast(GeodeMeshType, value)
 
 
 def geode_model_type(value: str) -> GeodeModelType:
     if value not in GeodeModelType_values:
-        raise ValueError(f"Invalid GeodeModelType: {value!r}. Must be one of {allowed}")
+        raise ValueError(
+            f"Invalid GeodeModelType: {value!r}. Must be one of {GeodeModelType_values}"
+        )
     return cast(GeodeModelType, value)
 
 

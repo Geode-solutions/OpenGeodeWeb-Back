@@ -3,11 +3,12 @@ from __future__ import annotations
 
 # Third party imports
 import opengeode as og
+import opengeode_geosciences as og_geosciences
 import opengeode_inspector as og_inspector
 import geode_viewables as viewables
 
 # Local application imports
-from .types import GeodeModelType, ViewerType
+from .types import GeodeModelType
 from .geode_model import GeodeModel, ComponentRegistry
 
 
@@ -77,3 +78,25 @@ class GeodeBRep(GeodeModel):
 
     def inspect(self) -> og_inspector.BRepInspectionResult:
         return og_inspector.inspect_brep(self.brep)
+
+    # def assign_crs(
+    #     self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo3D
+    # ) -> None:
+    #     builder = self.builder()
+    #     og_geosciences.assign_brep_geographic_coordinate_system_info(
+    #         self.brep, builder, crs_name, info
+    #     )
+
+    # def convert_crs(
+    #     self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo3D
+    # ) -> None:
+    #     builder = self.builder()
+    #     og_geosciences.convert_brep_coordinate_reference_system(
+    #         self.brep, builder, crs_name, info
+    #     )
+
+    # def create_crs(
+    #     self, crs_name: str, input: og.CoordinateSystem2D, output: og.CoordinateSystem2D
+    # ) -> None:
+    #     builder = self.builder()
+    #     og.create_brep_coordinate_system(self.brep, builder, crs_name, input, output)
