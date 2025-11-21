@@ -74,6 +74,7 @@ def errorhandler(e: HTTPException) -> tuple[dict[str, Any], int] | Response:
 
 @app.errorhandler(Exception)
 def handle_generic_exception(e: Exception) -> Response:
+    print("handle_generic_exception:", str(e), flush=True)
     return flask.make_response({"error": str(e)}, 500)
 
 

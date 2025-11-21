@@ -80,7 +80,7 @@ def create_voi() -> flask.Response:
     if not aoi_data:
         flask.abort(404, f"AOI with id {params.aoi_id} not found")
 
-    aoi_object = geode_functions.load_data(params.aoi_id)
+    aoi_object = geode_functions.load_object_data(params.aoi_id)
 
     nb_points = aoi_object.nb_vertices()
 
