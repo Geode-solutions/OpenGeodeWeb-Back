@@ -4,7 +4,7 @@ import threading
 import time
 import zipfile
 from collections.abc import Callable
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, Future
 
 # Third party imports
 import flask
@@ -184,25 +184,30 @@ def save_all_viewables_and_return_info(
     data_path: str,
 ) -> dict[str, str | list[str]]:
     with ThreadPoolExecutor() as executor:
-        native_future = executor.submit(
-            geode_object.save,
-            os.path.join(data_path, "native." + geode_object.native_extension()),
+        (native_files, viewable_path, light_path) = executor.map(
+            lambda func_path: func_path[0](),
+            [
+                (
+                    geode_object.save,
+                    os.path.join(
+                        data_path, "native." + geode_object.native_extension()
+                    ),
+                ),
+                (geode_object.save_viewable, os.path.join(data_path, "viewable")),
+                (
+                    geode_object.save_light_viewable,
+                    os.path.join(data_path, "light_viewable"),
+                ),
+            ],
         )
-        viewable_future = executor.submit(
-            geode_object.save_viewable, os.path.join(data_path, "viewable")
-        )
-        light_viewable_future = executor.submit(
-            geode_object.save_light_viewable, os.path.join(data_path, "light_viewable")
-        )
-        saved_light_viewable_file_path = light_viewable_future.result()
-        with open(saved_light_viewable_file_path, "rb") as f:
+        with open(light_path, "rb") as f:
             binary_light_viewable = f.read()
-        saved_native_file_path = native_future.result()
-        saved_viewable_file_path = viewable_future.result()
-        data.native_file_name = os.path.basename(saved_native_file_path[0])
-        data.viewable_file_name = os.path.basename(saved_viewable_file_path)
-        data.light_viewable = os.path.basename(saved_light_viewable_file_path)
-
+        data.native_file_name = os.path.basename(native_files[0])
+        data.viewable_file_name = os.path.basename(viewable_path)
+        data.light_viewable = os.path.basename(light_path)
+        assert data.native_file_name is not None
+        assert data.viewable_file_name is not None
+        assert data.light_viewable is not None
         return {
             "native_file_name": data.native_file_name,
             "viewable_file_name": data.viewable_file_name,

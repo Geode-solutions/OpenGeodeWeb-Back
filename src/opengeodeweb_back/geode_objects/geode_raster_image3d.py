@@ -27,7 +27,7 @@ class GeodeRasterImage3D(GeodeMesh):
 
     @classmethod
     def is_3D(cls) -> bool:
-        return False
+        return True
 
     @classmethod
     def is_viewable(cls) -> bool:

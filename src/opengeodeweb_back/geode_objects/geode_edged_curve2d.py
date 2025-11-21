@@ -3,6 +3,7 @@ from __future__ import annotations
 
 # Third party imports
 import opengeode as og
+import opengeode_geosciences as og_geosciences
 import opengeode_inspector as og_inspector
 import geode_viewables as viewables
 
@@ -78,3 +79,27 @@ class GeodeEdgedCurve2D(GeodeGraph):
 
     def inspect(self) -> og_inspector.EdgedCurveInspectionResult:
         return og_inspector.inspect_edged_curve2D(self.edged_curve)
+
+    def assign_crs(
+        self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
+    ) -> None:
+        builder = self.builder()
+        og_geosciences.assign_edged_curve_geographic_coordinate_system_info2D(
+            self.edged_curve, builder, crs_name, info
+        )
+
+    def convert_crs(
+        self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
+    ) -> None:
+        builder = self.builder()
+        og_geosciences.convert_edged_curve_coordinate_reference_system2D(
+            self.edged_curve, builder, crs_name, info
+        )
+
+    def create_crs(
+        self, crs_name: str, input: og.CoordinateSystem2D, output: og.CoordinateSystem2D
+    ) -> None:
+        builder = self.builder()
+        og.create_edged_curve_coordinate_system2D(
+            self.edged_curve, builder, crs_name, input, output
+        )

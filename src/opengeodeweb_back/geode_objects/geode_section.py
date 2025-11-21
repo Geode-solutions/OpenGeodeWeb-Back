@@ -3,6 +3,7 @@ from __future__ import annotations
 
 # Third party imports
 import opengeode as og
+import opengeode_geosciences as og_geosciences
 import opengeode_inspector as og_inspector
 import geode_viewables as viewables
 
@@ -79,3 +80,27 @@ class GeodeSection(GeodeModel):
 
     def inspect(self) -> og_inspector.SectionInspectionResult:
         return og_inspector.inspect_section(self.section)
+
+    def assign_crs(
+        self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
+    ) -> None:
+        builder = self.builder()
+        og_geosciences.assign_section_geographic_coordinate_system_info(
+            self.section, builder, crs_name, info
+        )
+
+    def convert_crs(
+        self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
+    ) -> None:
+        builder = self.builder()
+        og_geosciences.convert_section_coordinate_reference_system(
+            self.section, builder, crs_name, info
+        )
+
+    def create_crs(
+        self, crs_name: str, input: og.CoordinateSystem2D, output: og.CoordinateSystem2D
+    ) -> None:
+        builder = self.builder()
+        og.create_section_coordinate_system(
+            self.section, builder, crs_name, input, output
+        )

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 # Third party imports
 import opengeode as og
+import opengeode_geosciences as og_geosciences
 import opengeode_inspector as og_inspector
 import geode_viewables as viewables
 
@@ -78,3 +79,27 @@ class GeodePointSet2D(GeodeVertexSet):
 
     def inspect(self) -> og_inspector.PointSetInspectionResult:
         return og_inspector.inspect_point_set2D(self.point_set)
+
+    def assign_crs(
+        self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
+    ) -> None:
+        builder = self.builder()
+        og_geosciences.assign_point_set_geographic_coordinate_system_info2D(
+            self.point_set, builder, crs_name, info
+        )
+
+    def convert_crs(
+        self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
+    ) -> None:
+        builder = self.builder()
+        og_geosciences.convert_point_set_coordinate_reference_system2D(
+            self.point_set, builder, crs_name, info
+        )
+
+    def create_crs(
+        self, crs_name: str, input: og.CoordinateSystem2D, output: og.CoordinateSystem2D
+    ) -> None:
+        builder = self.builder()
+        og.create_point_set_coordinate_system2D(
+            self.point_set, builder, crs_name, input, output
+        )
