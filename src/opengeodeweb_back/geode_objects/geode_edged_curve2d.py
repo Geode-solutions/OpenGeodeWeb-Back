@@ -34,7 +34,7 @@ class GeodeEdgedCurve2D(GeodeGraph):
 
     @classmethod
     def is_viewable(cls) -> bool:
-        return False
+        return True
 
     def builder(self) -> og.EdgedCurveBuilder2D:
         return og.EdgedCurveBuilder2D.create(self.edged_curve)

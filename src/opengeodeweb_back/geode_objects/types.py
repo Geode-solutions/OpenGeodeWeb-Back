@@ -5,28 +5,41 @@ from typing import Literal, get_args, cast
 
 # Local application imports
 
-
-GeodeMeshType = Literal[
-    "VertexSet",
-    "Graph",
+GeodePointMeshType = Literal[
     "PointSet2D",
     "PointSet3D",
+]
+GeodeEdgeMeshType = Literal[
     "EdgedCurve2D",
     "EdgedCurve3D",
+]
+GeodePolygonMeshType = Literal[
     "RasterImage2D",
-    "RasterImage3D",
     "PolygonalSurface2D",
     "PolygonalSurface3D",
     "TriangulatedSurface2D",
     "TriangulatedSurface3D",
     "RegularGrid2D",
+    "LightRegularGrid2D",
+]
+GeodePolyhedronMeshType = Literal[
+    "RasterImage3D",
     "PolyhedralSolid3D",
     "TetrahedralSolid3D",
     "HybridSolid3D",
     "RegularGrid3D",
-    "LightRegularGrid2D",
     "LightRegularGrid3D",
 ]
+GeodeMeshType = (
+    Literal[
+        "VertexSet",
+        "Graph",
+    ]
+    | GeodePointMeshType
+    | GeodeEdgeMeshType
+    | GeodePolygonMeshType
+    | GeodePolyhedronMeshType
+)
 GeodeModelType = Literal[
     "BRep",
     "Section",
