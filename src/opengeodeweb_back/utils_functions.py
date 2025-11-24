@@ -20,7 +20,8 @@ from opengeodeweb_microservice.database.connection import get_session
 # Local application imports
 from . import geode_functions
 from .geode_objects import geode_objects
-from .geode_objects.geode_object import GeodeObjectType, GeodeObject
+from .geode_objects.types import GeodeObjectType
+from .geode_objects.geode_object import GeodeObject
 
 
 def increment_request_counter(current_app: flask.Flask) -> None:

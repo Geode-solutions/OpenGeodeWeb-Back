@@ -78,3 +78,6 @@ class GeodeRasterImage3D(GeodeMesh):
 
     def inspect(self) -> None:
         return None
+
+    def vertex_attribute_manager(self) -> og.AttributeManager:
+        return og.AttributeManager()
