@@ -15,22 +15,6 @@ ComponentRegistry = dict[og.ComponentType, list[og.uuid]]
 
 class GeodeModel(GeodeObject):
     @classmethod
-    def load(cls, filename: str) -> GeodeObject:
-        return cls.load_model(filename)
-
-    @classmethod
-    @abstractmethod
-    def load_model(cls, filename: str) -> GeodeModel: ...
-
-    @classmethod
-    def geode_object_type(cls) -> GeodeObjectType:
-        return cls.geode_model_type()
-
-    @classmethod
-    @abstractmethod
-    def geode_model_type(cls) -> GeodeModelType: ...
-
-    @classmethod
     def viewer_type(cls) -> ViewerType:
         return "model"
 

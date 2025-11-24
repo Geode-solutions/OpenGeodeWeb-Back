@@ -18,22 +18,22 @@ class GeodePolygonalSurface3D(GeodeSurfaceMesh3D):
         self.polygonal_surface = (
             polygonal_surface
             if polygonal_surface is not None
-            else og.PolygonalSurface3D()
+            else og.PolygonalSurface3D.create()
         )
         super().__init__(self.polygonal_surface)
 
     @classmethod
-    def geode_mesh_type(cls) -> GeodeMeshType:
+    def geode_object_type(cls) -> GeodeMeshType:
         return "PolygonalSurface3D"
 
     def native_extension(self) -> str:
         return self.polygonal_surface.native_extension()
 
     def builder(self) -> og.PolygonalSurfaceBuilder3D:
-        return og.PolygonalSurfaceBuilder3D(self.polygonal_surface)
+        return og.PolygonalSurfaceBuilder3D.create(self.polygonal_surface)
 
     @classmethod
-    def load_mesh(cls, filename: str) -> GeodePolygonalSurface3D:
+    def load(cls, filename: str) -> GeodePolygonalSurface3D:
         return GeodePolygonalSurface3D(og.load_polygonal_surface3D(filename))
 
     @classmethod

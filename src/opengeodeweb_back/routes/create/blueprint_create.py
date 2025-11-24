@@ -9,6 +9,8 @@ from opengeodeweb_microservice.schemas import get_schemas_dict
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
 from . import schemas
+from opengeodeweb_back.geode_objects.geode_point_set3d import GeodePointSet3D
+from opengeodeweb_back.geode_objects.geode_edged_curve3d import GeodeEdgedCurve3D
 
 routes = flask.Blueprint("create", __name__, url_prefix="/create")
 schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas"))
@@ -24,15 +26,14 @@ def create_point() -> flask.Response:
     params = schemas.CreatePoint.from_dict(flask.request.get_json())
 
     # Create the point
-    pointset = geode_functions.geode_object_class("PointSet3D").create()
-    builder = geode_functions.create_builder("PointSet3D", pointset)
+    pointset = GeodePointSet3D()
+    builder = pointset.builder()
     builder.set_name(params.name)
     builder.create_point(opengeode.Point3D([params.x, params.y, params.z]))
 
     # Save and get info
     result = utils_functions.generate_native_viewable_and_light_viewable_from_object(
-        geode_object="PointSet3D",
-        data=pointset,
+        pointset
     )
     return flask.make_response(result, 200)
 
@@ -46,8 +47,8 @@ def create_aoi() -> flask.Response:
     params = schemas.CreateAoi.from_dict(flask.request.get_json())
 
     # Create the edged curve
-    edged_curve = geode_functions.geode_object_class("EdgedCurve3D").create()
-    builder = geode_functions.create_builder("EdgedCurve3D", edged_curve)
+    edged_curve = GeodeEdgedCurve3D()
+    builder = edged_curve.builder()
     builder.set_name(params.name)
 
     # Create vertices first
@@ -62,8 +63,7 @@ def create_aoi() -> flask.Response:
 
     # Save and get info
     result = utils_functions.generate_native_viewable_and_light_viewable_from_object(
-        geode_object="EdgedCurve3D",
-        data=edged_curve,
+        edged_curve
     )
     return flask.make_response(result, 200)
 
@@ -78,24 +78,27 @@ def create_voi() -> flask.Response:
 
     aoi_data = geode_functions.get_data_info(params.aoi_id)
     if not aoi_data:
-        flask.abort(404, f"AOI with id {params.aoi_id} not found")
+        flask.abort(500, f"AOI with id {params.aoi_id} not found")
 
-    aoi_object = geode_functions.load_object_data(params.aoi_id)
+    aoi_object = geode_functions.load_geode_object(params.aoi_id)
+    if not isinstance(aoi_object, GeodeEdgedCurve3D):
+        flask.abort(500, f"AOI with id {params.aoi_id} not a GeodeEdgedCurve3D")
 
-    nb_points = aoi_object.nb_vertices()
+    aoi_curve = aoi_object.edged_curve
+    nb_points = aoi_curve.nb_vertices()
 
-    edged_curve = geode_functions.geode_object_class("EdgedCurve3D").create()
-    builder = geode_functions.create_builder("EdgedCurve3D", edged_curve)
+    edged_curve = GeodeEdgedCurve3D()
+    builder = edged_curve.builder()
     builder.set_name(params.name)
 
     for point_id in range(nb_points):
-        aoi_point = aoi_object.point(point_id)
+        aoi_point = aoi_curve.point(point_id)
         builder.create_point(
             opengeode.Point3D([aoi_point.value(0), aoi_point.value(1), params.z_min])
         )
 
     for point_id in range(nb_points):
-        aoi_point = aoi_object.point(point_id)
+        aoi_point = aoi_curve.point(point_id)
         builder.create_point(
             opengeode.Point3D([aoi_point.value(0), aoi_point.value(1), params.z_max])
         )
@@ -107,7 +110,6 @@ def create_voi() -> flask.Response:
         builder.create_edge_with_vertices(point_id, point_id + nb_points)
 
     result = utils_functions.generate_native_viewable_and_light_viewable_from_object(
-        geode_object="EdgedCurve3D",
-        data=edged_curve,
+        edged_curve
     )
     return flask.make_response(result, 200)

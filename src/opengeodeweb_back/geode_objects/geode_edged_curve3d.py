@@ -16,11 +16,13 @@ class GeodeEdgedCurve3D(GeodeGraph):
     edged_curve: og.EdgedCurve3D
 
     def __init__(self, edged_curve: og.EdgedCurve3D | None = None) -> None:
-        self.edged_curve = edged_curve if edged_curve is not None else og.EdgedCurve3D()
+        self.edged_curve = (
+            edged_curve if edged_curve is not None else og.EdgedCurve3D.create()
+        )
         super().__init__(self.edged_curve)
 
     @classmethod
-    def geode_mesh_type(cls) -> GeodeMeshType:
+    def geode_object_type(cls) -> GeodeMeshType:
         return "EdgedCurve3D"
 
     def native_extension(self) -> str:
@@ -35,10 +37,10 @@ class GeodeEdgedCurve3D(GeodeGraph):
         return False
 
     def builder(self) -> og.EdgedCurveBuilder3D:
-        return og.EdgedCurveBuilder3D(self.edged_curve)
+        return og.EdgedCurveBuilder3D.create(self.edged_curve)
 
     @classmethod
-    def load_mesh(cls, filename: str) -> GeodeEdgedCurve3D:
+    def load(cls, filename: str) -> GeodeEdgedCurve3D:
         return GeodeEdgedCurve3D(og.load_edged_curve3D(filename))
 
     @classmethod

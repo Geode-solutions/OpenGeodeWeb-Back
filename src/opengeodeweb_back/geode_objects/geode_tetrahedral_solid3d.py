@@ -18,22 +18,22 @@ class GeodeTetrahedralSolid3D(GeodeSolidMesh3D):
         self.tetrahedral_solid = (
             tetrahedral_solid
             if tetrahedral_solid is not None
-            else og.TetrahedralSolid3D()
+            else og.TetrahedralSolid3D.create()
         )
         super().__init__(self.tetrahedral_solid)
 
     @classmethod
-    def geode_mesh_type(cls) -> GeodeMeshType:
+    def geode_object_type(cls) -> GeodeMeshType:
         return "TetrahedralSolid3D"
 
     def native_extension(self) -> str:
         return self.tetrahedral_solid.native_extension()
 
     def builder(self) -> og.TetrahedralSolidBuilder3D:
-        return og.TetrahedralSolidBuilder3D(self.tetrahedral_solid)
+        return og.TetrahedralSolidBuilder3D.create(self.tetrahedral_solid)
 
     @classmethod
-    def load_mesh(cls, filename: str) -> GeodeTetrahedralSolid3D:
+    def load(cls, filename: str) -> GeodeTetrahedralSolid3D:
         return GeodeTetrahedralSolid3D(og.load_tetrahedral_solid3D(filename))
 
     @classmethod

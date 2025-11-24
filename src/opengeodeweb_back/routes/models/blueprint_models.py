@@ -4,6 +4,7 @@ import flask
 from opengeodeweb_microservice.schemas import get_schemas_dict
 
 from opengeodeweb_back import geode_functions, utils_functions
+from opengeodeweb_back.geode_objects.geode_model import GeodeModel
 from . import schemas
 
 routes = flask.Blueprint("models", __name__, url_prefix="/models")
@@ -40,7 +41,9 @@ def uuid_to_flat_index() -> flask.Response:
 def extract_uuids_endpoint() -> flask.Response:
     utils_functions.validate_request(flask.request, schemas_dict["mesh_components"])
     params = schemas.MeshComponents.from_dict(flask.request.get_json())
-    model = geode_functions.load_model_data(params.id)
+    model = geode_functions.load_geode_object(params.id)
+    if not isinstance(model, GeodeModel):
+        flask.abort(500, f"{params.id} is not a GeodeModel")
     mesh_components = model.mesh_components()
     uuid_dict = {}
     for mesh_component, ids in mesh_components.items():

@@ -16,11 +16,11 @@ class GeodePointSet2D(GeodeVertexSet):
     point_set: og.PointSet2D
 
     def __init__(self, point_set: og.PointSet2D | None = None) -> None:
-        self.point_set = point_set if point_set is not None else og.PointSet2D()
+        self.point_set = point_set if point_set is not None else og.PointSet2D.create()
         super().__init__(self.point_set)
 
     @classmethod
-    def geode_mesh_type(cls) -> GeodeMeshType:
+    def geode_object_type(cls) -> GeodeMeshType:
         return "PointSet2D"
 
     def native_extension(self) -> str:
@@ -35,10 +35,10 @@ class GeodePointSet2D(GeodeVertexSet):
         return True
 
     def builder(self) -> og.PointSetBuilder2D:
-        return og.PointSetBuilder2D(self.point_set)
+        return og.PointSetBuilder2D.create(self.point_set)
 
     @classmethod
-    def load_mesh(cls, filename: str) -> GeodePointSet2D:
+    def load(cls, filename: str) -> GeodePointSet2D:
         return GeodePointSet2D(og.load_point_set2D(filename))
 
     @classmethod

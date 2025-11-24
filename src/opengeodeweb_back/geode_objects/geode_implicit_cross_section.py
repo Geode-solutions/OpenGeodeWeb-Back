@@ -25,7 +25,7 @@ class GeodeImplicitCrossSection(GeodeCrossSection):
         super().__init__(self.implicit_cross_section)
 
     @classmethod
-    def geode_model_type(cls) -> GeodeModelType:
+    def geode_object_type(cls) -> GeodeModelType:
         return "ImplicitCrossSection"
 
     def native_extension(self) -> str:
@@ -35,7 +35,7 @@ class GeodeImplicitCrossSection(GeodeCrossSection):
         return og_geosciences.ImplicitCrossSectionBuilder(self.implicit_cross_section)
 
     @classmethod
-    def load_model(cls, filename: str) -> GeodeImplicitCrossSection:
+    def load(cls, filename: str) -> GeodeImplicitCrossSection:
         return GeodeImplicitCrossSection(
             og_geosciences.load_implicit_cross_section(filename)
         )

@@ -15,11 +15,11 @@ class GeodeGraph(GeodeVertexSet):
     graph: og.Graph
 
     def __init__(self, graph: og.Graph | None = None) -> None:
-        self.graph = graph if graph is not None else og.Graph()
+        self.graph = graph if graph is not None else og.Graph.create()
         super().__init__(self.graph)
 
     @classmethod
-    def geode_mesh_type(cls) -> GeodeMeshType:
+    def geode_object_type(cls) -> GeodeMeshType:
         return "Graph"
 
     def native_extension(self) -> str:
@@ -34,10 +34,10 @@ class GeodeGraph(GeodeVertexSet):
         return False
 
     def builder(self) -> og.GraphBuilder:
-        return og.GraphBuilder(self.graph)
+        return og.GraphBuilder.create(self.graph)
 
     @classmethod
-    def load_mesh(cls, filename: str) -> GeodeGraph:
+    def load(cls, filename: str) -> GeodeGraph:
         return GeodeGraph(og.load_graph(filename))
 
     @classmethod

@@ -20,7 +20,7 @@ class GeodeSection(GeodeModel):
         super().__init__(self.section)
 
     @classmethod
-    def geode_model_type(cls) -> GeodeModelType:
+    def geode_object_type(cls) -> GeodeModelType:
         return "Section"
 
     def native_extension(self) -> str:
@@ -38,7 +38,7 @@ class GeodeSection(GeodeModel):
         return og.SectionBuilder(self.section)
 
     @classmethod
-    def load_model(cls, filename: str) -> GeodeSection:
+    def load(cls, filename: str) -> GeodeSection:
         return GeodeSection(og.load_section(filename))
 
     @classmethod

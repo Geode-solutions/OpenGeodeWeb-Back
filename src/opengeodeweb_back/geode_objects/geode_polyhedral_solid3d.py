@@ -16,22 +16,24 @@ class GeodePolyhedralSolid3D(GeodeSolidMesh3D):
 
     def __init__(self, polyhedral_solid: og.PolyhedralSolid3D | None = None) -> None:
         self.polyhedral_solid = (
-            polyhedral_solid if polyhedral_solid is not None else og.PolyhedralSolid3D()
+            polyhedral_solid
+            if polyhedral_solid is not None
+            else og.PolyhedralSolid3D.create()
         )
         super().__init__(self.polyhedral_solid)
 
     @classmethod
-    def geode_mesh_type(cls) -> GeodeMeshType:
+    def geode_object_type(cls) -> GeodeMeshType:
         return "PolyhedralSolid3D"
 
     def native_extension(self) -> str:
         return self.polyhedral_solid.native_extension()
 
     def builder(self) -> og.PolyhedralSolidBuilder3D:
-        return og.PolyhedralSolidBuilder3D(self.polyhedral_solid)
+        return og.PolyhedralSolidBuilder3D.create(self.polyhedral_solid)
 
     @classmethod
-    def load_mesh(cls, filename: str) -> GeodePolyhedralSolid3D:
+    def load(cls, filename: str) -> GeodePolyhedralSolid3D:
         return GeodePolyhedralSolid3D(og.load_polyhedral_solid3D(filename))
 
     @classmethod

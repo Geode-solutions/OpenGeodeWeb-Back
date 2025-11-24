@@ -19,14 +19,14 @@ class GeodeLightRegularGrid2D(GeodeGrid2D):
         super().__init__(self.light_regular_grid)
 
     @classmethod
-    def geode_mesh_type(cls) -> GeodeMeshType:
+    def geode_object_type(cls) -> GeodeMeshType:
         return "LightRegularGrid2D"
 
     def native_extension(self) -> str:
         return self.light_regular_grid.native_extension()
 
     @classmethod
-    def load_mesh(cls, filename: str) -> GeodeLightRegularGrid2D:
+    def load(cls, filename: str) -> GeodeLightRegularGrid2D:
         return GeodeLightRegularGrid2D(og.load_light_regular_grid2D(filename))
 
     @classmethod
@@ -64,3 +64,6 @@ class GeodeLightRegularGrid2D(GeodeGrid2D):
         return viewables.save_light_viewable_light_regular_grid2D(
             self.light_regular_grid, filename_without_extension
         )
+
+    def vertex_attribute_manager(self) -> og.AttributeManager:
+        return self.light_regular_grid.grid_vertex_attribute_manager()

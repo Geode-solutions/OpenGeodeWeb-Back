@@ -110,6 +110,7 @@ def validate_request(request: flask.Request, schema: SchemaDict) -> None:
         validate(json_data)
     except fastjsonschema.JsonSchemaException as e:
         error_msg = str(e)
+        print("Validation failed:", error_msg, flush=True)
         flask.abort(400, error_msg)
 
 
@@ -185,7 +186,7 @@ def save_all_viewables_and_return_info(
 ) -> dict[str, str | list[str]]:
     with ThreadPoolExecutor() as executor:
         (native_files, viewable_path, light_path) = executor.map(
-            lambda func_path: func_path[0](),
+            lambda args: args[0](args[1]),
             [
                 (
                     geode_object.save,

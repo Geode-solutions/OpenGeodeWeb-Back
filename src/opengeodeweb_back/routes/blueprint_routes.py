@@ -20,6 +20,10 @@ from . import schemas
 from opengeodeweb_back import geode_functions, utils_functions
 from opengeodeweb_back.geode_objects import geode_objects
 from opengeodeweb_back.geode_objects.types import geode_object_type
+from opengeodeweb_back.geode_objects.geode_mesh import GeodeMesh
+from opengeodeweb_back.geode_objects.geode_surface_mesh2d import GeodeSurfaceMesh2D
+from opengeodeweb_back.geode_objects.geode_surface_mesh3d import GeodeSurfaceMesh3D
+from opengeodeweb_back.geode_objects.geode_solid_mesh3d import GeodeSolidMesh3D
 
 routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
 
@@ -44,7 +48,7 @@ def allowed_files() -> flask.Response:
     for geode_object in geode_objects.values():
         for extension in geode_object.input_extensions():
             extensions.add(extension)
-    return flask.make_response({"extensions": extensions}, 200)
+    return flask.make_response({"extensions": list(extensions)}, 200)
 
 
 @routes.route(
@@ -79,8 +83,8 @@ def allowed_objects() -> flask.Response:
             continue
         loadability_score = geode_object.is_loadable(file_absolute_path)
         priority_score = geode_object.object_priority(file_absolute_path)
-        allowed_objects[geode_object] = {
-            "is_loadable": loadability_score,
+        allowed_objects[geode_object_type] = {
+            "is_loadable": loadability_score.value(),
             "object_priority": priority_score,
         }
     return flask.make_response({"allowed_objects": allowed_objects}, 200)
@@ -237,8 +241,10 @@ def save_viewable_file() -> flask.Response:
 def texture_coordinates() -> flask.Response:
     utils_functions.validate_request(flask.request, schemas_dict["texture_coordinates"])
     params = schemas.TextureCoordinates.from_dict(flask.request.get_json())
-    data = geode_functions.load_object_data(params.id)
-    texture_coordinates = data.texture_manager().texture_names()
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeSurfaceMesh2D | GeodeSurfaceMesh3D):
+        flask.abort(500, f"{params.id} is not a GeodeSurfaceMesh")
+    texture_coordinates = geode_object.texture_manager().texture_names()
     return flask.make_response({"texture_coordinates": texture_coordinates}, 200)
 
 
@@ -251,8 +257,10 @@ def vertex_attribute_names() -> flask.Response:
         flask.request, schemas_dict["vertex_attribute_names"]
     )
     params = schemas.VertexAttributeNames.from_dict(flask.request.get_json())
-    data = geode_functions.load_object_data(params.id)
-    vertex_attribute_names = data.vertex_attribute_manager().attribute_names()
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeMesh):
+        flask.abort(500, f"{params.id} is not a GeodeMesh")
+    vertex_attribute_names = geode_object.vertex_attribute_manager().attribute_names()
     return flask.make_response(
         {
             "vertex_attribute_names": vertex_attribute_names,
@@ -270,8 +278,10 @@ def polygon_attribute_names() -> flask.Response:
         flask.request, schemas_dict["polygon_attribute_names"]
     )
     params = schemas.PolygonAttributeNames.from_dict(flask.request.get_json())
-    data = geode_functions.load_object_data(params.id)
-    polygon_attribute_names = data.polygon_attribute_manager().attribute_names()
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeSurfaceMesh2D | GeodeSurfaceMesh3D):
+        flask.abort(500, f"{params.id} is not a GeodeSurfaceMesh")
+    polygon_attribute_names = geode_object.polygon_attribute_manager().attribute_names()
     return flask.make_response(
         {
             "polygon_attribute_names": polygon_attribute_names,
@@ -289,8 +299,12 @@ def polyhedron_attribute_names() -> flask.Response:
         flask.request, schemas_dict["polyhedron_attribute_names"]
     )
     params = schemas.PolyhedronAttributeNames.from_dict(flask.request.get_json())
-    data = geode_functions.load_object_data(params.id)
-    polyhedron_attribute_names = data.polyhedron_attribute_manager().attribute_names()
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeSolidMesh3D):
+        flask.abort(500, f"{params.id} is not a GeodeSolidMesh")
+    polyhedron_attribute_names = (
+        geode_object.polyhedron_attribute_manager().attribute_names()
+    )
     return flask.make_response(
         {
             "polyhedron_attribute_names": polyhedron_attribute_names,

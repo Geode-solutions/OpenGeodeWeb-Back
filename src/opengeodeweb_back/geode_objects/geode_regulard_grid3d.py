@@ -16,22 +16,22 @@ class GeodeRegularGrid3D(GeodeSolidMesh3D):
 
     def __init__(self, regular_grid: og.RegularGrid3D | None = None) -> None:
         self.regular_grid = (
-            regular_grid if regular_grid is not None else og.RegularGrid3D()
+            regular_grid if regular_grid is not None else og.RegularGrid3D.create()
         )
         super().__init__(self.regular_grid)
 
     @classmethod
-    def geode_mesh_type(cls) -> GeodeMeshType:
+    def geode_object_type(cls) -> GeodeMeshType:
         return "RegularGrid3D"
 
     def native_extension(self) -> str:
         return self.regular_grid.native_extension()
 
     def builder(self) -> og.RegularGridBuilder3D:
-        return og.RegularGridBuilder3D(self.regular_grid)
+        return og.RegularGridBuilder3D.create(self.regular_grid)
 
     @classmethod
-    def load_mesh(cls, filename: str) -> GeodeRegularGrid3D:
+    def load(cls, filename: str) -> GeodeRegularGrid3D:
         return GeodeRegularGrid3D(og.load_regular_grid3D(filename))
 
     @classmethod

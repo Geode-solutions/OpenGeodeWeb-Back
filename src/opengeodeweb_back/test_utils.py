@@ -1,12 +1,12 @@
 # Standard library imports
-from typing import Callable
+from typing import Callable, Any
 
 # Third party imports
 from flask.testing import FlaskClient
 
 # Local application imports
 
-JsonData = dict[str, str]
+JsonData = dict[str, Any]
 
 
 def test_route_wrong_params(

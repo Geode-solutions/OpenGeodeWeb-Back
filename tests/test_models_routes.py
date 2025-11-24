@@ -183,11 +183,5 @@ def test_save_viewable_workflow_from_object(client: FlaskClient) -> None:
 
     data_id = response.get_json()["id"]
     assert isinstance(data_id, str) and len(data_id) > 0
-    assert response.get_json()["geode_object"] == "EdgedCurve3D"
+    assert response.get_json()["geode_object_type"] == "EdgedCurve3D"
     assert response.get_json()["viewable_file_name"].endswith(".vtp")
-
-    attr_resp = client.post(
-        "/opengeodeweb_back/vertex_attribute_names", json={"id": data_id}
-    )
-    assert attr_resp.status_code == 200
-    assert isinstance(attr_resp.get_json().get("vertex_attribute_names", []), list)

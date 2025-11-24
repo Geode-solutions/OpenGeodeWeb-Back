@@ -25,7 +25,7 @@ class GeodeCrossSection(GeodeSection):
         super().__init__(self.cross_section)
 
     @classmethod
-    def geode_model_type(cls) -> GeodeModelType:
+    def geode_object_type(cls) -> GeodeModelType:
         return "CrossSection"
 
     def native_extension(self) -> str:
@@ -35,7 +35,7 @@ class GeodeCrossSection(GeodeSection):
         return og_geosciences.CrossSectionBuilder(self.cross_section)
 
     @classmethod
-    def load_model(cls, filename: str) -> GeodeCrossSection:
+    def load(cls, filename: str) -> GeodeCrossSection:
         return GeodeCrossSection(og_geosciences.load_cross_section(filename))
 
     @classmethod

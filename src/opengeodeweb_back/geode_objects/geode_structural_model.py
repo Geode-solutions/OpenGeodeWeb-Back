@@ -26,7 +26,7 @@ class GeodeStructuralModel(GeodeBRep):
         super().__init__(self.structural_model)
 
     @classmethod
-    def geode_model_type(cls) -> GeodeModelType:
+    def geode_object_type(cls) -> GeodeModelType:
         return "StructuralModel"
 
     def native_extension(self) -> str:
@@ -36,7 +36,7 @@ class GeodeStructuralModel(GeodeBRep):
         return og_geosciences.StructuralModelBuilder(self.structural_model)
 
     @classmethod
-    def load_model(cls, filename: str) -> GeodeStructuralModel:
+    def load(cls, filename: str) -> GeodeStructuralModel:
         return GeodeStructuralModel(og_geosciences.load_structural_model(filename))
 
     @classmethod

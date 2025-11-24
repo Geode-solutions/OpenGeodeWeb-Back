@@ -16,11 +16,11 @@ class GeodePointSet3D(GeodeVertexSet):
     point_set: og.PointSet3D
 
     def __init__(self, point_set: og.PointSet3D | None = None) -> None:
-        self.point_set = point_set if point_set is not None else og.PointSet3D()
+        self.point_set = point_set if point_set is not None else og.PointSet3D.create()
         super().__init__(self.point_set)
 
     @classmethod
-    def geode_mesh_type(cls) -> GeodeMeshType:
+    def geode_object_type(cls) -> GeodeMeshType:
         return "PointSet3D"
 
     def native_extension(self) -> str:
@@ -35,10 +35,10 @@ class GeodePointSet3D(GeodeVertexSet):
         return True
 
     def builder(self) -> og.PointSetBuilder3D:
-        return og.PointSetBuilder3D(self.point_set)
+        return og.PointSetBuilder3D.create(self.point_set)
 
     @classmethod
-    def load_mesh(cls, filename: str) -> GeodePointSet3D:
+    def load(cls, filename: str) -> GeodePointSet3D:
         return GeodePointSet3D(og.load_point_set3D(filename))
 
     @classmethod

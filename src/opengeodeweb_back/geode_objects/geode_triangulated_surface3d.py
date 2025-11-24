@@ -20,22 +20,22 @@ class GeodeTriangulatedSurface3D(GeodeSurfaceMesh3D):
         self.triangulated_surface = (
             triangulated_surface
             if triangulated_surface is not None
-            else og.TriangulatedSurface3D()
+            else og.TriangulatedSurface3D.create()
         )
         super().__init__(self.triangulated_surface)
 
     @classmethod
-    def geode_mesh_type(cls) -> GeodeMeshType:
+    def geode_object_type(cls) -> GeodeMeshType:
         return "TriangulatedSurface3D"
 
     def native_extension(self) -> str:
         return self.triangulated_surface.native_extension()
 
     def builder(self) -> og.TriangulatedSurfaceBuilder3D:
-        return og.TriangulatedSurfaceBuilder3D(self.triangulated_surface)
+        return og.TriangulatedSurfaceBuilder3D.create(self.triangulated_surface)
 
     @classmethod
-    def load_mesh(cls, filename: str) -> GeodeTriangulatedSurface3D:
+    def load(cls, filename: str) -> GeodeTriangulatedSurface3D:
         return GeodeTriangulatedSurface3D(og.load_triangulated_surface3D(filename))
 
     @classmethod

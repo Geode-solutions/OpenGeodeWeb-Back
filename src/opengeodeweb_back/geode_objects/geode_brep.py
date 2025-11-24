@@ -20,7 +20,7 @@ class GeodeBRep(GeodeModel):
         super().__init__(self.brep)
 
     @classmethod
-    def geode_model_type(cls) -> GeodeModelType:
+    def geode_object_type(cls) -> GeodeModelType:
         return "BRep"
 
     def native_extension(self) -> str:
@@ -38,7 +38,7 @@ class GeodeBRep(GeodeModel):
         return og.BRepBuilder(self.brep)
 
     @classmethod
-    def load_model(cls, filename: str) -> GeodeBRep:
+    def load(cls, filename: str) -> GeodeBRep:
         return GeodeBRep(og.load_brep(filename))
 
     @classmethod

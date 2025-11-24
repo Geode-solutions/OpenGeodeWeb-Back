@@ -17,7 +17,7 @@ class GeodeSurfaceMesh2D(GeodeVertexSet):
 
     def __init__(self, surface_mesh: og.SurfaceMesh2D | None = None) -> None:
         self.surface_mesh = (
-            surface_mesh if surface_mesh is not None else og.SurfaceMesh2D()
+            surface_mesh if surface_mesh is not None else og.SurfaceMesh2D.create()
         )
         super().__init__(self.surface_mesh)
 
@@ -58,3 +58,9 @@ class GeodeSurfaceMesh2D(GeodeVertexSet):
         og.create_surface_mesh_coordinate_system2D(
             self.surface_mesh, builder, crs_name, input, output
         )
+
+    def polygon_attribute_manager(self) -> og.AttributeManager:
+        return self.surface_mesh.polygon_attribute_manager()
+
+    def texture_manager(self) -> og.TextureManager2D:
+        return self.surface_mesh.texture_manager()

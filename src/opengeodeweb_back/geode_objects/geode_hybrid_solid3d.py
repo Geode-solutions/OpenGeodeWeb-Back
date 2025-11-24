@@ -16,22 +16,22 @@ class GeodeHybridSolid3D(GeodeSolidMesh3D):
 
     def __init__(self, hybrid_solid: og.HybridSolid3D | None = None) -> None:
         self.hybrid_solid = (
-            hybrid_solid if hybrid_solid is not None else og.HybridSolid3D()
+            hybrid_solid if hybrid_solid is not None else og.HybridSolid3D.create()
         )
         super().__init__(self.hybrid_solid)
 
     @classmethod
-    def geode_mesh_type(cls) -> GeodeMeshType:
+    def geode_object_type(cls) -> GeodeMeshType:
         return "HybridSolid3D"
 
     def native_extension(self) -> str:
         return self.hybrid_solid.native_extension()
 
     def builder(self) -> og.HybridSolidBuilder3D:
-        return og.HybridSolidBuilder3D(self.hybrid_solid)
+        return og.HybridSolidBuilder3D.create(self.hybrid_solid)
 
     @classmethod
-    def load_mesh(cls, filename: str) -> GeodeHybridSolid3D:
+    def load(cls, filename: str) -> GeodeHybridSolid3D:
         return GeodeHybridSolid3D(og.load_hybrid_solid3D(filename))
 
     @classmethod

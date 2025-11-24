@@ -15,11 +15,13 @@ class GeodeVertexSet(GeodeMesh):
     vertex_set: og.VertexSet
 
     def __init__(self, vertex_set: og.VertexSet | None = None) -> None:
-        self.vertex_set = vertex_set if vertex_set is not None else og.VertexSet()
+        self.vertex_set = (
+            vertex_set if vertex_set is not None else og.VertexSet.create()
+        )
         super().__init__(self.vertex_set)
 
     @classmethod
-    def geode_mesh_type(cls) -> GeodeMeshType:
+    def geode_object_type(cls) -> GeodeMeshType:
         return "VertexSet"
 
     def native_extension(self) -> str:
@@ -34,10 +36,10 @@ class GeodeVertexSet(GeodeMesh):
         return False
 
     def builder(self) -> og.VertexSetBuilder:
-        return og.VertexSetBuilder(self.vertex_set)
+        return og.VertexSetBuilder.create(self.vertex_set)
 
     @classmethod
-    def load_mesh(cls, filename: str) -> GeodeVertexSet:
+    def load(cls, filename: str) -> GeodeVertexSet:
         return GeodeVertexSet(og.load_vertex_set(filename))
 
     @classmethod
@@ -74,3 +76,6 @@ class GeodeVertexSet(GeodeMesh):
 
     def inspect(self) -> object:
         return None
+
+    def vertex_attribute_manager(self) -> og.AttributeManager:
+        return self.vertex_set.vertex_attribute_manager()

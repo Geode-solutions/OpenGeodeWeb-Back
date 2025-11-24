@@ -19,7 +19,7 @@ class GeodeRasterImage3D(GeodeMesh):
         super().__init__(self.raster_image)
 
     @classmethod
-    def geode_mesh_type(cls) -> GeodeMeshType:
+    def geode_object_type(cls) -> GeodeMeshType:
         return "RasterImage3D"
 
     def native_extension(self) -> str:
@@ -37,7 +37,7 @@ class GeodeRasterImage3D(GeodeMesh):
         return None
 
     @classmethod
-    def load_mesh(cls, filename: str) -> GeodeRasterImage3D:
+    def load(cls, filename: str) -> GeodeRasterImage3D:
         return GeodeRasterImage3D(og.load_raster_image3D(filename))
 
     @classmethod

@@ -9,18 +9,12 @@ import flask
 from typing import Any
 
 # Local application imports
-from .geode_objects import geode_objects, geode_meshes, geode_models
+from .geode_objects import geode_objects
 from .geode_objects.types import (
     GeodeObjectType,
     geode_object_type,
-    GeodeMeshType,
-    geode_mesh_type,
-    GeodeModelType,
-    geode_model_type,
 )
 from .geode_objects.geode_object import GeodeObject
-from .geode_objects.geode_mesh import GeodeMesh
-from .geode_objects.geode_model import GeodeModel
 from . import utils_functions
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
@@ -38,15 +32,7 @@ def geode_object_from_string(value: str) -> type[GeodeObject]:
     return geode_objects[geode_object_type(value)]
 
 
-def geode_mesh_from_string(value: str) -> type[GeodeMesh]:
-    return geode_meshes[geode_mesh_type(value)]
-
-
-def geode_model_from_string(value: str) -> type[GeodeModel]:
-    return geode_models[geode_model_type(value)]
-
-
-def load_object_data(data_id: str) -> GeodeObject:
+def load_geode_object(data_id: str) -> GeodeObject:
     data = Data.get(data_id)
     if not data:
         flask.abort(404, f"Data with id {data_id} not found")
@@ -55,28 +41,6 @@ def load_object_data(data_id: str) -> GeodeObject:
     print("Loading file: ", file_absolute_path)
     print("File exists: ", os.path.exists(file_absolute_path))
     return geode_object_from_string(data.geode_object).load(file_absolute_path)
-
-
-def load_mesh_data(data_id: str) -> GeodeMesh:
-    data = Data.get(data_id)
-    if not data:
-        flask.abort(404, f"Data with id {data_id} not found")
-
-    file_absolute_path = data_file_path(data_id, data.native_file_name)
-    print("Loading file: ", file_absolute_path)
-    print("File exists: ", os.path.exists(file_absolute_path))
-    return geode_mesh_from_string(data.geode_object).load_mesh(file_absolute_path)
-
-
-def load_model_data(data_id: str) -> GeodeModel:
-    data = Data.get(data_id)
-    if not data:
-        flask.abort(404, f"Data with id {data_id} not found")
-
-    file_absolute_path = data_file_path(data_id, data.native_file_name)
-    print("Loading file: ", file_absolute_path)
-    print("File exists: ", os.path.exists(file_absolute_path))
-    return geode_model_from_string(data.geode_object).load_model(file_absolute_path)
 
 
 def get_data_info(data_id: str) -> Data:

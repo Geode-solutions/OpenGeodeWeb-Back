@@ -9,6 +9,12 @@ from flask.testing import FlaskClient
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_back import geode_functions, test_utils
+from opengeodeweb_back.geode_objects.geode_polygonal_surface3d import (
+    GeodePolygonalSurface3D,
+)
+from opengeodeweb_back.geode_objects.geode_polyhedral_solid3d import (
+    GeodePolyhedralSolid3D,
+)
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 data_dir = os.path.join(base_dir, "data")
@@ -18,9 +24,7 @@ def test_allowed_files(client: FlaskClient) -> None:
     route = f"/opengeodeweb_back/allowed_files"
 
     def get_full_data() -> test_utils.JsonData:
-        return {
-            "filename": "corbi.og_brep",
-        }
+        return {}
 
     json = get_full_data()
     response = client.post(route, json=json)
@@ -146,8 +150,7 @@ def test_geode_objects_and_output_extensions(client: FlaskClient) -> None:
     for geode_object, values in geode_objects_and_output_extensions.items():
         assert type(values) is dict
         for output_extension, value in values.items():
-            assert type(value) is dict
-            assert type(value["is_saveable"]) is bool
+            assert type(value) is bool
 
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
@@ -172,7 +175,7 @@ def test_save_viewable_file(client: FlaskClient) -> None:
     assert type(viewable_file_name) is str
     id = response.get_json().get("id")
     assert type(id) is str
-    object_type = response.get_json()["object_type"]
+    object_type = response.get_json()["viewer_type"]
     assert type(object_type) is str
     assert object_type in ["model", "mesh"]
     binary_light_viewable = response.get_json()["binary_light_viewable"]
@@ -186,8 +189,8 @@ def test_texture_coordinates(client: FlaskClient, test_id: str) -> None:
     with client.application.app_context():
         file = os.path.join(data_dir, "hat.vtp")
         data = Data.create(
-            geode_object="PolygonalSurface3D",
-            viewer_object=geode_functions.get_object_type("PolygonalSurface3D"),
+            geode_object=GeodePolygonalSurface3D.geode_object_type(),
+            viewer_object=GeodePolygonalSurface3D.viewer_type(),
             input_file=file,
         )
         data.native_file_name = file
@@ -214,8 +217,8 @@ def test_vertex_attribute_names(client: FlaskClient, test_id: str) -> None:
     with client.application.app_context():
         file = os.path.join(data_dir, "test.vtp")
         data = Data.create(
-            geode_object="PolygonalSurface3D",
-            viewer_object=geode_functions.get_object_type("PolygonalSurface3D"),
+            geode_object=GeodePolygonalSurface3D.geode_object_type(),
+            viewer_object=GeodePolygonalSurface3D.viewer_type(),
             input_file=file,
         )
         data.native_file_name = file
@@ -240,8 +243,8 @@ def test_polygon_attribute_names(client: FlaskClient, test_id: str) -> None:
     with client.application.app_context():
         file = os.path.join(data_dir, "test.vtp")
         data = Data.create(
-            geode_object="PolygonalSurface3D",
-            viewer_object=geode_functions.get_object_type("PolygonalSurface3D"),
+            geode_object=GeodePolygonalSurface3D.geode_object_type(),
+            viewer_object=GeodePolygonalSurface3D.viewer_type(),
             input_file=file,
         )
         data.native_file_name = file
@@ -266,8 +269,8 @@ def test_polyhedron_attribute_names(client: FlaskClient, test_id: str) -> None:
     with client.application.app_context():
         file = os.path.join(data_dir, "test.vtu")
         data = Data.create(
-            geode_object="PolyhedralSolid3D",
-            viewer_object=geode_functions.get_object_type("PolyhedralSolid3D"),
+            geode_object=GeodePolyhedralSolid3D.geode_object_type(),
+            viewer_object=GeodePolyhedralSolid3D.viewer_type(),
             input_file=file,
         )
         data.native_file_name = file

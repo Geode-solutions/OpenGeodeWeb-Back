@@ -42,7 +42,7 @@ from .geode_cross_section import GeodeCrossSection
 from .geode_implicit_structural_model import GeodeImplicitStructuralModel
 from .geode_implicit_cross_section import GeodeImplicitCrossSection
 
-geode_meshes: dict[GeodeMeshType, type[GeodeMesh]] = {
+geode_objects: dict[GeodeObjectType, type[GeodeObject]] = {
     "VertexSet": GeodeVertexSet,
     "Graph": GeodeGraph,
     "PointSet2D": GeodePointSet2D,
@@ -62,8 +62,6 @@ geode_meshes: dict[GeodeMeshType, type[GeodeMesh]] = {
     "RegularGrid3D": GeodeRegularGrid3D,
     "LightRegularGrid2D": GeodeLightRegularGrid2D,
     "LightRegularGrid3D": GeodeLightRegularGrid3D,
-}
-geode_models: dict[GeodeModelType, type[GeodeModel]] = {
     "BRep": GeodeBRep,
     "Section": GeodeSection,
     "StructuralModel": GeodeStructuralModel,
@@ -71,8 +69,3 @@ geode_models: dict[GeodeModelType, type[GeodeModel]] = {
     "ImplicitStructuralModel": GeodeImplicitStructuralModel,
     "ImplicitCrossSection": GeodeImplicitCrossSection,
 }
-
-GeodeObjectsDict = dict[GeodeObjectType, type[GeodeObject]]
-geode_objects: GeodeObjectsDict = {}
-geode_objects.update(cast(GeodeObjectsDict, geode_meshes))
-geode_objects.update(cast(GeodeObjectsDict, geode_models))
