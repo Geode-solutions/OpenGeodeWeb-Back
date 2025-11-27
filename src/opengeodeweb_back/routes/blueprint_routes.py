@@ -43,7 +43,6 @@ schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas
 )
 def allowed_files() -> flask.Response:
     utils_functions.validate_request(flask.request, schemas_dict["allowed_files"])
-    params = schemas.AllowedFiles.from_dict(flask.request.get_json())
     extensions: set[str] = set()
     for geode_object in geode_objects.values():
         for extension in geode_object.input_extensions():
@@ -71,8 +70,8 @@ def upload_file() -> flask.Response:
     methods=schemas_dict["allowed_objects"]["methods"],
 )
 def allowed_objects() -> flask.Response:
-    utils_functions.validate_request(flask.request, schemas_dict["allowed_objects"])
-    params = schemas.AllowedObjects.from_dict(flask.request.get_json())
+    json_data = utils_functions.validate_request(flask.request, schemas_dict["allowed_objects"])
+    params = schemas.AllowedObjects.from_dict(json_data)
     file_absolute_path = geode_functions.upload_file_path(params.filename)
     file_extension = utils_functions.extension_from_filename(
         os.path.basename(file_absolute_path)
@@ -95,8 +94,8 @@ def allowed_objects() -> flask.Response:
     methods=schemas_dict["missing_files"]["methods"],
 )
 def missing_files() -> flask.Response:
-    utils_functions.validate_request(flask.request, schemas_dict["missing_files"])
-    params = schemas.MissingFiles.from_dict(flask.request.get_json())
+    json_data = utils_functions.validate_request(flask.request, schemas_dict["missing_files"])
+    params = schemas.MissingFiles.from_dict(json_data)
     file_path = geode_functions.upload_file_path(params.filename)
     geode_object = geode_functions.geode_object_from_string(params.geode_object_type)
     additional_files = geode_object.additional_files(
@@ -132,10 +131,10 @@ def missing_files() -> flask.Response:
     methods=schemas_dict["geographic_coordinate_systems"]["methods"],
 )
 def crs_converter_geographic_coordinate_systems() -> flask.Response:
-    utils_functions.validate_request(
+    json_data = utils_functions.validate_request(
         flask.request, schemas_dict["geographic_coordinate_systems"]
     )
-    params = schemas.GeographicCoordinateSystems.from_dict(flask.request.get_json())
+    params = schemas.GeographicCoordinateSystems.from_dict(json_data)
     geode_object = geode_functions.geode_object_from_string(params.geode_object_type)
     infos = (
         og_geosciences.GeographicCoordinateSystem3D.geographic_coordinate_systems()
@@ -157,8 +156,8 @@ def crs_converter_geographic_coordinate_systems() -> flask.Response:
     methods=schemas_dict["inspect_file"]["methods"],
 )
 def inspect_file() -> flask.Response:
-    utils_functions.validate_request(flask.request, schemas_dict["inspect_file"])
-    params = schemas.InspectFile.from_dict(flask.request.get_json())
+    json_data = utils_functions.validate_request(flask.request, schemas_dict["inspect_file"])
+    params = schemas.InspectFile.from_dict(json_data)
     file_path = geode_functions.upload_file_path(params.filename)
     geode_object = geode_functions.geode_object_from_string(
         params.geode_object_type
@@ -201,10 +200,10 @@ def extract_inspector_result(inspection_data: Any) -> object:
     methods=schemas_dict["geode_objects_and_output_extensions"]["methods"],
 )
 def geode_objects_and_output_extensions() -> flask.Response:
-    utils_functions.validate_request(
+    json_data = utils_functions.validate_request(
         flask.request, schemas_dict["geode_objects_and_output_extensions"]
     )
-    params = schemas.GeodeObjectsAndOutputExtensions.from_dict(flask.request.get_json())
+    params = schemas.GeodeObjectsAndOutputExtensions.from_dict(json_data)
     file_path = geode_functions.upload_file_path(params.filename)
     geode_object = geode_functions.geode_object_from_string(
         params.geode_object_type
@@ -223,8 +222,8 @@ def geode_objects_and_output_extensions() -> flask.Response:
     methods=schemas_dict["save_viewable_file"]["methods"],
 )
 def save_viewable_file() -> flask.Response:
-    utils_functions.validate_request(flask.request, schemas_dict["save_viewable_file"])
-    params = schemas.SaveViewableFile.from_dict(flask.request.get_json())
+    json_data = utils_functions.validate_request(flask.request, schemas_dict["save_viewable_file"])
+    params = schemas.SaveViewableFile.from_dict(json_data)
     return flask.make_response(
         utils_functions.generate_native_viewable_and_light_viewable_from_file(
             geode_object_type=geode_object_type(params.geode_object_type),
@@ -239,8 +238,8 @@ def save_viewable_file() -> flask.Response:
     methods=schemas_dict["texture_coordinates"]["methods"],
 )
 def texture_coordinates() -> flask.Response:
-    utils_functions.validate_request(flask.request, schemas_dict["texture_coordinates"])
-    params = schemas.TextureCoordinates.from_dict(flask.request.get_json())
+    json_data = utils_functions.validate_request(flask.request, schemas_dict["texture_coordinates"])
+    params = schemas.TextureCoordinates.from_dict(json_data)
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeSurfaceMesh2D | GeodeSurfaceMesh3D):
         flask.abort(500, f"{params.id} is not a GeodeSurfaceMesh")
@@ -253,10 +252,10 @@ def texture_coordinates() -> flask.Response:
     methods=schemas_dict["vertex_attribute_names"]["methods"],
 )
 def vertex_attribute_names() -> flask.Response:
-    utils_functions.validate_request(
+    json_data = utils_functions.validate_request(
         flask.request, schemas_dict["vertex_attribute_names"]
     )
-    params = schemas.VertexAttributeNames.from_dict(flask.request.get_json())
+    params = schemas.VertexAttributeNames.from_dict(json_data)
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeMesh):
         flask.abort(500, f"{params.id} is not a GeodeMesh")
@@ -274,10 +273,10 @@ def vertex_attribute_names() -> flask.Response:
     methods=schemas_dict["polygon_attribute_names"]["methods"],
 )
 def polygon_attribute_names() -> flask.Response:
-    utils_functions.validate_request(
+    json_data = utils_functions.validate_request(
         flask.request, schemas_dict["polygon_attribute_names"]
     )
-    params = schemas.PolygonAttributeNames.from_dict(flask.request.get_json())
+    params = schemas.PolygonAttributeNames.from_dict(json_data)
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeSurfaceMesh2D | GeodeSurfaceMesh3D):
         flask.abort(500, f"{params.id} is not a GeodeSurfaceMesh")
@@ -295,10 +294,10 @@ def polygon_attribute_names() -> flask.Response:
     methods=schemas_dict["polyhedron_attribute_names"]["methods"],
 )
 def polyhedron_attribute_names() -> flask.Response:
-    utils_functions.validate_request(
+    json_data = utils_functions.validate_request(
         flask.request, schemas_dict["polyhedron_attribute_names"]
     )
-    params = schemas.PolyhedronAttributeNames.from_dict(flask.request.get_json())
+    params = schemas.PolyhedronAttributeNames.from_dict(json_data)
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeSolidMesh3D):
         flask.abort(500, f"{params.id} is not a GeodeSolidMesh")
@@ -335,8 +334,8 @@ def kill() -> flask.Response:
     methods=schemas_dict["export_project"]["methods"],
 )
 def export_project() -> flask.Response:
-    utils_functions.validate_request(flask.request, schemas_dict["export_project"])
-    params = schemas.ExportProject.from_dict(flask.request.get_json())
+    json_data = utils_functions.validate_request(flask.request, schemas_dict["export_project"])
+    params = schemas.ExportProject.from_dict(json_data)
 
     project_folder: str = flask.current_app.config["DATA_FOLDER_PATH"]
     os.makedirs(project_folder, exist_ok=True)

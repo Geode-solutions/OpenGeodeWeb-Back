@@ -2,7 +2,6 @@
 
 import argparse
 import os
-import time
 from typing import Any
 import flask
 import flask_cors  # type: ignore
@@ -36,8 +35,13 @@ SECONDS_BETWEEN_SHUTDOWNS: float = float(
 
 
 @app.before_request
-def before_request() -> None:
+def before_request() -> flask.Response|None:
+    if flask.request.method == "OPTIONS":
+        response = flask.make_response()
+        response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE,OPTIONS'
+        return response
     utils_functions.before_request(flask.current_app)
+    return None
 
 
 @app.teardown_request
@@ -111,7 +115,7 @@ def run_server() -> None:
     parser.add_argument(
         "-d",
         "--debug",
-        default=FLASK_DEBUG,
+        default=True,
         help="Whether to run in debug mode",
         action="store_true",
     )
@@ -145,7 +149,7 @@ def run_server() -> None:
     app.config.update(DATA_FOLDER_PATH=args.data_folder_path)
     app.config.update(UPLOAD_FOLDER=args.upload_folder_path)
     app.config.update(MINUTES_BEFORE_TIMEOUT=args.timeout)
-    flask_cors.CORS(app, origins=args.allowed_origins)
+    flask_cors.CORS(app, origins=args.allowed_origins, methods=["GET", "POST", "PUT"])
     print(
         f"Host: {args.host}, Port: {args.port}, Debug: {args.debug}, "
         f"Data folder path: {args.data_folder_path}, Timeout: {args.timeout}, "

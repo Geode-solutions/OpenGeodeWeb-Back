@@ -1,4 +1,5 @@
 # Standard library imports
+import json
 import os
 import threading
 import time
@@ -101,7 +102,7 @@ def versions(list_packages: list[str]) -> list[dict[str, str]]:
     return list_with_versions
 
 
-def validate_request(request: flask.Request, schema: SchemaDict) -> None:
+def validate_request(request: flask.Request, schema: SchemaDict) -> dict:
     json_data = request.get_json(force=True, silent=True)
 
     if json_data is None:
@@ -113,6 +114,7 @@ def validate_request(request: flask.Request, schema: SchemaDict) -> None:
         error_msg = str(e)
         print("Validation failed:", error_msg, flush=True)
         flask.abort(400, error_msg)
+    return json_data
 
 
 def set_interval(
@@ -169,6 +171,7 @@ def handle_exception(exception: HTTPException) -> flask.Response:
             "description": exception.description or "An error occurred",
         }
     )
+    response.content_type = "application/json"
     response.status_code = exception.code or 500
     return response
 
