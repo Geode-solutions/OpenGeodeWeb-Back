@@ -35,10 +35,10 @@ SECONDS_BETWEEN_SHUTDOWNS: float = float(
 
 
 @app.before_request
-def before_request() -> flask.Response|None:
+def before_request() -> flask.Response | None:
     if flask.request.method == "OPTIONS":
         response = flask.make_response()
-        response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE,OPTIONS'
+        response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
         return response
     utils_functions.before_request(flask.current_app)
     return None
