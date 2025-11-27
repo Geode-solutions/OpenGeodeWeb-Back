@@ -25,6 +25,6 @@ class GeodeGrid3D(GeodeMesh):
 
     def inspect(self) -> None:
         return None
-    
+
     @abstractmethod
     def cell_attribute_manager(self) -> og.AttributeManager: ...

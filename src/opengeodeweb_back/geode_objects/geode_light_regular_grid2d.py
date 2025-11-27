@@ -67,6 +67,6 @@ class GeodeLightRegularGrid2D(GeodeGrid2D):
 
     def vertex_attribute_manager(self) -> og.AttributeManager:
         return self.light_regular_grid.grid_vertex_attribute_manager()
-    
+
     def cell_attribute_manager(self) -> og.AttributeManager:
         return self.light_regular_grid.cell_attribute_manager()
