@@ -9,6 +9,7 @@ import geode_viewables as viewables
 # Local application imports
 from .types import GeodeMeshType
 from .geode_surface_mesh2d import GeodeSurfaceMesh2D
+from .geode_grid2d import GeodeGrid2D
 
 
 class GeodeRegularGrid2D(GeodeSurfaceMesh2D):

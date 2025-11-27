@@ -1,5 +1,6 @@
 # Standard library imports
 from __future__ import annotations
+from abc import abstractmethod
 
 # Third party imports
 import opengeode as og
@@ -24,3 +25,7 @@ class GeodeGrid2D(GeodeMesh):
 
     def inspect(self) -> None:
         return None
+    
+    @abstractmethod
+    def cell_attribute_manager(self) -> og.AttributeManager: ...
+    

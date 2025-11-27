@@ -21,6 +21,8 @@ from opengeodeweb_back import geode_functions, utils_functions
 from opengeodeweb_back.geode_objects import geode_objects
 from opengeodeweb_back.geode_objects.types import geode_object_type
 from opengeodeweb_back.geode_objects.geode_mesh import GeodeMesh
+from opengeodeweb_back.geode_objects.geode_grid2d import GeodeGrid2D
+from opengeodeweb_back.geode_objects.geode_grid3d import GeodeGrid3D
 from opengeodeweb_back.geode_objects.geode_surface_mesh2d import GeodeSurfaceMesh2D
 from opengeodeweb_back.geode_objects.geode_surface_mesh3d import GeodeSurfaceMesh3D
 from opengeodeweb_back.geode_objects.geode_solid_mesh3d import GeodeSolidMesh3D
@@ -267,6 +269,25 @@ def vertex_attribute_names() -> flask.Response:
         200,
     )
 
+@routes.route(
+    schemas_dict["cell_attribute_names"]["route"],
+    methods=schemas_dict["cell_attribute_names"]["methods"],
+)
+def cell_attribute_names() -> flask.Response:
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["cell_attribute_names"]
+    )
+    params = schemas.PolygonAttributeNames.from_dict(json_data)
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeGrid2D | GeodeGrid3D):
+        flask.abort(500, f"{params.id} is not a GeodeGrid")
+    cell_attribute_names = geode_object.cell_attribute_manager().attribute_names()
+    return flask.make_response(
+        {
+            "cell_attribute_names": cell_attribute_names,
+        },
+        200,
+    )
 
 @routes.route(
     schemas_dict["polygon_attribute_names"]["route"],
