@@ -22,7 +22,9 @@ schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas
 )
 def create_point() -> flask.Response:
     """Endpoint to create a single point in 3D space."""
-    json_data = utils_functions.validate_request(flask.request, schemas_dict["create_point"])
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["create_point"]
+    )
     params = schemas.CreatePoint.from_dict(json_data)
 
     # Create the point
@@ -43,7 +45,9 @@ def create_point() -> flask.Response:
 )
 def create_aoi() -> flask.Response:
     """Endpoint to create an Area of Interest (AOI) as an EdgedCurve3D."""
-    json_data = utils_functions.validate_request(flask.request, schemas_dict["create_aoi"])
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["create_aoi"]
+    )
     params = schemas.CreateAoi.from_dict(json_data)
 
     # Create the edged curve

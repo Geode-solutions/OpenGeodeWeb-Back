@@ -39,7 +39,9 @@ def uuid_to_flat_index() -> flask.Response:
     methods=schemas_dict["mesh_components"]["methods"],
 )
 def extract_uuids_endpoint() -> flask.Response:
-    json_data = utils_functions.validate_request(flask.request, schemas_dict["mesh_components"])
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["mesh_components"]
+    )
     params = schemas.MeshComponents.from_dict(json_data)
     model = geode_functions.load_geode_object(params.id)
     if not isinstance(model, GeodeModel):

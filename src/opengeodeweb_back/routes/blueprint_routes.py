@@ -72,7 +72,9 @@ def upload_file() -> flask.Response:
     methods=schemas_dict["allowed_objects"]["methods"],
 )
 def allowed_objects() -> flask.Response:
-    json_data = utils_functions.validate_request(flask.request, schemas_dict["allowed_objects"])
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["allowed_objects"]
+    )
     params = schemas.AllowedObjects.from_dict(json_data)
     file_absolute_path = geode_functions.upload_file_path(params.filename)
     file_extension = utils_functions.extension_from_filename(
@@ -96,7 +98,9 @@ def allowed_objects() -> flask.Response:
     methods=schemas_dict["missing_files"]["methods"],
 )
 def missing_files() -> flask.Response:
-    json_data = utils_functions.validate_request(flask.request, schemas_dict["missing_files"])
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["missing_files"]
+    )
     params = schemas.MissingFiles.from_dict(json_data)
     file_path = geode_functions.upload_file_path(params.filename)
     geode_object = geode_functions.geode_object_from_string(params.geode_object_type)
@@ -158,7 +162,9 @@ def crs_converter_geographic_coordinate_systems() -> flask.Response:
     methods=schemas_dict["inspect_file"]["methods"],
 )
 def inspect_file() -> flask.Response:
-    json_data = utils_functions.validate_request(flask.request, schemas_dict["inspect_file"])
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["inspect_file"]
+    )
     params = schemas.InspectFile.from_dict(json_data)
     file_path = geode_functions.upload_file_path(params.filename)
     geode_object = geode_functions.geode_object_from_string(
@@ -224,7 +230,9 @@ def geode_objects_and_output_extensions() -> flask.Response:
     methods=schemas_dict["save_viewable_file"]["methods"],
 )
 def save_viewable_file() -> flask.Response:
-    json_data = utils_functions.validate_request(flask.request, schemas_dict["save_viewable_file"])
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["save_viewable_file"]
+    )
     params = schemas.SaveViewableFile.from_dict(json_data)
     return flask.make_response(
         utils_functions.generate_native_viewable_and_light_viewable_from_file(
@@ -240,7 +248,9 @@ def save_viewable_file() -> flask.Response:
     methods=schemas_dict["texture_coordinates"]["methods"],
 )
 def texture_coordinates() -> flask.Response:
-    json_data = utils_functions.validate_request(flask.request, schemas_dict["texture_coordinates"])
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["texture_coordinates"]
+    )
     params = schemas.TextureCoordinates.from_dict(json_data)
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeSurfaceMesh2D | GeodeSurfaceMesh3D):
@@ -355,7 +365,9 @@ def kill() -> flask.Response:
     methods=schemas_dict["export_project"]["methods"],
 )
 def export_project() -> flask.Response:
-    json_data = utils_functions.validate_request(flask.request, schemas_dict["export_project"])
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["export_project"]
+    )
     params = schemas.ExportProject.from_dict(json_data)
 
     project_folder: str = flask.current_app.config["DATA_FOLDER_PATH"]
