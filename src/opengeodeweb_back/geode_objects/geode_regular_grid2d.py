@@ -24,7 +24,7 @@ class GeodeRegularGrid2D(GeodeSurfaceMesh2D, GeodeGrid2D):
     @classmethod
     def geode_object_type(cls) -> GeodeMeshType:
         return "RegularGrid2D"
-    
+
     def inspect(self) -> og_inspector.SurfaceInspectionResult:
         return super().inspect()
 
@@ -73,7 +73,6 @@ class GeodeRegularGrid2D(GeodeSurfaceMesh2D, GeodeGrid2D):
         return viewables.save_light_viewable_regular_grid2D(
             self.regular_grid, filename_without_extension
         )
-    
+
     def cell_attribute_manager(self) -> og.AttributeManager:
         return self.regular_grid.cell_attribute_manager()
-
