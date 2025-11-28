@@ -173,10 +173,10 @@ def test_save_viewable_file(client: FlaskClient) -> None:
     # Normal test with filename 'corbi.og_brep'
     response = client.post(route, json=get_full_data())
     assert response.status_code == 200
-    native_filename = response.get_json()["native_filename"]
-    assert type(native_filename) is str
-    viewable_filename = response.get_json()["viewable_filename"]
-    assert type(viewable_filename) is str
+    native_file = response.get_json()["native_file"]
+    assert type(native_file) is str
+    viewable_file = response.get_json()["viewable_file"]
+    assert type(viewable_file) is str
     id = response.get_json().get("id")
     assert type(id) is str
     object_type = response.get_json()["viewer_type"]
@@ -197,12 +197,12 @@ def test_texture_coordinates(client: FlaskClient, test_id: str) -> None:
             viewer_object=GeodePolygonalSurface3D.viewer_type(),
             input_file=file,
         )
-        data.native_filename = file
+        data.native_file = file
         session = get_session()
         if session:
             session.commit()
 
-        data_path = geode_functions.data_file_path(data.id, data.native_filename)
+        data_path = geode_functions.data_file_path(data.id, data.native_file)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(
@@ -225,12 +225,12 @@ def test_vertex_attribute_names(client: FlaskClient, test_id: str) -> None:
             viewer_object=GeodePolygonalSurface3D.viewer_type(),
             input_file=file,
         )
-        data.native_filename = file
+        data.native_file = file
         session = get_session()
         if session:
             session.commit()
 
-        data_path = geode_functions.data_file_path(data.id, data.native_filename)
+        data_path = geode_functions.data_file_path(data.id, data.native_file)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
@@ -251,12 +251,12 @@ def test_cell_attribute_names(client: FlaskClient, test_id: str) -> None:
             viewer_object=GeodeRegularGrid2D.viewer_type(),
             input_file=file,
         )
-        data.native_filename = file
+        data.native_file = file
         session = get_session()
         if session:
             session.commit()
 
-        data_path = geode_functions.data_file_path(data.id, data.native_filename)
+        data_path = geode_functions.data_file_path(data.id, data.native_file)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
@@ -277,12 +277,12 @@ def test_polygon_attribute_names(client: FlaskClient, test_id: str) -> None:
             viewer_object=GeodePolygonalSurface3D.viewer_type(),
             input_file=file,
         )
-        data.native_filename = file
+        data.native_file = file
         session = get_session()
         if session:
             session.commit()
 
-        data_path = geode_functions.data_file_path(data.id, data.native_filename)
+        data_path = geode_functions.data_file_path(data.id, data.native_file)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
@@ -303,12 +303,12 @@ def test_polyhedron_attribute_names(client: FlaskClient, test_id: str) -> None:
             viewer_object=GeodePolyhedralSolid3D.viewer_type(),
             input_file=file,
         )
-        data.native_filename = file
+        data.native_file = file
         session = get_session()
         if session:
             session.commit()
 
-        data_path = geode_functions.data_file_path(data.id, data.native_filename)
+        data_path = geode_functions.data_file_path(data.id, data.native_file)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})

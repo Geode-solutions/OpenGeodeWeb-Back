@@ -1,11 +1,10 @@
 # Standard library imports
-import json
 import os
 import threading
 import time
 import zipfile
 from collections.abc import Callable
-from concurrent.futures import ThreadPoolExecutor, Future
+from concurrent.futures import ThreadPoolExecutor
 
 # Third party imports
 import flask
@@ -208,15 +207,15 @@ def save_all_viewables_and_return_info(
         )
         with open(light_path, "rb") as f:
             binary_light_viewable = f.read()
-        data.native_filename = os.path.basename(native_files[0])
-        data.viewable_filename = os.path.basename(viewable_path)
+        data.native_file = os.path.basename(native_files[0])
+        data.viewable_file = os.path.basename(viewable_path)
         data.light_viewable = os.path.basename(light_path)
-        assert data.native_filename is not None
-        assert data.viewable_filename is not None
+        assert data.native_file is not None
+        assert data.viewable_file is not None
         assert data.light_viewable is not None
         return {
-            "native_filename": data.native_filename,
-            "viewable_filename": data.viewable_filename,
+            "native_file": data.native_file,
+            "viewable_file": data.viewable_file,
             "id": data.id,
             "name": geode_object.identifier.name(),
             "viewer_type": data.viewer_object,
@@ -239,20 +238,20 @@ def generate_native_viewable_and_light_viewable_from_object(
 
 
 def generate_native_viewable_and_light_viewable_from_file(
-    geode_object_type: GeodeObjectType, input_filename: str
+    geode_object_type: GeodeObjectType, input_file: str
 ) -> dict[str, str | list[str]]:
     generic_geode_object = geode_objects[geode_object_type]
     data = Data.create(
         geode_object=geode_object_type,
         viewer_object=generic_geode_object.viewer_type(),
-        input_file=input_filename,
+        input_file=input_file,
     )
 
     data_path = create_data_folder_from_id(data.id)
 
-    full_input_filename = geode_functions.upload_file_path(input_filename)
+    full_input_filename = geode_functions.upload_file_path(input_file)
     copied_full_path = os.path.join(
-        data_path, werkzeug.utils.secure_filename(input_filename)
+        data_path, werkzeug.utils.secure_filename(input_file)
     )
     shutil.copy2(full_input_filename, copied_full_path)
 

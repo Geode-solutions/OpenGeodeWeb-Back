@@ -46,7 +46,7 @@ def test_extract_brep_uuids(client: FlaskClient, test_id: str) -> None:
             viewer_object=GeodeBRep.viewer_type(),
             input_file=brep_filename,
         )
-        data.native_filename = brep_filename
+        data.native_file = brep_filename
         session = get_session()
         if session:
             session.commit()
@@ -106,8 +106,8 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
     temp_db = tmp_path / "temp_project.db"
     conn = sqlite3.connect(str(temp_db))
     conn.execute(
-        "CREATE TABLE datas (id TEXT PRIMARY KEY, geode_object TEXT, viewer_object TEXT, native_filename TEXT, "
-        "viewable_filename TEXT, light_viewable TEXT, input_file TEXT, additional_files TEXT)"
+        "CREATE TABLE datas (id TEXT PRIMARY KEY, geode_object TEXT, viewer_object TEXT, native_file TEXT, "
+        "viewable_file TEXT, light_viewable TEXT, input_file TEXT, additional_files TEXT)"
     )
     conn.commit()
     conn.close()
@@ -154,7 +154,7 @@ def test_save_viewable_workflow_from_file(client: FlaskClient) -> None:
 
     data_id = response.get_json()["id"]
     assert isinstance(data_id, str) and len(data_id) > 0
-    assert response.get_json()["viewable_filename"].endswith(".vtm")
+    assert response.get_json()["viewable_file"].endswith(".vtm")
 
     comp_resp = client.post(
         "/opengeodeweb_back/models/vtm_component_indices", json={"id": data_id}
@@ -184,4 +184,4 @@ def test_save_viewable_workflow_from_object(client: FlaskClient) -> None:
     data_id = response.get_json()["id"]
     assert isinstance(data_id, str) and len(data_id) > 0
     assert response.get_json()["geode_object_type"] == "EdgedCurve3D"
-    assert response.get_json()["viewable_filename"].endswith(".vtp")
+    assert response.get_json()["viewable_file"].endswith(".vtp")

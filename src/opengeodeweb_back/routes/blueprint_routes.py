@@ -237,7 +237,7 @@ def save_viewable_file() -> flask.Response:
     return flask.make_response(
         utils_functions.generate_native_viewable_and_light_viewable_from_file(
             geode_object_type=geode_object_type(params.geode_object_type),
-            input_filename=params.filename,
+            input_file=params.filename,
         ),
         200,
     )
@@ -473,7 +473,7 @@ def import_project() -> flask.Response:
         with get_session() as session:
             for data in rows:
                 data_path = geode_functions.data_file_path(data.id)
-                viewable_name = data.viewable_filename
+                viewable_name = data.viewable_file
                 if viewable_name:
                     vpath = geode_functions.data_file_path(data.id, viewable_name)
                     if os.path.isfile(vpath):

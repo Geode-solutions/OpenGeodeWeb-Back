@@ -9,13 +9,11 @@ from flask.testing import FlaskClient
 import shutil
 import uuid
 import zipfile
-import io
 from pathlib import Path
 
 # Local application imports
 from opengeodeweb_microservice.database.data import Data
-from opengeodeweb_microservice.database.connection import get_session
-from opengeodeweb_back import geode_functions, utils_functions
+from opengeodeweb_back import utils_functions
 from opengeodeweb_back.geode_objects.geode_brep import GeodeBRep
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
@@ -123,12 +121,12 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
         )
 
         assert isinstance(result, dict)
-        native_filename = result["native_filename"]
-        assert isinstance(native_filename, str)
-        assert native_filename.startswith("native.")
-        viewable_filename = result["viewable_filename"]
-        assert isinstance(viewable_filename, str)
-        assert viewable_filename.endswith(".vtm")
+        native_file = result["native_file"]
+        assert isinstance(native_file, str)
+        assert native_file.startswith("native.")
+        viewable_file = result["viewable_file"]
+        assert isinstance(viewable_file, str)
+        assert viewable_file.endswith(".vtm")
         assert isinstance(result["id"], str)
         assert len(result["id"]) == 32
         assert re.match(r"[0-9a-f]{32}", result["id"])
@@ -139,8 +137,8 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
 
         db_entry = Data.get(result["id"])
         assert db_entry is not None
-        assert db_entry.native_filename == result["native_filename"]
-        assert db_entry.viewable_filename == result["viewable_filename"]
+        assert db_entry.native_file == result["native_file"]
+        assert db_entry.viewable_file == result["viewable_file"]
         assert db_entry.geode_object == geode_object.geode_object_type()
         assert db_entry.input_file == input_file
         assert db_entry.additional_files == additional_files
@@ -169,7 +167,7 @@ def test_save_all_viewables_commits_to_db(client: FlaskClient) -> None:
         assert isinstance(data_id, str)
         db_entry_before = Data.get(data_id)
         assert db_entry_before is not None
-        assert db_entry_before.native_filename == result["native_filename"]
+        assert db_entry_before.native_file == result["native_file"]
 
 
 def test_generate_native_viewable_and_light_viewable_from_object(
@@ -186,10 +184,10 @@ def test_generate_native_viewable_and_light_viewable_from_object(
         )
 
     assert isinstance(result, dict)
-    assert isinstance(result["native_filename"], str)
-    assert result["native_filename"].startswith("native.")
-    assert isinstance(result["viewable_filename"], str)
-    assert result["viewable_filename"].endswith(".vtm")
+    assert isinstance(result["native_file"], str)
+    assert result["native_file"].startswith("native.")
+    assert isinstance(result["viewable_file"], str)
+    assert result["viewable_file"].endswith(".vtm")
     assert isinstance(result["id"], str)
     assert re.match(r"[0-9a-f]{32}", result["id"])
     assert isinstance(result["viewer_type"], str)
@@ -207,10 +205,10 @@ def test_generate_native_viewable_and_light_viewable_from_file(
         )
 
     assert isinstance(result, dict)
-    assert isinstance(result["native_filename"], str)
-    assert result["native_filename"].startswith("native.")
-    assert isinstance(result["viewable_filename"], str)
-    assert result["viewable_filename"].endswith(".vtm")
+    assert isinstance(result["native_file"], str)
+    assert result["native_file"].startswith("native.")
+    assert isinstance(result["viewable_file"], str)
+    assert result["viewable_file"].endswith(".vtm")
     assert isinstance(result["id"], str)
     assert re.match(r"[0-9a-f]{32}", result["id"])
     assert isinstance(result["viewer_type"], str)

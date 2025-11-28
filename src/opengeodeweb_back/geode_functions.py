@@ -2,11 +2,8 @@
 import os
 
 # Third party imports
-import opengeode_geosciences as og_gs
-import opengeode as og
 import werkzeug
 import flask
-from typing import Any
 
 # Local application imports
 from .geode_objects import geode_objects
@@ -15,9 +12,7 @@ from .geode_objects.types import (
     geode_object_type,
 )
 from .geode_objects.geode_object import GeodeObject
-from . import utils_functions
 from opengeodeweb_microservice.database.data import Data
-from opengeodeweb_microservice.database.connection import get_session
 
 
 def data_file_path(data_id: str, filename: str | None = None) -> str:
@@ -37,7 +32,7 @@ def load_geode_object(data_id: str) -> GeodeObject:
     if not data:
         flask.abort(404, f"Data with id {data_id} not found")
 
-    file_absolute_path = data_file_path(data_id, data.native_filename)
+    file_absolute_path = data_file_path(data_id, data.native_file)
     print("Loading file: ", file_absolute_path)
     print("File exists: ", os.path.exists(file_absolute_path))
     return geode_object_from_string(data.geode_object).load(file_absolute_path)
