@@ -2,7 +2,6 @@
 
 import argparse
 import os
-import time
 from typing import Any
 import flask
 import flask_cors  # type: ignore
@@ -36,8 +35,13 @@ SECONDS_BETWEEN_SHUTDOWNS: float = float(
 
 
 @app.before_request
-def before_request() -> None:
+def before_request() -> flask.Response | None:
+    if flask.request.method == "OPTIONS":
+        response = flask.make_response()
+        response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
+        return response
     utils_functions.before_request(flask.current_app)
+    return None
 
 
 @app.teardown_request
@@ -68,13 +72,14 @@ if FLASK_DEBUG == False:
 
 
 @app.errorhandler(HTTPException)
-def errorhandler(e: HTTPException) -> tuple[dict[str, Any], int] | Response:
-    return utils_functions.handle_exception(e)
+def errorhandler(exception: HTTPException) -> tuple[dict[str, Any], int] | Response:
+    return utils_functions.handle_exception(exception)
 
 
 @app.errorhandler(Exception)
-def handle_generic_exception(e: Exception) -> Response:
-    return flask.make_response({"error": str(e)}, 500)
+def handle_generic_exception(exception: Exception) -> Response:
+    print("\033[91mError:\033[0m \033[91m" + str(exception) + "\033[0m", flush=True)
+    return flask.make_response({"description": str(exception)}, 500)
 
 
 @app.route(

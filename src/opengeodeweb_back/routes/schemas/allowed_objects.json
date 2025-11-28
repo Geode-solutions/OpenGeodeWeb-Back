@@ -8,17 +8,10 @@
     "filename": {
       "type": "string",
       "minLength": 1
-    },
-    "supported_feature": {
-      "type": [
-        "string",
-        "null"
-      ]
     }
   },
   "required": [
-    "filename",
-    "supported_feature"
+    "filename"
   ],
   "additionalProperties": false
 }

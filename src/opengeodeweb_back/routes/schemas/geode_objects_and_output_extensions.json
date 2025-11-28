@@ -5,7 +5,7 @@
   ],
   "type": "object",
   "properties": {
-    "input_geode_object": {
+    "geode_object_type": {
       "type": "string",
       "minLength": 1
     },
@@ -15,7 +15,7 @@
     }
   },
   "required": [
-    "input_geode_object",
+    "geode_object_type",
     "filename"
   ],
   "additionalProperties": false

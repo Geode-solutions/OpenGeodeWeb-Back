@@ -12,5 +12,6 @@ from .import_project import *
 from .geographic_coordinate_systems import *
 from .geode_objects_and_output_extensions import *
 from .export_project import *
+from .cell_attribute_names import *
 from .allowed_objects import *
 from .allowed_files import *

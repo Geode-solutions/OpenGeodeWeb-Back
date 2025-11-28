@@ -31,7 +31,7 @@ markupsafe>=3
     #   flask
     #   jinja2
     #   werkzeug
-opengeode-core==15.30.2
+opengeode-core==15.30.4
     # via
     #   -r requirements.in
     #   geode-common
@@ -40,7 +40,7 @@ opengeode-core==15.30.2
     #   opengeode-geosciencesio
     #   opengeode-inspector
     #   opengeode-io
-opengeode-geosciences==9.5.4
+opengeode-geosciences==9.5.5
     # via
     #   -r requirements.in
     #   geode-viewables
@@ -60,4 +60,3 @@ werkzeug==3.1.2
     #   flask
     #   flask-cors
 
-opengeodeweb-microservice==1.*,>=1.0.9
