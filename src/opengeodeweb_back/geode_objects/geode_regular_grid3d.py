@@ -73,6 +73,6 @@ class GeodeRegularGrid3D(GeodeSolidMesh3D, GeodeGrid3D):
 
     def cell_attribute_manager(self) -> og.AttributeManager:
         return self.regular_grid.cell_attribute_manager()
-    
+
     def inspect(self) -> og_inspector.SolidInspectionResult:
         return super().inspect()

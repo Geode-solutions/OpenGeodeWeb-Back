@@ -291,7 +291,7 @@ def cell_attribute_names() -> flask.Response:
     params = schemas.PolygonAttributeNames.from_dict(json_data)
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeGrid2D | GeodeGrid3D):
-       flask.abort(400, f"{params.id} is not a GeodeGrid")
+        flask.abort(400, f"{params.id} is not a GeodeGrid")
     cell_attribute_names = geode_object.cell_attribute_manager().attribute_names()
     return flask.make_response(
         {

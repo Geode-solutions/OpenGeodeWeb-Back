@@ -77,7 +77,7 @@ def errorhandler(exception: HTTPException) -> tuple[dict[str, Any], int] | Respo
 
 
 @app.errorhandler(Exception)
-def handle_generic_exception(exception: Exception) -> Response: 
+def handle_generic_exception(exception: Exception) -> Response:
     print("\033[91mError:\033[0m \033[91m" + str(exception) + "\033[0m", flush=True)
     return flask.make_response({"description": str(exception)}, 500)
 
