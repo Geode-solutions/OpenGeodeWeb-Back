@@ -82,11 +82,11 @@ def create_voi() -> flask.Response:
 
     aoi_data = geode_functions.get_data_info(params.aoi_id)
     if not aoi_data:
-        flask.abort(500, f"AOI with id {params.aoi_id} not found")
+        flask.abort(404, f"AOI with id {params.aoi_id} not found")
 
     aoi_object = geode_functions.load_geode_object(params.aoi_id)
     if not isinstance(aoi_object, GeodeEdgedCurve3D):
-        flask.abort(500, f"AOI with id {params.aoi_id} not a GeodeEdgedCurve3D")
+        flask.abort(400, f"AOI with id {params.aoi_id} is not a GeodeEdgedCurve3D")
 
     aoi_curve = aoi_object.edged_curve
     nb_points = aoi_curve.nb_vertices()

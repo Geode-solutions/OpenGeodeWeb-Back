@@ -20,10 +20,10 @@ class GeodeGrid2D(GeodeMesh):
     def is_viewable(cls) -> bool:
         return True
 
-    def builder(self) -> None:
+    def builder(self) -> object:
         return None
 
-    def inspect(self) -> None:
+    def inspect(self) -> object:
         return None
     
     @abstractmethod

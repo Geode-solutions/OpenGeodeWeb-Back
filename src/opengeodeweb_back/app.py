@@ -72,14 +72,14 @@ if FLASK_DEBUG == False:
 
 
 @app.errorhandler(HTTPException)
-def errorhandler(e: HTTPException) -> tuple[dict[str, Any], int] | Response:
-    return utils_functions.handle_exception(e)
+def errorhandler(exception: HTTPException) -> tuple[dict[str, Any], int] | Response:
+    return utils_functions.handle_exception(exception)
 
 
 @app.errorhandler(Exception)
-def handle_generic_exception(e: Exception) -> Response:
-    print("handle_generic_exception:", str(e), flush=True)
-    return flask.make_response({"error": str(e)}, 500)
+def handle_generic_exception(exception: Exception) -> Response: 
+    print("\033[91mError:\033[0m \033[91m" + str(exception) + "\033[0m", flush=True)
+    return flask.make_response({"description": str(exception)}, 500)
 
 
 @app.route(

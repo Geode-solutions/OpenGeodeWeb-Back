@@ -12,7 +12,7 @@ from .geode_surface_mesh2d import GeodeSurfaceMesh2D
 from .geode_grid2d import GeodeGrid2D
 
 
-class GeodeRegularGrid2D(GeodeSurfaceMesh2D):
+class GeodeRegularGrid2D(GeodeSurfaceMesh2D, GeodeGrid2D):
     regular_grid: og.RegularGrid2D
 
     def __init__(self, regular_grid: og.RegularGrid2D | None = None) -> None:
@@ -24,6 +24,9 @@ class GeodeRegularGrid2D(GeodeSurfaceMesh2D):
     @classmethod
     def geode_object_type(cls) -> GeodeMeshType:
         return "RegularGrid2D"
+    
+    def inspect(self) -> og_inspector.SurfaceInspectionResult:
+        return super().inspect()
 
     def native_extension(self) -> str:
         return self.regular_grid.native_extension()
@@ -70,3 +73,7 @@ class GeodeRegularGrid2D(GeodeSurfaceMesh2D):
         return viewables.save_light_viewable_regular_grid2D(
             self.regular_grid, filename_without_extension
         )
+    
+    def cell_attribute_manager(self) -> og.AttributeManager:
+        return self.regular_grid.cell_attribute_manager()
+

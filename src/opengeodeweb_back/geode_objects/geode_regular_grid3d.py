@@ -9,9 +9,10 @@ import geode_viewables as viewables
 # Local application imports
 from .types import GeodeMeshType
 from .geode_solid_mesh3d import GeodeSolidMesh3D
+from .geode_grid3d import GeodeGrid3D
 
 
-class GeodeRegularGrid3D(GeodeSolidMesh3D):
+class GeodeRegularGrid3D(GeodeSolidMesh3D, GeodeGrid3D):
     regular_grid: og.RegularGrid3D
 
     def __init__(self, regular_grid: og.RegularGrid3D | None = None) -> None:
@@ -69,3 +70,9 @@ class GeodeRegularGrid3D(GeodeSolidMesh3D):
         return viewables.save_light_viewable_regular_grid3D(
             self.regular_grid, filename_without_extension
         )
+
+    def cell_attribute_manager(self) -> og.AttributeManager:
+        return self.regular_grid.cell_attribute_manager()
+    
+    def inspect(self) -> og_inspector.SolidInspectionResult:
+        return super().inspect()

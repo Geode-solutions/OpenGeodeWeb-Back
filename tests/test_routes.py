@@ -16,6 +16,10 @@ from opengeodeweb_back.geode_objects.geode_polyhedral_solid3d import (
     GeodePolyhedralSolid3D,
 )
 
+from opengeodeweb_back.geode_objects.geode_regular_grid2d import (
+    GeodeRegularGrid2D,
+)
+
 base_dir = os.path.abspath(os.path.dirname(__file__))
 data_dir = os.path.join(base_dir, "data")
 
@@ -235,6 +239,32 @@ def test_vertex_attribute_names(client: FlaskClient, test_id: str) -> None:
     assert type(vertex_attribute_names) is list
     for vertex_attribute_name in vertex_attribute_names:
         assert type(vertex_attribute_name) is str
+
+
+def test_cell_attribute_names(client: FlaskClient, test_id: str) -> None:
+    route = f"/opengeodeweb_back/cell_attribute_names"
+
+    with client.application.app_context():
+        file = os.path.join(data_dir, "test.og_rgd2d")
+        data = Data.create(
+            geode_object=GeodeRegularGrid2D.geode_object_type(),
+            viewer_object=GeodeRegularGrid2D.viewer_type(),
+            input_file=file,
+        )
+        data.native_file_name = file
+        session = get_session()
+        if session:
+            session.commit()
+
+        data_path = geode_functions.data_file_path(data.id, data.native_file_name)
+        os.makedirs(os.path.dirname(data_path), exist_ok=True)
+        assert os.path.exists(data_path), f"File not found at {data_path}"
+    response = client.post(route, json={"id": data.id})
+    assert response.status_code == 200
+    cell_attribute_names = response.get_json()["cell_attribute_names"]
+    assert type(cell_attribute_names) is list
+    for cell_attribute_name in cell_attribute_names:
+        assert type(cell_attribute_name) is str
 
 
 def test_polygon_attribute_names(client: FlaskClient, test_id: str) -> None:

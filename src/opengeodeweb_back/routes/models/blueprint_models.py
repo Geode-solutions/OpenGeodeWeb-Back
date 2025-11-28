@@ -24,7 +24,7 @@ def uuid_to_flat_index() -> flask.Response:
     tree = ET.parse(vtm_file_path)
     root = tree.find("vtkMultiBlockDataSet")
     if root is None:
-        raise Exception("Failed to read viewable file")
+        flask.abort(500, "Failed to read viewable file")
     uuid_to_flat_index = {}
     current_index = 0
     for elem in root.iter():
@@ -45,7 +45,7 @@ def extract_uuids_endpoint() -> flask.Response:
     params = schemas.MeshComponents.from_dict(json_data)
     model = geode_functions.load_geode_object(params.id)
     if not isinstance(model, GeodeModel):
-        flask.abort(500, f"{params.id} is not a GeodeModel")
+        flask.abort(400, f"{params.id} is not a GeodeModel")
     mesh_components = model.mesh_components()
     uuid_dict = {}
     for mesh_component, ids in mesh_components.items():

@@ -164,6 +164,7 @@ def send_file(
 
 
 def handle_exception(exception: HTTPException) -> flask.Response:
+    print("\033[91mError:\033[0m \033[91m" + str(exception) + "\033[0m", flush=True)
     response = flask.jsonify(
         {
             "code": exception.code,
