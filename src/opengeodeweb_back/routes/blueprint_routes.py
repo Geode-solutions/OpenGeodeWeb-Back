@@ -279,6 +279,7 @@ def vertex_attribute_names() -> flask.Response:
         200,
     )
 
+
 @routes.route(
     schemas_dict["cell_attribute_names"]["route"],
     methods=schemas_dict["cell_attribute_names"]["methods"],
@@ -298,6 +299,7 @@ def cell_attribute_names() -> flask.Response:
         },
         200,
     )
+
 
 @routes.route(
     schemas_dict["polygon_attribute_names"]["route"],
