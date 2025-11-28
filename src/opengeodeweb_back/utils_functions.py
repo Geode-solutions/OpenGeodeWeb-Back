@@ -5,6 +5,8 @@ import time
 import zipfile
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any
+
 
 # Third party imports
 import flask
@@ -101,7 +103,7 @@ def versions(list_packages: list[str]) -> list[dict[str, str]]:
     return list_with_versions
 
 
-def validate_request(request: flask.Request, schema: SchemaDict) -> dict:
+def validate_request(request: flask.Request, schema: SchemaDict) -> dict[str, Any]:
     json_data = request.get_json(force=True, silent=True)
 
     if json_data is None:
@@ -209,10 +211,10 @@ def save_all_viewables_and_return_info(
             binary_light_viewable = f.read()
         data.native_file = os.path.basename(native_files[0])
         data.viewable_file = os.path.basename(viewable_path)
-        data.light_viewable = os.path.basename(light_path)
+        data.light_viewable_file = os.path.basename(light_path)
         assert data.native_file is not None
         assert data.viewable_file is not None
-        assert data.light_viewable is not None
+        assert data.light_viewable_file is not None
         return {
             "native_file": data.native_file,
             "viewable_file": data.viewable_file,
