@@ -208,15 +208,15 @@ def save_all_viewables_and_return_info(
         )
         with open(light_path, "rb") as f:
             binary_light_viewable = f.read()
-        data.native_file_name = os.path.basename(native_files[0])
-        data.viewable_file_name = os.path.basename(viewable_path)
+        data.native_filename = os.path.basename(native_files[0])
+        data.viewable_filename = os.path.basename(viewable_path)
         data.light_viewable = os.path.basename(light_path)
-        assert data.native_file_name is not None
-        assert data.viewable_file_name is not None
+        assert data.native_filename is not None
+        assert data.viewable_filename is not None
         assert data.light_viewable is not None
         return {
-            "native_file_name": data.native_file_name,
-            "viewable_file_name": data.viewable_file_name,
+            "native_filename": data.native_filename,
+            "viewable_filename": data.viewable_filename,
             "id": data.id,
             "name": geode_object.identifier.name(),
             "viewer_type": data.viewer_object,

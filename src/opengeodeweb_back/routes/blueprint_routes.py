@@ -473,7 +473,7 @@ def import_project() -> flask.Response:
         with get_session() as session:
             for data in rows:
                 data_path = geode_functions.data_file_path(data.id)
-                viewable_name = data.viewable_file_name
+                viewable_name = data.viewable_filename
                 if viewable_name:
                     vpath = geode_functions.data_file_path(data.id, viewable_name)
                     if os.path.isfile(vpath):

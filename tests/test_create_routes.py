@@ -51,10 +51,10 @@ def test_create_point(client: FlaskClient, point_data: test_utils.JsonData) -> N
 
     # Verify response data
     response_data = response.get_json()
-    assert "viewable_file_name" in response_data
+    assert "viewable_filename" in response_data
     assert "id" in response_data
     assert "name" in response_data
-    assert "native_file_name" in response_data
+    assert "native_filename" in response_data
     assert "viewer_type" in response_data
     assert "geode_object_type" in response_data
 
@@ -76,10 +76,10 @@ def test_create_aoi(client: FlaskClient, aoi_data: test_utils.JsonData) -> None:
 
     # Verify response data
     response_data = response.get_json()
-    assert "viewable_file_name" in response_data
+    assert "viewable_filename" in response_data
     assert "id" in response_data
     assert "name" in response_data
-    assert "native_file_name" in response_data
+    assert "native_filename" in response_data
     assert "viewer_type" in response_data
     assert "geode_object_type" in response_data
 

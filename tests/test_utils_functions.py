@@ -123,12 +123,12 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
         )
 
         assert isinstance(result, dict)
-        native_file_name = result["native_file_name"]
-        assert isinstance(native_file_name, str)
-        assert native_file_name.startswith("native.")
-        viewable_file_name = result["viewable_file_name"]
-        assert isinstance(viewable_file_name, str)
-        assert viewable_file_name.endswith(".vtm")
+        native_filename = result["native_filename"]
+        assert isinstance(native_filename, str)
+        assert native_filename.startswith("native.")
+        viewable_filename = result["viewable_filename"]
+        assert isinstance(viewable_filename, str)
+        assert viewable_filename.endswith(".vtm")
         assert isinstance(result["id"], str)
         assert len(result["id"]) == 32
         assert re.match(r"[0-9a-f]{32}", result["id"])
@@ -139,8 +139,8 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
 
         db_entry = Data.get(result["id"])
         assert db_entry is not None
-        assert db_entry.native_file_name == result["native_file_name"]
-        assert db_entry.viewable_file_name == result["viewable_file_name"]
+        assert db_entry.native_filename == result["native_filename"]
+        assert db_entry.viewable_filename == result["viewable_filename"]
         assert db_entry.geode_object == geode_object.geode_object_type()
         assert db_entry.input_file == input_file
         assert db_entry.additional_files == additional_files
@@ -169,7 +169,7 @@ def test_save_all_viewables_commits_to_db(client: FlaskClient) -> None:
         assert isinstance(data_id, str)
         db_entry_before = Data.get(data_id)
         assert db_entry_before is not None
-        assert db_entry_before.native_file_name == result["native_file_name"]
+        assert db_entry_before.native_filename == result["native_filename"]
 
 
 def test_generate_native_viewable_and_light_viewable_from_object(
@@ -186,10 +186,10 @@ def test_generate_native_viewable_and_light_viewable_from_object(
         )
 
     assert isinstance(result, dict)
-    assert isinstance(result["native_file_name"], str)
-    assert result["native_file_name"].startswith("native.")
-    assert isinstance(result["viewable_file_name"], str)
-    assert result["viewable_file_name"].endswith(".vtm")
+    assert isinstance(result["native_filename"], str)
+    assert result["native_filename"].startswith("native.")
+    assert isinstance(result["viewable_filename"], str)
+    assert result["viewable_filename"].endswith(".vtm")
     assert isinstance(result["id"], str)
     assert re.match(r"[0-9a-f]{32}", result["id"])
     assert isinstance(result["viewer_type"], str)
@@ -207,10 +207,10 @@ def test_generate_native_viewable_and_light_viewable_from_file(
         )
 
     assert isinstance(result, dict)
-    assert isinstance(result["native_file_name"], str)
-    assert result["native_file_name"].startswith("native.")
-    assert isinstance(result["viewable_file_name"], str)
-    assert result["viewable_file_name"].endswith(".vtm")
+    assert isinstance(result["native_filename"], str)
+    assert result["native_filename"].startswith("native.")
+    assert isinstance(result["viewable_filename"], str)
+    assert result["viewable_filename"].endswith(".vtm")
     assert isinstance(result["id"], str)
     assert re.match(r"[0-9a-f]{32}", result["id"])
     assert isinstance(result["viewer_type"], str)

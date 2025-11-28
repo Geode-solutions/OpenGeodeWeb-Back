@@ -37,7 +37,7 @@ def load_geode_object(data_id: str) -> GeodeObject:
     if not data:
         flask.abort(404, f"Data with id {data_id} not found")
 
-    file_absolute_path = data_file_path(data_id, data.native_file_name)
+    file_absolute_path = data_file_path(data_id, data.native_filename)
     print("Loading file: ", file_absolute_path)
     print("File exists: ", os.path.exists(file_absolute_path))
     return geode_object_from_string(data.geode_object).load(file_absolute_path)
