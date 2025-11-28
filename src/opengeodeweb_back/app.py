@@ -115,7 +115,7 @@ def run_server() -> None:
     parser.add_argument(
         "-d",
         "--debug",
-        default=True,
+        default=FLASK_DEBUG,
         help="Whether to run in debug mode",
         action="store_true",
     )
@@ -149,7 +149,7 @@ def run_server() -> None:
     app.config.update(DATA_FOLDER_PATH=args.data_folder_path)
     app.config.update(UPLOAD_FOLDER=args.upload_folder_path)
     app.config.update(MINUTES_BEFORE_TIMEOUT=args.timeout)
-    flask_cors.CORS(app, origins=args.allowed_origins, methods=["GET", "POST", "PUT"])
+    flask_cors.CORS(app, origins=args.allowed_origins)
     print(
         f"Host: {args.host}, Port: {args.port}, Debug: {args.debug}, "
         f"Data folder path: {args.data_folder_path}, Timeout: {args.timeout}, "
