@@ -77,7 +77,9 @@ def create_aoi() -> flask.Response:
 )
 def create_voi() -> flask.Response:
     """Endpoint to create a Volume of Interest (VOI) as an EdgedCurve3D (a bounding box/prism)."""
-    json_data = utils_functions.validate_request(flask.request, schemas_dict["create_voi"])
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["create_voi"]
+    )
     params = schemas.CreateVoi.from_dict(json_data)
 
     aoi_data = geode_functions.get_data_info(params.aoi_id)
