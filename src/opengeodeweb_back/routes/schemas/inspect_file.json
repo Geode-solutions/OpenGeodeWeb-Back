@@ -9,14 +9,14 @@
       "type": "string",
       "minLength": 1
     },
-    "input_geode_object": {
+    "geode_object_type": {
       "type": "string",
       "minLength": 1
     }
   },
   "required": [
     "filename",
-    "input_geode_object"
+    "geode_object_type"
   ],
   "additionalProperties": false
 }

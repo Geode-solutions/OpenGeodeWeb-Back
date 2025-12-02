@@ -213,7 +213,7 @@
       ],
       "type": "object",
       "properties": {
-        "input_geode_object": {
+        "geode_object_type": {
           "type": "string",
           "minLength": 1
         },
@@ -223,7 +223,7 @@
         }
       },
       "required": [
-        "input_geode_object",
+        "geode_object_type",
         "filename"
       ],
       "additionalProperties": false
@@ -283,7 +283,7 @@
       ],
       "type": "object",
       "properties": {
-        "input_geode_object": {
+        "geode_object_type": {
           "type": "string",
           "minLength": 1
         },
@@ -293,7 +293,7 @@
         }
       },
       "required": [
-        "input_geode_object",
+        "geode_object_type",
         "filename"
       ],
       "additionalProperties": false
@@ -321,14 +321,14 @@
           "type": "string",
           "minLength": 1
         },
-        "input_geode_object": {
+        "geode_object_type": {
           "type": "string",
           "minLength": 1
         }
       },
       "required": [
         "filename",
-        "input_geode_object"
+        "geode_object_type"
       ],
       "additionalProperties": false
     },
@@ -351,13 +351,13 @@
       ],
       "type": "object",
       "properties": {
-        "input_geode_object": {
+        "geode_object_type": {
           "type": "string",
           "minLength": 1
         }
       },
       "required": [
-        "input_geode_object"
+        "geode_object_type"
       ],
       "additionalProperties": false
     },
@@ -369,7 +369,7 @@
       ],
       "type": "object",
       "properties": {
-        "input_geode_object": {
+        "geode_object_type": {
           "type": "string",
           "minLength": 1
         },
@@ -379,7 +379,7 @@
         }
       },
       "required": [
-        "input_geode_object",
+        "geode_object_type",
         "filename"
       ],
       "additionalProperties": false
@@ -406,6 +406,24 @@
       ],
       "additionalProperties": false
     },
+    "cell_attribute_names": {
+      "$id": "opengeodeweb_back/cell_attribute_names",
+      "route": "/cell_attribute_names",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
     "allowed_objects": {
       "$id": "opengeodeweb_back/allowed_objects",
       "route": "/allowed_objects",
@@ -417,17 +435,10 @@
         "filename": {
           "type": "string",
           "minLength": 1
-        },
-        "supported_feature": {
-          "type": [
-            "string",
-            "null"
-          ]
         }
       },
       "required": [
-        "filename",
-        "supported_feature"
+        "filename"
       ],
       "additionalProperties": false
     },
@@ -438,17 +449,8 @@
         "POST"
       ],
       "type": "object",
-      "properties": {
-        "supported_feature": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "supported_feature"
-      ],
+      "properties": {},
+      "required": [],
       "additionalProperties": false
     }
   }

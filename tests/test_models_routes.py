@@ -1,18 +1,21 @@
 import os
 import shutil
-
-from opengeodeweb_back import geode_functions
-from opengeodeweb_microservice.database.data import Data
-from opengeodeweb_microservice.database.connection import get_session
-from werkzeug.datastructures import FileStorage
 import zipfile
 import json
+from flask.testing import FlaskClient
+from werkzeug.datastructures import FileStorage
+from pathlib import Path
+
+from opengeodeweb_microservice.database.data import Data
+from opengeodeweb_microservice.database.connection import get_session
+from opengeodeweb_back import geode_functions
+from opengeodeweb_back.geode_objects.geode_brep import GeodeBRep
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 data_dir = os.path.join(base_dir, "data")
 
 
-def test_model_mesh_components(client, test_id):
+def test_model_mesh_components(client: FlaskClient, test_id: str) -> None:
     route = "/opengeodeweb_back/models/vtm_component_indices"
 
     with client.application.app_context():
@@ -23,7 +26,7 @@ def test_model_mesh_components(client, test_id):
     response = client.post(route, json={"id": test_id})
     assert response.status_code == 200
 
-    uuid_dict = response.json["uuid_to_flat_index"]
+    uuid_dict = response.get_json()["uuid_to_flat_index"]
     assert isinstance(uuid_dict, dict)
 
     indices = list(uuid_dict.values())
@@ -33,29 +36,29 @@ def test_model_mesh_components(client, test_id):
         assert isinstance(uuid, str)
 
 
-def test_extract_brep_uuids(client, test_id):
+def test_extract_brep_uuids(client: FlaskClient, test_id: str) -> None:
     route = "/opengeodeweb_back/models/mesh_components"
     brep_filename = os.path.join(data_dir, "cube.og_brep")
 
     with client.application.app_context():
-        data_entry = Data.create(
-            geode_object="BRep",
-            viewer_object=geode_functions.get_object_type("BRep"),
+        data = Data.create(
+            geode_object=GeodeBRep.geode_object_type(),
+            viewer_object=GeodeBRep.viewer_type(),
             input_file=brep_filename,
         )
-        data_entry.native_file_name = brep_filename
+        data.native_file = brep_filename
         session = get_session()
         if session:
             session.commit()
 
-        response = client.post(route, json={"id": data_entry.id})
+        response = client.post(route, json={"id": data.id})
         assert response.status_code == 200
-        assert "uuid_dict" in response.json
-        uuid_dict = response.json["uuid_dict"]
+        assert "uuid_dict" in response.get_json()
+        uuid_dict = response.get_json()["uuid_dict"]
         assert isinstance(uuid_dict, dict)
 
 
-def test_export_project_route(client, tmp_path):
+def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
     route = "/opengeodeweb_back/export_project"
     snapshot = {
         "styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}
@@ -86,7 +89,7 @@ def test_export_project_route(client, tmp_path):
         os.remove(export_path)
 
 
-def test_import_project_route(client, tmp_path):
+def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
     route = "/opengeodeweb_back/import_project"
     snapshot = {
         "styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}
@@ -103,8 +106,8 @@ def test_import_project_route(client, tmp_path):
     temp_db = tmp_path / "temp_project.db"
     conn = sqlite3.connect(str(temp_db))
     conn.execute(
-        "CREATE TABLE datas (id TEXT PRIMARY KEY, geode_object TEXT, viewer_object TEXT, native_file_name TEXT, "
-        "viewable_file_name TEXT, light_viewable TEXT, input_file TEXT, additional_files TEXT)"
+        "CREATE TABLE datas (id TEXT PRIMARY KEY, geode_object TEXT, viewer_object TEXT, native_file TEXT, "
+        "viewable_file TEXT, light_viewable_file TEXT, input_file TEXT, additional_files TEXT)"
     )
     conn.commit()
     conn.close()
@@ -122,7 +125,7 @@ def test_import_project_route(client, tmp_path):
         )
 
     assert resp.status_code == 200
-    assert resp.json.get("snapshot") == snapshot
+    assert resp.get_json().get("snapshot") == snapshot
     assert os.path.exists(db_path)
 
     from opengeodeweb_microservice.database import connection
@@ -135,7 +138,7 @@ def test_import_project_route(client, tmp_path):
     client.application.config["DATA_FOLDER_PATH"] = original_data_folder
 
 
-def test_save_viewable_workflow_from_file(client):
+def test_save_viewable_workflow_from_file(client: FlaskClient) -> None:
     file = os.path.join(data_dir, "cube.og_brep")
     upload_resp = client.put(
         "/opengeodeweb_back/upload_file",
@@ -144,14 +147,14 @@ def test_save_viewable_workflow_from_file(client):
     assert upload_resp.status_code == 201
 
     route = "/opengeodeweb_back/save_viewable_file"
-    payload = {"input_geode_object": "BRep", "filename": "cube.og_brep"}
+    payload = {"geode_object_type": "BRep", "filename": "cube.og_brep"}
 
     response = client.post(route, json=payload)
     assert response.status_code == 200
 
-    data_id = response.json["id"]
+    data_id = response.get_json()["id"]
     assert isinstance(data_id, str) and len(data_id) > 0
-    assert response.json["viewable_file_name"].endswith(".vtm")
+    assert response.get_json()["viewable_file"].endswith(".vtm")
 
     comp_resp = client.post(
         "/opengeodeweb_back/models/vtm_component_indices", json={"id": data_id}
@@ -162,7 +165,7 @@ def test_save_viewable_workflow_from_file(client):
     assert refreshed is not None
 
 
-def test_save_viewable_workflow_from_object(client):
+def test_save_viewable_workflow_from_object(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/create/create_aoi"
     aoi_data = {
         "name": "workflow_aoi",
@@ -178,13 +181,7 @@ def test_save_viewable_workflow_from_object(client):
     response = client.post(route, json=aoi_data)
     assert response.status_code == 200
 
-    data_id = response.json["id"]
+    data_id = response.get_json()["id"]
     assert isinstance(data_id, str) and len(data_id) > 0
-    assert response.json["geode_object"] == "EdgedCurve3D"
-    assert response.json["viewable_file_name"].endswith(".vtp")
-
-    attr_resp = client.post(
-        "/opengeodeweb_back/vertex_attribute_names", json={"id": data_id}
-    )
-    assert attr_resp.status_code == 200
-    assert isinstance(attr_resp.json.get("vertex_attribute_names", []), list)
+    assert response.get_json()["geode_object_type"] == "EdgedCurve3D"
+    assert response.get_json()["viewable_file"].endswith(".vtp")

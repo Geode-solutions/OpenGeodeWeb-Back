@@ -8,4 +8,4 @@ class SaveViewableFile(DataClassJsonMixin):
         print(self, flush=True)
 
     filename: str
-    input_geode_object: str
+    geode_object_type: str
