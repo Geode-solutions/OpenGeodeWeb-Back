@@ -15,3 +15,4 @@ from .export_project import *
 from .cell_attribute_names import *
 from .allowed_objects import *
 from .allowed_files import *
+from .import_extension import *

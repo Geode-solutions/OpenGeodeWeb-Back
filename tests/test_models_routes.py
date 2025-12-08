@@ -185,3 +185,82 @@ def test_save_viewable_workflow_from_object(client: FlaskClient) -> None:
     assert isinstance(data_id, str) and len(data_id) > 0
     assert response.get_json()["geode_object_type"] == "EdgedCurve3D"
     assert response.get_json()["viewable_file"].endswith(".vtp")
+
+
+def test_import_extension_route(client: FlaskClient, tmp_path: Path) -> None:
+    """Test importing a .vext extension file."""
+    route = "/opengeodeweb_back/import_extension"
+    original_data_folder = client.application.config["DATA_FOLDER_PATH"]
+    client.application.config["DATA_FOLDER_PATH"] = os.path.join(
+        str(tmp_path), "extension_test_data"
+    )
+    vext_path = tmp_path / "test-extension-1.0.0.vext"
+    with zipfile.ZipFile(vext_path, "w", compression=zipfile.ZIP_DEFLATED) as zipf:
+        zipf.writestr(
+            "dist/test-extension-extension.es.js",
+            "export const metadata = { id: 'test-extension', name: 'Test Extension' };",
+        )
+        zipf.writestr("dist/test-extension-back", "#!/bin/bash\necho 'mock backend'")
+        zipf.writestr("dist/test-extension.css", ".test { color: red; }")
+    with open(vext_path, "rb") as f:
+        response = client.post(
+            route,
+            data={"file": (f, "test-extension-1.0.0.vext")},
+            content_type="multipart/form-data",
+        )
+    assert response.status_code == 200
+    json_data = response.get_json()
+    assert "extension_name" in json_data
+    assert "frontend_path" in json_data
+    assert "backend_path" in json_data
+    assert "extension_folder" in json_data
+    assert json_data["extension_name"] == "test-extension"
+    extensions_folder = os.path.join(
+        client.application.config["DATA_FOLDER_PATH"], "extensions"
+    )
+    extension_path = os.path.join(extensions_folder, "test-extension")
+    assert os.path.exists(extension_path)
+    dist_path = os.path.join(extension_path, "dist")
+    assert os.path.exists(dist_path)
+    frontend_js = json_data["frontend_path"]
+    assert os.path.exists(frontend_js)
+    assert frontend_js.endswith("-extension.es.js")
+    backend_exec = json_data["backend_path"]
+    assert os.path.exists(backend_exec)
+    assert os.access(backend_exec, os.X_OK)
+    client.application.config["DATA_FOLDER_PATH"] = original_data_folder
+
+
+def test_import_extension_invalid_file(client: FlaskClient, tmp_path: Path) -> None:
+    """Test importing an invalid .vext file (missing dist folder)."""
+    route = "/opengeodeweb_back/import_extension"
+    original_data_folder = client.application.config["DATA_FOLDER_PATH"]
+    client.application.config["DATA_FOLDER_PATH"] = os.path.join(
+        str(tmp_path), "extension_invalid_test"
+    )
+    vext_path = tmp_path / "invalid-extension.vext"
+    with zipfile.ZipFile(vext_path, "w") as zipf:
+        zipf.writestr("README.md", "This is invalid")
+    with open(vext_path, "rb") as f:
+        response = client.post(
+            route,
+            data={"file": (f, "invalid-extension.vext")},
+            content_type="multipart/form-data",
+        )
+    assert response.status_code == 400
+    client.application.config["DATA_FOLDER_PATH"] = original_data_folder
+
+
+def test_import_extension_wrong_extension(client: FlaskClient, tmp_path: Path) -> None:
+    """Test uploading a file with wrong extension."""
+    route = "/opengeodeweb_back/import_extension"
+    wrong_file = tmp_path / "not-an-extension.zip"
+    with open(wrong_file, "wb") as f:
+        f.write(b"test content")
+    with open(wrong_file, "rb") as f:
+        response = client.post(
+            route,
+            data={"file": (f, "not-an-extension.zip")},
+            content_type="multipart/form-data",
+        )
+    assert response.status_code == 400
