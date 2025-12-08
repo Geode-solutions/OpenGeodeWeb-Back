@@ -566,16 +566,19 @@ def import_extension() -> flask.Response:
 
     if not frontend_file:
         flask.abort(400, "Invalid .vext file: missing frontend JavaScript")
-
     if not backend_executable:
         flask.abort(400, "Invalid .vext file: missing backend executable")
+
+    # Read the frontend JS content
+    assert frontend_file is not None
+    with open(frontend_file, "r", encoding="utf-8") as f:
+        frontend_content = f.read()
 
     return flask.make_response(
         {
             "extension_name": extension_name,
-            "frontend_path": frontend_file,
+            "frontend_content": frontend_content,
             "backend_path": backend_executable,
-            "extension_folder": extension_path,
         },
         200,
     )
