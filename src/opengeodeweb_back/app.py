@@ -147,6 +147,9 @@ def run_server() -> None:
     )
     args = parser.parse_args()
     app.config.update(DATA_FOLDER_PATH=args.data_folder_path)
+    app.config.update(
+        EXTENSIONS_FOLDER_PATH=os.path.join(args.data_folder_path, "extensions")
+    )
     app.config.update(UPLOAD_FOLDER=args.upload_folder_path)
     app.config.update(MINUTES_BEFORE_TIMEOUT=args.timeout)
     flask_cors.CORS(app, origins=args.allowed_origins)
