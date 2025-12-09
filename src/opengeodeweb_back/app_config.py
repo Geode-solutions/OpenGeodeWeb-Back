@@ -24,6 +24,7 @@ class ProdConfig(Config):
     MINUTES_BEFORE_TIMEOUT = "1"
     SECONDS_BETWEEN_SHUTDOWNS = "10"
     DATA_FOLDER_PATH = "/data"
+    EXTENSIONS_FOLDER_PATH = os.path.join(DATA_FOLDER_PATH, "extensions")
 
 
 class DevConfig(Config):
@@ -33,3 +34,4 @@ class DevConfig(Config):
     SECONDS_BETWEEN_SHUTDOWNS = "10"
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     DATA_FOLDER_PATH = os.path.join(BASE_DIR, "data")
+    EXTENSIONS_FOLDER_PATH = os.path.join(DATA_FOLDER_PATH, "extensions")

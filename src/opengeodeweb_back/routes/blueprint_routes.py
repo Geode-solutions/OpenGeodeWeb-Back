@@ -523,8 +523,7 @@ def import_extension() -> flask.Response:
         flask.abort(400, "Uploaded file must be a .vext")
 
     # Create extensions directory in the data folder
-    data_folder_path: str = flask.current_app.config.get("DATA_FOLDER_PATH", "")
-    extensions_folder = os.path.join(data_folder_path, "extensions")
+    extensions_folder = flask.current_app.config["EXTENSIONS_FOLDER_PATH"]
     os.makedirs(extensions_folder, exist_ok=True)
 
     # Extract extension name from filename (e.g., "vease-modeling-0.0.0.vext" -> "vease-modeling")
