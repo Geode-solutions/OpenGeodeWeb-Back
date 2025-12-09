@@ -191,8 +191,10 @@ def test_import_extension_route(client: FlaskClient, tmp_path: Path) -> None:
     """Test importing a .vext extension file."""
     route = "/opengeodeweb_back/import_extension"
     original_data_folder = client.application.config["DATA_FOLDER_PATH"]
-    client.application.config["DATA_FOLDER_PATH"] = os.path.join(
-        str(tmp_path), "extension_test_data"
+    new_data_folder = os.path.join(str(tmp_path), "extension_test_data")
+    client.application.config["DATA_FOLDER_PATH"] = new_data_folder
+    client.application.config["EXTENSIONS_FOLDER_PATH"] = os.path.join(
+        new_data_folder, "extensions"
     )
     vext_path = tmp_path / "test-extension-1.0.0.vext"
     with zipfile.ZipFile(vext_path, "w", compression=zipfile.ZIP_DEFLATED) as zipf:
@@ -238,8 +240,10 @@ def test_import_extension_invalid_file(client: FlaskClient, tmp_path: Path) -> N
     """Test importing an invalid .vext file (missing dist folder)."""
     route = "/opengeodeweb_back/import_extension"
     original_data_folder = client.application.config["DATA_FOLDER_PATH"]
-    client.application.config["DATA_FOLDER_PATH"] = os.path.join(
-        str(tmp_path), "extension_invalid_test"
+    new_data_folder = os.path.join(str(tmp_path), "extension_invalid_test")
+    client.application.config["DATA_FOLDER_PATH"] = new_data_folder
+    client.application.config["EXTENSIONS_FOLDER_PATH"] = os.path.join(
+        new_data_folder, "extensions"
     )
     vext_path = tmp_path / "invalid-extension.vext"
     with zipfile.ZipFile(vext_path, "w") as zipf:
