@@ -37,6 +37,7 @@ routes.register_blueprint(
 
 schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas"))
 
+
 @routes.route(
     schemas_dict["allowed_files"]["route"],
     methods=schemas_dict["allowed_files"]["methods"],
@@ -48,6 +49,7 @@ def allowed_files() -> flask.Response:
         for extension in geode_object.input_extensions():
             extensions.add(extension)
     return flask.make_response({"extensions": list(extensions)}, 200)
+
 
 @routes.route(
     schemas_dict["upload_file"]["route"],
@@ -62,6 +64,7 @@ def upload_file() -> flask.Response:
     filename = werkzeug.utils.secure_filename(os.path.basename(file.filename))
     file.save(os.path.join(UPLOAD_FOLDER, filename))
     return flask.make_response({"message": "File uploaded"}, 201)
+
 
 @routes.route(
     schemas_dict["allowed_objects"]["route"],
@@ -87,6 +90,7 @@ def allowed_objects() -> flask.Response:
             "object_priority": priority_score,
         }
     return flask.make_response({"allowed_objects": allowed_objects}, 200)
+
 
 @routes.route(
     schemas_dict["missing_files"]["route"],
@@ -126,6 +130,7 @@ def missing_files() -> flask.Response:
         200,
     )
 
+
 @routes.route(
     schemas_dict["geographic_coordinate_systems"]["route"],
     methods=schemas_dict["geographic_coordinate_systems"]["methods"],
@@ -150,6 +155,7 @@ def crs_converter_geographic_coordinate_systems() -> flask.Response:
         crs_list.append(crs)
     return flask.make_response({"crs_list": crs_list}, 200)
 
+
 @routes.route(
     schemas_dict["inspect_file"]["route"],
     methods=schemas_dict["inspect_file"]["methods"],
@@ -166,6 +172,7 @@ def inspect_file() -> flask.Response:
     inspection_data = geode_object.inspect()
     inspection_result = extract_inspector_result(inspection_data)
     return flask.make_response({"inspection_result": inspection_result}, 200)
+
 
 def extract_inspector_result(inspection_data: Any) -> object:
     new_object = {}
@@ -194,6 +201,7 @@ def extract_inspector_result(inspection_data: Any) -> object:
             new_object["issues"] = issues
     return new_object
 
+
 @routes.route(
     schemas_dict["geode_objects_and_output_extensions"]["route"],
     methods=schemas_dict["geode_objects_and_output_extensions"]["methods"],
@@ -215,6 +223,7 @@ def geode_objects_and_output_extensions() -> flask.Response:
         200,
     )
 
+
 @routes.route(
     schemas_dict["save_viewable_file"]["route"],
     methods=schemas_dict["save_viewable_file"]["methods"],
@@ -232,6 +241,7 @@ def save_viewable_file() -> flask.Response:
         200,
     )
 
+
 @routes.route(
     schemas_dict["texture_coordinates"]["route"],
     methods=schemas_dict["texture_coordinates"]["methods"],
@@ -246,6 +256,7 @@ def texture_coordinates() -> flask.Response:
         flask.abort(400, f"{params.id} is not a GeodeSurfaceMesh")
     texture_coordinates = geode_object.texture_manager().texture_names()
     return flask.make_response({"texture_coordinates": texture_coordinates}, 200)
+
 
 @routes.route(
     schemas_dict["vertex_attribute_names"]["route"],
@@ -267,6 +278,7 @@ def vertex_attribute_names() -> flask.Response:
         200,
     )
 
+
 @routes.route(
     schemas_dict["cell_attribute_names"]["route"],
     methods=schemas_dict["cell_attribute_names"]["methods"],
@@ -287,6 +299,7 @@ def cell_attribute_names() -> flask.Response:
         200,
     )
 
+
 @routes.route(
     schemas_dict["polygon_attribute_names"]["route"],
     methods=schemas_dict["polygon_attribute_names"]["methods"],
@@ -306,6 +319,7 @@ def polygon_attribute_names() -> flask.Response:
         },
         200,
     )
+
 
 @routes.route(
     schemas_dict["polyhedron_attribute_names"]["route"],
@@ -329,6 +343,7 @@ def polyhedron_attribute_names() -> flask.Response:
         200,
     )
 
+
 @routes.route(
     schemas_dict["ping"]["route"],
     methods=schemas_dict["ping"]["methods"],
@@ -338,11 +353,13 @@ def ping() -> flask.Response:
     flask.current_app.config.update(LAST_PING_TIME=time.time())
     return flask.make_response({"message": "Flask server is running"}, 200)
 
+
 @routes.route(schemas_dict["kill"]["route"], methods=schemas_dict["kill"]["methods"])
 def kill() -> flask.Response:
     print("Manual server kill, shutting down...", flush=True)
     os._exit(0)
     return flask.make_response({"message": "Flask server is dead"}, 200)
+
 
 @routes.route(
     schemas_dict["export_project"]["route"],
@@ -365,12 +382,9 @@ def export_project() -> flask.Response:
     with get_session() as session:
         session.query(Data).filter(
             (Data.input_file == None) | (Data.input_file == "")
-        ).update(
-            {Data.input_file: Data.native_file},
-            synchronize_session=False
-        )
+        ).update({Data.input_file: Data.native_file}, synchronize_session=False)
         session.commit()
-        
+
         rows = session.query(Data.id, Data.input_file, Data.additional_files).all()
 
     with zipfile.ZipFile(
@@ -399,6 +413,7 @@ def export_project() -> flask.Response:
         zip_file.writestr("snapshot.json", flask.json.dumps(params.snapshot))
 
     return utils_functions.send_file(project_folder, [export_vease_path], filename)
+
 
 @routes.route(
     schemas_dict["import_project"]["route"],
