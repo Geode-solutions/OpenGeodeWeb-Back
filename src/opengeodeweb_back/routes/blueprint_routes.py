@@ -29,6 +29,7 @@ from opengeodeweb_back.geode_objects.geode_solid_mesh3d import GeodeSolidMesh3D
 
 routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
 
+
 routes.register_blueprint(
     blueprint_models.routes,
     url_prefix=blueprint_models.routes.url_prefix,
@@ -426,6 +427,7 @@ def import_project() -> flask.Response:
 
     data_folder_path: str = flask.current_app.config["DATA_FOLDER_PATH"]
 
+    # 423 Locked bypass : remove stopped requests
     if connection.scoped_session_registry:
         connection.scoped_session_registry.remove()
     if connection.engine:
