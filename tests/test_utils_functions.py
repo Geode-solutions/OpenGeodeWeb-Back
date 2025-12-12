@@ -193,15 +193,15 @@ def test_generate_native_viewable_and_light_viewable_from_object(
         assert isinstance(result["viewer_type"], str)
         assert isinstance(result["binary_light_viewable"], str)
         assert result["binary_light_viewable"].startswith('<?xml version="1.0"?>')
-        
+
         assert result["input_file"] == result["native_file"]
-        
+
         data = Data.get(result["id"])
         assert data is not None
         assert data.input_file == data.native_file
         assert data.light_viewable_file is not None
-        assert data.light_viewable_file.endswith('.vtp')
-        
+        assert data.light_viewable_file.endswith(".vtp")
+
         data_path = os.path.join(app.config["DATA_FOLDER_PATH"], result["id"])
         assert os.path.exists(os.path.join(data_path, result["native_file"]))
         assert os.path.exists(os.path.join(data_path, result["viewable_file"]))
