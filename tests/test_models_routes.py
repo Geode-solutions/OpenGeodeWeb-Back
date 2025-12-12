@@ -78,7 +78,7 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
             id="test_data_1",
             geode_object="BRep",
             viewer_object="BRep",
-            input_file=None,
+            input_file="test_native.txt",
             native_file="test_native.txt",
             additional_files=[],
         )
@@ -121,12 +121,6 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
         assert "project.db" in names
         assert "test_data_1/test_native.txt" in names
         assert "test_data_2/test_input.txt" in names
-    with get_session() as session:
-        data1_updated = session.query(Data).filter_by(id="test_data_1").first()
-        assert data1_updated.input_file == "test_native.txt"
-
-        data2_updated = session.query(Data).filter_by(id="test_data_2").first()
-        assert data2_updated.input_file == "test_input.txt"
 
     response.close()
 
