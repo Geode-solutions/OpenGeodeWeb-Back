@@ -59,6 +59,6 @@ def test_input_output() -> None:
                             geode_object,
                             os.path.join(os.path.abspath(f"./output"), filename),
                         )
-                        assert type(saved_files) is list 
+                        assert type(saved_files) is list
                         for saved_file in saved_files:
                             os.remove(saved_file)

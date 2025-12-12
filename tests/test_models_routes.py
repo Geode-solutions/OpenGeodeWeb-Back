@@ -14,6 +14,7 @@ from opengeodeweb_back.geode_objects.geode_brep import GeodeBRep
 base_dir = os.path.abspath(os.path.dirname(__file__))
 data_dir = os.path.join(base_dir, "data")
 
+
 def test_model_mesh_components(client: FlaskClient, test_id: str) -> None:
     route = "/opengeodeweb_back/models/vtm_component_indices"
 
@@ -33,6 +34,7 @@ def test_model_mesh_components(client: FlaskClient, test_id: str) -> None:
     assert all(indices[i] > indices[i - 1] for i in range(1, len(indices)))
     for uuid in uuid_dict.keys():
         assert isinstance(uuid, str)
+
 
 def test_extract_brep_uuids(client: FlaskClient, test_id: str) -> None:
     route = "/opengeodeweb_back/models/mesh_components"
@@ -54,6 +56,7 @@ def test_extract_brep_uuids(client: FlaskClient, test_id: str) -> None:
         assert "uuid_dict" in response.get_json()
         uuid_dict = response.get_json()["uuid_dict"]
         assert isinstance(uuid_dict, dict)
+
 
 def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
     route = "/opengeodeweb_back/export_project"
@@ -77,7 +80,7 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
             viewer_object="BRep",
             input_file=None,
             native_file="test_native.txt",
-            additional_files=[]
+            additional_files=[],
         )
         data2 = Data(
             id="test_data_2",
@@ -85,7 +88,7 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
             viewer_object="Section",
             input_file="test_input.txt",
             native_file="test_native2.txt",
-            additional_files=[]
+            additional_files=[],
         )
         session.add(data1)
         session.add(data2)
@@ -130,6 +133,7 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
     export_path = os.path.join(project_folder, filename)
     if os.path.exists(export_path):
         os.remove(export_path)
+
 
 def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
     route = "/opengeodeweb_back/import_project"
@@ -179,6 +183,7 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
 
     client.application.config["DATA_FOLDER_PATH"] = original_data_folder
 
+
 def test_save_viewable_workflow_from_file(client: FlaskClient) -> None:
     file = os.path.join(data_dir, "cube.og_brep")
     upload_resp = client.put(
@@ -204,6 +209,7 @@ def test_save_viewable_workflow_from_file(client: FlaskClient) -> None:
 
     refreshed = Data.get(data_id)
     assert refreshed is not None
+
 
 def test_save_viewable_workflow_from_object(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/create/create_aoi"
