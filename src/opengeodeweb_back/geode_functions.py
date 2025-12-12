@@ -55,8 +55,7 @@ def geode_object_output_extensions(
     geode_object: GeodeObject,
 ) -> dict[GeodeObjectType, dict[str, bool]]:
     results: dict[GeodeObjectType, dict[str, bool]] = {}
-    current_type = geode_object.geode_object_type()
-    for mixin_geode_object in geode_objects[current_type].__mro__:
+    for mixin_geode_object in geode_objects[geode_object.geode_object_type()].__mro__:
         output_extensions_method = getattr(
             mixin_geode_object, "output_extensions", None
         )
@@ -67,16 +66,11 @@ def geode_object_output_extensions(
             continue
         object_output_extensions: dict[str, bool] = {}
         is_saveable_method = getattr(mixin_geode_object, "is_saveable")
-        target_type = None
-        if hasattr(mixin_geode_object, "geode_object_type"):
-            target_type = mixin_geode_object.geode_object_type()
-        if target_type and target_type != current_type:
-            continue
         for output_extension in output_extensions:
             bool_is_saveable = is_saveable_method(
                 geode_object, f"test.{output_extension}"
             )
             object_output_extensions[output_extension] = bool_is_saveable
-        if target_type:
-            results[target_type] = object_output_extensions
+        if hasattr(mixin_geode_object, "geode_object_type"):
+            results[mixin_geode_object.geode_object_type()] = object_output_extensions
     return results

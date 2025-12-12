@@ -212,6 +212,10 @@ def save_all_viewables_and_return_info(
         data.native_file = os.path.basename(native_files[0])
         data.viewable_file = os.path.basename(viewable_path)
         data.light_viewable_file = os.path.basename(light_path)
+        
+        if not data.input_file:
+            data.input_file = data.native_file
+        
         assert data.native_file is not None
         assert data.viewable_file is not None
         assert data.light_viewable_file is not None
@@ -223,10 +227,9 @@ def save_all_viewables_and_return_info(
             "viewer_type": data.viewer_object,
             "binary_light_viewable": binary_light_viewable.decode("utf-8"),
             "geode_object_type": data.geode_object,
-            "input_file": data.input_file or "",
+            "input_file": data.input_file or "", 
             "additional_files": data.additional_files or [],
         }
-
 
 def generate_native_viewable_and_light_viewable_from_object(
     geode_object: GeodeObject,
