@@ -380,11 +380,6 @@ def export_project() -> flask.Response:
     export_vease_path = os.path.join(project_folder, filename)
 
     with get_session() as session:
-        session.query(Data).filter(
-            (Data.input_file == None) | (Data.input_file == "")
-        ).update({Data.input_file: Data.native_file}, synchronize_session=False)
-        session.commit()
-
         rows = session.query(Data.id, Data.input_file, Data.additional_files).all()
 
     with zipfile.ZipFile(
