@@ -525,11 +525,9 @@ def import_extension() -> flask.Response:
         flask.abort(400, "Uploaded file must be a .vext")
 
     # Create extensions directory in the data folder
-    data_folder_path: str = flask.current_app.config.get("DATA_FOLDER_PATH", "")
-    extensions_folder = os.path.join(data_folder_path, "extensions")
+    extensions_folder = flask.current_app.config["EXTENSIONS_FOLDER_PATH"]
     os.makedirs(extensions_folder, exist_ok=True)
 
-    # Extract extension name from filename (e.g., "vease-modeling-0.0.0.vext" -> "vease-modeling")
     extension_name = (
         filename.rsplit("-", 1)[0] if "-" in filename else filename.replace(".vext", "")
     )
@@ -561,23 +559,23 @@ def import_extension() -> flask.Response:
             if file.endswith(".es.js"):
                 frontend_file = file_path
             elif not file.endswith(".js") and not file.endswith(".css"):
-                # Assume it's the backend executable
                 backend_executable = file_path
-                # Make it executable
                 os.chmod(backend_executable, 0o755)
 
     if not frontend_file:
         flask.abort(400, "Invalid .vext file: missing frontend JavaScript")
-
     if not backend_executable:
         flask.abort(400, "Invalid .vext file: missing backend executable")
+
+    assert frontend_file is not None
+    with open(frontend_file, "r", encoding="utf-8") as f:
+        frontend_content = f.read()
 
     return flask.make_response(
         {
             "extension_name": extension_name,
-            "frontend_path": frontend_file,
+            "frontend_content": frontend_content,
             "backend_path": backend_executable,
-            "extension_folder": extension_path,
         },
         200,
     )

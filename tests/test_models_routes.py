@@ -231,8 +231,10 @@ def test_import_extension_route(client: FlaskClient, tmp_path: Path) -> None:
     """Test importing a .vext extension file."""
     route = "/opengeodeweb_back/import_extension"
     original_data_folder = client.application.config["DATA_FOLDER_PATH"]
-    client.application.config["DATA_FOLDER_PATH"] = os.path.join(
-        str(tmp_path), "extension_test_data"
+    new_data_folder = os.path.join(str(tmp_path), "extension_test_data")
+    client.application.config["DATA_FOLDER_PATH"] = new_data_folder
+    client.application.config["EXTENSIONS_FOLDER_PATH"] = os.path.join(
+        new_data_folder, "extensions"
     )
     vext_path = tmp_path / "test-extension-1.0.0.vext"
     with zipfile.ZipFile(vext_path, "w", compression=zipfile.ZIP_DEFLATED) as zipf:
@@ -251,9 +253,8 @@ def test_import_extension_route(client: FlaskClient, tmp_path: Path) -> None:
     assert response.status_code == 200
     json_data = response.get_json()
     assert "extension_name" in json_data
-    assert "frontend_path" in json_data
+    assert "frontend_content" in json_data
     assert "backend_path" in json_data
-    assert "extension_folder" in json_data
     assert json_data["extension_name"] == "test-extension"
     extensions_folder = os.path.join(
         client.application.config["DATA_FOLDER_PATH"], "extensions"
@@ -262,9 +263,13 @@ def test_import_extension_route(client: FlaskClient, tmp_path: Path) -> None:
     assert os.path.exists(extension_path)
     dist_path = os.path.join(extension_path, "dist")
     assert os.path.exists(dist_path)
-    frontend_js = json_data["frontend_path"]
-    assert os.path.exists(frontend_js)
-    assert frontend_js.endswith("-extension.es.js")
+
+    # Verify frontend content is returned
+    frontend_content = json_data["frontend_content"]
+    assert isinstance(frontend_content, str)
+    assert len(frontend_content) > 0
+    assert "export const metadata" in frontend_content
+
     backend_exec = json_data["backend_path"]
     assert os.path.exists(backend_exec)
     assert os.access(backend_exec, os.X_OK)
@@ -275,8 +280,10 @@ def test_import_extension_invalid_file(client: FlaskClient, tmp_path: Path) -> N
     """Test importing an invalid .vext file (missing dist folder)."""
     route = "/opengeodeweb_back/import_extension"
     original_data_folder = client.application.config["DATA_FOLDER_PATH"]
-    client.application.config["DATA_FOLDER_PATH"] = os.path.join(
-        str(tmp_path), "extension_invalid_test"
+    new_data_folder = os.path.join(str(tmp_path), "extension_invalid_test")
+    client.application.config["DATA_FOLDER_PATH"] = new_data_folder
+    client.application.config["EXTENSIONS_FOLDER_PATH"] = os.path.join(
+        new_data_folder, "extensions"
     )
     vext_path = tmp_path / "invalid-extension.vext"
     with zipfile.ZipFile(vext_path, "w") as zipf:
