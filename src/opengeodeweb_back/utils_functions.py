@@ -212,6 +212,10 @@ def save_all_viewables_and_return_info(
         data.native_file = os.path.basename(native_files[0])
         data.viewable_file = os.path.basename(viewable_path)
         data.light_viewable_file = os.path.basename(light_path)
+
+        if not data.input_file:
+            data.input_file = data.native_file
+
         assert data.native_file is not None
         assert data.viewable_file is not None
         assert data.light_viewable_file is not None

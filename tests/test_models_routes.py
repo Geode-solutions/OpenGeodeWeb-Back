@@ -69,6 +69,41 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
     database_root_path = os.path.join(project_folder, "project.db")
     with open(database_root_path, "wb") as f:
         f.write(b"test_project_db")
+
+    with get_session() as session:
+        session.query(Data).delete()
+        session.commit()
+
+        data1 = Data(
+            id="test_data_1",
+            geode_object="BRep",
+            viewer_object="BRep",
+            input_file="test_native.txt",
+            native_file="test_native.txt",
+            additional_files=[],
+        )
+        data2 = Data(
+            id="test_data_2",
+            geode_object="Section",
+            viewer_object="Section",
+            input_file="test_input.txt",
+            native_file="test_native2.txt",
+            additional_files=[],
+        )
+        session.add(data1)
+        session.add(data2)
+        session.commit()
+
+        data1_dir = os.path.join(project_folder, "test_data_1")
+        os.makedirs(data1_dir, exist_ok=True)
+        with open(os.path.join(data1_dir, "test_native.txt"), "w") as f:
+            f.write("native file content")
+
+        data2_dir = os.path.join(project_folder, "test_data_2")
+        os.makedirs(data2_dir, exist_ok=True)
+        with open(os.path.join(data2_dir, "test_input.txt"), "w") as f:
+            f.write("input file content")
+
     response = client.post(route, json={"snapshot": snapshot, "filename": filename})
     assert response.status_code == 200
     assert response.headers.get("new-file-name") == filename
@@ -77,13 +112,18 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
     zip_bytes = response.get_data()
     tmp_zip_path = tmp_path / filename
     tmp_zip_path.write_bytes(zip_bytes)
+
     with zipfile.ZipFile(tmp_zip_path, "r") as zip_file:
         names = zip_file.namelist()
         assert "snapshot.json" in names
         parsed = json.loads(zip_file.read("snapshot.json").decode("utf-8"))
         assert parsed == snapshot
         assert "project.db" in names
+        assert "test_data_1/test_native.txt" in names
+        assert "test_data_2/test_input.txt" in names
+
     response.close()
+
     export_path = os.path.join(project_folder, filename)
     if os.path.exists(export_path):
         os.remove(export_path)

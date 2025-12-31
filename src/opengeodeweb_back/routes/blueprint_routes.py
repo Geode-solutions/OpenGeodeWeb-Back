@@ -8,7 +8,9 @@ from typing import Any
 import flask
 import werkzeug
 import zipfile
+import opengeode_io as og_io
 import opengeode_geosciences as og_geosciences
+import opengeode_geosciencesio as og_geosciencesio
 from opengeodeweb_microservice.schemas import get_schemas_dict
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
