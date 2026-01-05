@@ -1,5 +1,6 @@
 # Standard library imports
 from __future__ import annotations
+from typing import cast
 
 # Third party imports
 import opengeode as og
@@ -26,7 +27,7 @@ class GeodeEdgedCurve2D(GeodeGraph):
         return "EdgedCurve2D"
 
     def native_extension(self) -> str:
-        return self.edged_curve.native_extension()
+        return cast(str, self.edged_curve.native_extension())
 
     @classmethod
     def is_3D(cls) -> bool:
@@ -53,30 +54,36 @@ class GeodeEdgedCurve2D(GeodeGraph):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return og.EdgedCurveInputFactory2D.list_creators()
+        return cast(list[str], og.EdgedCurveInputFactory2D.list_creators())
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return og.EdgedCurveOutputFactory2D.list_creators()
+        return cast(list[str], og.EdgedCurveOutputFactory2D.list_creators())
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return og.edged_curve_object_priority2D(filename)
+        return cast(int, og.edged_curve_object_priority2D(filename))
 
     def is_saveable(self, filename: str) -> bool:
-        return og.is_edged_curve_saveable2D(self.edged_curve, filename)
+        return cast(bool, og.is_edged_curve_saveable2D(self.edged_curve, filename))
 
     def save(self, filename: str) -> list[str]:
-        return og.save_edged_curve2D(self.edged_curve, filename)
+        return cast(list[str], og.save_edged_curve2D(self.edged_curve, filename))
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_viewable_edged_curve2D(
-            self.edged_curve, filename_without_extension
+        return cast(
+            str,
+            viewables.save_viewable_edged_curve2D(
+                self.edged_curve, filename_without_extension
+            ),
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_light_viewable_edged_curve2D(
-            self.edged_curve, filename_without_extension
+        return cast(
+            str,
+            viewables.save_light_viewable_edged_curve2D(
+                self.edged_curve, filename_without_extension
+            ),
         )
 
     def inspect(self) -> og_inspector.EdgedCurveInspectionResult:

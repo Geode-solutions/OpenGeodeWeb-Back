@@ -1,5 +1,6 @@
 # Standard library imports
 from __future__ import annotations
+from typing import cast
 
 # Third party imports
 import opengeode as og
@@ -29,7 +30,7 @@ class GeodeCrossSection(GeodeSection):
         return "CrossSection"
 
     def native_extension(self) -> str:
-        return self.cross_section.native_extension()
+        return cast(str, self.cross_section.native_extension())
 
     def builder(self) -> og_geosciences.CrossSectionBuilder:
         return og_geosciences.CrossSectionBuilder(self.cross_section)
@@ -48,28 +49,38 @@ class GeodeCrossSection(GeodeSection):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return og_geosciences.CrossSectionInputFactory.list_creators()
+        return cast(list[str], og_geosciences.CrossSectionInputFactory.list_creators())
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return og_geosciences.CrossSectionOutputFactory.list_creators()
+        return cast(list[str], og_geosciences.CrossSectionOutputFactory.list_creators())
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return og_geosciences.cross_section_object_priority(filename)
+        return cast(int, og_geosciences.cross_section_object_priority(filename))
 
     def is_saveable(self, filename: str) -> bool:
-        return og_geosciences.is_cross_section_saveable(self.cross_section, filename)
+        return cast(
+            bool, og_geosciences.is_cross_section_saveable(self.cross_section, filename)
+        )
 
     def save(self, filename: str) -> list[str]:
-        return og_geosciences.save_cross_section(self.cross_section, filename)
+        return cast(
+            list[str], og_geosciences.save_cross_section(self.cross_section, filename)
+        )
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_viewable_cross_section(
-            self.cross_section, filename_without_extension
+        return cast(
+            str,
+            viewables.save_viewable_cross_section(
+                self.cross_section, filename_without_extension
+            ),
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_light_viewable_cross_section(
-            self.cross_section, filename_without_extension
+        return cast(
+            str,
+            viewables.save_light_viewable_cross_section(
+                self.cross_section, filename_without_extension
+            ),
         )

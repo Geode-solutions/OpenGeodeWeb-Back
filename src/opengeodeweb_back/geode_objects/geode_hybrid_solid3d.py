@@ -1,5 +1,6 @@
 # Standard library imports
 from __future__ import annotations
+from typing import cast
 
 # Third party imports
 import opengeode as og
@@ -25,7 +26,7 @@ class GeodeHybridSolid3D(GeodeSolidMesh3D):
         return "HybridSolid3D"
 
     def native_extension(self) -> str:
-        return self.hybrid_solid.native_extension()
+        return cast(str, self.hybrid_solid.native_extension())
 
     def builder(self) -> og.HybridSolidBuilder3D:
         return og.HybridSolidBuilder3D.create(self.hybrid_solid)
@@ -44,28 +45,34 @@ class GeodeHybridSolid3D(GeodeSolidMesh3D):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return og.HybridSolidInputFactory3D.list_creators()
+        return cast(list[str], og.HybridSolidInputFactory3D.list_creators())
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return og.HybridSolidOutputFactory3D.list_creators()
+        return cast(list[str], og.HybridSolidOutputFactory3D.list_creators())
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return og.hybrid_solid_object_priority3D(filename)
+        return cast(int, og.hybrid_solid_object_priority3D(filename))
 
     def is_saveable(self, filename: str) -> bool:
-        return og.is_hybrid_solid_saveable3D(self.hybrid_solid, filename)
+        return cast(bool, og.is_hybrid_solid_saveable3D(self.hybrid_solid, filename))
 
     def save(self, filename: str) -> list[str]:
-        return og.save_hybrid_solid3D(self.hybrid_solid, filename)
+        return cast(list[str], og.save_hybrid_solid3D(self.hybrid_solid, filename))
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_viewable_hybrid_solid3D(
-            self.hybrid_solid, filename_without_extension
+        return cast(
+            str,
+            viewables.save_viewable_hybrid_solid3D(
+                self.hybrid_solid, filename_without_extension
+            ),
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_light_viewable_hybrid_solid3D(
-            self.hybrid_solid, filename_without_extension
+        return cast(
+            str,
+            viewables.save_light_viewable_hybrid_solid3D(
+                self.hybrid_solid, filename_without_extension
+            ),
         )

@@ -1,5 +1,6 @@
 # Standard library imports
 from __future__ import annotations
+from typing import cast
 
 # Third party imports
 import opengeode as og
@@ -25,7 +26,7 @@ class GeodeVertexSet(GeodeMesh):
         return "VertexSet"
 
     def native_extension(self) -> str:
-        return self.vertex_set.native_extension()
+        return cast(str, self.vertex_set.native_extension())
 
     @classmethod
     def is_3D(cls) -> bool:
@@ -52,21 +53,21 @@ class GeodeVertexSet(GeodeMesh):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return og.VertexSetInputFactory.list_creators()
+        return cast(list[str], og.VertexSetInputFactory.list_creators())
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return og.VertexSetOutputFactory.list_creators()
+        return cast(list[str], og.VertexSetOutputFactory.list_creators())
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return og.vertex_set_object_priority(filename)
+        return cast(int, og.vertex_set_object_priority(filename))
 
     def is_saveable(self, filename: str) -> bool:
-        return og.is_vertex_set_saveable(self.vertex_set, filename)
+        return cast(bool, og.is_vertex_set_saveable(self.vertex_set, filename))
 
     def save(self, filename: str) -> list[str]:
-        return og.save_vertex_set(self.vertex_set, filename)
+        return cast(list[str], og.save_vertex_set(self.vertex_set, filename))
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return ""

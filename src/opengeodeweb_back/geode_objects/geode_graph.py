@@ -1,5 +1,6 @@
 # Standard library imports
 from __future__ import annotations
+from typing import cast
 
 # Third party imports
 import opengeode as og
@@ -23,7 +24,7 @@ class GeodeGraph(GeodeVertexSet):
         return "Graph"
 
     def native_extension(self) -> str:
-        return self.graph.native_extension()
+        return cast(str, self.graph.native_extension())
 
     @classmethod
     def is_3D(cls) -> bool:
@@ -50,21 +51,21 @@ class GeodeGraph(GeodeVertexSet):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return og.GraphInputFactory.list_creators()
+        return cast(list[str], og.GraphInputFactory.list_creators())
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return og.GraphOutputFactory.list_creators()
+        return cast(list[str], og.GraphOutputFactory.list_creators())
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return og.graph_object_priority(filename)
+        return cast(int, og.graph_object_priority(filename))
 
     def is_saveable(self, filename: str) -> bool:
-        return og.is_graph_saveable(self.graph, filename)
+        return cast(bool, og.is_graph_saveable(self.graph, filename))
 
     def save(self, filename: str) -> list[str]:
-        return og.save_graph(self.graph, filename)
+        return cast(list[str], og.save_graph(self.graph, filename))
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return ""

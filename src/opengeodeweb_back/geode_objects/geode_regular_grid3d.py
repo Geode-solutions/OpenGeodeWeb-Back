@@ -1,5 +1,6 @@
 # Standard library imports
 from __future__ import annotations
+from typing import cast
 
 # Third party imports
 import opengeode as og
@@ -26,7 +27,7 @@ class GeodeRegularGrid3D(GeodeSolidMesh3D, GeodeGrid3D):
         return "RegularGrid3D"
 
     def native_extension(self) -> str:
-        return self.regular_grid.native_extension()
+        return cast(str, self.regular_grid.native_extension())
 
     def builder(self) -> og.RegularGridBuilder3D:
         return og.RegularGridBuilder3D.create(self.regular_grid)
@@ -45,30 +46,36 @@ class GeodeRegularGrid3D(GeodeSolidMesh3D, GeodeGrid3D):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return og.RegularGridInputFactory3D.list_creators()
+        return cast(list[str], og.RegularGridInputFactory3D.list_creators())
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return og.RegularGridOutputFactory3D.list_creators()
+        return cast(list[str], og.RegularGridOutputFactory3D.list_creators())
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return og.regular_grid_object_priority3D(filename)
+        return cast(int, og.regular_grid_object_priority3D(filename))
 
     def is_saveable(self, filename: str) -> bool:
-        return og.is_regular_grid_saveable3D(self.regular_grid, filename)
+        return cast(bool, og.is_regular_grid_saveable3D(self.regular_grid, filename))
 
     def save(self, filename: str) -> list[str]:
-        return og.save_regular_grid3D(self.regular_grid, filename)
+        return cast(list[str], og.save_regular_grid3D(self.regular_grid, filename))
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_viewable_regular_grid3D(
-            self.regular_grid, filename_without_extension
+        return cast(
+            str,
+            viewables.save_viewable_regular_grid3D(
+                self.regular_grid, filename_without_extension
+            ),
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_light_viewable_regular_grid3D(
-            self.regular_grid, filename_without_extension
+        return cast(
+            str,
+            viewables.save_light_viewable_regular_grid3D(
+                self.regular_grid, filename_without_extension
+            ),
         )
 
     def cell_attribute_manager(self) -> og.AttributeManager:

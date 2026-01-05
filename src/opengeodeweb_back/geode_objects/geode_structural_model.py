@@ -1,5 +1,6 @@
 # Standard library imports
 from __future__ import annotations
+from typing import cast
 
 # Third party imports
 import opengeode as og
@@ -30,7 +31,7 @@ class GeodeStructuralModel(GeodeBRep):
         return "StructuralModel"
 
     def native_extension(self) -> str:
-        return self.structural_model.native_extension()
+        return cast(str, self.structural_model.native_extension())
 
     def builder(self) -> og_geosciences.StructuralModelBuilder:
         return og_geosciences.StructuralModelBuilder(self.structural_model)
@@ -49,30 +50,46 @@ class GeodeStructuralModel(GeodeBRep):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return og_geosciences.StructuralModelInputFactory.list_creators()
+        return cast(
+            list[str], og_geosciences.StructuralModelInputFactory.list_creators()
+        )
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return og_geosciences.StructuralModelOutputFactory.list_creators()
+        return cast(
+            list[str], og_geosciences.StructuralModelOutputFactory.list_creators()
+        )
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return og_geosciences.structural_model_object_priority(filename)
+        return cast(int, og_geosciences.structural_model_object_priority(filename))
 
     def is_saveable(self, filename: str) -> bool:
-        return og_geosciences.is_structural_model_saveable(
-            self.structural_model, filename
+        return cast(
+            bool,
+            og_geosciences.is_structural_model_saveable(
+                self.structural_model, filename
+            ),
         )
 
     def save(self, filename: str) -> list[str]:
-        return og_geosciences.save_structural_model(self.structural_model, filename)
+        return cast(
+            list[str],
+            og_geosciences.save_structural_model(self.structural_model, filename),
+        )
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_viewable_structural_model(
-            self.structural_model, filename_without_extension
+        return cast(
+            str,
+            viewables.save_viewable_structural_model(
+                self.structural_model, filename_without_extension
+            ),
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_light_viewable_structural_model(
-            self.structural_model, filename_without_extension
+        return cast(
+            str,
+            viewables.save_light_viewable_structural_model(
+                self.structural_model, filename_without_extension
+            ),
         )

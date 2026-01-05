@@ -1,5 +1,6 @@
 # Standard library imports
 from __future__ import annotations
+from typing import cast
 
 # Third party imports
 import opengeode as og
@@ -29,7 +30,7 @@ class GeodeTriangulatedSurface2D(GeodeSurfaceMesh2D):
         return "TriangulatedSurface2D"
 
     def native_extension(self) -> str:
-        return self.triangulated_surface.native_extension()
+        return cast(str, self.triangulated_surface.native_extension())
 
     def builder(self) -> og.TriangulatedSurfaceBuilder2D:
         return og.TriangulatedSurfaceBuilder2D.create(self.triangulated_surface)
@@ -48,30 +49,40 @@ class GeodeTriangulatedSurface2D(GeodeSurfaceMesh2D):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return og.TriangulatedSurfaceInputFactory2D.list_creators()
+        return cast(list[str], og.TriangulatedSurfaceInputFactory2D.list_creators())
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return og.TriangulatedSurfaceOutputFactory2D.list_creators()
+        return cast(list[str], og.TriangulatedSurfaceOutputFactory2D.list_creators())
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return og.triangulated_surface_object_priority2D(filename)
+        return cast(int, og.triangulated_surface_object_priority2D(filename))
 
     def is_saveable(self, filename: str) -> bool:
-        return og.is_triangulated_surface_saveable2D(
-            self.triangulated_surface, filename
+        return cast(
+            bool,
+            og.is_triangulated_surface_saveable2D(self.triangulated_surface, filename),
         )
 
     def save(self, filename: str) -> list[str]:
-        return og.save_triangulated_surface2D(self.triangulated_surface, filename)
+        return cast(
+            list[str],
+            og.save_triangulated_surface2D(self.triangulated_surface, filename),
+        )
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_viewable_triangulated_surface2D(
-            self.triangulated_surface, filename_without_extension
+        return cast(
+            str,
+            viewables.save_viewable_triangulated_surface2D(
+                self.triangulated_surface, filename_without_extension
+            ),
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_light_viewable_triangulated_surface2D(
-            self.triangulated_surface, filename_without_extension
+        return cast(
+            str,
+            viewables.save_light_viewable_triangulated_surface2D(
+                self.triangulated_surface, filename_without_extension
+            ),
         )

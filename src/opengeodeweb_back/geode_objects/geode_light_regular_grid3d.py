@@ -1,5 +1,6 @@
 # Standard library imports
 from __future__ import annotations
+from typing import cast
 
 # Third party imports
 import opengeode as og
@@ -23,7 +24,7 @@ class GeodeLightRegularGrid3D(GeodeGrid3D):
         return "LightRegularGrid3D"
 
     def native_extension(self) -> str:
-        return self.light_regular_grid.native_extension()
+        return cast(str, self.light_regular_grid.native_extension())
 
     @classmethod
     def load(cls, filename: str) -> GeodeLightRegularGrid3D:
@@ -39,30 +40,40 @@ class GeodeLightRegularGrid3D(GeodeGrid3D):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return og.LightRegularGridInputFactory3D.list_creators()
+        return cast(list[str], og.LightRegularGridInputFactory3D.list_creators())
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return og.LightRegularGridOutputFactory3D.list_creators()
+        return cast(list[str], og.LightRegularGridOutputFactory3D.list_creators())
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return og.light_regular_grid_object_priority3D(filename)
+        return cast(int, og.light_regular_grid_object_priority3D(filename))
 
     def is_saveable(self, filename: str) -> bool:
-        return og.is_light_regular_grid_saveable3D(self.light_regular_grid, filename)
+        return cast(
+            bool, og.is_light_regular_grid_saveable3D(self.light_regular_grid, filename)
+        )
 
     def save(self, filename: str) -> list[str]:
-        return og.save_light_regular_grid3D(self.light_regular_grid, filename)
+        return cast(
+            list[str], og.save_light_regular_grid3D(self.light_regular_grid, filename)
+        )
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_viewable_light_regular_grid3D(
-            self.light_regular_grid, filename_without_extension
+        return cast(
+            str,
+            viewables.save_viewable_light_regular_grid3D(
+                self.light_regular_grid, filename_without_extension
+            ),
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_light_viewable_light_regular_grid3D(
-            self.light_regular_grid, filename_without_extension
+        return cast(
+            str,
+            viewables.save_light_viewable_light_regular_grid3D(
+                self.light_regular_grid, filename_without_extension
+            ),
         )
 
     def vertex_attribute_manager(self) -> og.AttributeManager:

@@ -1,7 +1,6 @@
 # Standard library imports
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Literal, Any, get_args, cast
 
 # Third party imports
 import opengeode as og

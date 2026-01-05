@@ -1,5 +1,6 @@
 # Standard library imports
 from __future__ import annotations
+from typing import cast, Any
 
 # Third party imports
 import opengeode as og
@@ -24,7 +25,7 @@ class GeodeBRep(GeodeModel):
         return "BRep"
 
     def native_extension(self) -> str:
-        return self.brep.native_extension()
+        return cast(str, self.brep.native_extension())
 
     @classmethod
     def is_3D(cls) -> bool:
@@ -51,30 +52,35 @@ class GeodeBRep(GeodeModel):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return og.BRepInputFactory.list_creators()
+        return cast(list[str], og.BRepInputFactory.list_creators())
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return og.BRepOutputFactory.list_creators()
+        return cast(list[str], og.BRepOutputFactory.list_creators())
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return og.brep_object_priority(filename)
+        return cast(int, og.brep_object_priority(filename))
 
     def is_saveable(self, filename: str) -> bool:
-        return og.is_brep_saveable(self.brep, filename)
+        return cast(bool, og.is_brep_saveable(self.brep, filename))
 
     def save(self, filename: str) -> list[str]:
-        return og.save_brep(self.brep, filename)
+        return cast(list[str], og.save_brep(self.brep, filename))
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_viewable_brep(self.brep, filename_without_extension)
+        return cast(
+            str, viewables.save_viewable_brep(self.brep, filename_without_extension)
+        )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_light_viewable_brep(self.brep, filename_without_extension)
+        return cast(
+            str,
+            viewables.save_light_viewable_brep(self.brep, filename_without_extension),
+        )
 
     def mesh_components(self) -> ComponentRegistry:
-        return self.brep.mesh_components()
+        return cast(dict[Any, list[Any]], self.brep.mesh_components())
 
     def inspect(self) -> og_inspector.BRepInspectionResult:
         return og_inspector.inspect_brep(self.brep)
