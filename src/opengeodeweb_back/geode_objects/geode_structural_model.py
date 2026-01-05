@@ -60,22 +60,21 @@ class GeodeStructuralModel(GeodeBRep):
 
     def is_saveable(self, filename: str) -> bool:
         return og_geosciences.is_structural_model_saveable(
-                self.structural_model, filename
-            ,
+            self.structural_model,
+            filename,
         )
 
     def save(self, filename: str) -> list[str]:
-        return og_geosciences.save_structural_model(self.structural_model, filename
-        )
+        return og_geosciences.save_structural_model(self.structural_model, filename)
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_structural_model(
-                self.structural_model, filename_without_extension
-            ,
+            self.structural_model,
+            filename_without_extension,
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_structural_model(
-                self.structural_model, filename_without_extension
-            ,
+            self.structural_model,
+            filename_without_extension,
         )

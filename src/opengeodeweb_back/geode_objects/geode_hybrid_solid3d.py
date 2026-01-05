@@ -61,12 +61,12 @@ class GeodeHybridSolid3D(GeodeSolidMesh3D):
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_hybrid_solid3D(
-                self.hybrid_solid, filename_without_extension
-            ,
+            self.hybrid_solid,
+            filename_without_extension,
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_hybrid_solid3D(
-                self.hybrid_solid, filename_without_extension
-            ,
+            self.hybrid_solid,
+            filename_without_extension,
         )

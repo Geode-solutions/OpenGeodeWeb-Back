@@ -56,21 +56,19 @@ class GeodePolygonalSurface3D(GeodeSurfaceMesh3D):
         return og.polygonal_surface_object_priority3D(filename)
 
     def is_saveable(self, filename: str) -> bool:
-        return og.is_polygonal_surface_saveable3D(self.polygonal_surface, filename
-        )
+        return og.is_polygonal_surface_saveable3D(self.polygonal_surface, filename)
 
     def save(self, filename: str) -> list[str]:
-        return og.save_polygonal_surface3D(self.polygonal_surface, filename
-        )
+        return og.save_polygonal_surface3D(self.polygonal_surface, filename)
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_polygonal_surface3D(
-                self.polygonal_surface, filename_without_extension
-            ,
+            self.polygonal_surface,
+            filename_without_extension,
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_polygonal_surface3D(
-                self.polygonal_surface, filename_without_extension
-            ,
+            self.polygonal_surface,
+            filename_without_extension,
         )

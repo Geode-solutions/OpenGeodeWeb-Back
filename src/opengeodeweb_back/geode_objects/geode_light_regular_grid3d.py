@@ -49,23 +49,21 @@ class GeodeLightRegularGrid3D(GeodeGrid3D):
         return og.light_regular_grid_object_priority3D(filename)
 
     def is_saveable(self, filename: str) -> bool:
-        return og.is_light_regular_grid_saveable3D(self.light_regular_grid, filename
-        )
+        return og.is_light_regular_grid_saveable3D(self.light_regular_grid, filename)
 
     def save(self, filename: str) -> list[str]:
-        return og.save_light_regular_grid3D(self.light_regular_grid, filename
-        )
+        return og.save_light_regular_grid3D(self.light_regular_grid, filename)
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_light_regular_grid3D(
-                self.light_regular_grid, filename_without_extension
-            ,
+            self.light_regular_grid,
+            filename_without_extension,
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_light_regular_grid3D(
-                self.light_regular_grid, filename_without_extension
-            ,
+            self.light_regular_grid,
+            filename_without_extension,
         )
 
     def vertex_attribute_manager(self) -> og.AttributeManager:

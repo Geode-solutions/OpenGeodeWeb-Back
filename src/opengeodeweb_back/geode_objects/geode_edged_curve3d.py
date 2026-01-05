@@ -71,14 +71,14 @@ class GeodeEdgedCurve3D(GeodeGraph):
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_edged_curve3D(
-                self.edged_curve, filename_without_extension
-            ,
+            self.edged_curve,
+            filename_without_extension,
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_edged_curve3D(
-                self.edged_curve, filename_without_extension
-            ,
+            self.edged_curve,
+            filename_without_extension,
         )
 
     def inspect(self) -> og_inspector.EdgedCurveInspectionResult:

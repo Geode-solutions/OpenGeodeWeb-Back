@@ -56,21 +56,19 @@ class GeodePolyhedralSolid3D(GeodeSolidMesh3D):
         return og.polyhedral_solid_object_priority3D(filename)
 
     def is_saveable(self, filename: str) -> bool:
-        return og.is_polyhedral_solid_saveable3D(self.polyhedral_solid, filename
-        )
+        return og.is_polyhedral_solid_saveable3D(self.polyhedral_solid, filename)
 
     def save(self, filename: str) -> list[str]:
-        return og.save_polyhedral_solid3D(self.polyhedral_solid, filename
-        )
+        return og.save_polyhedral_solid3D(self.polyhedral_solid, filename)
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_polyhedral_solid3D(
-                self.polyhedral_solid, filename_without_extension
-            ,
+            self.polyhedral_solid,
+            filename_without_extension,
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_polyhedral_solid3D(
-                self.polyhedral_solid, filename_without_extension
-            ,
+            self.polyhedral_solid,
+            filename_without_extension,
         )
