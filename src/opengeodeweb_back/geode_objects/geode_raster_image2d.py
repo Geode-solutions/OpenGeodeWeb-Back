@@ -1,13 +1,12 @@
 # Standard library imports
 from __future__ import annotations
-from typing import cast
 
 # Third party imports
 import opengeode as og
 import geode_viewables as viewables
 
 # Local application imports
-from .types import GeodeMeshType
+from .types import GeodeMeshType, cast_str, cast_list_str, cast_int, cast_bool
 from .geode_mesh import GeodeMesh
 
 
@@ -23,7 +22,7 @@ class GeodeRasterImage2D(GeodeMesh):
         return "RasterImage2D"
 
     def native_extension(self) -> str:
-        return cast(str, self.raster_image.native_extension())
+        return cast_str(self.raster_image.native_extension())
 
     @classmethod
     def is_3D(cls) -> bool:
@@ -50,33 +49,31 @@ class GeodeRasterImage2D(GeodeMesh):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return cast(list[str], og.RasterImageInputFactory2D.list_creators())
+        return cast_list_str(og.RasterImageInputFactory2D.list_creators())
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return cast(list[str], og.RasterImageOutputFactory2D.list_creators())
+        return cast_list_str(og.RasterImageOutputFactory2D.list_creators())
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return cast(int, og.raster_image_object_priority2D(filename))
+        return cast_int(og.raster_image_object_priority2D(filename))
 
     def is_saveable(self, filename: str) -> bool:
-        return cast(bool, og.is_raster_image_saveable2D(self.raster_image, filename))
+        return cast_bool(og.is_raster_image_saveable2D(self.raster_image, filename))
 
     def save(self, filename: str) -> list[str]:
-        return cast(list[str], og.save_raster_image2D(self.raster_image, filename))
+        return cast_list_str(og.save_raster_image2D(self.raster_image, filename))
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return cast(
-            str,
+        return cast_str(
             viewables.save_viewable_raster_image2D(
                 self.raster_image, filename_without_extension
             ),
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return cast(
-            str,
+        return cast_str(
             viewables.save_light_viewable_raster_image2D(
                 self.raster_image, filename_without_extension
             ),

@@ -1,6 +1,6 @@
 # Standard library imports
 from __future__ import annotations
-from typing import cast, Any
+from typing import cast
 
 # Third party imports
 import opengeode as og
@@ -9,7 +9,7 @@ import opengeode_inspector as og_inspector
 import geode_viewables as viewables
 
 # Local application imports
-from .types import GeodeModelType
+from .types import GeodeModelType, cast_str, cast_list_str, cast_int, cast_bool
 from .geode_model import GeodeModel, ComponentRegistry
 
 
@@ -25,7 +25,7 @@ class GeodeSection(GeodeModel):
         return "Section"
 
     def native_extension(self) -> str:
-        return cast(str, self.section.native_extension())
+        return cast_str(self.section.native_extension())
 
     @classmethod
     def is_3D(cls) -> bool:
@@ -52,38 +52,36 @@ class GeodeSection(GeodeModel):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return cast(list[str], og.SectionInputFactory.list_creators())
+        return cast_list_str(og.SectionInputFactory.list_creators())
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return cast(list[str], og.SectionOutputFactory.list_creators())
+        return cast_list_str(og.SectionOutputFactory.list_creators())
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return cast(int, og.section_object_priority(filename))
+        return cast_int(og.section_object_priority(filename))
 
     def is_saveable(self, filename: str) -> bool:
-        return cast(bool, og.is_section_saveable(self.section, filename))
+        return cast_bool(og.is_section_saveable(self.section, filename))
 
     def save(self, filename: str) -> list[str]:
-        return cast(list[str], og.save_section(self.section, filename))
+        return cast_list_str(og.save_section(self.section, filename))
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return cast(
-            str,
+        return cast_str(
             viewables.save_viewable_section(self.section, filename_without_extension),
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return cast(
-            str,
+        return cast_str(
             viewables.save_light_viewable_section(
                 self.section, filename_without_extension
             ),
         )
 
     def mesh_components(self) -> ComponentRegistry:
-        return cast(dict[Any, list[Any]], self.section.mesh_components())
+        return cast(ComponentRegistry, self.section.mesh_components())
 
     def inspect(self) -> og_inspector.SectionInspectionResult:
         return og_inspector.inspect_section(self.section)

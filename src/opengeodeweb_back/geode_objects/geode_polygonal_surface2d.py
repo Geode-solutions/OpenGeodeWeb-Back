@@ -1,13 +1,12 @@
 # Standard library imports
 from __future__ import annotations
-from typing import cast
 
 # Third party imports
 import opengeode as og
 import geode_viewables as viewables
 
 # Local application imports
-from .types import GeodeMeshType
+from .types import GeodeMeshType, cast_str, cast_list_str, cast_int, cast_bool
 from .geode_surface_mesh2d import GeodeSurfaceMesh2D
 
 
@@ -27,7 +26,7 @@ class GeodePolygonalSurface2D(GeodeSurfaceMesh2D):
         return "PolygonalSurface2D"
 
     def native_extension(self) -> str:
-        return cast(str, self.polygonal_surface.native_extension())
+        return cast_str(self.polygonal_surface.native_extension())
 
     def builder(self) -> og.PolygonalSurfaceBuilder2D:
         return og.PolygonalSurfaceBuilder2D.create(self.polygonal_surface)
@@ -46,37 +45,35 @@ class GeodePolygonalSurface2D(GeodeSurfaceMesh2D):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return cast(list[str], og.PolygonalSurfaceInputFactory2D.list_creators())
+        return cast_list_str(og.PolygonalSurfaceInputFactory2D.list_creators())
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return cast(list[str], og.PolygonalSurfaceOutputFactory2D.list_creators())
+        return cast_list_str(og.PolygonalSurfaceOutputFactory2D.list_creators())
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return cast(int, og.polygonal_surface_object_priority2D(filename))
+        return cast_int(og.polygonal_surface_object_priority2D(filename))
 
     def is_saveable(self, filename: str) -> bool:
-        return cast(
-            bool, og.is_polygonal_surface_saveable2D(self.polygonal_surface, filename)
+        return cast_bool(
+            og.is_polygonal_surface_saveable2D(self.polygonal_surface, filename)
         )
 
     def save(self, filename: str) -> list[str]:
-        return cast(
-            list[str], og.save_polygonal_surface2D(self.polygonal_surface, filename)
+        return cast_list_str(
+            og.save_polygonal_surface2D(self.polygonal_surface, filename)
         )
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return cast(
-            str,
+        return cast_str(
             viewables.save_viewable_polygonal_surface2D(
                 self.polygonal_surface, filename_without_extension
             ),
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return cast(
-            str,
+        return cast_str(
             viewables.save_light_viewable_polygonal_surface2D(
                 self.polygonal_surface, filename_without_extension
             ),

@@ -5,7 +5,7 @@ import time
 import zipfile
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any
+from typing import Any, cast
 
 
 # Third party imports
@@ -15,7 +15,6 @@ import importlib.metadata as metadata
 import shutil
 from werkzeug.exceptions import HTTPException
 import werkzeug
-from typing import cast
 from opengeodeweb_microservice.schemas import SchemaDict
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session

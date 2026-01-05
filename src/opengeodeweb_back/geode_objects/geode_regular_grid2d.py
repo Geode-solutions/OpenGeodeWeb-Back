@@ -1,6 +1,5 @@
 # Standard library imports
 from __future__ import annotations
-from typing import cast
 
 # Third party imports
 import opengeode as og
@@ -8,7 +7,7 @@ import opengeode_inspector as og_inspector
 import geode_viewables as viewables
 
 # Local application imports
-from .types import GeodeMeshType
+from .types import GeodeMeshType, cast_str, cast_list_str, cast_int, cast_bool
 from .geode_surface_mesh2d import GeodeSurfaceMesh2D
 from .geode_grid2d import GeodeGrid2D
 
@@ -30,7 +29,7 @@ class GeodeRegularGrid2D(GeodeSurfaceMesh2D, GeodeGrid2D):
         return super().inspect()
 
     def native_extension(self) -> str:
-        return cast(str, self.regular_grid.native_extension())
+        return cast_str(self.regular_grid.native_extension())
 
     def builder(self) -> og.RegularGridBuilder2D:
         return og.RegularGridBuilder2D.create(self.regular_grid)
@@ -49,33 +48,31 @@ class GeodeRegularGrid2D(GeodeSurfaceMesh2D, GeodeGrid2D):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return cast(list[str], og.RegularGridInputFactory2D.list_creators())
+        return cast_list_str(og.RegularGridInputFactory2D.list_creators())
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return cast(list[str], og.RegularGridOutputFactory2D.list_creators())
+        return cast_list_str(og.RegularGridOutputFactory2D.list_creators())
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return cast(int, og.regular_grid_object_priority2D(filename))
+        return cast_int(og.regular_grid_object_priority2D(filename))
 
     def is_saveable(self, filename: str) -> bool:
-        return cast(bool, og.is_regular_grid_saveable2D(self.regular_grid, filename))
+        return cast_bool(og.is_regular_grid_saveable2D(self.regular_grid, filename))
 
     def save(self, filename: str) -> list[str]:
-        return cast(list[str], og.save_regular_grid2D(self.regular_grid, filename))
+        return cast_list_str(og.save_regular_grid2D(self.regular_grid, filename))
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return cast(
-            str,
+        return cast_str(
             viewables.save_viewable_regular_grid2D(
                 self.regular_grid, filename_without_extension
             ),
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return cast(
-            str,
+        return cast_str(
             viewables.save_light_viewable_regular_grid2D(
                 self.regular_grid, filename_without_extension
             ),

@@ -1,13 +1,12 @@
 # Standard library imports
 from __future__ import annotations
-from typing import cast
 
 # Third party imports
 import opengeode as og
 import geode_viewables as viewables
 
 # Local application imports
-from .types import GeodeMeshType
+from .types import GeodeMeshType, cast_str, cast_list_str, cast_int, cast_bool
 from .geode_solid_mesh3d import GeodeSolidMesh3D
 
 
@@ -27,7 +26,7 @@ class GeodePolyhedralSolid3D(GeodeSolidMesh3D):
         return "PolyhedralSolid3D"
 
     def native_extension(self) -> str:
-        return cast(str, self.polyhedral_solid.native_extension())
+        return cast_str(self.polyhedral_solid.native_extension())
 
     def builder(self) -> og.PolyhedralSolidBuilder3D:
         return og.PolyhedralSolidBuilder3D.create(self.polyhedral_solid)
@@ -46,37 +45,35 @@ class GeodePolyhedralSolid3D(GeodeSolidMesh3D):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return cast(list[str], og.PolyhedralSolidInputFactory3D.list_creators())
+        return cast_list_str(og.PolyhedralSolidInputFactory3D.list_creators())
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return cast(list[str], og.PolyhedralSolidOutputFactory3D.list_creators())
+        return cast_list_str(og.PolyhedralSolidOutputFactory3D.list_creators())
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return cast(int, og.polyhedral_solid_object_priority3D(filename))
+        return cast_int(og.polyhedral_solid_object_priority3D(filename))
 
     def is_saveable(self, filename: str) -> bool:
-        return cast(
-            bool, og.is_polyhedral_solid_saveable3D(self.polyhedral_solid, filename)
+        return cast_bool(
+            og.is_polyhedral_solid_saveable3D(self.polyhedral_solid, filename)
         )
 
     def save(self, filename: str) -> list[str]:
-        return cast(
-            list[str], og.save_polyhedral_solid3D(self.polyhedral_solid, filename)
+        return cast_list_str(
+            og.save_polyhedral_solid3D(self.polyhedral_solid, filename)
         )
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return cast(
-            str,
+        return cast_str(
             viewables.save_viewable_polyhedral_solid3D(
                 self.polyhedral_solid, filename_without_extension
             ),
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return cast(
-            str,
+        return cast_str(
             viewables.save_light_viewable_polyhedral_solid3D(
                 self.polyhedral_solid, filename_without_extension
             ),

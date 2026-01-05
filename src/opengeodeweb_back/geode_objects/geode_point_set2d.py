@@ -1,6 +1,5 @@
 # Standard library imports
 from __future__ import annotations
-from typing import cast
 
 # Third party imports
 import opengeode as og
@@ -9,7 +8,7 @@ import opengeode_inspector as og_inspector
 import geode_viewables as viewables
 
 # Local application imports
-from .types import GeodeMeshType
+from .types import GeodeMeshType, cast_str, cast_list_str, cast_int, cast_bool
 from .geode_vertex_set import GeodeVertexSet
 
 
@@ -25,7 +24,7 @@ class GeodePointSet2D(GeodeVertexSet):
         return "PointSet2D"
 
     def native_extension(self) -> str:
-        return cast(str, self.point_set.native_extension())
+        return cast_str(self.point_set.native_extension())
 
     @classmethod
     def is_3D(cls) -> bool:
@@ -52,33 +51,31 @@ class GeodePointSet2D(GeodeVertexSet):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return cast(list[str], og.PointSetInputFactory2D.list_creators())
+        return cast_list_str(og.PointSetInputFactory2D.list_creators())
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return cast(list[str], og.PointSetOutputFactory2D.list_creators())
+        return cast_list_str(og.PointSetOutputFactory2D.list_creators())
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return cast(int, og.point_set_object_priority2D(filename))
+        return cast_int(og.point_set_object_priority2D(filename))
 
     def is_saveable(self, filename: str) -> bool:
-        return cast(bool, og.is_point_set_saveable2D(self.point_set, filename))
+        return cast_bool(og.is_point_set_saveable2D(self.point_set, filename))
 
     def save(self, filename: str) -> list[str]:
-        return cast(list[str], og.save_point_set2D(self.point_set, filename))
+        return cast_list_str(og.save_point_set2D(self.point_set, filename))
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return cast(
-            str,
+        return cast_str(
             viewables.save_viewable_point_set2D(
                 self.point_set, filename_without_extension
             ),
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return cast(
-            str,
+        return cast_str(
             viewables.save_light_viewable_point_set2D(
                 self.point_set, filename_without_extension
             ),

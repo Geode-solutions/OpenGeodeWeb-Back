@@ -1,6 +1,5 @@
 # Standard library imports
 from __future__ import annotations
-from typing import cast
 
 # Third party imports
 import opengeode as og
@@ -8,7 +7,7 @@ import opengeode_geosciences as og_geosciences
 import geode_viewables as viewables
 
 # Local application imports
-from .types import GeodeModelType
+from .types import GeodeModelType, cast_str, cast_list_str, cast_int, cast_bool
 from .geode_cross_section import GeodeCrossSection
 
 
@@ -30,7 +29,7 @@ class GeodeImplicitCrossSection(GeodeCrossSection):
         return "ImplicitCrossSection"
 
     def native_extension(self) -> str:
-        return cast(str, self.implicit_cross_section.native_extension())
+        return cast_str(self.implicit_cross_section.native_extension())
 
     def builder(self) -> og_geosciences.ImplicitCrossSectionBuilder:
         return og_geosciences.ImplicitCrossSectionBuilder(self.implicit_cross_section)
@@ -51,49 +50,43 @@ class GeodeImplicitCrossSection(GeodeCrossSection):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return cast(
-            list[str], og_geosciences.ImplicitCrossSectionInputFactory.list_creators()
+        return cast_list_str(
+            og_geosciences.ImplicitCrossSectionInputFactory.list_creators()
         )
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return cast(
-            list[str], og_geosciences.ImplicitCrossSectionOutputFactory.list_creators()
+        return cast_list_str(
+            og_geosciences.ImplicitCrossSectionOutputFactory.list_creators()
         )
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return cast(
-            int, og_geosciences.implicit_cross_section_object_priority(filename)
-        )
+        return cast_int(og_geosciences.implicit_cross_section_object_priority(filename))
 
     def is_saveable(self, filename: str) -> bool:
-        return cast(
-            bool,
+        return cast_bool(
             og_geosciences.is_implicit_cross_section_saveable(
                 self.implicit_cross_section, filename
             ),
         )
 
     def save(self, filename: str) -> list[str]:
-        return cast(
-            list[str],
+        return cast_list_str(
             og_geosciences.save_implicit_cross_section(
                 self.implicit_cross_section, filename
             ),
         )
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return cast(
-            str,
+        return cast_str(
             viewables.save_viewable_implicit_cross_section(
                 self.implicit_cross_section, filename_without_extension
             ),
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return cast(
-            str,
+        return cast_str(
             viewables.save_light_viewable_implicit_cross_section(
                 self.implicit_cross_section, filename_without_extension
             ),
