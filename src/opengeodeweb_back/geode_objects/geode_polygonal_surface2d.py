@@ -63,12 +63,10 @@ class GeodePolygonalSurface2D(GeodeSurfaceMesh2D):
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_polygonal_surface2D(
-            self.polygonal_surface,
-            filename_without_extension,
+            self.polygonal_surface, filename_without_extension
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_polygonal_surface2D(
-            self.polygonal_surface,
-            filename_without_extension,
+            self.polygonal_surface, filename_without_extension
         )

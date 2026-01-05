@@ -69,14 +69,12 @@ class GeodePointSet3D(GeodeVertexSet):
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_point_set3D(
-            self.point_set,
-            filename_without_extension,
+            self.point_set, filename_without_extension
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_point_set3D(
-            self.point_set,
-            filename_without_extension,
+            self.point_set, filename_without_extension
         )
 
     def inspect(self) -> og_inspector.PointSetInspectionResult:

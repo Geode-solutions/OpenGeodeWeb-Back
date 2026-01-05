@@ -69,15 +69,11 @@ class GeodeSection(GeodeModel):
         return og.save_section(self.section, filename)
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_viewable_section(
-            self.section,
-            filename_without_extension,
-        )
+        return viewables.save_viewable_section(self.section, filename_without_extension)
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_section(
-            self.section,
-            filename_without_extension,
+            self.section, filename_without_extension
         )
 
     def mesh_components(self) -> ComponentRegistry:

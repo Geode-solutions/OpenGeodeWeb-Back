@@ -59,24 +59,18 @@ class GeodeTriangulatedSurface2D(GeodeSurfaceMesh2D):
 
     def is_saveable(self, filename: str) -> bool:
         return og.is_triangulated_surface_saveable2D(
-            self.triangulated_surface,
-            filename,
+            self.triangulated_surface, filename
         )
 
     def save(self, filename: str) -> list[str]:
-        return og.save_triangulated_surface2D(
-            self.triangulated_surface,
-            filename,
-        )
+        return og.save_triangulated_surface2D(self.triangulated_surface, filename)
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_triangulated_surface2D(
-            self.triangulated_surface,
-            filename_without_extension,
+            self.triangulated_surface, filename_without_extension
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_triangulated_surface2D(
-            self.triangulated_surface,
-            filename_without_extension,
+            self.triangulated_surface, filename_without_extension
         )

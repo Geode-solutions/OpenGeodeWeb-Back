@@ -63,14 +63,12 @@ class GeodeRegularGrid3D(GeodeSolidMesh3D, GeodeGrid3D):
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_regular_grid3D(
-            self.regular_grid,
-            filename_without_extension,
+            self.regular_grid, filename_without_extension
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_regular_grid3D(
-            self.regular_grid,
-            filename_without_extension,
+            self.regular_grid, filename_without_extension
         )
 
     def cell_attribute_manager(self) -> og.AttributeManager:

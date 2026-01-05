@@ -69,12 +69,10 @@ class GeodeStructuralModel(GeodeBRep):
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_structural_model(
-            self.structural_model,
-            filename_without_extension,
+            self.structural_model, filename_without_extension
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_structural_model(
-            self.structural_model,
-            filename_without_extension,
+            self.structural_model, filename_without_extension
         )

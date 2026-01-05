@@ -66,14 +66,12 @@ class GeodeRegularGrid2D(GeodeSurfaceMesh2D, GeodeGrid2D):
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_regular_grid2D(
-            self.regular_grid,
-            filename_without_extension,
+            self.regular_grid, filename_without_extension
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_regular_grid2D(
-            self.regular_grid,
-            filename_without_extension,
+            self.regular_grid, filename_without_extension
         )
 
     def cell_attribute_manager(self) -> og.AttributeManager:

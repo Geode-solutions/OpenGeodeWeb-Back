@@ -67,14 +67,12 @@ class GeodeRasterImage3D(GeodeMesh):
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_raster_image3D(
-            self.raster_image,
-            filename_without_extension,
+            self.raster_image, filename_without_extension
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_raster_image3D(
-            self.raster_image,
-            filename_without_extension,
+            self.raster_image, filename_without_extension
         )
 
     def inspect(self) -> None:

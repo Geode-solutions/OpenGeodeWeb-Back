@@ -65,24 +65,20 @@ class GeodeImplicitStructuralModel(GeodeStructuralModel):
 
     def is_saveable(self, filename: str) -> bool:
         return og_geosciences.is_implicit_structural_model_saveable(
-            self.implicit_structural_model,
-            filename,
+            self.implicit_structural_model, filename
         )
 
     def save(self, filename: str) -> list[str]:
         return og_geosciences.save_implicit_structural_model(
-            self.implicit_structural_model,
-            filename,
+            self.implicit_structural_model, filename
         )
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_implicit_structural_model(
-            self.implicit_structural_model,
-            filename_without_extension,
+            self.implicit_structural_model, filename_without_extension
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_implicit_structural_model(
-            self.implicit_structural_model,
-            filename_without_extension,
+            self.implicit_structural_model, filename_without_extension
         )

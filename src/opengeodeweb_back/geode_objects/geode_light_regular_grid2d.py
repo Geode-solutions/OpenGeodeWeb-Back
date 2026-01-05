@@ -56,14 +56,12 @@ class GeodeLightRegularGrid2D(GeodeGrid2D):
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_light_regular_grid2D(
-            self.light_regular_grid,
-            filename_without_extension,
+            self.light_regular_grid, filename_without_extension
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_light_regular_grid2D(
-            self.light_regular_grid,
-            filename_without_extension,
+            self.light_regular_grid, filename_without_extension
         )
 
     def vertex_attribute_manager(self) -> og.AttributeManager:

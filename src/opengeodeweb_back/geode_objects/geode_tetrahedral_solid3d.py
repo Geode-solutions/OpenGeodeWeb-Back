@@ -63,12 +63,10 @@ class GeodeTetrahedralSolid3D(GeodeSolidMesh3D):
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_tetrahedral_solid3D(
-            self.tetrahedral_solid,
-            filename_without_extension,
+            self.tetrahedral_solid, filename_without_extension
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_tetrahedral_solid3D(
-            self.tetrahedral_solid,
-            filename_without_extension,
+            self.tetrahedral_solid, filename_without_extension
         )
