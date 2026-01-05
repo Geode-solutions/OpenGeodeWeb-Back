@@ -8,7 +8,7 @@ import opengeode_inspector as og_inspector
 import geode_viewables as viewables
 
 # Local application imports
-from .types import GeodeMeshType, cast_str, cast_list_str, cast_int, cast_bool
+from .types import GeodeMeshType
 from .geode_vertex_set import GeodeVertexSet
 
 
@@ -24,7 +24,7 @@ class GeodePointSet3D(GeodeVertexSet):
         return "PointSet3D"
 
     def native_extension(self) -> str:
-        return cast_str(self.point_set.native_extension())
+        return self.point_set.native_extension()
 
     @classmethod
     def is_3D(cls) -> bool:
@@ -51,34 +51,32 @@ class GeodePointSet3D(GeodeVertexSet):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return cast_list_str(og.PointSetInputFactory3D.list_creators())
+        return og.PointSetInputFactory3D.list_creators()
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return cast_list_str(og.PointSetOutputFactory3D.list_creators())
+        return og.PointSetOutputFactory3D.list_creators()
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return cast_int(og.point_set_object_priority3D(filename))
+        return og.point_set_object_priority3D(filename)
 
     def is_saveable(self, filename: str) -> bool:
-        return cast_bool(og.is_point_set_saveable3D(self.point_set, filename))
+        return og.is_point_set_saveable3D(self.point_set, filename)
 
     def save(self, filename: str) -> list[str]:
-        return cast_list_str(og.save_point_set3D(self.point_set, filename))
+        return og.save_point_set3D(self.point_set, filename)
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return cast_str(
-            viewables.save_viewable_point_set3D(
+        return viewables.save_viewable_point_set3D(
                 self.point_set, filename_without_extension
-            ),
+            ,
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return cast_str(
-            viewables.save_light_viewable_point_set3D(
+        return viewables.save_light_viewable_point_set3D(
                 self.point_set, filename_without_extension
-            ),
+            ,
         )
 
     def inspect(self) -> og_inspector.PointSetInspectionResult:

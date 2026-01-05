@@ -7,7 +7,7 @@ import flask
 
 # Local application imports
 from .geode_objects import geode_objects
-from .geode_objects.types import GeodeObjectType, geode_object_type, cast_str
+from .geode_objects.types import GeodeObjectType, geode_object_type
 from .geode_objects.geode_object import GeodeObject
 from opengeodeweb_microservice.database.data import Data
 
@@ -45,7 +45,7 @@ def get_data_info(data_id: str) -> Data:
 def upload_file_path(filename: str) -> str:
     upload_folder = flask.current_app.config["UPLOAD_FOLDER"]
     secure_filename = werkzeug.utils.secure_filename(filename)
-    return cast_str(os.path.abspath(os.path.join(upload_folder, secure_filename)))
+    return os.path.abspath(os.path.join(upload_folder, secure_filename))
 
 
 def geode_object_output_extensions(

@@ -6,7 +6,7 @@ import opengeode as og
 import geode_viewables as viewables
 
 # Local application imports
-from .types import GeodeMeshType, cast_str, cast_list_str, cast_int, cast_bool
+from .types import GeodeMeshType
 from .geode_solid_mesh3d import GeodeSolidMesh3D
 
 
@@ -26,7 +26,7 @@ class GeodeTetrahedralSolid3D(GeodeSolidMesh3D):
         return "TetrahedralSolid3D"
 
     def native_extension(self) -> str:
-        return cast_str(self.tetrahedral_solid.native_extension())
+        return self.tetrahedral_solid.native_extension()
 
     def builder(self) -> og.TetrahedralSolidBuilder3D:
         return og.TetrahedralSolidBuilder3D.create(self.tetrahedral_solid)
@@ -45,36 +45,32 @@ class GeodeTetrahedralSolid3D(GeodeSolidMesh3D):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return cast_list_str(og.TetrahedralSolidInputFactory3D.list_creators())
+        return og.TetrahedralSolidInputFactory3D.list_creators()
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return cast_list_str(og.TetrahedralSolidOutputFactory3D.list_creators())
+        return og.TetrahedralSolidOutputFactory3D.list_creators()
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return cast_int(og.tetrahedral_solid_object_priority3D(filename))
+        return og.tetrahedral_solid_object_priority3D(filename)
 
     def is_saveable(self, filename: str) -> bool:
-        return cast_bool(
-            og.is_tetrahedral_solid_saveable3D(self.tetrahedral_solid, filename)
+        return og.is_tetrahedral_solid_saveable3D(self.tetrahedral_solid, filename
         )
 
     def save(self, filename: str) -> list[str]:
-        return cast_list_str(
-            og.save_tetrahedral_solid3D(self.tetrahedral_solid, filename)
+        return og.save_tetrahedral_solid3D(self.tetrahedral_solid, filename
         )
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return cast_str(
-            viewables.save_viewable_tetrahedral_solid3D(
+        return viewables.save_viewable_tetrahedral_solid3D(
                 self.tetrahedral_solid, filename_without_extension
-            ),
+            ,
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return cast_str(
-            viewables.save_light_viewable_tetrahedral_solid3D(
+        return viewables.save_light_viewable_tetrahedral_solid3D(
                 self.tetrahedral_solid, filename_without_extension
-            ),
+            ,
         )

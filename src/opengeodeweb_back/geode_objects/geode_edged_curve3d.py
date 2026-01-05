@@ -8,7 +8,7 @@ import opengeode_inspector as og_inspector
 import geode_viewables as viewables
 
 # Local application imports
-from .types import GeodeMeshType, cast_str, cast_list_str, cast_int, cast_bool
+from .types import GeodeMeshType
 from .geode_graph import GeodeGraph
 
 
@@ -26,7 +26,7 @@ class GeodeEdgedCurve3D(GeodeGraph):
         return "EdgedCurve3D"
 
     def native_extension(self) -> str:
-        return cast_str(self.edged_curve.native_extension())
+        return self.edged_curve.native_extension()
 
     @classmethod
     def is_3D(cls) -> bool:
@@ -53,34 +53,32 @@ class GeodeEdgedCurve3D(GeodeGraph):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        return cast_list_str(og.EdgedCurveInputFactory3D.list_creators())
+        return og.EdgedCurveInputFactory3D.list_creators()
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        return cast_list_str(og.EdgedCurveOutputFactory3D.list_creators())
+        return og.EdgedCurveOutputFactory3D.list_creators()
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        return cast_int(og.edged_curve_object_priority3D(filename))
+        return og.edged_curve_object_priority3D(filename)
 
     def is_saveable(self, filename: str) -> bool:
-        return cast_bool(og.is_edged_curve_saveable3D(self.edged_curve, filename))
+        return og.is_edged_curve_saveable3D(self.edged_curve, filename)
 
     def save(self, filename: str) -> list[str]:
-        return cast_list_str(og.save_edged_curve3D(self.edged_curve, filename))
+        return og.save_edged_curve3D(self.edged_curve, filename)
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return cast_str(
-            viewables.save_viewable_edged_curve3D(
+        return viewables.save_viewable_edged_curve3D(
                 self.edged_curve, filename_without_extension
-            ),
+            ,
         )
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return cast_str(
-            viewables.save_light_viewable_edged_curve3D(
+        return viewables.save_light_viewable_edged_curve3D(
                 self.edged_curve, filename_without_extension
-            ),
+            ,
         )
 
     def inspect(self) -> og_inspector.EdgedCurveInspectionResult:
