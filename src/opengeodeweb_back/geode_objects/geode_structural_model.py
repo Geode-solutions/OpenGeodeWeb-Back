@@ -60,8 +60,7 @@ class GeodeStructuralModel(GeodeBRep):
 
     def is_saveable(self, filename: str) -> bool:
         return og_geosciences.is_structural_model_saveable(
-            self.structural_model,
-            filename,
+            self.structural_model, filename
         )
 
     def save(self, filename: str) -> list[str]:

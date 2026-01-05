@@ -47,7 +47,6 @@ def extract_uuids_endpoint() -> flask.Response:
     model = geode_functions.load_geode_object(params.id)
     if not isinstance(model, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
-    assert isinstance(model, GeodeModel)
     mesh_components = model.mesh_components()
     uuid_dict = {}
     for mesh_component, ids in mesh_components.items():

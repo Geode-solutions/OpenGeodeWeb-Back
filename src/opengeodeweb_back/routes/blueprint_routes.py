@@ -259,7 +259,6 @@ def texture_coordinates() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeSurfaceMesh2D | GeodeSurfaceMesh3D):
         flask.abort(400, f"{params.id} is not a GeodeSurfaceMesh")
-    assert isinstance(geode_object, GeodeSurfaceMesh2D | GeodeSurfaceMesh3D)
     texture_coordinates = geode_object.texture_manager().texture_names()
     return flask.make_response({"texture_coordinates": texture_coordinates}, 200)
 
@@ -276,7 +275,6 @@ def vertex_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeMesh):
         flask.abort(400, f"{params.id} is not a GeodeMesh")
-    assert isinstance(geode_object, GeodeMesh)
     vertex_attribute_names = geode_object.vertex_attribute_manager().attribute_names()
     return flask.make_response(
         {
@@ -298,7 +296,6 @@ def cell_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeGrid2D | GeodeGrid3D):
         flask.abort(400, f"{params.id} is not a GeodeGrid")
-    assert isinstance(geode_object, GeodeGrid2D | GeodeGrid3D)
     cell_attribute_names = geode_object.cell_attribute_manager().attribute_names()
     return flask.make_response(
         {
@@ -320,7 +317,6 @@ def polygon_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeSurfaceMesh2D | GeodeSurfaceMesh3D):
         flask.abort(400, f"{params.id} is not a GeodeSurfaceMesh")
-    assert isinstance(geode_object, GeodeSurfaceMesh2D | GeodeSurfaceMesh3D)
     polygon_attribute_names = geode_object.polygon_attribute_manager().attribute_names()
     return flask.make_response(
         {
@@ -342,7 +338,6 @@ def polyhedron_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeSolidMesh3D):
         flask.abort(400, f"{params.id} is not a GeodeSolidMesh")
-    assert isinstance(geode_object, GeodeSolidMesh3D)
     polyhedron_attribute_names = (
         geode_object.polyhedron_attribute_manager().attribute_names()
     )

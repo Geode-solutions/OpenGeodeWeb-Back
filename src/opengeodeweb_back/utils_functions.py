@@ -115,7 +115,7 @@ def validate_request(request: flask.Request, schema: SchemaDict) -> dict[str, An
         error_msg = str(e)
         print("Validation failed:", error_msg, flush=True)
         flask.abort(400, error_msg)
-    return cast(dict[str, Any], json_data)
+    return json_data
 
 
 def set_interval(
