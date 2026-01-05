@@ -15,6 +15,7 @@ import importlib.metadata as metadata
 import shutil
 from werkzeug.exceptions import HTTPException
 import werkzeug
+from typing import cast
 from opengeodeweb_microservice.schemas import SchemaDict
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
@@ -115,7 +116,7 @@ def validate_request(request: flask.Request, schema: SchemaDict) -> dict[str, An
         error_msg = str(e)
         print("Validation failed:", error_msg, flush=True)
         flask.abort(400, error_msg)
-    return json_data
+    return cast(dict[str, Any], json_data)
 
 
 def set_interval(

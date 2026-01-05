@@ -4,6 +4,7 @@ import os
 # Third party imports
 import werkzeug
 import flask
+from typing import cast
 
 # Local application imports
 from .geode_objects import geode_objects
@@ -48,7 +49,7 @@ def get_data_info(data_id: str) -> Data:
 def upload_file_path(filename: str) -> str:
     upload_folder = flask.current_app.config["UPLOAD_FOLDER"]
     secure_filename = werkzeug.utils.secure_filename(filename)
-    return os.path.abspath(os.path.join(upload_folder, secure_filename))
+    return cast(str, os.path.abspath(os.path.join(upload_folder, secure_filename)))
 
 
 def geode_object_output_extensions(

@@ -4,7 +4,6 @@ from typing import cast
 
 # Third party imports
 import opengeode as og
-import opengeode_inspector as og_inspector
 import geode_viewables as viewables
 
 # Local application imports

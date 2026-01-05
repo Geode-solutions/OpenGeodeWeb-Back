@@ -9,7 +9,7 @@ import opengeode_inspector as og_inspector
 import geode_viewables as viewables
 
 # Local application imports
-from .types import GeodeModelType, ViewerType
+from .types import GeodeModelType
 from .geode_model import GeodeModel, ComponentRegistry
 
 

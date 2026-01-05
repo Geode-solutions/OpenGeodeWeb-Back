@@ -1,12 +1,12 @@
 # Standard library imports
 from __future__ import annotations
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 # Third party imports
 import opengeode as og
 
 # Local application imports
-from .types import GeodeObjectType, GeodeModelType, ViewerType
+from .types import ViewerType
 from .geode_object import GeodeObject
 
 ComponentRegistry = dict[og.ComponentType, list[og.uuid]]

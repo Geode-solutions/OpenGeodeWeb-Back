@@ -90,7 +90,7 @@ def create_voi() -> flask.Response:
     if not isinstance(aoi_object, GeodeEdgedCurve3D):
         flask.abort(400, f"AOI with id {params.aoi_id} is not a GeodeEdgedCurve3D")
 
-    aoi_curve = aoi_object.edged_curve
+    aoi_curve = aoi_object.edged_curve  # type: ignore[attr-defined]
     nb_points = aoi_curve.nb_vertices()
 
     edged_curve = GeodeEdgedCurve3D()

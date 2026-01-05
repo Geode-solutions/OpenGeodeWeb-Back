@@ -6,7 +6,7 @@ from abc import abstractmethod
 import opengeode as og
 
 # Local application imports
-from .types import GeodeObjectType, ViewerType
+from .types import ViewerType
 from .geode_object import GeodeObject
 
 

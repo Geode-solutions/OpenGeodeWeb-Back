@@ -4,10 +4,8 @@ from abc import abstractmethod
 
 # Third party imports
 import opengeode as og
-import geode_viewables as viewables
 
 # Local application imports
-from .types import GeodeMeshType
 from .geode_mesh import GeodeMesh
 
 

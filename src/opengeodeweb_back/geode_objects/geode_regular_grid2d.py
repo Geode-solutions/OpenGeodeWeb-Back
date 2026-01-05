@@ -1,6 +1,6 @@
 # Standard library imports
 from __future__ import annotations
-from typing import cast, Any
+from typing import cast
 
 # Third party imports
 import opengeode as og
