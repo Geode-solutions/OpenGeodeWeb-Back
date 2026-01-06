@@ -5,7 +5,7 @@ import time
 import zipfile
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, cast
+from typing import Any
 
 
 # Third party imports
