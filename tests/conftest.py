@@ -48,8 +48,6 @@ def configure_test_environment() -> Generator[None, None, None]:
     if tmp_data_path and os.path.exists(tmp_data_path):
         shutil.rmtree(tmp_data_path, ignore_errors=True)
         print(f"Cleaned up test data folder: {tmp_data_path}", flush=True)
-    
-    
 
 @pytest.fixture
 def client() -> Generator[FlaskClient, None, None]:
