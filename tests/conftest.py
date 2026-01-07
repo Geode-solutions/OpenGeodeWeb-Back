@@ -11,12 +11,13 @@ from flask.testing import FlaskClient
 import pytest
 
 # Local application imports
-from opengeodeweb_back.app import app
+from opengeodeweb_back.app import create_app
 
 from opengeodeweb_microservice.database.connection import init_database
 
 TEST_ID = "1"
 
+app = create_app(__name__)
 
 @pytest.fixture(scope="session", autouse=True)
 def configure_test_environment() -> Generator[None, None, None]:
