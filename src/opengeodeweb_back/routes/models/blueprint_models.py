@@ -27,6 +27,7 @@ def uuid_to_flat_index() -> flask.Response:
         flask.abort(500, "Failed to read viewable file")
     uuid_to_flat_index = {}
     current_index = 0
+    assert root is not None
     for elem in root.iter():
         if "uuid" in elem.attrib and elem.tag == "DataSet":
             uuid_to_flat_index[elem.attrib["uuid"]] = current_index

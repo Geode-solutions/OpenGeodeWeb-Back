@@ -3,11 +3,9 @@ from __future__ import annotations
 
 # Third party imports
 import opengeode as og
-import opengeode_inspector as og_inspector
-import geode_viewables as viewables
 
 # Local application imports
-from .types import GeodeMeshType, ViewerType
+from .types import GeodeMeshType
 from .geode_mesh import GeodeMesh
 
 
