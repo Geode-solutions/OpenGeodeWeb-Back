@@ -17,9 +17,9 @@ from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_microservice.database import connection
 
 # Local application imports
-from .models import blueprint_models
-from . import schemas
 from opengeodeweb_back import geode_functions, utils_functions
+from opengeodeweb_back.routes import schemas
+from opengeodeweb_back.routes.models import blueprint_models
 from opengeodeweb_back.geode_objects import geode_objects
 from opengeodeweb_back.geode_objects.types import geode_object_type
 from opengeodeweb_back.geode_objects.geode_mesh import GeodeMesh
@@ -544,17 +544,12 @@ def import_extension() -> flask.Response:
     with zipfile.ZipFile(vext_file.stream) as zip_archive:
         zip_archive.extractall(extension_path)
 
-    # Find the extracted files
-    dist_path = os.path.join(extension_path, "dist")
-    if not os.path.exists(dist_path):
-        flask.abort(400, "Invalid .vext file: missing dist folder")
-
     # Look for the backend executable and frontend JS
     backend_executable = None
     frontend_file = None
 
-    for file in os.listdir(dist_path):
-        file_path = os.path.join(dist_path, file)
+    for file in os.listdir(extension_path):
+        file_path = os.path.join(extension_path, file)
         if os.path.isfile(file_path):
             if file.endswith(".es.js"):
                 frontend_file = file_path
