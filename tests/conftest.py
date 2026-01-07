@@ -49,6 +49,7 @@ def configure_test_environment() -> Generator[None, None, None]:
         shutil.rmtree(tmp_data_path, ignore_errors=True)
         print(f"Cleaned up test data folder: {tmp_data_path}", flush=True)
 
+
 @pytest.fixture
 def client() -> Generator[FlaskClient, None, None]:
     app.config["REQUEST_COUNTER"] = 0
