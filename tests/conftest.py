@@ -11,7 +11,7 @@ from flask.testing import FlaskClient
 import pytest
 
 # Local application imports
-from opengeodeweb_back.app import create_app
+from opengeodeweb_back.app import create_app, register_ogw_back_blueprints
 
 from opengeodeweb_microservice.database.connection import init_database
 
@@ -48,7 +48,8 @@ def configure_test_environment() -> Generator[None, None, None]:
     if tmp_data_path and os.path.exists(tmp_data_path):
         shutil.rmtree(tmp_data_path, ignore_errors=True)
         print(f"Cleaned up test data folder: {tmp_data_path}", flush=True)
-
+    register_ogw_back_blueprints(app)
+    
 
 @pytest.fixture
 def client() -> Generator[FlaskClient, None, None]:
