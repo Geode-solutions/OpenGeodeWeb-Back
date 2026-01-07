@@ -7,10 +7,7 @@ import flask
 
 # Local application imports
 from .geode_objects import geode_objects
-from .geode_objects.types import (
-    GeodeObjectType,
-    geode_object_type,
-)
+from .geode_objects.types import GeodeObjectType, geode_object_type
 from .geode_objects.geode_object import GeodeObject
 from opengeodeweb_microservice.database.data import Data
 
