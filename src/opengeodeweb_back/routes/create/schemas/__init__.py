@@ -1,1 +1,1 @@
-
+from .point import *

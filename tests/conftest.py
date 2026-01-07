@@ -41,14 +41,14 @@ def configure_test_environment() -> Generator[None, None, None]:
 
     init_database(db_path)
     os.environ["TEST_DB_PATH"] = str(db_path)
-
+    register_ogw_back_blueprints(app)
     yield
 
     tmp_data_path = app.config.get("DATA_FOLDER_PATH")
     if tmp_data_path and os.path.exists(tmp_data_path):
         shutil.rmtree(tmp_data_path, ignore_errors=True)
         print(f"Cleaned up test data folder: {tmp_data_path}", flush=True)
-    register_ogw_back_blueprints(app)
+    
     
 
 @pytest.fixture

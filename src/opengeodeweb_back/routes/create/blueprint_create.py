@@ -8,7 +8,7 @@ from opengeodeweb_microservice.schemas import get_schemas_dict
 
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
-from opengeodeweb_back.routes.create.schemas import schemas
+import opengeodeweb_back.routes.create.schemas as schemas
 from opengeodeweb_back.geode_objects.geode_point_set3d import GeodePointSet3D
 from opengeodeweb_back.geode_objects.geode_edged_curve3d import GeodeEdgedCurve3D
 
@@ -23,7 +23,7 @@ schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas
 def point() -> flask.Response:
     """Endpoint to create a single point in 3D space."""
     json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["create_point"]
+        flask.request, schemas_dict["point"]
     )
     params = schemas.Point.from_dict(json_data)
 

@@ -206,24 +206,20 @@ def test_save_viewable_workflow_from_file(client: FlaskClient) -> None:
 
 
 def test_save_viewable_workflow_from_object(client: FlaskClient) -> None:
-    route = "/opengeodeweb_back/create/create_aoi"
-    aoi_data = {
-        "name": "workflow_aoi",
-        "points": [
-            {"x": 0.0, "y": 0.0},
-            {"x": 1.0, "y": 0.0},
-            {"x": 1.0, "y": 1.0},
-            {"x": 0.0, "y": 1.0},
-        ],
+    route = "/opengeodeweb_back/create/point"
+    point_data = {
+        "name": "workflow_point_3d",
+        "x": 0.0,
+        "y": 0.0,
         "z": 0.0,
     }
 
-    response = client.post(route, json=aoi_data)
+    response = client.post(route, json=point_data)
     assert response.status_code == 200
 
     data_id = response.get_json()["id"]
     assert isinstance(data_id, str) and len(data_id) > 0
-    assert response.get_json()["geode_object_type"] == "EdgedCurve3D"
+    assert response.get_json()["geode_object_type"] == "PointSet3D"
     assert response.get_json()["viewable_file"].endswith(".vtp")
 
 
@@ -239,11 +235,11 @@ def test_import_extension_route(client: FlaskClient, tmp_path: Path) -> None:
     vext_path = tmp_path / "test-extension-1.0.0.vext"
     with zipfile.ZipFile(vext_path, "w", compression=zipfile.ZIP_DEFLATED) as zipf:
         zipf.writestr(
-            "dist/test-extension-extension.es.js",
+            "test-extension-extension.es.js",
             "export const metadata = { id: 'test-extension', name: 'Test Extension' };",
         )
-        zipf.writestr("dist/test-extension-back", "#!/bin/bash\necho 'mock backend'")
-        zipf.writestr("dist/test-extension.css", ".test { color: red; }")
+        zipf.writestr("test-extension-back", "#!/bin/bash\necho 'mock backend'")
+        zipf.writestr("test-extension.css", ".test { color: red; }")
     with open(vext_path, "rb") as f:
         response = client.post(
             route,
@@ -261,8 +257,6 @@ def test_import_extension_route(client: FlaskClient, tmp_path: Path) -> None:
     )
     extension_path = os.path.join(extensions_folder, "test-extension")
     assert os.path.exists(extension_path)
-    dist_path = os.path.join(extension_path, "dist")
-    assert os.path.exists(dist_path)
 
     # Verify frontend content is returned
     frontend_content = json_data["frontend_content"]
