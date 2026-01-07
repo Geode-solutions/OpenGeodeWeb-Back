@@ -22,9 +22,7 @@ schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas
 )
 def point() -> flask.Response:
     """Endpoint to create a single point in 3D space."""
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["point"]
-    )
+    json_data = utils_functions.validate_request(flask.request, schemas_dict["point"])
     params = schemas.Point.from_dict(json_data)
 
     # Create the point
