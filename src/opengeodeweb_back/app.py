@@ -14,16 +14,19 @@ from opengeodeweb_back.routes.models import blueprint_models
 from opengeodeweb_back.routes.create import blueprint_create
 from opengeodeweb_microservice.database import connection
 
+
 def create_app(name: str) -> flask.Flask:
     app = flask.Flask(name)
 
     """ Config variables """
-    FLASK_DEBUG = True if os.environ.get("FLASK_DEBUG", default=None) == "True" else False
+    FLASK_DEBUG = (
+        True if os.environ.get("FLASK_DEBUG", default=None) == "True" else False
+    )
     if FLASK_DEBUG == False:
         app.config.from_object(app_config.ProdConfig)
     else:
         app.config.from_object(app_config.DevConfig)
-    
+
     if FLASK_DEBUG == False:
         SECONDS_BETWEEN_SHUTDOWNS: float = float(
             app.config.get("SECONDS_BETWEEN_SHUTDOWNS") or 60.0
@@ -36,7 +39,9 @@ def create_app(name: str) -> flask.Flask:
     def before_request() -> flask.Response | None:
         if flask.request.method == "OPTIONS":
             response = flask.make_response()
-            response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
+            response.headers["Access-Control-Allow-Methods"] = (
+                "GET,POST,PUT,DELETE,OPTIONS"
+            )
             return response
         utils_functions.before_request(flask.current_app)
         return None
@@ -49,12 +54,10 @@ def create_app(name: str) -> flask.Flask:
     def errorhandler(exception: HTTPException) -> tuple[dict[str, Any], int] | Response:
         return utils_functions.handle_exception(exception)
 
-
     @app.errorhandler(Exception)
     def handle_generic_exception(exception: Exception) -> Response:
         print("\033[91mError:\033[0m \033[91m" + str(exception) + "\033[0m", flush=True)
         return flask.make_response({"description": str(exception)}, 500)
-
 
     @app.route(
         "/error",
@@ -64,12 +67,10 @@ def create_app(name: str) -> flask.Flask:
         flask.abort(500, f"Test")
         return flask.make_response({}, 500)
 
-
     @app.route("/", methods=["POST"])
     @cross_origin()
     def root() -> Response:
         return flask.make_response({}, 200)
-
 
     @app.route("/kill", methods=["POST"])
     @cross_origin()
@@ -78,6 +79,7 @@ def create_app(name: str) -> flask.Flask:
         os._exit(0)
 
     return app
+
 
 def register_ogw_back_blueprints(app: flask.Flask) -> None:
     app.register_blueprint(
@@ -96,13 +98,23 @@ def register_ogw_back_blueprints(app: flask.Flask) -> None:
         name="opengeodeweb_create",
     )
 
+
 def run_server(app: Flask) -> None:
     parser = argparse.ArgumentParser(
         prog="OpenGeodeWeb-Back", description="Backend server for OpenGeodeWeb"
     )
-    parser.add_argument("--host", type=str, default=app.config.get("DEFAULT_HOST"), help="Host to run on")
     parser.add_argument(
-        "-p", "--port", type=int, default=app.config.get("DEFAULT_PORT"), help="Port to listen on"
+        "--host",
+        type=str,
+        default=app.config.get("DEFAULT_HOST"),
+        help="Host to run on",
+    )
+    parser.add_argument(
+        "-p",
+        "--port",
+        type=int,
+        default=app.config.get("DEFAULT_PORT"),
+        help="Port to listen on",
     )
     parser.add_argument(
         "-d",
@@ -160,5 +172,10 @@ def run_server(app: Flask) -> None:
 
     connection.init_database(db_path)
     print(f"Database initialized at: {db_path}", flush=True)
-    app.run(debug=args.debug, host=args.host, port=args.port, ssl_context=app.config.get("SSL"))
+    app.run(
+        debug=args.debug,
+        host=args.host,
+        port=args.port,
+        ssl_context=app.config.get("SSL"),
+    )
     print("Server stopped", flush=True)
