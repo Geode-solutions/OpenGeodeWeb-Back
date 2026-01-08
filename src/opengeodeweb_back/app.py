@@ -178,4 +178,10 @@ def run_server(app: Flask) -> None:
         port=args.port,
         ssl_context=app.config.get("SSL"),
     )
+
+# ''' Main '''
+if __name__ == "__main__":
+    app = create_app(__name__)
+    register_ogw_back_blueprints(app)
+    run_server(app)
     print("Server stopped", flush=True)
