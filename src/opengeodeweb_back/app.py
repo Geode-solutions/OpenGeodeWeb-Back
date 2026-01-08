@@ -186,7 +186,7 @@ def run_opengeodeweb_back() -> None:
     run_server(app)
     print("Server stopped", flush=True)
 
-    
+
 # ''' Main '''
 if __name__ == "__main__":
     run_opengeodeweb_back()
