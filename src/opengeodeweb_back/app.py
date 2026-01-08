@@ -179,9 +179,14 @@ def run_server(app: Flask) -> None:
         ssl_context=app.config.get("SSL"),
     )
 
-# ''' Main '''
-if __name__ == "__main__":
+
+def run_opengeodeweb_back() -> None:
     app = create_app(__name__)
     register_ogw_back_blueprints(app)
     run_server(app)
     print("Server stopped", flush=True)
+
+    
+# ''' Main '''
+if __name__ == "__main__":
+    run_opengeodeweb_back()
