@@ -179,6 +179,7 @@ def run_server(app: Flask) -> None:
         ssl_context=app.config.get("SSL"),
     )
 
+
 # ''' Main '''
 if __name__ == "__main__":
     app = create_app(__name__)
