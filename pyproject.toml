@@ -21,7 +21,7 @@ classifiers = [
 "Bug Tracker" = "https://github.com/Geode-solutions/OpenGeodeWeb-Back/issues"
 
 [project.scripts]
-opengeodeweb-back = "opengeodeweb_back.app:run_server"
+opengeodeweb-back = "opengeodeweb_back.app:run_opengeodeweb_back"
 
 [tool.setuptools.dynamic]
 dependencies = { file = ["requirements.txt"] }

@@ -11,11 +11,13 @@ from flask.testing import FlaskClient
 import pytest
 
 # Local application imports
-from opengeodeweb_back.app import app
+from opengeodeweb_back.app import create_app, register_ogw_back_blueprints
 
 from opengeodeweb_microservice.database.connection import init_database
 
 TEST_ID = "1"
+
+app = create_app(__name__)
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -39,7 +41,7 @@ def configure_test_environment() -> Generator[None, None, None]:
 
     init_database(db_path)
     os.environ["TEST_DB_PATH"] = str(db_path)
-
+    register_ogw_back_blueprints(app)
     yield
 
     tmp_data_path = app.config.get("DATA_FOLDER_PATH")
