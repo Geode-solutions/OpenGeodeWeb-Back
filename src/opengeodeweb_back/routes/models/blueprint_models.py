@@ -12,14 +12,18 @@ schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas
 
 
 @routes.route(
-    schemas_dict["vtm_component_indices"]["route"],
-    methods=schemas_dict["vtm_component_indices"]["methods"],
+    schemas_dict["mesh_components"]["route"],
+    methods=schemas_dict["mesh_components"]["methods"],
 )
-def uuid_to_flat_index() -> flask.Response:
+def mesh_components() -> flask.Response:
     json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["vtm_component_indices"]
+        flask.request, schemas_dict["mesh_components"]
     )
-    params = schemas.VtmComponentIndices.from_dict(json_data)
+    params = schemas.MeshComponents.from_dict(json_data)
+    model = geode_functions.load_geode_object(params.id)
+    if not isinstance(model, GeodeModel):
+        flask.abort(400, f"{params.id} is not a GeodeModel")
+
     vtm_file_path = geode_functions.data_file_path(params.id, "viewable.vtm")
     tree = ET.parse(vtm_file_path)
     root = tree.find("vtkMultiBlockDataSet")
@@ -32,24 +36,22 @@ def uuid_to_flat_index() -> flask.Response:
         if "uuid" in elem.attrib and elem.tag == "DataSet":
             uuid_to_flat_index[elem.attrib["uuid"]] = current_index
         current_index += 1
-    return flask.make_response({"uuid_to_flat_index": uuid_to_flat_index}, 200)
+    model_mesh_components = model.mesh_components()
+    mesh_components = []
+    for mesh_component, ids in model_mesh_components.items():
+        component_type = mesh_component.get()
+        for id in ids:
+            geode_id = id.string()
+            component_name = geode_id
+            viewer_id = uuid_to_flat_index[geode_id]
 
+            mesh_component_object = {
+                "id": params.id,
+                "viewer_id": viewer_id,
+                "geode_id": geode_id,
+                "name": component_name,
+                "type": component_type,
+            }
+            mesh_components.append(mesh_component_object)
 
-@routes.route(
-    schemas_dict["mesh_components"]["route"],
-    methods=schemas_dict["mesh_components"]["methods"],
-)
-def extract_uuids_endpoint() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["mesh_components"]
-    )
-    params = schemas.MeshComponents.from_dict(json_data)
-    model = geode_functions.load_geode_object(params.id)
-    if not isinstance(model, GeodeModel):
-        flask.abort(400, f"{params.id} is not a GeodeModel")
-    mesh_components = model.mesh_components()
-    uuid_dict = {}
-    for mesh_component, ids in mesh_components.items():
-        component_name = mesh_component.get()
-        uuid_dict[component_name] = [id.string() for id in ids]
-    return flask.make_response({"uuid_dict": uuid_dict}, 200)
+    return flask.make_response({"mesh_components": mesh_components}, 200)
