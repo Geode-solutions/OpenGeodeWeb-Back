@@ -33,24 +33,6 @@
       }
     },
     "models": {
-      "vtm_component_indices": {
-        "$id": "opengeodeweb_back/models/vtm_component_indices",
-        "route": "/vtm_component_indices",
-        "methods": [
-          "POST"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "required": [
-          "id"
-        ],
-        "additionalProperties": false
-      },
       "mesh_components": {
         "$id": "opengeodeweb_back/models/mesh_components",
         "route": "/mesh_components",
