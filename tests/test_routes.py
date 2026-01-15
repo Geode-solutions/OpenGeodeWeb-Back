@@ -161,7 +161,11 @@ def test_geode_objects_and_output_extensions(client: FlaskClient) -> None:
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_save_viewable_file(client: FlaskClient, geode_object_type: str = "BRep", filename: str = "corbi.og_brep") -> TestResponse:
+def test_save_viewable_file(
+    client: FlaskClient,
+    geode_object_type: str = "BRep",
+    filename: str = "corbi.og_brep",
+) -> TestResponse:
     test_upload_file(client, filename)
     route = f"/opengeodeweb_back/save_viewable_file"
 
@@ -189,6 +193,7 @@ def test_save_viewable_file(client: FlaskClient, geode_object_type: str = "BRep"
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
     return response
+
 
 def test_texture_coordinates(client: FlaskClient, test_id: str) -> None:
     with client.application.app_context():

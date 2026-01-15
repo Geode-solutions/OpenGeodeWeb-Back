@@ -10,6 +10,7 @@ from . import schemas
 routes = flask.Blueprint("models", __name__, url_prefix="/models")
 schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas"))
 
+
 @routes.route(
     schemas_dict["mesh_components"]["route"],
     methods=schemas_dict["mesh_components"]["methods"],
@@ -22,7 +23,6 @@ def mesh_components() -> flask.Response:
     model = geode_functions.load_geode_object(params.id)
     if not isinstance(model, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
-
 
     vtm_file_path = geode_functions.data_file_path(params.id, "viewable.vtm")
     tree = ET.parse(vtm_file_path)
@@ -44,13 +44,13 @@ def mesh_components() -> flask.Response:
             geode_id = id.string()
             component_name = geode_id
             viewer_id = uuid_to_flat_index[geode_id]
-            
+
             mesh_component_object = {
                 "id": params.id,
                 "viewer_id": viewer_id,
                 "geode_id": geode_id,
                 "name": component_name,
-                "type": component_type
+                "type": component_type,
             }
             mesh_components.append(mesh_component_object)
 

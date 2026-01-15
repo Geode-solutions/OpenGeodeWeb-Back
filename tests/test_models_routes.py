@@ -26,7 +26,6 @@ def test_mesh_components(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/models/mesh_components"
     brep_filename = os.path.join(data_dir, "cube.og_brep")
 
-
     response = client.post(route, json={"id": response.get_json()["id"]})
     assert response.status_code == 200
     assert "mesh_components" in response.get_json()
@@ -40,7 +39,6 @@ def test_mesh_components(client: FlaskClient) -> None:
         assert isinstance(mesh_component["viewer_id"], int)
         assert isinstance(mesh_component["name"], str)
         assert isinstance(mesh_component["type"], str)
-
 
 
 def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
@@ -161,6 +159,7 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
         connection.init_database(test_db_path, create_tables=True)
 
     client.application.config["DATA_FOLDER_PATH"] = original_data_folder
+
 
 def test_save_viewable_workflow_from_object(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/create/point"
