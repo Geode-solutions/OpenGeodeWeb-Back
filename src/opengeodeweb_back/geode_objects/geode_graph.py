@@ -72,3 +72,6 @@ class GeodeGraph(GeodeVertexSet):
 
     def inspect(self) -> object:
         return None
+
+    def edge_attribute_manager(self) -> og.AttributeManager:
+        return self.graph.edge_attribute_manager()
