@@ -7,7 +7,6 @@ from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
-
 # Third party imports
 import flask
 import fastjsonschema  # type: ignore
@@ -191,7 +190,7 @@ def save_all_viewables_and_return_info(
     data_path: str,
 ) -> dict[str, str | list[str]]:
     with ThreadPoolExecutor() as executor:
-        (native_files, viewable_path, light_path) = executor.map(
+        native_files, viewable_path, light_path = executor.map(
             lambda args: args[0](args[1]),
             [
                 (

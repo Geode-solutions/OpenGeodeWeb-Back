@@ -11,51 +11,34 @@ from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_back import geode_functions
 from opengeodeweb_back.geode_objects.geode_brep import GeodeBRep
 
+
+from .test_routes import test_save_viewable_file
+
 base_dir = os.path.abspath(os.path.dirname(__file__))
 data_dir = os.path.join(base_dir, "data")
 
 
-def test_model_mesh_components(client: FlaskClient, test_id: str) -> None:
-    route = "/opengeodeweb_back/models/vtm_component_indices"
+def test_mesh_components(client: FlaskClient) -> None:
+    geode_object_type = "BRep"
+    filename = "cube.og_brep"
+    response = test_save_viewable_file(client, geode_object_type, filename)
 
-    with client.application.app_context():
-        data_path = geode_functions.data_file_path(test_id, "viewable.vtm")
-        os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        shutil.copy(os.path.join(data_dir, "cube.vtm"), data_path)
-
-    response = client.post(route, json={"id": test_id})
-    assert response.status_code == 200
-
-    uuid_dict = response.get_json()["uuid_to_flat_index"]
-    assert isinstance(uuid_dict, dict)
-
-    indices = list(uuid_dict.values())
-    indices.sort()
-    assert all(indices[i] > indices[i - 1] for i in range(1, len(indices)))
-    for uuid in uuid_dict.keys():
-        assert isinstance(uuid, str)
-
-
-def test_extract_brep_uuids(client: FlaskClient, test_id: str) -> None:
     route = "/opengeodeweb_back/models/mesh_components"
     brep_filename = os.path.join(data_dir, "cube.og_brep")
 
-    with client.application.app_context():
-        data = Data.create(
-            geode_object=GeodeBRep.geode_object_type(),
-            viewer_object=GeodeBRep.viewer_type(),
-            input_file=brep_filename,
-        )
-        data.native_file = brep_filename
-        session = get_session()
-        if session:
-            session.commit()
-
-        response = client.post(route, json={"id": data.id})
-        assert response.status_code == 200
-        assert "uuid_dict" in response.get_json()
-        uuid_dict = response.get_json()["uuid_dict"]
-        assert isinstance(uuid_dict, dict)
+    response = client.post(route, json={"id": response.get_json()["id"]})
+    assert response.status_code == 200
+    assert "mesh_components" in response.get_json()
+    mesh_components = response.get_json()["mesh_components"]
+    assert isinstance(mesh_components, list)
+    assert len(mesh_components) > 0
+    for mesh_component in mesh_components:
+        assert isinstance(mesh_component, object)
+        assert isinstance(mesh_component["id"], str)
+        assert isinstance(mesh_component["geode_id"], str)
+        assert isinstance(mesh_component["viewer_id"], int)
+        assert isinstance(mesh_component["name"], str)
+        assert isinstance(mesh_component["type"], str)
 
 
 def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
@@ -176,33 +159,6 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
         connection.init_database(test_db_path, create_tables=True)
 
     client.application.config["DATA_FOLDER_PATH"] = original_data_folder
-
-
-def test_save_viewable_workflow_from_file(client: FlaskClient) -> None:
-    file = os.path.join(data_dir, "cube.og_brep")
-    upload_resp = client.put(
-        "/opengeodeweb_back/upload_file",
-        data={"file": FileStorage(open(file, "rb"))},
-    )
-    assert upload_resp.status_code == 201
-
-    route = "/opengeodeweb_back/save_viewable_file"
-    payload = {"geode_object_type": "BRep", "filename": "cube.og_brep"}
-
-    response = client.post(route, json=payload)
-    assert response.status_code == 200
-
-    data_id = response.get_json()["id"]
-    assert isinstance(data_id, str) and len(data_id) > 0
-    assert response.get_json()["viewable_file"].endswith(".vtm")
-
-    comp_resp = client.post(
-        "/opengeodeweb_back/models/vtm_component_indices", json={"id": data_id}
-    )
-    assert comp_resp.status_code == 200
-
-    refreshed = Data.get(data_id)
-    assert refreshed is not None
 
 
 def test_save_viewable_workflow_from_object(client: FlaskClient) -> None:

@@ -4,6 +4,7 @@ import os
 # Third party imports
 from werkzeug.datastructures import FileStorage
 from flask.testing import FlaskClient
+from werkzeug.test import TestResponse
 
 # Local application imports
 from opengeodeweb_microservice.database.data import Data
@@ -163,14 +164,18 @@ def test_geode_objects_and_output_extensions(client: FlaskClient) -> None:
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_save_viewable_file(client: FlaskClient) -> None:
-    test_upload_file(client, filename="corbi.og_brep")
+def test_save_viewable_file(
+    client: FlaskClient,
+    geode_object_type: str = "BRep",
+    filename: str = "corbi.og_brep",
+) -> TestResponse:
+    test_upload_file(client, filename)
     route = f"/opengeodeweb_back/save_viewable_file"
 
     def get_full_data() -> test_utils.JsonData:
         return {
-            "geode_object_type": "BRep",
-            "filename": "corbi.og_brep",
+            "geode_object_type": geode_object_type,
+            "filename": filename,
         }
 
     # Normal test with filename 'corbi.og_brep'
@@ -190,6 +195,7 @@ def test_save_viewable_file(client: FlaskClient) -> None:
 
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
+    return response
 
 
 def test_texture_coordinates(client: FlaskClient, test_id: str) -> None:
