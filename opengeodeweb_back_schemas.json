@@ -316,6 +316,24 @@
       ],
       "additionalProperties": false
     },
+    "edge_attribute_names": {
+      "$id": "opengeodeweb_back/edge_attribute_names",
+      "route": "/edge_attribute_names",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
     "cell_attribute_names": {
       "$id": "opengeodeweb_back/cell_attribute_names",
       "route": "/cell_attribute_names",

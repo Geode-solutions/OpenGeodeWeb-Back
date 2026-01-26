@@ -23,6 +23,7 @@ from opengeodeweb_back.routes.models import blueprint_models
 from opengeodeweb_back.geode_objects import geode_objects
 from opengeodeweb_back.geode_objects.types import geode_object_type
 from opengeodeweb_back.geode_objects.geode_mesh import GeodeMesh
+from opengeodeweb_back.geode_objects.geode_graph import GeodeGraph
 from opengeodeweb_back.geode_objects.geode_grid2d import GeodeGrid2D
 from opengeodeweb_back.geode_objects.geode_grid3d import GeodeGrid3D
 from opengeodeweb_back.geode_objects.geode_surface_mesh2d import GeodeSurfaceMesh2D
@@ -292,7 +293,7 @@ def cell_attribute_names() -> flask.Response:
     json_data = utils_functions.validate_request(
         flask.request, schemas_dict["cell_attribute_names"]
     )
-    params = schemas.PolygonAttributeNames.from_dict(json_data)
+    params = schemas.CellAttributeNames.from_dict(json_data)
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeGrid2D | GeodeGrid3D):
         flask.abort(400, f"{params.id} is not a GeodeGrid")
@@ -344,6 +345,27 @@ def polyhedron_attribute_names() -> flask.Response:
     return flask.make_response(
         {
             "polyhedron_attribute_names": polyhedron_attribute_names,
+        },
+        200,
+    )
+
+
+@routes.route(
+    schemas_dict["edge_attribute_names"]["route"],
+    methods=schemas_dict["edge_attribute_names"]["methods"],
+)
+def edge_attribute_names() -> flask.Response:
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["edge_attribute_names"]
+    )
+    params = schemas.EdgeAttributeNames.from_dict(json_data)
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeGraph):
+        flask.abort(400, f"{params.id} does not have edges")
+    edge_attribute_names = geode_object.edge_attribute_manager().attribute_names()
+    return flask.make_response(
+        {
+            "edge_attribute_names": edge_attribute_names,
         },
         200,
     )
