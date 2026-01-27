@@ -8,6 +8,7 @@ from typing import Any
 import flask
 import werkzeug
 import zipfile
+import opengeode as og
 import opengeode_io as og_io
 import opengeode_geosciences as og_geosciences
 import opengeode_geosciencesio as og_geosciencesio
@@ -264,6 +265,30 @@ def texture_coordinates() -> flask.Response:
     return flask.make_response({"texture_coordinates": texture_coordinates}, 200)
 
 
+def attributes_metadata(manager: og.AttributeManager) -> dict[str, list[float]]:
+    metadata: dict[str, list[float]] = {}
+    for name in manager.attribute_names():
+        attribute = manager.find_generic_attribute(name)
+        if not attribute.is_genericable():
+            metadata[name] = [-1.0, -1.0]
+            continue
+        min_value = None
+        max_value = None
+        nb_items = attribute.nb_items()
+        for i in range(nb_items):
+            generic_value = attribute.generic_value(i)
+            if min_value is None or generic_value < min_value:
+                min_value = generic_value
+            if max_value is None or generic_value > max_value:
+                max_value = generic_value
+        metadata[name] = (
+            [min_value, max_value]
+            if min_value is not None and max_value is not None
+            else [-1.0, -1.0]
+        )
+    return metadata
+
+
 @routes.route(
     schemas_dict["vertex_attribute_names"]["route"],
     methods=schemas_dict["vertex_attribute_names"]["methods"],
@@ -276,10 +301,11 @@ def vertex_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeMesh):
         flask.abort(400, f"{params.id} is not a GeodeMesh")
-    vertex_attribute_names = geode_object.vertex_attribute_manager().attribute_names()
+    attribute_manager = geode_object.vertex_attribute_manager()
     return flask.make_response(
         {
-            "vertex_attribute_names": vertex_attribute_names,
+            "vertex_attribute_names": attribute_manager.attribute_names(),
+            "vertex_attribute_metadata": attributes_metadata(attribute_manager),
         },
         200,
     )
@@ -297,10 +323,11 @@ def cell_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeGrid2D | GeodeGrid3D):
         flask.abort(400, f"{params.id} is not a GeodeGrid")
-    cell_attribute_names = geode_object.cell_attribute_manager().attribute_names()
+    attribute_manager = geode_object.cell_attribute_manager()
     return flask.make_response(
         {
-            "cell_attribute_names": cell_attribute_names,
+            "cell_attribute_names": attribute_manager.attribute_names(),
+            "cell_attribute_metadata": attributes_metadata(attribute_manager),
         },
         200,
     )
@@ -318,10 +345,11 @@ def polygon_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeSurfaceMesh2D | GeodeSurfaceMesh3D):
         flask.abort(400, f"{params.id} is not a GeodeSurfaceMesh")
-    polygon_attribute_names = geode_object.polygon_attribute_manager().attribute_names()
+    attribute_manager = geode_object.polygon_attribute_manager()
     return flask.make_response(
         {
-            "polygon_attribute_names": polygon_attribute_names,
+            "polygon_attribute_names": attribute_manager.attribute_names(),
+            "polygon_attribute_metadata": attributes_metadata(attribute_manager),
         },
         200,
     )
@@ -339,12 +367,11 @@ def polyhedron_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeSolidMesh3D):
         flask.abort(400, f"{params.id} is not a GeodeSolidMesh")
-    polyhedron_attribute_names = (
-        geode_object.polyhedron_attribute_manager().attribute_names()
-    )
+    attribute_manager = geode_object.polyhedron_attribute_manager()
     return flask.make_response(
         {
-            "polyhedron_attribute_names": polyhedron_attribute_names,
+            "polyhedron_attribute_names": attribute_manager.attribute_names(),
+            "polyhedron_attribute_metadata": attributes_metadata(attribute_manager),
         },
         200,
     )
@@ -362,10 +389,11 @@ def edge_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeGraph):
         flask.abort(400, f"{params.id} does not have edges")
-    edge_attribute_names = geode_object.edge_attribute_manager().attribute_names()
+    attribute_manager = geode_object.edge_attribute_manager()
     return flask.make_response(
         {
-            "edge_attribute_names": edge_attribute_names,
+            "edge_attribute_names": attribute_manager.attribute_names(),
+            "edge_attribute_metadata": attributes_metadata(attribute_manager),
         },
         200,
     )
