@@ -341,7 +341,7 @@ def test_polyhedron_attribute_names(client: FlaskClient, test_id: str) -> None:
         assert polyhedron_attribute_name in polyhedron_attribute_metadata
 
     if "Range" in polyhedron_attribute_metadata:
-        assert polyhedron_attribute_metadata["Range"] == [0, 579]
+        assert polyhedron_attribute_metadata["Range"] == [0.0, 579.0]
 
 
 def test_edge_attribute_names(client: FlaskClient, test_id: str) -> None:

@@ -8,6 +8,7 @@ from typing import Any
 import flask
 import werkzeug
 import zipfile
+import opengeode as og
 import opengeode_io as og_io
 import opengeode_geosciences as og_geosciences
 import opengeode_geosciencesio as og_geosciencesio
@@ -264,25 +265,27 @@ def texture_coordinates() -> flask.Response:
     return flask.make_response({"texture_coordinates": texture_coordinates}, 200)
 
 
-def attributes_metadata(manager: Any) -> dict[str, Any]:
-    metadata: dict[str, Any] = {}
+def attributes_metadata(manager: og.AttributeManager) -> dict[str, list[float]]:
+    metadata: dict[str, list[float]] = {}
     for name in manager.attribute_names():
         attribute = manager.find_generic_attribute(name)
         if not attribute.is_genericable():
-            metadata[name] = [-1, -1]
+            metadata[name] = [-1.0, -1.0]
             continue
         min_value = None
         max_value = None
         nb_items = attribute.nb_items()
         for i in range(nb_items):
             generic_value = attribute.generic_value(i)
-            if not isinstance(generic_value, (int, float)):
-                continue
             if min_value is None or generic_value < min_value:
                 min_value = generic_value
             if max_value is None or generic_value > max_value:
                 max_value = generic_value
-        metadata[name] = [min_value, max_value] if min_value is not None else [-1, -1]
+        metadata[name] = (
+            [min_value, max_value]
+            if min_value is not None and max_value is not None
+            else [-1.0, -1.0]
+        )
     return metadata
 
 
@@ -364,11 +367,11 @@ def polyhedron_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeSolidMesh3D):
         flask.abort(400, f"{params.id} is not a GeodeSolidMesh")
-    attributemanager = geode_object.polyhedron_attribute_manager()
+    attribute_manager = geode_object.polyhedron_attribute_manager()
     return flask.make_response(
         {
-            "polyhedron_attribute_names": attributemanager.attribute_names(),
-            "polyhedron_attribute_metadata": attributes_metadata(attributemanager),
+            "polyhedron_attribute_names": attribute_manager.attribute_names(),
+            "polyhedron_attribute_metadata": attributes_metadata(attribute_manager),
         },
         200,
     )
