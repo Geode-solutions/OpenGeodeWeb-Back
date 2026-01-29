@@ -62,6 +62,7 @@ def allowed_files() -> flask.Response:
 )
 def upload_file() -> flask.Response:
     UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
+    print(f"{UPLOAD_FOLDER=}", flush=True)
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -69,6 +70,7 @@ def upload_file() -> flask.Response:
     if file.filename is None:
         flask.abort(400, "Filename is required")
     filename = werkzeug.utils.secure_filename(os.path.basename(file.filename))
+    print(f"{filename=}", flush=True)
     file.save(os.path.join(UPLOAD_FOLDER, filename))
     return flask.make_response({"message": "File uploaded"}, 201)
 
