@@ -2,6 +2,7 @@
 import os
 import time
 import shutil
+import math
 from typing import Any
 
 # Third party imports
@@ -267,6 +268,7 @@ def texture_coordinates() -> flask.Response:
 
 def attributes_metadata(manager: og.AttributeManager) -> dict[str, list[float]]:
     metadata: dict[str, list[float]] = {}
+    nb_elements = manager.nb_elements()
     for name in manager.attribute_names():
         attribute = manager.find_generic_attribute(name)
         if not attribute.is_genericable():
@@ -274,13 +276,22 @@ def attributes_metadata(manager: og.AttributeManager) -> dict[str, list[float]]:
             continue
         min_value = None
         max_value = None
-        nb_items = attribute.nb_items()
-        for i in range(nb_items):
-            generic_value = attribute.generic_value(i)
-            if min_value is None or generic_value < min_value:
-                min_value = generic_value
-            if max_value is None or generic_value > max_value:
-                max_value = generic_value
+        for i in range(nb_elements):
+            if hasattr(attribute, "value"):
+                val = attribute.value(i)
+                if isinstance(val, list):
+                    values_to_check = val
+                else:
+                    values_to_check = [val]
+            else:
+                values_to_check = [attribute.generic_value(i)]
+
+            for v in values_to_check:
+                if v is not None and not math.isnan(v):
+                    if min_value is None or v < min_value:
+                        min_value = v
+                    if max_value is None or v > max_value:
+                        max_value = v
         metadata[name] = (
             [min_value, max_value]
             if min_value is not None and max_value is not None
