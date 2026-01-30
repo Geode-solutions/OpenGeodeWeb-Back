@@ -271,35 +271,26 @@ def attributes_metadata(manager: og.AttributeManager) -> list[dict[str, Any]]:
     nb_elements = manager.nb_elements()
     for name in manager.attribute_names():
         attribute = manager.find_generic_attribute(name)
-        if not attribute.is_genericable():
-            attributes.append(
-                {"attribute_name": name, "min_value": -1.0, "max_value": -1.0}
+        min_value, max_value = -1.0, -1.0
+        if attribute.is_genericable():
+            get_val = (
+                attribute.value
+                if hasattr(attribute, "value")
+                else attribute.generic_value
             )
-            continue
-        min_value = None
-        max_value = None
-        for index in range(nb_elements):
-            if hasattr(attribute, "value"):
-                val = attribute.value(index)
-                if isinstance(val, list):
-                    values_to_check = val
-                else:
-                    values_to_check = [val]
-            else:
-                values_to_check = [attribute.generic_value(index)]
+            values = []
+            for index in range(nb_elements):
+                value = get_val(index)
+                values.extend(value if isinstance(value, list) else [value])
 
-            for value in values_to_check:
-                if value is not None and not math.isnan(value):
-                    if min_value is None or value < min_value:
-                        min_value = value
-                    if max_value is None or value > max_value:
-                        max_value = value
+            valid_values = [
+                value for value in values if value is not None and not math.isnan(value)
+            ]
+            if valid_values:
+                min_value, max_value = min(valid_values), max(valid_values)
+
         attributes.append(
-            {
-                "attribute_name": name,
-                "min_value": min_value if min_value is not None else -1.0,
-                "max_value": max_value if max_value is not None else -1.0,
-            }
+            {"attribute_name": name, "min_value": min_value, "max_value": max_value}
         )
     return attributes
 
