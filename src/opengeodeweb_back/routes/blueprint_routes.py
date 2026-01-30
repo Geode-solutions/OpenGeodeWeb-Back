@@ -266,38 +266,42 @@ def texture_coordinates() -> flask.Response:
     return flask.make_response({"texture_coordinates": texture_coordinates}, 200)
 
 
-def attributes_metadata(manager: og.AttributeManager) -> dict[str, list[float]]:
-    metadata: dict[str, list[float]] = {}
+def attributes_metadata(manager: og.AttributeManager) -> list[dict[str, Any]]:
+    attributes: list[dict[str, Any]] = []
     nb_elements = manager.nb_elements()
     for name in manager.attribute_names():
         attribute = manager.find_generic_attribute(name)
         if not attribute.is_genericable():
-            metadata[name] = [-1.0, -1.0]
+            attributes.append(
+                {"attribute_name": name, "min_value": -1.0, "max_value": -1.0}
+            )
             continue
         min_value = None
         max_value = None
-        for i in range(nb_elements):
+        for index in range(nb_elements):
             if hasattr(attribute, "value"):
-                val = attribute.value(i)
+                val = attribute.value(index)
                 if isinstance(val, list):
                     values_to_check = val
                 else:
                     values_to_check = [val]
             else:
-                values_to_check = [attribute.generic_value(i)]
+                values_to_check = [attribute.generic_value(index)]
 
-            for v in values_to_check:
-                if v is not None and not math.isnan(v):
-                    if min_value is None or v < min_value:
-                        min_value = v
-                    if max_value is None or v > max_value:
-                        max_value = v
-        metadata[name] = (
-            [min_value, max_value]
-            if min_value is not None and max_value is not None
-            else [-1.0, -1.0]
+            for value in values_to_check:
+                if value is not None and not math.isnan(value):
+                    if min_value is None or value < min_value:
+                        min_value = value
+                    if max_value is None or value > max_value:
+                        max_value = value
+        attributes.append(
+            {
+                "attribute_name": name,
+                "min_value": min_value if min_value is not None else -1.0,
+                "max_value": max_value if max_value is not None else -1.0,
+            }
         )
-    return metadata
+    return attributes
 
 
 @routes.route(
@@ -314,10 +318,7 @@ def vertex_attribute_names() -> flask.Response:
         flask.abort(400, f"{params.id} is not a GeodeMesh")
     attribute_manager = geode_object.vertex_attribute_manager()
     return flask.make_response(
-        {
-            "vertex_attribute_names": attribute_manager.attribute_names(),
-            "vertex_attribute_metadata": attributes_metadata(attribute_manager),
-        },
+        {"attributes": attributes_metadata(attribute_manager)},
         200,
     )
 
@@ -336,10 +337,7 @@ def cell_attribute_names() -> flask.Response:
         flask.abort(400, f"{params.id} is not a GeodeGrid")
     attribute_manager = geode_object.cell_attribute_manager()
     return flask.make_response(
-        {
-            "cell_attribute_names": attribute_manager.attribute_names(),
-            "cell_attribute_metadata": attributes_metadata(attribute_manager),
-        },
+        {"attributes": attributes_metadata(attribute_manager)},
         200,
     )
 
@@ -358,10 +356,7 @@ def polygon_attribute_names() -> flask.Response:
         flask.abort(400, f"{params.id} is not a GeodeSurfaceMesh")
     attribute_manager = geode_object.polygon_attribute_manager()
     return flask.make_response(
-        {
-            "polygon_attribute_names": attribute_manager.attribute_names(),
-            "polygon_attribute_metadata": attributes_metadata(attribute_manager),
-        },
+        {"attributes": attributes_metadata(attribute_manager)},
         200,
     )
 
@@ -380,10 +375,7 @@ def polyhedron_attribute_names() -> flask.Response:
         flask.abort(400, f"{params.id} is not a GeodeSolidMesh")
     attribute_manager = geode_object.polyhedron_attribute_manager()
     return flask.make_response(
-        {
-            "polyhedron_attribute_names": attribute_manager.attribute_names(),
-            "polyhedron_attribute_metadata": attributes_metadata(attribute_manager),
-        },
+        {"attributes": attributes_metadata(attribute_manager)},
         200,
     )
 
@@ -402,10 +394,7 @@ def edge_attribute_names() -> flask.Response:
         flask.abort(400, f"{params.id} does not have edges")
     attribute_manager = geode_object.edge_attribute_manager()
     return flask.make_response(
-        {
-            "edge_attribute_names": attribute_manager.attribute_names(),
-            "edge_attribute_metadata": attributes_metadata(attribute_manager),
-        },
+        {"attributes": attributes_metadata(attribute_manager)},
         200,
     )
 

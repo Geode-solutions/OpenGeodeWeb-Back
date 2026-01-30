@@ -244,13 +244,12 @@ def test_vertex_attribute_names(client: FlaskClient, test_id: str) -> None:
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     assert response.status_code == 200
-    vertex_attribute_names = response.get_json()["vertex_attribute_names"]
-    vertex_attribute_metadata = response.get_json()["vertex_attribute_metadata"]
-    assert type(vertex_attribute_names) is list
-    assert type(vertex_attribute_metadata) is dict
-    for vertex_attribute_name in vertex_attribute_names:
-        assert type(vertex_attribute_name) is str
-        assert vertex_attribute_name in vertex_attribute_metadata
+    attributes = response.get_json()["attributes"]
+    assert type(attributes) is list
+    for attribute in attributes:
+        assert "attribute_name" in attribute
+        assert "min_value" in attribute
+        assert "max_value" in attribute
 
 
 def test_cell_attribute_names(client: FlaskClient, test_id: str) -> None:
@@ -273,13 +272,12 @@ def test_cell_attribute_names(client: FlaskClient, test_id: str) -> None:
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     assert response.status_code == 200
-    cell_attribute_names = response.get_json()["cell_attribute_names"]
-    cell_attribute_metadata = response.get_json()["cell_attribute_metadata"]
-    assert type(cell_attribute_names) is list
-    assert type(cell_attribute_metadata) is dict
-    for cell_attribute_name in cell_attribute_names:
-        assert type(cell_attribute_name) is str
-        assert cell_attribute_name in cell_attribute_metadata
+    attributes = response.get_json()["attributes"]
+    assert type(attributes) is list
+    for attribute in attributes:
+        assert "attribute_name" in attribute
+        assert "min_value" in attribute
+        assert "max_value" in attribute
 
 
 def test_polygon_attribute_names(client: FlaskClient, test_id: str) -> None:
@@ -302,13 +300,12 @@ def test_polygon_attribute_names(client: FlaskClient, test_id: str) -> None:
         assert os.path.exists(data_path), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     assert response.status_code == 200
-    polygon_attribute_names = response.get_json()["polygon_attribute_names"]
-    polygon_attribute_metadata = response.get_json()["polygon_attribute_metadata"]
-    assert type(polygon_attribute_names) is list
-    assert type(polygon_attribute_metadata) is dict
-    for polygon_attribute_name in polygon_attribute_names:
-        assert type(polygon_attribute_name) is str
-        assert polygon_attribute_name in polygon_attribute_metadata
+    attributes = response.get_json()["attributes"]
+    assert type(attributes) is list
+    for attribute in attributes:
+        assert "attribute_name" in attribute
+        assert "min_value" in attribute
+        assert "max_value" in attribute
 
 
 def test_polyhedron_attribute_names(client: FlaskClient, test_id: str) -> None:
@@ -332,16 +329,15 @@ def test_polyhedron_attribute_names(client: FlaskClient, test_id: str) -> None:
     response = client.post(route, json={"id": data.id})
     print(response.get_json())
     assert response.status_code == 200
-    polyhedron_attribute_names = response.get_json()["polyhedron_attribute_names"]
-    polyhedron_attribute_metadata = response.get_json()["polyhedron_attribute_metadata"]
-    assert type(polyhedron_attribute_names) is list
-    assert type(polyhedron_attribute_metadata) is dict
-    for polyhedron_attribute_name in polyhedron_attribute_names:
-        assert type(polyhedron_attribute_name) is str
-        assert polyhedron_attribute_name in polyhedron_attribute_metadata
-
-    if "Range" in polyhedron_attribute_metadata:
-        assert polyhedron_attribute_metadata["Range"] == [0.0, 579.0]
+    attributes = response.get_json()["attributes"]
+    assert type(attributes) is list
+    for attribute in attributes:
+        assert "attribute_name" in attribute
+        assert "min_value" in attribute
+        assert "max_value" in attribute
+        if attribute["attribute_name"] == "Range":
+            assert attribute["min_value"] == 0.0
+            assert attribute["max_value"] == 579.0
 
 
 def test_edge_attribute_names(client: FlaskClient, test_id: str) -> None:
@@ -365,13 +361,12 @@ def test_edge_attribute_names(client: FlaskClient, test_id: str) -> None:
     response = client.post(route, json={"id": data.id})
     print(response.get_json())
     assert response.status_code == 200
-    edge_attribute_names = response.get_json()["edge_attribute_names"]
-    edge_attribute_metadata = response.get_json()["edge_attribute_metadata"]
-    assert type(edge_attribute_names) is list
-    assert type(edge_attribute_metadata) is dict
-    for edge_attribute_name in edge_attribute_names:
-        assert type(edge_attribute_name) is str
-        assert edge_attribute_name in edge_attribute_metadata
+    attributes = response.get_json()["attributes"]
+    assert type(attributes) is list
+    for attribute in attributes:
+        assert "attribute_name" in attribute
+        assert "min_value" in attribute
+        assert "max_value" in attribute
 
 
 def test_database_uri_path(client: FlaskClient) -> None:
