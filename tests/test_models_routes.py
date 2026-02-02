@@ -60,7 +60,7 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
         data1 = Data(
             id="test_data_1",
             geode_object="BRep",
-            viewer_object="BRep",
+            viewer_object="model",
             input_file="test_native.txt",
             native_file="test_native.txt",
             additional_files=[],
@@ -68,7 +68,7 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
         data2 = Data(
             id="test_data_2",
             geode_object="Section",
-            viewer_object="Section",
+            viewer_object="model",
             input_file="test_input.txt",
             native_file="test_native2.txt",
             additional_files=[],
