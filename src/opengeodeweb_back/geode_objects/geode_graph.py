@@ -5,7 +5,7 @@ from __future__ import annotations
 import opengeode as og
 
 # Local application imports
-from .types import GeodeMeshType
+from .types import GeodeMeshType, ViewerElementsType
 from .geode_vertex_set import GeodeVertexSet
 
 
@@ -19,6 +19,10 @@ class GeodeGraph(GeodeVertexSet):
     @classmethod
     def geode_object_type(cls) -> GeodeMeshType:
         return "Graph"
+    
+    @classmethod
+    def viewer_elements_type(cls) -> ViewerElementsType:
+        return "edges"
 
     def native_extension(self) -> str:
         return self.graph.native_extension()

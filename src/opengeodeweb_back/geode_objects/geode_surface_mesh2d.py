@@ -8,6 +8,7 @@ import opengeode_inspector as og_inspector
 
 # Local application imports
 from .geode_vertex_set import GeodeVertexSet
+from .types import ViewerElementsType
 
 
 class GeodeSurfaceMesh2D(GeodeVertexSet):
@@ -26,6 +27,10 @@ class GeodeSurfaceMesh2D(GeodeVertexSet):
     @classmethod
     def is_viewable(cls) -> bool:
         return True
+    
+    @classmethod
+    def viewer_elements_type(cls) -> ViewerElementsType:
+        return "polygons"
 
     def builder(self) -> og.SurfaceMeshBuilder2D:
         return og.SurfaceMeshBuilder2D.create(self.surface_mesh)
