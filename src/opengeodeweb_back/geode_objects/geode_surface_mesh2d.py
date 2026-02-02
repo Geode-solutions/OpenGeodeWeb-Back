@@ -27,7 +27,7 @@ class GeodeSurfaceMesh2D(GeodeVertexSet):
     @classmethod
     def is_viewable(cls) -> bool:
         return True
-    
+
     @classmethod
     def viewer_elements_type(cls) -> ViewerElementsType:
         return "polygons"
