@@ -266,22 +266,19 @@ def texture_coordinates() -> flask.Response:
     return flask.make_response({"texture_coordinates": texture_coordinates}, 200)
 
 
-def attributes_metadata(manager: og.AttributeManager) -> list[dict[str, Any]]:
-    attributes: list[dict[str, Any]] = []
+def attributes_metadata(manager: og.AttributeManager) -> list[dict[str, str | float]]:
+    attributes: list[dict[str, str | float]] = []
     nb_elements = manager.nb_elements()
     for name in manager.attribute_names():
         attribute = manager.find_generic_attribute(name)
         min_value, max_value = -1.0, -1.0
         if attribute.is_genericable():
-            get_val = (
-                attribute.value
-                if hasattr(attribute, "value")
-                else attribute.generic_value
-            )
             values = []
+            nb_items = attribute.nb_items()
             for index in range(nb_elements):
-                value = get_val(index)
-                values.extend(value if isinstance(value, list) else [value])
+                for item in range(nb_items):
+                    value = attribute.generic_item_value(index, item)
+                    values.append(value)
 
             valid_values = [
                 value for value in values if value is not None and not math.isnan(value)
