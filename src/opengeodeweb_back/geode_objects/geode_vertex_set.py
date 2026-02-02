@@ -21,7 +21,7 @@ class GeodeVertexSet(GeodeMesh):
     @classmethod
     def geode_object_type(cls) -> GeodeMeshType:
         return "VertexSet"
-    
+
     @classmethod
     def viewer_elements_type(cls) -> ViewerElementsType:
         return "points"
