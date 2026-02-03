@@ -20,7 +20,7 @@ class GeodeRasterImage3D(GeodeMesh):
     @classmethod
     def geode_object_type(cls) -> GeodeMeshType:
         return "RasterImage3D"
-    
+
     @classmethod
     def viewer_elements_type(cls) -> ViewerElementsType:
         return "polyhedra"
