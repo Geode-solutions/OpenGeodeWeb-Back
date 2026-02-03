@@ -131,7 +131,7 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
     temp_db = tmp_path / "temp_project.db"
     conn = sqlite3.connect(str(temp_db))
     conn.execute(
-        "CREATE TABLE datas (id TEXT PRIMARY KEY, geode_object TEXT, viewer_object TEXT, native_file TEXT, "
+        "CREATE TABLE datas (id TEXT PRIMARY KEY, geode_object TEXT, viewer_object TEXT, viewer_elements_type TEXT, native_file TEXT, "
         "viewable_file TEXT, light_viewable_file TEXT, input_file TEXT, additional_files TEXT)"
     )
     conn.commit()
