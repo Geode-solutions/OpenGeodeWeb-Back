@@ -8,6 +8,7 @@ import opengeode_inspector as og_inspector
 
 # Local application imports
 from .geode_vertex_set import GeodeVertexSet
+from .types import ViewerElementsType
 
 
 class GeodeSolidMesh3D(GeodeVertexSet):
@@ -24,6 +25,10 @@ class GeodeSolidMesh3D(GeodeVertexSet):
     @classmethod
     def is_viewable(cls) -> bool:
         return True
+
+    @classmethod
+    def viewer_elements_type(cls) -> ViewerElementsType:
+        return "polyhedra"
 
     def builder(self) -> og.SolidMeshBuilder3D:
         return og.SolidMeshBuilder3D.create(self.solid_mesh)

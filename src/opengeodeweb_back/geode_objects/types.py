@@ -73,3 +73,5 @@ def geode_object_type(value: str) -> GeodeObjectType:
 
 
 ViewerType = Literal["mesh", "model"]
+
+ViewerElementsType = Literal["points", "edges", "polygons", "polyhedra", "default"]
