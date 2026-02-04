@@ -111,6 +111,7 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
         data_entry = Data.create(
             geode_object=geode_object.geode_object_type(),
             viewer_object=geode_object.viewer_type(),
+            viewer_elements_type=geode_object.viewer_elements_type(),
             input_file=input_file,
             additional_files=additional_files,
         )
@@ -155,6 +156,7 @@ def test_save_all_viewables_commits_to_db(client: FlaskClient) -> None:
         data_entry = Data.create(
             geode_object=geode_object.geode_object_type(),
             viewer_object=geode_object.viewer_type(),
+            viewer_elements_type=geode_object.viewer_elements_type(),
             input_file=input_file,
             additional_files=[],
         )

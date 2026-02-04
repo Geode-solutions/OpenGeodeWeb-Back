@@ -7,7 +7,7 @@ from typing import Any
 import opengeode as og
 
 # Local application imports
-from .types import GeodeObjectType, ViewerType
+from .types import GeodeObjectType, ViewerType, ViewerElementsType
 
 
 class GeodeObject(ABC):
@@ -23,6 +23,10 @@ class GeodeObject(ABC):
     @classmethod
     @abstractmethod
     def viewer_type(cls) -> ViewerType: ...
+
+    @classmethod
+    @abstractmethod
+    def viewer_elements_type(cls) -> ViewerElementsType: ...
 
     @classmethod
     @abstractmethod
