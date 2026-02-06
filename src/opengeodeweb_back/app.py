@@ -24,16 +24,14 @@ def create_app(name: str) -> flask.Flask:
     )
     if FLASK_DEBUG == False:
         app.config.from_object(app_config.ProdConfig)
-    else:
-        app.config.from_object(app_config.DevConfig)
-
-    if FLASK_DEBUG == False:
         SECONDS_BETWEEN_SHUTDOWNS: float = float(
             app.config.get("SECONDS_BETWEEN_SHUTDOWNS") or 60.0
         )
         utils_functions.set_interval(
             utils_functions.kill_task, SECONDS_BETWEEN_SHUTDOWNS, app
         )
+    else:
+        app.config.from_object(app_config.DevConfig)  
 
     @app.before_request
     def before_request() -> flask.Response | None:
@@ -134,7 +132,7 @@ def run_server(app: Flask) -> None:
         "-ufp",
         "--upload_folder_path",
         type=str,
-        default=app.config.get("DEFAULT_DATA_FOLDER_PATH"),
+        default=app.config.get("UPLOAD_FOLDER"),
         help="Path to the folder where uploads are stored",
     )
     parser.add_argument(
@@ -157,12 +155,7 @@ def run_server(app: Flask) -> None:
     app.config.update(UPLOAD_FOLDER=args.upload_folder_path)
     app.config.update(MINUTES_BEFORE_TIMEOUT=args.timeout)
     flask_cors.CORS(app, origins=args.allowed_origins)
-    print(
-        f"Host: {args.host}, Port: {args.port}, Debug: {args.debug}, "
-        f"Data folder path: {args.data_folder_path}, Timeout: {args.timeout}, "
-        f"Origins: {args.allowed_origins}",
-        flush=True,
-    )
+    print(f"{args=}", flush=True, sep="\n")
 
     db_filename: str = app.config.get("DATABASE_FILENAME") or "project.db"
     db_path = os.path.join(str(args.data_folder_path), db_filename)
