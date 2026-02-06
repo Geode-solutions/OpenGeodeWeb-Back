@@ -155,7 +155,7 @@ def run_server(app: Flask) -> None:
     app.config.update(UPLOAD_FOLDER=args.upload_folder_path)
     app.config.update(MINUTES_BEFORE_TIMEOUT=args.timeout)
     flask_cors.CORS(app, origins=args.allowed_origins)
-    print(f"{args=}", flush=True, sep="\n")
+    print(f"{args=}", flush=True)
 
     db_filename: str = app.config.get("DATABASE_FILENAME") or "project.db"
     db_path = os.path.join(str(args.data_folder_path), db_filename)
