@@ -31,7 +31,7 @@ def create_app(name: str) -> flask.Flask:
             utils_functions.kill_task, SECONDS_BETWEEN_SHUTDOWNS, app
         )
     else:
-        app.config.from_object(app_config.DevConfig)  
+        app.config.from_object(app_config.DevConfig)
 
     @app.before_request
     def before_request() -> flask.Response | None:
