@@ -6,7 +6,7 @@ import opengeode as og
 import geode_viewables as viewables
 
 # Local application imports
-from .types import GeodeMeshType
+from .types import GeodeMeshType, ViewerElementsType
 from .geode_mesh import GeodeMesh
 
 
@@ -20,6 +20,10 @@ class GeodeRasterImage2D(GeodeMesh):
     @classmethod
     def geode_object_type(cls) -> GeodeMeshType:
         return "RasterImage2D"
+
+    @classmethod
+    def viewer_elements_type(cls) -> ViewerElementsType:
+        return "polygons"
 
     def native_extension(self) -> str:
         return self.raster_image.native_extension()

@@ -7,6 +7,7 @@ import opengeode as og
 
 # Local application imports
 from .geode_mesh import GeodeMesh
+from .types import ViewerElementsType
 
 
 class GeodeGrid2D(GeodeMesh):
@@ -17,6 +18,10 @@ class GeodeGrid2D(GeodeMesh):
     @classmethod
     def is_viewable(cls) -> bool:
         return True
+
+    @classmethod
+    def viewer_elements_type(cls) -> ViewerElementsType:
+        return "polygons"
 
     def builder(self) -> object:
         return None

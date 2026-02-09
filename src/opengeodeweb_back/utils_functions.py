@@ -237,6 +237,7 @@ def generate_native_viewable_and_light_viewable_from_object(
     data = Data.create(
         geode_object=geode_object.geode_object_type(),
         viewer_object=geode_object.viewer_type(),
+        viewer_elements_type=geode_object.viewer_elements_type(),
     )
     data_path = create_data_folder_from_id(data.id)
     return save_all_viewables_and_return_info(geode_object, data, data_path)
@@ -249,6 +250,7 @@ def generate_native_viewable_and_light_viewable_from_file(
     data = Data.create(
         geode_object=geode_object_type,
         viewer_object=generic_geode_object.viewer_type(),
+        viewer_elements_type=generic_geode_object.viewer_elements_type(),
         input_file=input_file,
     )
 
