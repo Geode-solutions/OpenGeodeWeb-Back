@@ -560,71 +560,78 @@ def import_project() -> flask.Response:
     return flask.make_response({"snapshot": snapshot}, 200)
 
 
-# @routes.route(
-#     schemas_dict["import_extension"]["route"],
-#     methods=schemas_dict["import_extension"]["methods"],
-# )
-# def import_extension() -> flask.Response:
-#     """Import a .vext extension file and extract its contents."""
-#     utils_functions.validate_request(flask.request, schemas_dict["import_extension"])
+@routes.route(
+    schemas_dict["import_extension"]["route"],
+    methods=schemas_dict["import_extension"]["methods"],
+)
+def import_extension() -> flask.Response:
+    """Import a .vext extension file and extract its contents."""
+    utils_functions.validate_request(flask.request, schemas_dict["import_extension"])
 
-#     if "file" not in flask.request.files:
-#         flask.abort(400, "No .vext file provided under 'file'")
+    if "file" not in flask.request.files:
+        flask.abort(400, "No .vext file provided under 'file'")
 
-#     vext_file = flask.request.files["file"]
-#     assert vext_file.filename is not None
-#     filename = werkzeug.utils.secure_filename(os.path.basename(vext_file.filename))
+    vext_file = flask.request.files["file"]
+    assert vext_file.filename is not None
+    filename = werkzeug.utils.secure_filename(os.path.basename(vext_file.filename))
 
-#     if not filename.lower().endswith(".vext"):
-#         flask.abort(400, "Uploaded file must be a .vext")
+    if not filename.lower().endswith(".vext"):
+        flask.abort(400, "Uploaded file must be a .vext")
+    
 
-#     # Create extensions directory in the data folder
-#     extensions_folder = flask.current_app.config["EXTENSIONS_FOLDER_PATH"]
-#     os.makedirs(extensions_folder, exist_ok=True)
+    # Create extensions directory in the data folder
+    extensions_folder = flask.current_app.config["EXTENSIONS_FOLDER_PATH"]
+    os.makedirs(extensions_folder, exist_ok=True)
 
-#     extension_name = (
-#         filename.rsplit("-", 1)[0] if "-" in filename else filename.replace(".vext", "")
-#     )
-#     extension_path = os.path.join(extensions_folder, extension_name)
+    archive_path = os.path.join(extensions_folder, filename)
 
-#     # Remove existing extension if present
-#     if os.path.exists(extension_path):
-#         shutil.rmtree(extension_path)
+    # Remove existing extension if present
+    unziped_extension_path = os.path.join(archive_path.replace(".vext", ""))
+    if os.path.exists(unziped_extension_path):
+        shutil.rmtree(unziped_extension_path)
 
-#     os.makedirs(extension_path, exist_ok=True)
+    os.makedirs(unziped_extension_path, exist_ok=True)
 
-#     # Extract the .vext file
-#     vext_file.stream.seek(0)
-#     with zipfile.ZipFile(vext_file.stream) as zip_archive:
-#         zip_archive.extractall(extension_path)
+    # Extract the .vext file
+    vext_file.stream.seek(0)
+    with zipfile.ZipFile(vext_file.stream) as zip_archive:
+        zip_archive.extractall(unziped_extension_path)
 
-#     # Look for the backend executable and frontend JS
-#     backend_executable = None
-#     frontend_file = None
+    metadata_path = os.path.join(unziped_extension_path, "metadata.json")
+    if not os.path.isfile(metadata_path):
+        flask.abort(400, "Invalid .vext file: missing metadata.json")
+    with open(metadata_path, "r", encoding="utf-8") as f:
+        metadata = flask.json.load(f)
 
-#     for file in os.listdir(extension_path):
-#         file_path = os.path.join(extension_path, file)
-#         if os.path.isfile(file_path):
-#             if file.endswith(".es.js"):
-#                 frontend_file = file_path
-#             elif not file.endswith(".js") and not file.endswith(".css"):
-#                 backend_executable = file_path
-#                 os.chmod(backend_executable, 0o755)
 
-#     if not frontend_file:
-#         flask.abort(400, "Invalid .vext file: missing frontend JavaScript")
-#     if not backend_executable:
-#         flask.abort(400, "Invalid .vext file: missing backend executable")
+    # Look for the backend executable and frontend JS
+    backend_executable = None
+    frontend_file = None
 
-#     assert frontend_file is not None
-#     with open(frontend_file, "r", encoding="utf-8") as f:
-#         frontend_content = f.read()
+    for file in os.listdir(unziped_extension_path):
+        file_path = os.path.join(unziped_extension_path, file)
+        if os.path.isfile(file_path):
+            if file.endswith(".es.js"):
+                frontend_file = file_path
+            elif not file.endswith(".js") and not file.endswith(".css"):
+                backend_executable = file_path
+                os.chmod(backend_executable, 0o755)
 
-#     return flask.make_response(
-#         {
-#             "extension_name": extension_name,
-#             "frontend_content": frontend_content,
-#             "backend_path": backend_executable,
-#         },
-#         200,
-#     )
+    if not frontend_file:
+        flask.abort(400, "Invalid .vext file: missing frontend JavaScript")
+    if not backend_executable:
+        flask.abort(400, "Invalid .vext file: missing backend executable")
+
+    assert frontend_file is not None
+    with open(frontend_file, "r", encoding="utf-8") as f:
+        frontend_content = f.read()
+
+    return flask.make_response(
+        {
+            "extension_name": metadata["name"],
+            "extension_version": metadata["version"],
+            "frontend_content": frontend_content,
+            "backend_path": metadata["microservice_executable"],
+        },
+        200,
+    )
