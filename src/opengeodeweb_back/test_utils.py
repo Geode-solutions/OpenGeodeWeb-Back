@@ -10,11 +10,17 @@ JsonData = dict[str, Any]
 
 
 def test_route_wrong_params(
-    client: FlaskClient, route: str, get_full_data: Callable[[], JsonData], path: list = []
+    client: FlaskClient,
+    route: str,
+    get_full_data: Callable[[], JsonData],
+    path: list[str | int] | None = None,
 ) -> None:
-    def get_json():
+    if path is None:
+        path = []
+
+    def get_json() -> tuple[JsonData, Any]:
         json = get_full_data()
-        target = json
+        target: Any = json
         for p in path:
             target = target[p]
         return json, target
@@ -26,7 +32,7 @@ def test_route_wrong_params(
             target.pop(key)
             response = client.post(route, json=json)
             if response.status_code == 400:
-                error_description = response.get_json()["description"]
+                error_description: str = response.get_json()["description"]
                 assert "must contain" in error_description
                 assert f"'{key}'" in error_description
             if isinstance(value, (dict, list)):
