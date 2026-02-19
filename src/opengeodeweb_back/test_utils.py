@@ -21,8 +21,8 @@ def test_route_wrong_params(
     def get_json() -> tuple[JsonData, Any]:
         json = get_full_data()
         target: Any = json
-        for p in path:
-            target = target[p]
+        for sub_path in path:
+            target = target[sub_path]
         return json, target
 
     data = get_json()[1]
