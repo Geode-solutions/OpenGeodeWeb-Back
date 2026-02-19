@@ -10,7 +10,10 @@ JsonData = dict[str, Any]
 
 
 def test_route_wrong_params(
-    client: FlaskClient, route: str, get_full_data: Callable[[], JsonData], path: list = []
+    client: FlaskClient,
+    route: str,
+    get_full_data: Callable[[], JsonData],
+    path: list = [],
 ) -> None:
     def get_json():
         json = get_full_data()
