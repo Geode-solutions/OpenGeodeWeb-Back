@@ -18,12 +18,12 @@ base_dir = os.path.abspath(os.path.dirname(__file__))
 data_dir = os.path.join(base_dir, "data")
 
 
-def test_mesh_components(client: FlaskClient) -> None:
+def test_model_components(client: FlaskClient) -> None:
     geode_object_type = "BRep"
     filename = "cube.og_brep"
     response = test_save_viewable_file(client, geode_object_type, filename)
 
-    route = "/opengeodeweb_back/models/mesh_components"
+    route = "/opengeodeweb_back/models/model_components"
     brep_filename = os.path.join(data_dir, "cube.og_brep")
 
     response = client.post(route, json={"id": response.get_json()["id"]})
@@ -39,6 +39,9 @@ def test_mesh_components(client: FlaskClient) -> None:
         assert isinstance(mesh_component["viewer_id"], int)
         assert isinstance(mesh_component["name"], str)
         assert isinstance(mesh_component["type"], str)
+    assert "collection_components" in response.get_json()
+    collection_components = response.get_json()["collection_components"]
+    assert isinstance(collection_components, list)
 
 
 def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:

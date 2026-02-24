@@ -33,9 +33,9 @@
       }
     },
     "models": {
-      "mesh_components": {
-        "$id": "opengeodeweb_back/models/mesh_components",
-        "route": "/mesh_components",
+      "model_components": {
+        "$id": "opengeodeweb_back/models/model_components",
+        "route": "/model_components",
         "methods": [
           "POST"
         ],

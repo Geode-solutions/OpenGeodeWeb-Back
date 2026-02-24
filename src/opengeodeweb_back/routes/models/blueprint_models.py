@@ -12,14 +12,14 @@ schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas
 
 
 @routes.route(
-    schemas_dict["mesh_components"]["route"],
-    methods=schemas_dict["mesh_components"]["methods"],
+    schemas_dict["model_components"]["route"],
+    methods=schemas_dict["model_components"]["methods"],
 )
-def mesh_components() -> flask.Response:
+def model_components() -> flask.Response:
     json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["mesh_components"]
+        flask.request, schemas_dict["model_components"]
     )
-    params = schemas.MeshComponents.from_dict(json_data)
+    params = schemas.ModelComponents.from_dict(json_data)
     model = geode_functions.load_geode_object(params.id)
     if not isinstance(model, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
@@ -54,4 +54,24 @@ def mesh_components() -> flask.Response:
             }
             mesh_components.append(mesh_component_object)
 
-    return flask.make_response({"mesh_components": mesh_components}, 200)
+    model_collection_components = model.collection_components()
+    collection_components = []
+    for collection_component, ids in model_collection_components.items():
+        component_type = collection_component.get()
+        for id in ids:
+            geode_id = id.string()
+            collection_component_object = {
+                "id": params.id,
+                "geode_id": geode_id,
+                "name": geode_id,
+                "type": component_type,
+            }
+            collection_components.append(collection_component_object)
+
+    return flask.make_response(
+        {
+            "mesh_components": mesh_components,
+            "collection_components": collection_components,
+        },
+        200,
+    )

@@ -76,6 +76,9 @@ class GeodeBRep(GeodeModel):
     def mesh_components(self) -> ComponentRegistry:
         return self.brep.mesh_components()
 
+    def collection_components(self) -> ComponentRegistry:
+        return self.brep.collection_components()
+
     def inspect(self) -> og_inspector.BRepInspectionResult:
         return og_inspector.inspect_brep(self.brep)
 

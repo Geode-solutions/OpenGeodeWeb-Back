@@ -78,6 +78,9 @@ class GeodeSection(GeodeModel):
     def mesh_components(self) -> ComponentRegistry:
         return self.section.mesh_components()
 
+    def collection_components(self) -> ComponentRegistry:
+        return self.section.collection_components()
+
     def inspect(self) -> og_inspector.SectionInspectionResult:
         return og_inspector.inspect_section(self.section)
 

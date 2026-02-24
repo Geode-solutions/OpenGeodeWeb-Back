@@ -23,3 +23,6 @@ class GeodeModel(GeodeObject):
 
     @abstractmethod
     def mesh_components(self) -> ComponentRegistry: ...
+
+    @abstractmethod
+    def collection_components(self) -> ComponentRegistry: ...
