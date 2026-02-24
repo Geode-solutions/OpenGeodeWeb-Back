@@ -42,6 +42,10 @@ def test_model_components(client: FlaskClient) -> None:
     assert "collection_components" in response.get_json()
     collection_components = response.get_json()["collection_components"]
     assert isinstance(collection_components, list)
+    for collection_component in collection_components:
+        assert isinstance(collection_component, object)
+        assert isinstance(collection_component["id"], str)
+        assert isinstance(collection_component["name"], str)
 
 
 def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
