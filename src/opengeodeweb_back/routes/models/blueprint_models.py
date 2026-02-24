@@ -62,9 +62,7 @@ def model_components() -> flask.Response:
             geode_id = id.string()
             collection_component_object = {
                 "id": params.id,
-                "geode_id": geode_id,
                 "name": geode_id,
-                "type": component_type,
             }
             collection_components.append(collection_component_object)
 
