@@ -46,7 +46,6 @@ def model_components() -> flask.Response:
             viewer_id = uuid_to_flat_index[geode_id]
 
             mesh_component_object = {
-                "id": params.id,
                 "viewer_id": viewer_id,
                 "geode_id": geode_id,
                 "name": component_name,
@@ -61,8 +60,9 @@ def model_components() -> flask.Response:
         for id in ids:
             geode_id = id.string()
             collection_component_object = {
-                "id": params.id,
+                "geode_id": geode_id,
                 "name": geode_id,
+                "type": component_type,
             }
             collection_components.append(collection_component_object)
 

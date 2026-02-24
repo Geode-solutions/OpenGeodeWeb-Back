@@ -34,7 +34,6 @@ def test_model_components(client: FlaskClient) -> None:
     assert len(mesh_components) > 0
     for mesh_component in mesh_components:
         assert isinstance(mesh_component, object)
-        assert isinstance(mesh_component["id"], str)
         assert isinstance(mesh_component["geode_id"], str)
         assert isinstance(mesh_component["viewer_id"], int)
         assert isinstance(mesh_component["name"], str)
@@ -44,7 +43,7 @@ def test_model_components(client: FlaskClient) -> None:
     assert isinstance(collection_components, list)
     for collection_component in collection_components:
         assert isinstance(collection_component, object)
-        assert isinstance(collection_component["id"], str)
+        assert isinstance(collection_component["geode_id"], str)
         assert isinstance(collection_component["name"], str)
 
 
