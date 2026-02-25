@@ -62,14 +62,14 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
             geode_object="BRep",
             viewer_object="BRep",
             viewer_elements_type="default",
-            native_file="test_native.txt",
+            native_file="native.txt",
         )
         data2 = Data(
             id="test_data_2",
             geode_object="Section",
             viewer_object="Section",
             viewer_elements_type="default",
-            native_file="test_native2.txt",
+            native_file="native.txt",
         )
         session.add(data1)
         session.add(data2)
@@ -77,12 +77,12 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
 
         data1_dir = os.path.join(project_folder, "test_data_1")
         os.makedirs(data1_dir, exist_ok=True)
-        with open(os.path.join(data1_dir, "test_native.txt"), "w") as f:
+        with open(os.path.join(data1_dir, "native.txt"), "w") as f:
             f.write("native file content")
 
         data2_dir = os.path.join(project_folder, "test_data_2")
         os.makedirs(data2_dir, exist_ok=True)
-        with open(os.path.join(data2_dir, "test_native2.txt"), "w") as f:
+        with open(os.path.join(data2_dir, "native.txt"), "w") as f:
             f.write("native file content")
 
     response = client.post(route, json={"snapshot": snapshot, "filename": filename})
@@ -100,8 +100,8 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
         parsed = json.loads(zip_file.read("snapshot.json").decode("utf-8"))
         assert parsed == snapshot
         assert "project.db" in names
-        assert "test_data_1/test_native.txt" in names
-        assert "test_data_2/test_native2.txt" in names
+        assert "test_data_1/native.txt" in names
+        assert "test_data_2/native.txt" in names
 
     response.close()
 

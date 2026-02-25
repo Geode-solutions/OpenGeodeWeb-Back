@@ -188,7 +188,6 @@ def save_all_viewables_and_return_info(
     geode_object: GeodeObject,
     data: Data,
     data_path: str,
-    native_filename: str | None = None,
 ) -> dict[str, str | list[str]]:
     with ThreadPoolExecutor() as executor:
         native_files, viewable_path, light_path = executor.map(
@@ -197,12 +196,7 @@ def save_all_viewables_and_return_info(
                 (
                     geode_object.save,
                     os.path.join(
-                        data_path,
-                        (
-                            native_filename
-                            if native_filename is not None
-                            else "native." + geode_object.native_extension()
-                        ),
+                        data_path, "native." + geode_object.native_extension()
                     ),
                 ),
                 (geode_object.save_viewable, os.path.join(data_path, "viewable")),
@@ -276,10 +270,9 @@ def generate_native_viewable_and_light_viewable_from_file(
         shutil.copy2(source_path, dest_path)
         additional_files_copied.append(additional_file.filename)
 
+    data.name = input_file
     geode_object = generic_geode_object.load(copied_full_path)
-    return save_all_viewables_and_return_info(
-        geode_object,
-        data,
-        data_path,
-        native_filename=secure_input_file,
-    )
+    result = save_all_viewables_and_return_info(geode_object, data, data_path)
+    if os.path.exists(copied_full_path):
+        os.remove(copied_full_path)
+    return result
