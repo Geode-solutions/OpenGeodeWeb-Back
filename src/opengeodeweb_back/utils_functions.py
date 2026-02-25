@@ -247,31 +247,8 @@ def generate_native_viewable_and_light_viewable_from_file(
         viewer_object=generic_geode_object.viewer_type(),
         viewer_elements_type=generic_geode_object.viewer_elements_type(),
     )
-
     data_path = create_data_folder_from_id(data.id)
-
     full_input_filename = geode_functions.upload_file_path(input_file)
-    secure_input_file = werkzeug.utils.secure_filename(input_file)
-    copied_full_path = os.path.join(data_path, secure_input_file)
-    shutil.copy2(full_input_filename, copied_full_path)
-
-    additional_files_copied: list[str] = []
-    additional = generic_geode_object.additional_files(full_input_filename)
-    for additional_file in additional.mandatory_files + additional.optional_files:
-        if additional_file.is_missing:
-            continue
-        source_path = os.path.join(
-            os.path.dirname(full_input_filename), additional_file.filename
-        )
-        if not os.path.exists(source_path):
-            continue
-        dest_path = os.path.join(data_path, additional_file.filename)
-        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-        shutil.copy2(source_path, dest_path)
-        additional_files_copied.append(additional_file.filename)
-
-    geode_object = generic_geode_object.load(copied_full_path)
-    result = save_all_viewables_and_return_info(geode_object, data, data_path)
-    if os.path.exists(copied_full_path):
-        os.remove(copied_full_path)
-    return result
+    geode_object = generic_geode_object.load(full_input_filename)
+    geode_object.builder().set_name(input_file)
+    return save_all_viewables_and_return_info(geode_object, data, data_path)
