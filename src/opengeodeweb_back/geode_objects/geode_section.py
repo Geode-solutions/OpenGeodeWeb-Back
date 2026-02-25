@@ -81,6 +81,15 @@ class GeodeSection(GeodeModel):
     def collection_components(self) -> ComponentRegistry:
         return self.section.collection_components()
 
+    def boundaries(self, id: og.uuid) -> list[og.ComponentID]:
+        return self.section.boundaries(id)
+
+    def internals(self, id: og.uuid) -> list[og.ComponentID]:
+        return self.section.internals(id)
+
+    def items(self, id: og.uuid) -> list[og.ComponentID]:
+        return self.section.items(id)
+
     def inspect(self) -> og_inspector.SectionInspectionResult:
         return og_inspector.inspect_section(self.section)
 

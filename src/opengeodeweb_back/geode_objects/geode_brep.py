@@ -79,6 +79,15 @@ class GeodeBRep(GeodeModel):
     def collection_components(self) -> ComponentRegistry:
         return self.brep.collection_components()
 
+    def boundaries(self, id: og.uuid) -> list[og.ComponentID]:
+        return self.brep.boundaries(id)
+
+    def internals(self, id: og.uuid) -> list[og.ComponentID]:
+        return self.brep.internals(id)
+
+    def items(self, id: og.uuid) -> list[og.ComponentID]:
+        return self.brep.items(id)
+
     def inspect(self) -> og_inspector.BRepInspectionResult:
         return og_inspector.inspect_brep(self.brep)
 

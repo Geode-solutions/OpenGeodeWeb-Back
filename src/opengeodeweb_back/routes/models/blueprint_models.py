@@ -44,12 +44,17 @@ def model_components() -> flask.Response:
             geode_id = id.string()
             component_name = geode_id
             viewer_id = uuid_to_flat_index[geode_id]
-
+            boundaries = model.boundaries(id)
+            boundaries_uuid = [boundary.id().string() for boundary in boundaries]
+            internals = model.internals(id)
+            internals_uuid = [internal.id().string() for internal in internals]
             mesh_component_object = {
                 "viewer_id": viewer_id,
                 "geode_id": geode_id,
                 "name": component_name,
                 "type": component_type,
+                "boundaries": boundaries_uuid,
+                "internals": internals_uuid,
             }
             mesh_components.append(mesh_component_object)
 
@@ -59,10 +64,13 @@ def model_components() -> flask.Response:
         component_type = collection_component.get()
         for id in ids:
             geode_id = id.string()
+            items = model.items(id)
+            items_uuid = [item.id().string() for item in items]
             collection_component_object = {
                 "geode_id": geode_id,
                 "name": geode_id,
                 "type": component_type,
+                "items": items_uuid,
             }
             collection_components.append(collection_component_object)
 

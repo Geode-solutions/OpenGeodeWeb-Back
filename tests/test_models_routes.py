@@ -38,6 +38,12 @@ def test_model_components(client: FlaskClient) -> None:
         assert isinstance(mesh_component["viewer_id"], int)
         assert isinstance(mesh_component["name"], str)
         assert isinstance(mesh_component["type"], str)
+        assert isinstance(mesh_component["boundaries"], list)
+        for boundary_uuid in mesh_component["boundaries"]:
+            assert isinstance(boundary_uuid, str)
+        assert isinstance(mesh_component["internals"], list)
+        for internal_uuid in mesh_component["internals"]:
+            assert isinstance(internal_uuid, str)
     assert "collection_components" in response.get_json()
     collection_components = response.get_json()["collection_components"]
     assert isinstance(collection_components, list)
@@ -45,6 +51,9 @@ def test_model_components(client: FlaskClient) -> None:
         assert isinstance(collection_component, object)
         assert isinstance(collection_component["geode_id"], str)
         assert isinstance(collection_component["name"], str)
+        assert isinstance(collection_component["items"], list)
+        for item_uuid in collection_component["items"]:
+            assert isinstance(item_uuid, str)
 
 
 def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
