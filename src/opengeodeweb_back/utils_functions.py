@@ -198,9 +198,11 @@ def save_all_viewables_and_return_info(
                     geode_object.save,
                     os.path.join(
                         data_path,
-                        native_filename
-                        if native_filename is not None
-                        else "native." + geode_object.native_extension(),
+                        (
+                            native_filename
+                            if native_filename is not None
+                            else "native." + geode_object.native_extension()
+                        ),
                     ),
                 ),
                 (geode_object.save_viewable, os.path.join(data_path, "viewable")),
