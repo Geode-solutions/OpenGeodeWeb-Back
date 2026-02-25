@@ -188,6 +188,7 @@ def save_all_viewables_and_return_info(
     geode_object: GeodeObject,
     data: Data,
     data_path: str,
+    native_filename: str | None = None,
 ) -> dict[str, str | list[str]]:
     with ThreadPoolExecutor() as executor:
         native_files, viewable_path, light_path = executor.map(
@@ -196,7 +197,10 @@ def save_all_viewables_and_return_info(
                 (
                     geode_object.save,
                     os.path.join(
-                        data_path, "native." + geode_object.native_extension()
+                        data_path,
+                        native_filename
+                        if native_filename is not None
+                        else "native." + geode_object.native_extension(),
                     ),
                 ),
                 (geode_object.save_viewable, os.path.join(data_path, "viewable")),
@@ -212,9 +216,6 @@ def save_all_viewables_and_return_info(
         data.viewable_file = os.path.basename(viewable_path)
         data.light_viewable_file = os.path.basename(light_path)
 
-        if not data.input_file:
-            data.input_file = data.native_file
-
         assert data.native_file is not None
         assert data.viewable_file is not None
         assert data.light_viewable_file is not None
@@ -226,8 +227,6 @@ def save_all_viewables_and_return_info(
             "viewer_type": data.viewer_object,
             "binary_light_viewable": binary_light_viewable.decode("utf-8"),
             "geode_object_type": data.geode_object,
-            "input_file": data.input_file or "",
-            "additional_files": data.additional_files or [],
         }
 
 
@@ -251,15 +250,13 @@ def generate_native_viewable_and_light_viewable_from_file(
         geode_object=geode_object_type,
         viewer_object=generic_geode_object.viewer_type(),
         viewer_elements_type=generic_geode_object.viewer_elements_type(),
-        input_file=input_file,
     )
 
     data_path = create_data_folder_from_id(data.id)
 
     full_input_filename = geode_functions.upload_file_path(input_file)
-    copied_full_path = os.path.join(
-        data_path, werkzeug.utils.secure_filename(input_file)
-    )
+    secure_input_file = werkzeug.utils.secure_filename(input_file)
+    copied_full_path = os.path.join(data_path, secure_input_file)
     shutil.copy2(full_input_filename, copied_full_path)
 
     additional_files_copied: list[str] = []
@@ -278,9 +275,9 @@ def generate_native_viewable_and_light_viewable_from_file(
         additional_files_copied.append(additional_file.filename)
 
     geode_object = generic_geode_object.load(copied_full_path)
-    data.additional_files = additional_files_copied
     return save_all_viewables_and_return_info(
         geode_object,
         data,
         data_path,
+        native_filename=secure_input_file,
     )
