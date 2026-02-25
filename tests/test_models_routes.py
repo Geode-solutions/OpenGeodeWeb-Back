@@ -62,18 +62,14 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
             geode_object="BRep",
             viewer_object="BRep",
             viewer_elements_type="default",
-            input_file="test_native.txt",
             native_file="test_native.txt",
-            additional_files=[],
         )
         data2 = Data(
             id="test_data_2",
             geode_object="Section",
             viewer_object="Section",
             viewer_elements_type="default",
-            input_file="test_input.txt",
             native_file="test_native2.txt",
-            additional_files=[],
         )
         session.add(data1)
         session.add(data2)
@@ -86,8 +82,8 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
 
         data2_dir = os.path.join(project_folder, "test_data_2")
         os.makedirs(data2_dir, exist_ok=True)
-        with open(os.path.join(data2_dir, "test_input.txt"), "w") as f:
-            f.write("input file content")
+        with open(os.path.join(data2_dir, "test_native2.txt"), "w") as f:
+            f.write("native file content")
 
     response = client.post(route, json={"snapshot": snapshot, "filename": filename})
     assert response.status_code == 200
@@ -105,7 +101,7 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
         assert parsed == snapshot
         assert "project.db" in names
         assert "test_data_1/test_native.txt" in names
-        assert "test_data_2/test_input.txt" in names
+        assert "test_data_2/test_native2.txt" in names
 
     response.close()
 
@@ -132,7 +128,7 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
     conn = sqlite3.connect(str(temp_db))
     conn.execute(
         "CREATE TABLE datas (id TEXT PRIMARY KEY, geode_object TEXT, viewer_object TEXT, viewer_elements_type TEXT, native_file TEXT, "
-        "viewable_file TEXT, light_viewable_file TEXT, input_file TEXT, additional_files TEXT)"
+        "viewable_file TEXT, light_viewable_file TEXT)"
     )
     conn.commit()
     conn.close()
