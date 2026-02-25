@@ -270,7 +270,6 @@ def generate_native_viewable_and_light_viewable_from_file(
         shutil.copy2(source_path, dest_path)
         additional_files_copied.append(additional_file.filename)
 
-    data.name = input_file
     geode_object = generic_geode_object.load(copied_full_path)
     result = save_all_viewables_and_return_info(geode_object, data, data_path)
     if os.path.exists(copied_full_path):
