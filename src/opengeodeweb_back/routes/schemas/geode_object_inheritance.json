@@ -1,0 +1,17 @@
+{
+  "route": "/geode_object_inheritance",
+  "methods": [
+    "POST"
+  ],
+  "type": "object",
+  "properties": {
+    "geode_object_type": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "geode_object_type"
+  ],
+  "additionalProperties": false
+}

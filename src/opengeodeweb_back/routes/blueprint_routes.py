@@ -608,3 +608,48 @@ def import_extension() -> flask.Response:
         },
         200,
     )
+
+
+@routes.route(
+    schemas_dict["geode_object_inheritance"]["route"],
+    methods=schemas_dict["geode_object_inheritance"]["methods"],
+)
+def geode_object_inheritance() -> flask.Response:
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["geode_object_inheritance"]
+    )
+    params = schemas.GeodeObjectInheritance.from_dict(json_data)
+    geode_object_type = params.geode_object_type
+    target_class = geode_functions.geode_object_from_string(geode_object_type)
+
+    def get_all_bases(geode_class: type) -> set[type]:
+        bases = set()
+        for base_class in geode_class.__bases__:
+            if base_class is not object:
+                bases.add(base_class)
+                bases.update(get_all_bases(base_class))
+        return bases
+
+    def get_all_subclasses(geode_class: type) -> set[type]:
+        subclasses = set()
+        for subclass_class in geode_class.__subclasses__():
+            subclasses.add(subclass_class)
+            subclasses.update(get_all_subclasses(subclass_class))
+        return subclasses
+
+    # Extract all related Geode classes (parents and children)
+    base_classes = get_all_bases(target_class)
+    subclass_classes = get_all_subclasses(target_class)
+
+    # Filter GeodeObjectType to only include registered related objects, excluding target
+    parents = []
+    children = []
+    for geode_object_type_str, geode_class in geode_objects.items():
+        if geode_class == target_class:
+            continue
+        if geode_class in base_classes:
+            parents.append(geode_object_type_str)
+        if geode_class in subclass_classes:
+            children.append(geode_object_type_str)
+
+    return flask.make_response({"parents": parents, "children": children}, 200)
