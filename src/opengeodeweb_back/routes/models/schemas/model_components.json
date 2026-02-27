@@ -1,5 +1,5 @@
 {
-  "route": "/mesh_components",
+  "route": "/model_components",
   "methods": [
     "POST"
   ],
