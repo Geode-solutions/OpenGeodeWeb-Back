@@ -641,10 +641,8 @@ def geode_object_inheritance() -> flask.Response:
     # Extract all related Geode classes (parents and children)
     bases = get_all_bases(target_class)
     subclasses = get_all_subclasses(target_class)
-    print(f"Bases found: {[base_class.__name__ for base_class in bases]}")
-    print(
-        f"Subclasses found: {[subclass_class.__name__ for subclass_class in subclasses]}"
-    )
+    print(f"Bases: {[base_class.__name__ for base_class in bases]}")
+    print(f"Subclasses: {[subclass_class.__name__ for subclass_class in subclasses]}")
 
     all_related_classes = bases | subclasses
     all_related_classes.add(target_class)
@@ -655,5 +653,5 @@ def geode_object_inheritance() -> flask.Response:
         if geode_class in all_related_classes:
             geode_inheritances.append(geode_object_type_str)
 
-    print(f"Geode Object inheritances: {geode_inheritances}")
+    print(f"inheritances: {geode_inheritances}")
     return flask.make_response({"geode_inheritances": geode_inheritances}, 200)
