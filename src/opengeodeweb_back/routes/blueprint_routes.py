@@ -426,7 +426,7 @@ def export_project() -> flask.Response:
     export_vease_path = os.path.join(project_folder, filename)
 
     with get_session() as session:
-        rows = session.query(Data.id, Data.input_file, Data.additional_files).all()
+        rows = session.query(Data.id, Data.native_file).all()
 
     with zipfile.ZipFile(
         export_vease_path, "w", compression=zipfile.ZIP_DEFLATED
@@ -435,21 +435,12 @@ def export_project() -> flask.Response:
         if os.path.isfile(database_root_path):
             zip_file.write(database_root_path, "project.db")
 
-        for data_id, input_file, additional_files in rows:
+        for data_id, native_file in rows:
             base_dir = os.path.join(project_folder, data_id)
 
-            input_path = os.path.join(base_dir, str(input_file))
-            if os.path.isfile(input_path):
-                zip_file.write(input_path, os.path.join(data_id, str(input_file)))
-
-            for relative_path in (
-                additional_files if isinstance(additional_files, list) else []
-            ):
-                additional_path = os.path.join(base_dir, relative_path)
-                if os.path.isfile(additional_path):
-                    zip_file.write(
-                        additional_path, os.path.join(data_id, relative_path)
-                    )
+            native_path = os.path.join(base_dir, str(native_file))
+            if os.path.isfile(native_path):
+                zip_file.write(native_path, os.path.join(data_id, str(native_file)))
 
         zip_file.writestr("snapshot.json", flask.json.dumps(params.snapshot))
 
@@ -524,17 +515,17 @@ def import_project() -> flask.Response:
                     if os.path.isfile(vpath):
                         continue
 
-                input_file = str(data.input_file or "")
-                if not input_file:
+                native_file = str(data.native_file or "")
+                if not native_file:
                     continue
 
-                input_full = geode_functions.data_file_path(data.id, input_file)
-                if not os.path.isfile(input_full):
+                native_full = geode_functions.data_file_path(data.id, native_file)
+                if not os.path.isfile(native_full):
                     continue
 
                 geode_object = geode_functions.geode_object_from_string(
                     data.geode_object
-                ).load(input_full)
+                ).load(native_full)
                 utils_functions.save_all_viewables_and_return_info(
                     geode_object, data, data_path
                 )

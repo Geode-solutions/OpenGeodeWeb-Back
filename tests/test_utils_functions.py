@@ -105,15 +105,11 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
         assert os.path.exists(expected_db_path)
 
         geode_object = GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
-        input_file = "test.og_brep"
-        additional_files = ["additional_file.txt"]
 
         data_entry = Data.create(
             geode_object=geode_object.geode_object_type(),
             viewer_object=geode_object.viewer_type(),
             viewer_elements_type=geode_object.viewer_elements_type(),
-            input_file=input_file,
-            additional_files=additional_files,
         )
         data_path = utils_functions.create_data_folder_from_id(data_entry.id)
 
@@ -124,7 +120,7 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
         assert isinstance(result, dict)
         native_file = result["native_file"]
         assert isinstance(native_file, str)
-        assert native_file.startswith("native.")
+        assert native_file == "native.og_brep"
         viewable_file = result["viewable_file"]
         assert isinstance(viewable_file, str)
         assert viewable_file.endswith(".vtm")
@@ -134,15 +130,12 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
         assert isinstance(result["viewer_type"], str)
         assert isinstance(result["binary_light_viewable"], str)
         assert result["geode_object_type"] == geode_object.geode_object_type()
-        assert result["input_file"] == input_file
 
         db_entry = Data.get(result["id"])
         assert db_entry is not None
         assert db_entry.native_file == result["native_file"]
         assert db_entry.viewable_file == result["viewable_file"]
         assert db_entry.geode_object == geode_object.geode_object_type()
-        assert db_entry.input_file == input_file
-        assert db_entry.additional_files == additional_files
 
         expected_data_path = os.path.join(app.config["DATA_FOLDER_PATH"], result["id"])
         assert os.path.exists(expected_data_path)
@@ -152,13 +145,10 @@ def test_save_all_viewables_commits_to_db(client: FlaskClient) -> None:
     app = client.application
     with app.app_context():
         geode_object = GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
-        input_file = "test.og_brep"
         data_entry = Data.create(
             geode_object=geode_object.geode_object_type(),
             viewer_object=geode_object.viewer_type(),
             viewer_elements_type=geode_object.viewer_elements_type(),
-            input_file=input_file,
-            additional_files=[],
         )
         data_path = utils_functions.create_data_folder_from_id(data_entry.id)
 
@@ -196,11 +186,8 @@ def test_generate_native_viewable_and_light_viewable_from_object(
         assert isinstance(result["binary_light_viewable"], str)
         assert result["binary_light_viewable"].startswith('<?xml version="1.0"?>')
 
-        assert result["input_file"] == result["native_file"]
-
         data = Data.get(result["id"])
         assert data is not None
-        assert data.input_file == data.native_file
         assert data.light_viewable_file is not None
         assert data.light_viewable_file.endswith(".vtp")
 
@@ -221,14 +208,13 @@ def test_generate_native_viewable_and_light_viewable_from_file(
 
     assert isinstance(result, dict)
     assert isinstance(result["native_file"], str)
-    assert result["native_file"].startswith("native.")
+    assert result["native_file"] == "native.og_brep"
     assert isinstance(result["viewable_file"], str)
     assert result["viewable_file"].endswith(".vtm")
     assert isinstance(result["id"], str)
     assert re.match(r"[0-9a-f]{32}", result["id"])
     assert isinstance(result["viewer_type"], str)
     assert isinstance(result["binary_light_viewable"], str)
-    assert isinstance(result["input_file"], str)
 
 
 def test_send_file_multiple_returns_zip(client: FlaskClient, tmp_path: Path) -> None:
