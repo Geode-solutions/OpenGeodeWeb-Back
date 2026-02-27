@@ -386,29 +386,38 @@ def test_geode_object_inheritance(client: FlaskClient) -> None:
     # Test BRep
     response = client.post(route, json={"geode_object_type": "BRep"})
     assert response.status_code == 200
-    geode_inheritances = response.get_json()["geode_inheritances"]
-    assert "BRep" in geode_inheritances
+    json_data = response.get_json()
+    parents = json_data["parents"]
+    children = json_data["children"]
+    assert "BRep" not in parents
+    assert "BRep" not in children
     # Descendants
-    assert "StructuralModel" in geode_inheritances
-    assert "ImplicitStructuralModel" in geode_inheritances
+    assert "StructuralModel" in children
+    assert "ImplicitStructuralModel" in children
 
     # Test CrossSection
     response = client.post(route, json={"geode_object_type": "CrossSection"})
     assert response.status_code == 200
-    geode_inheritances = response.get_json()["geode_inheritances"]
-    assert "CrossSection" in geode_inheritances
+    json_data = response.get_json()
+    parents = json_data["parents"]
+    children = json_data["children"]
+    assert "CrossSection" not in parents
+    assert "CrossSection" not in children
     # Parent
-    assert "Section" in geode_inheritances
+    assert "Section" in parents
     # Descendant
-    assert "ImplicitCrossSection" in geode_inheritances
+    assert "ImplicitCrossSection" in children
 
     # Test PolyhedralSolid3D
     response = client.post(route, json={"geode_object_type": "PolyhedralSolid3D"})
     assert response.status_code == 200
-    geode_inheritances = response.get_json()["geode_inheritances"]
-    assert "PolyhedralSolid3D" in geode_inheritances
+    json_data = response.get_json()
+    parents = json_data["parents"]
+    children = json_data["children"]
+    assert "PolyhedralSolid3D" not in parents
+    assert "PolyhedralSolid3D" not in children
     # Parent
-    assert "VertexSet" in geode_inheritances
+    assert "VertexSet" in parents
 
     # Test all params
     def get_full_data() -> test_utils.JsonData:
