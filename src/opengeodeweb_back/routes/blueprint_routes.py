@@ -402,6 +402,7 @@ def ping() -> flask.Response:
 @routes.route(schemas_dict["kill"]["route"], methods=schemas_dict["kill"]["methods"])
 def kill() -> flask.Response:
     print("Manual server kill, shutting down...", flush=True)
+    utils_functions.teardown_request(flask.current_app)
     os._exit(0)
     return flask.make_response({"message": "Flask server is dead"}, 200)
 
