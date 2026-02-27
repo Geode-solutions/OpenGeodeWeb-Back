@@ -18,12 +18,12 @@ base_dir = os.path.abspath(os.path.dirname(__file__))
 data_dir = os.path.join(base_dir, "data")
 
 
-def test_mesh_components(client: FlaskClient) -> None:
+def test_model_components(client: FlaskClient) -> None:
     geode_object_type = "BRep"
     filename = "cube.og_brep"
     response = test_save_viewable_file(client, geode_object_type, filename)
 
-    route = "/opengeodeweb_back/models/mesh_components"
+    route = "/opengeodeweb_back/models/model_components"
     brep_filename = os.path.join(data_dir, "cube.og_brep")
 
     response = client.post(route, json={"id": response.get_json()["id"]})
@@ -34,11 +34,26 @@ def test_mesh_components(client: FlaskClient) -> None:
     assert len(mesh_components) > 0
     for mesh_component in mesh_components:
         assert isinstance(mesh_component, object)
-        assert isinstance(mesh_component["id"], str)
         assert isinstance(mesh_component["geode_id"], str)
         assert isinstance(mesh_component["viewer_id"], int)
         assert isinstance(mesh_component["name"], str)
         assert isinstance(mesh_component["type"], str)
+        assert isinstance(mesh_component["boundaries"], list)
+        for boundary_uuid in mesh_component["boundaries"]:
+            assert isinstance(boundary_uuid, str)
+        assert isinstance(mesh_component["internals"], list)
+        for internal_uuid in mesh_component["internals"]:
+            assert isinstance(internal_uuid, str)
+    assert "collection_components" in response.get_json()
+    collection_components = response.get_json()["collection_components"]
+    assert isinstance(collection_components, list)
+    for collection_component in collection_components:
+        assert isinstance(collection_component, object)
+        assert isinstance(collection_component["geode_id"], str)
+        assert isinstance(collection_component["name"], str)
+        assert isinstance(collection_component["items"], list)
+        for item_uuid in collection_component["items"]:
+            assert isinstance(item_uuid, str)
 
 
 def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
@@ -62,18 +77,14 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
             geode_object="BRep",
             viewer_object="BRep",
             viewer_elements_type="default",
-            input_file="test_native.txt",
-            native_file="test_native.txt",
-            additional_files=[],
+            native_file="native.txt",
         )
         data2 = Data(
             id="test_data_2",
             geode_object="Section",
             viewer_object="Section",
             viewer_elements_type="default",
-            input_file="test_input.txt",
-            native_file="test_native2.txt",
-            additional_files=[],
+            native_file="native.txt",
         )
         session.add(data1)
         session.add(data2)
@@ -81,13 +92,13 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
 
         data1_dir = os.path.join(project_folder, "test_data_1")
         os.makedirs(data1_dir, exist_ok=True)
-        with open(os.path.join(data1_dir, "test_native.txt"), "w") as f:
+        with open(os.path.join(data1_dir, "native.txt"), "w") as f:
             f.write("native file content")
 
         data2_dir = os.path.join(project_folder, "test_data_2")
         os.makedirs(data2_dir, exist_ok=True)
-        with open(os.path.join(data2_dir, "test_input.txt"), "w") as f:
-            f.write("input file content")
+        with open(os.path.join(data2_dir, "native.txt"), "w") as f:
+            f.write("native file content")
 
     response = client.post(route, json={"snapshot": snapshot, "filename": filename})
     assert response.status_code == 200
@@ -104,8 +115,8 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
         parsed = json.loads(zip_file.read("snapshot.json").decode("utf-8"))
         assert parsed == snapshot
         assert "project.db" in names
-        assert "test_data_1/test_native.txt" in names
-        assert "test_data_2/test_input.txt" in names
+        assert "test_data_1/native.txt" in names
+        assert "test_data_2/native.txt" in names
 
     response.close()
 
@@ -132,7 +143,7 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
     conn = sqlite3.connect(str(temp_db))
     conn.execute(
         "CREATE TABLE datas (id TEXT PRIMARY KEY, geode_object TEXT, viewer_object TEXT, viewer_elements_type TEXT, native_file TEXT, "
-        "viewable_file TEXT, light_viewable_file TEXT, input_file TEXT, additional_files TEXT)"
+        "viewable_file TEXT, light_viewable_file TEXT)"
     )
     conn.commit()
     conn.close()

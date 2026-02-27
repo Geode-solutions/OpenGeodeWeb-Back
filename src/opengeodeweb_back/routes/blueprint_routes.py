@@ -402,6 +402,7 @@ def ping() -> flask.Response:
 @routes.route(schemas_dict["kill"]["route"], methods=schemas_dict["kill"]["methods"])
 def kill() -> flask.Response:
     print("Manual server kill, shutting down...", flush=True)
+    utils_functions.teardown_request(flask.current_app)
     os._exit(0)
     return flask.make_response({"message": "Flask server is dead"}, 200)
 
@@ -425,7 +426,7 @@ def export_project() -> flask.Response:
     export_vease_path = os.path.join(project_folder, filename)
 
     with get_session() as session:
-        rows = session.query(Data.id, Data.input_file, Data.additional_files).all()
+        rows = session.query(Data.id, Data.native_file).all()
 
     with zipfile.ZipFile(
         export_vease_path, "w", compression=zipfile.ZIP_DEFLATED
@@ -434,21 +435,12 @@ def export_project() -> flask.Response:
         if os.path.isfile(database_root_path):
             zip_file.write(database_root_path, "project.db")
 
-        for data_id, input_file, additional_files in rows:
+        for data_id, native_file in rows:
             base_dir = os.path.join(project_folder, data_id)
 
-            input_path = os.path.join(base_dir, str(input_file))
-            if os.path.isfile(input_path):
-                zip_file.write(input_path, os.path.join(data_id, str(input_file)))
-
-            for relative_path in (
-                additional_files if isinstance(additional_files, list) else []
-            ):
-                additional_path = os.path.join(base_dir, relative_path)
-                if os.path.isfile(additional_path):
-                    zip_file.write(
-                        additional_path, os.path.join(data_id, relative_path)
-                    )
+            native_path = os.path.join(base_dir, str(native_file))
+            if os.path.isfile(native_path):
+                zip_file.write(native_path, os.path.join(data_id, str(native_file)))
 
         zip_file.writestr("snapshot.json", flask.json.dumps(params.snapshot))
 
@@ -523,17 +515,17 @@ def import_project() -> flask.Response:
                     if os.path.isfile(vpath):
                         continue
 
-                input_file = str(data.input_file or "")
-                if not input_file:
+                native_file = str(data.native_file or "")
+                if not native_file:
                     continue
 
-                input_full = geode_functions.data_file_path(data.id, input_file)
-                if not os.path.isfile(input_full):
+                native_full = geode_functions.data_file_path(data.id, native_file)
+                if not os.path.isfile(native_full):
                     continue
 
                 geode_object = geode_functions.geode_object_from_string(
                     data.geode_object
-                ).load(input_full)
+                ).load(native_full)
                 utils_functions.save_all_viewables_and_return_info(
                     geode_object, data, data_path
                 )
@@ -546,3 +538,48 @@ def import_project() -> flask.Response:
         except KeyError:
             snapshot = {}
     return flask.make_response({"snapshot": snapshot}, 200)
+
+
+@routes.route(
+    schemas_dict["geode_object_inheritance"]["route"],
+    methods=schemas_dict["geode_object_inheritance"]["methods"],
+)
+def geode_object_inheritance() -> flask.Response:
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["geode_object_inheritance"]
+    )
+    params = schemas.GeodeObjectInheritance.from_dict(json_data)
+    geode_object_type = params.geode_object_type
+    target_class = geode_functions.geode_object_from_string(geode_object_type)
+
+    def get_all_bases(geode_class: type) -> set[type]:
+        bases = set()
+        for base_class in geode_class.__bases__:
+            if base_class is not object:
+                bases.add(base_class)
+                bases.update(get_all_bases(base_class))
+        return bases
+
+    def get_all_subclasses(geode_class: type) -> set[type]:
+        subclasses = set()
+        for subclass_class in geode_class.__subclasses__():
+            subclasses.add(subclass_class)
+            subclasses.update(get_all_subclasses(subclass_class))
+        return subclasses
+
+    # Extract all related Geode classes (parents and children)
+    base_classes = get_all_bases(target_class)
+    subclass_classes = get_all_subclasses(target_class)
+
+    # Filter GeodeObjectType to only include registered related objects, excluding target
+    parents = []
+    children = []
+    for geode_object_type_str, geode_class in geode_objects.items():
+        if geode_class == target_class:
+            continue
+        if geode_class in base_classes:
+            parents.append(geode_object_type_str)
+        if geode_class in subclass_classes:
+            children.append(geode_object_type_str)
+
+    return flask.make_response({"parents": parents, "children": children}, 200)
