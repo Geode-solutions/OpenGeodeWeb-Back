@@ -621,7 +621,6 @@ def geode_object_inheritance() -> flask.Response:
     params = schemas.GeodeObjectInheritance.from_dict(json_data)
     geode_object_type = params.geode_object_type
     target_class = geode_functions.geode_object_from_string(geode_object_type)
-    print(f"Inheritance for {geode_object_type} ({target_class.__name__})")
 
     def get_all_bases(geode_class: type) -> set[type]:
         bases = set()
@@ -641,10 +640,6 @@ def geode_object_inheritance() -> flask.Response:
     # Extract all related Geode classes (parents and children)
     base_classes = get_all_bases(target_class)
     subclass_classes = get_all_subclasses(target_class)
-    print(f"Bases: {[base_class.__name__ for base_class in base_classes]}")
-    print(
-        f"Subclasses: {[subclass_class.__name__ for subclass_class in subclass_classes]}"
-    )
 
     # Filter GeodeObjectType to only include registered related objects, excluding target
     parents = []
@@ -657,6 +652,4 @@ def geode_object_inheritance() -> flask.Response:
         if geode_class in subclass_classes:
             children.append(geode_object_type_str)
 
-    print(f"parents: {parents}")
-    print(f"children: {children}")
     return flask.make_response({"parents": parents, "children": children}, 200)
