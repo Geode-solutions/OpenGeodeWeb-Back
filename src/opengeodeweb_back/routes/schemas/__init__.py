@@ -11,8 +11,8 @@ from .inspect_file import *
 from .import_project import *
 from .import_extension import *
 from .geographic_coordinate_systems import *
-from .geode_object_inheritance import *
 from .geode_objects_and_output_extensions import *
+from .geode_object_inheritance import *
 from .export_project import *
 from .edge_attribute_names import *
 from .cell_attribute_names import *
