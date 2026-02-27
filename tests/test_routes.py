@@ -379,3 +379,39 @@ def test_database_uri_path(client: FlaskClient) -> None:
         assert app.config["SQLALCHEMY_DATABASE_URI"] == expected_uri
 
         assert os.path.exists(expected_db_path)
+
+
+def test_geode_object_inheritance(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/geode_object_inheritance"
+    # Test BRep
+    response = client.post(route, json={"geode_object_type": "BRep"})
+    assert response.status_code == 200
+    geode_inheritances = response.get_json()["geode_inheritances"]
+    assert "BRep" in geode_inheritances
+    # Descendants
+    assert "StructuralModel" in geode_inheritances
+    assert "ImplicitStructuralModel" in geode_inheritances
+
+    # Test CrossSection
+    response = client.post(route, json={"geode_object_type": "CrossSection"})
+    assert response.status_code == 200
+    geode_inheritances = response.get_json()["geode_inheritances"]
+    assert "CrossSection" in geode_inheritances
+    # Parent
+    assert "Section" in geode_inheritances
+    # Descendant
+    assert "ImplicitCrossSection" in geode_inheritances
+
+    # Test PolyhedralSolid3D
+    response = client.post(route, json={"geode_object_type": "PolyhedralSolid3D"})
+    assert response.status_code == 200
+    geode_inheritances = response.get_json()["geode_inheritances"]
+    assert "PolyhedralSolid3D" in geode_inheritances
+    # Parent
+    assert "VertexSet" in geode_inheritances
+
+    # Test all params
+    def get_full_data() -> test_utils.JsonData:
+        return {"geode_object_type": "BRep"}
+
+    test_utils.test_route_wrong_params(client, route, get_full_data)

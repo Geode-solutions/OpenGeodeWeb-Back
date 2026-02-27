@@ -608,3 +608,52 @@ def import_extension() -> flask.Response:
         },
         200,
     )
+
+
+@routes.route(
+    schemas_dict["geode_object_inheritance"]["route"],
+    methods=schemas_dict["geode_object_inheritance"]["methods"],
+)
+def geode_object_inheritance() -> flask.Response:
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["geode_object_inheritance"]
+    )
+    params = schemas.GeodeObjectInheritance.from_dict(json_data)
+    geode_object_type = params.geode_object_type
+    target_class = geode_functions.geode_object_from_string(geode_object_type)
+    print(f"Inheritance for {geode_object_type} ({target_class.__name__})")
+
+    def get_all_bases(geode_class: type) -> set[type]:
+        bases = set()
+        for base_class in geode_class.__bases__:
+            if base_class is not object:
+                bases.add(base_class)
+                bases.update(get_all_bases(base_class))
+        return bases
+
+    def get_all_subclasses(geode_class: type) -> set[type]:
+        subclasses = set()
+        for subclass_class in geode_class.__subclasses__():
+            subclasses.add(subclass_class)
+            subclasses.update(get_all_subclasses(subclass_class))
+        return subclasses
+
+    # Extract all related Geode classes (parents and children)
+    bases = get_all_bases(target_class)
+    subclasses = get_all_subclasses(target_class)
+    print(f"Bases found: {[base_class.__name__ for base_class in bases]}")
+    print(
+        f"Subclasses found: {[subclass_class.__name__ for subclass_class in subclasses]}"
+    )
+
+    all_related_classes = bases | subclasses
+    all_related_classes.add(target_class)
+
+    # Filter GeodeObjectType to only include registered related objects
+    geode_inheritances = []
+    for geode_object_type_str, geode_class in geode_objects.items():
+        if geode_class in all_related_classes:
+            geode_inheritances.append(geode_object_type_str)
+
+    print(f"Geode Object inheritances: {geode_inheritances}")
+    return flask.make_response({"geode_inheritances": geode_inheritances}, 200)
