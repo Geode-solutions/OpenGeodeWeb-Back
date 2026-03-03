@@ -205,7 +205,6 @@ def test_texture_coordinates(client: FlaskClient, test_id: str) -> None:
             geode_object=GeodePolygonalSurface3D.geode_object_type(),
             viewer_object=GeodePolygonalSurface3D.viewer_type(),
             viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
-            input_file=file,
         )
         data.native_file = file
         session = get_session()
@@ -234,7 +233,6 @@ def test_vertex_attribute_names(client: FlaskClient, test_id: str) -> None:
             geode_object=GeodePolygonalSurface3D.geode_object_type(),
             viewer_object=GeodePolygonalSurface3D.viewer_type(),
             viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
-            input_file=file,
         )
         data.native_file = file
         session = get_session()
@@ -263,7 +261,6 @@ def test_cell_attribute_names(client: FlaskClient, test_id: str) -> None:
             geode_object=GeodeRegularGrid2D.geode_object_type(),
             viewer_object=GeodeRegularGrid2D.viewer_type(),
             viewer_elements_type=GeodeRegularGrid2D.viewer_elements_type(),
-            input_file=file,
         )
         data.native_file = file
         session = get_session()
@@ -292,7 +289,6 @@ def test_polygon_attribute_names(client: FlaskClient, test_id: str) -> None:
             geode_object=GeodePolygonalSurface3D.geode_object_type(),
             viewer_object=GeodePolygonalSurface3D.viewer_type(),
             viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
-            input_file=file,
         )
         data.native_file = file
         session = get_session()
@@ -321,7 +317,6 @@ def test_polyhedron_attribute_names(client: FlaskClient, test_id: str) -> None:
             geode_object=GeodePolyhedralSolid3D.geode_object_type(),
             viewer_object=GeodePolyhedralSolid3D.viewer_type(),
             viewer_elements_type=GeodePolyhedralSolid3D.viewer_elements_type(),
-            input_file=file,
         )
         data.native_file = file
         session = get_session()
@@ -354,7 +349,6 @@ def test_edge_attribute_names(client: FlaskClient, test_id: str) -> None:
             geode_object=GeodeEdgedCurve3D.geode_object_type(),
             viewer_object=GeodeEdgedCurve3D.viewer_type(),
             viewer_elements_type=GeodeEdgedCurve3D.viewer_elements_type(),
-            input_file=file,
         )
         data.native_file = file
         session = get_session()
@@ -385,3 +379,48 @@ def test_database_uri_path(client: FlaskClient) -> None:
         assert app.config["SQLALCHEMY_DATABASE_URI"] == expected_uri
 
         assert os.path.exists(expected_db_path)
+
+
+def test_geode_object_inheritance(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/geode_object_inheritance"
+    # Test BRep
+    response = client.post(route, json={"geode_object_type": "BRep"})
+    assert response.status_code == 200
+    json_data = response.get_json()
+    parents = json_data["parents"]
+    children = json_data["children"]
+    assert "BRep" not in parents
+    assert "BRep" not in children
+    # Descendants
+    assert "StructuralModel" in children
+    assert "ImplicitStructuralModel" in children
+
+    # Test CrossSection
+    response = client.post(route, json={"geode_object_type": "CrossSection"})
+    assert response.status_code == 200
+    json_data = response.get_json()
+    parents = json_data["parents"]
+    children = json_data["children"]
+    assert "CrossSection" not in parents
+    assert "CrossSection" not in children
+    # Parent
+    assert "Section" in parents
+    # Descendant
+    assert "ImplicitCrossSection" in children
+
+    # Test PolyhedralSolid3D
+    response = client.post(route, json={"geode_object_type": "PolyhedralSolid3D"})
+    assert response.status_code == 200
+    json_data = response.get_json()
+    parents = json_data["parents"]
+    children = json_data["children"]
+    assert "PolyhedralSolid3D" not in parents
+    assert "PolyhedralSolid3D" not in children
+    # Parent
+    assert "VertexSet" in parents
+
+    # Test all params
+    def get_full_data() -> test_utils.JsonData:
+        return {"geode_object_type": "BRep"}
+
+    test_utils.test_route_wrong_params(client, route, get_full_data)

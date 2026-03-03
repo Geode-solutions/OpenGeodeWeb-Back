@@ -212,9 +212,6 @@ def save_all_viewables_and_return_info(
         data.viewable_file = os.path.basename(viewable_path)
         data.light_viewable_file = os.path.basename(light_path)
 
-        if not data.input_file:
-            data.input_file = data.native_file
-
         assert data.native_file is not None
         assert data.viewable_file is not None
         assert data.light_viewable_file is not None
@@ -226,8 +223,6 @@ def save_all_viewables_and_return_info(
             "viewer_type": data.viewer_object,
             "binary_light_viewable": binary_light_viewable.decode("utf-8"),
             "geode_object_type": data.geode_object,
-            "input_file": data.input_file or "",
-            "additional_files": data.additional_files or [],
         }
 
 
@@ -251,36 +246,9 @@ def generate_native_viewable_and_light_viewable_from_file(
         geode_object=geode_object_type,
         viewer_object=generic_geode_object.viewer_type(),
         viewer_elements_type=generic_geode_object.viewer_elements_type(),
-        input_file=input_file,
     )
-
     data_path = create_data_folder_from_id(data.id)
-
     full_input_filename = geode_functions.upload_file_path(input_file)
-    copied_full_path = os.path.join(
-        data_path, werkzeug.utils.secure_filename(input_file)
-    )
-    shutil.copy2(full_input_filename, copied_full_path)
-
-    additional_files_copied: list[str] = []
-    additional = generic_geode_object.additional_files(full_input_filename)
-    for additional_file in additional.mandatory_files + additional.optional_files:
-        if additional_file.is_missing:
-            continue
-        source_path = os.path.join(
-            os.path.dirname(full_input_filename), additional_file.filename
-        )
-        if not os.path.exists(source_path):
-            continue
-        dest_path = os.path.join(data_path, additional_file.filename)
-        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-        shutil.copy2(source_path, dest_path)
-        additional_files_copied.append(additional_file.filename)
-
-    geode_object = generic_geode_object.load(copied_full_path)
-    data.additional_files = additional_files_copied
-    return save_all_viewables_and_return_info(
-        geode_object,
-        data,
-        data_path,
-    )
+    geode_object = generic_geode_object.load(full_input_filename)
+    geode_object.builder().set_name(input_file)
+    return save_all_viewables_and_return_info(geode_object, data, data_path)

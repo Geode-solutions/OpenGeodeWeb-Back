@@ -1,17 +1,17 @@
 {
-  "route": "/mesh_components",
+  "route": "/geode_object_inheritance",
   "methods": [
     "POST"
   ],
   "type": "object",
   "properties": {
-    "id": {
+    "geode_object_type": {
       "type": "string",
-      "minLength": 1      
+      "minLength": 1
     }
   },
   "required": [
-    "id"
+    "geode_object_type"
   ],
   "additionalProperties": false
 }

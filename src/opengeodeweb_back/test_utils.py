@@ -10,21 +10,40 @@ JsonData = dict[str, Any]
 
 
 def test_route_wrong_params(
-    client: FlaskClient, route: str, get_full_data: Callable[[], JsonData]
+    client: FlaskClient,
+    route: str,
+    get_full_data: Callable[[], JsonData],
+    path: list[str | int] | None = None,
 ) -> None:
-    for key, value in get_full_data().items():
+    if path is None:
+        path = []
+
+    def get_json() -> tuple[JsonData, Any]:
         json = get_full_data()
-        json.pop(key)
+        target: Any = json
+        for sub_path in path:
+            target = target[sub_path]
+        return json, target
+
+    data = get_json()[1]
+    if isinstance(data, dict):
+        for key, value in data.items():
+            json, target = get_json()
+            target.pop(key)
+            response = client.post(route, json=json)
+            if response.status_code == 400:
+                error_description: str = response.get_json()["description"]
+                assert "must contain" in error_description
+                assert f"'{key}'" in error_description
+            if isinstance(value, (dict, list)):
+                test_route_wrong_params(client, route, get_full_data, path + [key])
+
+        json, target = get_json()
+        target["dumb_key"] = "dumb_value"
         response = client.post(route, json=json)
         assert response.status_code == 400
         error_description = response.get_json()["description"]
-        assert "data must contain" in error_description
-        assert f"'{key}'" in error_description
-
-    json = get_full_data()
-    json["dumb_key"] = "dumb_value"
-    response = client.post(route, json=json)
-    assert response.status_code == 400
-    error_description = response.get_json()["description"]
-    assert "data must not contain" in error_description
-    assert "'dumb_key'" in error_description
+        assert "must not contain" in error_description
+        assert "'dumb_key'" in error_description
+    elif isinstance(data, list) and data:
+        test_route_wrong_params(client, route, get_full_data, path + [0])

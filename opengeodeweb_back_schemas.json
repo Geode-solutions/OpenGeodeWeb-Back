@@ -33,9 +33,9 @@
       }
     },
     "models": {
-      "mesh_components": {
-        "$id": "opengeodeweb_back/models/mesh_components",
-        "route": "/mesh_components",
+      "model_components": {
+        "$id": "opengeodeweb_back/models/model_components",
+        "route": "/model_components",
         "methods": [
           "POST"
         ],
@@ -291,6 +291,24 @@
       "required": [
         "geode_object_type",
         "filename"
+      ],
+      "additionalProperties": false
+    },
+    "geode_object_inheritance": {
+      "$id": "opengeodeweb_back/geode_object_inheritance",
+      "route": "/geode_object_inheritance",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "geode_object_type": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "geode_object_type"
       ],
       "additionalProperties": false
     },
