@@ -184,7 +184,7 @@ def inspect_file() -> flask.Response:
     return flask.make_response({"inspection_result": inspection_result}, 200)
 
 
-def extract_inspector_result(inspection_data: Any) -> object:
+def extract_inspector_result(inspection_data: Any) -> dict[str, Any]:
     new_object = {}
 
     if hasattr(inspection_data, "inspection_type"):
@@ -195,14 +195,17 @@ def extract_inspector_result(inspection_data: Any) -> object:
             if child.startswith("__") or child in [
                 "inspection_type",
                 "string",
+                "nb_issues",
             ]:
                 continue
             child_instance = getattr(inspection_data, child)
+            if callable(child_instance):
+                continue
             child_object = extract_inspector_result(child_instance)
             new_object["children"].append(child_object)
-            if hasattr(child_object, "nb_issues"):
-                new_object["nb_issues"] += child_object.nb_issues()
-    else:
+            if "nb_issues" in child_object:
+                new_object["nb_issues"] += child_object["nb_issues"]
+    elif hasattr(inspection_data, "description"):
         new_object["title"] = inspection_data.description()
         nb_issues = inspection_data.nb_issues()
         new_object["nb_issues"] = nb_issues

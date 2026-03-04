@@ -215,11 +215,14 @@ def save_all_viewables_and_return_info(
         assert data.native_file is not None
         assert data.viewable_file is not None
         assert data.light_viewable_file is not None
+        name = geode_object.identifier.name()
+        if not name:
+            flask.abort(400, "Geode object has no name defined.")
         return {
             "native_file": data.native_file,
             "viewable_file": data.viewable_file,
             "id": data.id,
-            "name": geode_object.identifier.name(),
+            "name": name,
             "viewer_type": data.viewer_object,
             "binary_light_viewable": binary_light_viewable.decode("utf-8"),
             "geode_object_type": data.geode_object,

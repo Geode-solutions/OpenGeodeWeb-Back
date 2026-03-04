@@ -26,7 +26,9 @@ def test_input_output() -> None:
             if generic_geode_object.is_loadable(file_absolute_path).value() == 0.0:
                 continue
             geode_object = generic_geode_object.load(file_absolute_path)
-            data_name = geode_object.identifier.name()
+            data_name = geode_object.identifier.name() or os.path.basename(
+                file_absolute_path
+            )
             if geode_object.is_viewable():
                 viewable_file_path = geode_object.save_viewable(
                     os.path.join(os.path.abspath(f"./output"), data_name)
