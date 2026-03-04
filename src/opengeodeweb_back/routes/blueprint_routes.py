@@ -195,13 +195,15 @@ def extract_inspector_result(inspection_data: Any) -> object:
             if child.startswith("__") or child in [
                 "inspection_type",
                 "string",
+                "description",
+                "nb_issues",
             ]:
                 continue
             child_instance = getattr(inspection_data, child)
             child_object = extract_inspector_result(child_instance)
             new_object["children"].append(child_object)
-            if hasattr(child_object, "nb_issues"):
-                new_object["nb_issues"] += child_object.nb_issues()
+            if "nb_issues" in child_object:
+                new_object["nb_issues"] += child_object["nb_issues"]
     else:
         new_object["title"] = inspection_data.description()
         nb_issues = inspection_data.nb_issues()
