@@ -184,7 +184,7 @@ def inspect_file() -> flask.Response:
     return flask.make_response({"inspection_result": inspection_result}, 200)
 
 
-def extract_inspector_result(inspection_data: Any) -> dict:
+def extract_inspector_result(inspection_data: Any) -> dict[str, Any]:
     new_object = {}
 
     if hasattr(inspection_data, "inspection_type"):
