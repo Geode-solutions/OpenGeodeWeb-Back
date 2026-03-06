@@ -68,10 +68,12 @@ def teardown_request(
     decrement_request_counter(current_app)
     update_last_request_time(current_app)
     terminate_session(exception)
-    duration = time.perf_counter() - flask.g.start_time
-    print(
-        "Request to", flask.request.endpoint, "completed in", duration, "s", flush=True
-    )
+    if flask.has_request_context():
+        message = "Request to" + str(flask.request.endpoint) + "completed"
+        if hasattr(flask.g, "start_time"):
+            duration = time.perf_counter() - flask.g.start_time
+            message += "in" + str(duration) + "s"
+        print(message, flush=True)
 
 
 def kill_task(current_app: flask.Flask) -> None:
