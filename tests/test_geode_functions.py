@@ -3,11 +3,11 @@ import os
 import uuid
 
 # Third party imports
+from opengeodeweb_microservice.database.data_types import GeodeObjectType_values
 
 # Local application imports
 from opengeodeweb_back import geode_functions
 from opengeodeweb_back.geode_objects import geode_objects
-from opengeodeweb_back.geode_objects.types import GeodeObjectType_values
 
 data_folder = os.path.join(os.path.dirname(__file__), "data")
 

@@ -5,10 +5,10 @@ from __future__ import annotations
 import opengeode as og
 import opengeode_geosciences as og_geosciences
 import opengeode_inspector as og_inspector
+from opengeodeweb_microservice.database.data_types import ViewerElementsType
 
 # Local application imports
 from .geode_vertex_set import GeodeVertexSet
-from .types import ViewerElementsType
 
 
 class GeodeSurfaceMesh3D(GeodeVertexSet):

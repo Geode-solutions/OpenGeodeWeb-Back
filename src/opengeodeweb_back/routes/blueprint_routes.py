@@ -17,13 +17,13 @@ from opengeodeweb_microservice.schemas import get_schemas_dict
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_microservice.database import connection
+from opengeodeweb_microservice.database.data_types import geode_object_type
 
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
 from opengeodeweb_back.routes import schemas
 from opengeodeweb_back.routes.models import blueprint_models
 from opengeodeweb_back.geode_objects import geode_objects
-from opengeodeweb_back.geode_objects.types import geode_object_type
 from opengeodeweb_back.geode_objects.geode_mesh import GeodeMesh
 from opengeodeweb_back.geode_objects.geode_graph import GeodeGraph
 from opengeodeweb_back.geode_objects.geode_grid2d import GeodeGrid2D
