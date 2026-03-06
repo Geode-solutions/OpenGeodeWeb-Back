@@ -59,6 +59,7 @@ def terminate_session(exception: BaseException | None) -> None:
 def before_request(current_app: flask.Flask) -> None:
     increment_request_counter(current_app)
     flask.g.session = get_session()
+    flask.g.start_time = time.perf_counter()
 
 
 def teardown_request(
@@ -67,6 +68,10 @@ def teardown_request(
     decrement_request_counter(current_app)
     update_last_request_time(current_app)
     terminate_session(exception)
+    duration = time.perf_counter() - flask.g.start_time
+    print(
+        "Request to", flask.request.endpoint, "completed in", duration, "s", flush=True
+    )
 
 
 def kill_task(current_app: flask.Flask) -> None:
