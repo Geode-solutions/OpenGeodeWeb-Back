@@ -190,5 +190,3 @@ def test_save_viewable_workflow_from_object(client: FlaskClient) -> None:
     assert isinstance(data_id, str) and len(data_id) > 0
     assert response.get_json()["geode_object_type"] == "PointSet3D"
     assert response.get_json()["viewable_file"].endswith(".vtp")
-
-
