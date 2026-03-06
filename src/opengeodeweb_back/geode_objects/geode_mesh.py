@@ -4,9 +4,9 @@ from abc import abstractmethod
 
 # Third party imports
 import opengeode as og
+from opengeodeweb_microservice.database.data_types import ViewerType
 
 # Local application imports
-from .types import ViewerType
 from .geode_object import GeodeObject
 
 

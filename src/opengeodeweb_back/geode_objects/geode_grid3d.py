@@ -4,10 +4,10 @@ from abc import abstractmethod
 
 # Third party imports
 import opengeode as og
+from opengeodeweb_microservice.database.data_types import ViewerElementsType
 
 # Local application imports
 from .geode_mesh import GeodeMesh
-from .types import ViewerElementsType
 
 
 class GeodeGrid3D(GeodeMesh):

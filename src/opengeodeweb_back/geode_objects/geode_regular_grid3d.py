@@ -5,9 +5,9 @@ from __future__ import annotations
 import opengeode as og
 import opengeode_inspector as og_inspector
 import geode_viewables as viewables
+from opengeodeweb_microservice.database.data_types import GeodeMeshType
 
 # Local application imports
-from .types import GeodeMeshType
 from .geode_solid_mesh3d import GeodeSolidMesh3D
 from .geode_grid3d import GeodeGrid3D
 
