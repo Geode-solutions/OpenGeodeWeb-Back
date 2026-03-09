@@ -6,9 +6,9 @@ import opengeode as og
 import opengeode_geosciences as og_geosciences
 import opengeode_inspector as og_inspector
 import geode_viewables as viewables
+from opengeodeweb_microservice.database.data_types import GeodeModelType
 
 # Local application imports
-from .types import GeodeModelType
 from .geode_model import GeodeModel, ComponentRegistry
 
 

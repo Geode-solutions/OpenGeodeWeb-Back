@@ -17,11 +17,11 @@ import werkzeug
 from opengeodeweb_microservice.schemas import SchemaDict
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
+from opengeodeweb_microservice.database.data_types import GeodeObjectType
 
 # Local application imports
 from . import geode_functions
 from .geode_objects import geode_objects
-from .geode_objects.types import GeodeObjectType
 from .geode_objects.geode_object import GeodeObject
 
 
