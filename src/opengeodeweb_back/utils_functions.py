@@ -23,7 +23,6 @@ from opengeodeweb_microservice.database.data_types import GeodeObjectType
 # Local application imports
 from . import geode_functions
 from .geode_objects import geode_objects
-from .geode_objects.types import GeodeObjectType
 from .geode_objects.geode_model import GeodeModel
 from .geode_objects.geode_object import GeodeObject
 
