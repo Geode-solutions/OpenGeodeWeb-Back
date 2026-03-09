@@ -424,3 +424,36 @@ def test_geode_object_inheritance(client: FlaskClient) -> None:
         return {"geode_object_type": "BRep"}
 
     test_utils.test_route_wrong_params(client, route, get_full_data)
+
+
+def test_model_components(client: FlaskClient) -> None:
+    geode_object_type = "BRep"
+    filename = "cube.og_brep"
+    response = test_save_viewable_file(client, geode_object_type, filename)
+    assert response.status_code == 200
+    assert "mesh_components" in response.get_json()
+    mesh_components = response.get_json()["mesh_components"]
+    assert isinstance(mesh_components, list)
+    assert len(mesh_components) > 0
+    for mesh_component in mesh_components:
+        assert isinstance(mesh_component, object)
+        assert isinstance(mesh_component["geode_id"], str)
+        assert isinstance(mesh_component["viewer_id"], int)
+        assert isinstance(mesh_component["name"], str)
+        assert isinstance(mesh_component["type"], str)
+        assert isinstance(mesh_component["boundaries"], list)
+        for boundary_uuid in mesh_component["boundaries"]:
+            assert isinstance(boundary_uuid, str)
+        assert isinstance(mesh_component["internals"], list)
+        for internal_uuid in mesh_component["internals"]:
+            assert isinstance(internal_uuid, str)
+    assert "collection_components" in response.get_json()
+    collection_components = response.get_json()["collection_components"]
+    assert isinstance(collection_components, list)
+    for collection_component in collection_components:
+        assert isinstance(collection_component, object)
+        assert isinstance(collection_component["geode_id"], str)
+        assert isinstance(collection_component["name"], str)
+        assert isinstance(collection_component["items"], list)
+        for item_uuid in collection_component["items"]:
+            assert isinstance(item_uuid, str)
