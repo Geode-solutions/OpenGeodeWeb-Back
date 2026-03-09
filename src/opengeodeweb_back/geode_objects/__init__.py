@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 # Third party imports
+from opengeodeweb_microservice.database.data_types import GeodeObjectType
 
 # Local application imports
-from .types import GeodeObjectType
 from .geode_object import GeodeObject
 from .geode_brep import GeodeBRep
 from .geode_vertex_set import GeodeVertexSet

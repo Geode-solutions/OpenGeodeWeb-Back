@@ -18,6 +18,7 @@ import werkzeug
 from opengeodeweb_microservice.schemas import SchemaDict
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
+from opengeodeweb_microservice.database.data_types import GeodeObjectType
 
 # Local application imports
 from . import geode_functions
@@ -61,6 +62,7 @@ def terminate_session(exception: BaseException | None) -> None:
 def before_request(current_app: flask.Flask) -> None:
     increment_request_counter(current_app)
     flask.g.session = get_session()
+    flask.g.start_time = time.perf_counter()
 
 
 def teardown_request(
@@ -69,6 +71,12 @@ def teardown_request(
     decrement_request_counter(current_app)
     update_last_request_time(current_app)
     terminate_session(exception)
+    if flask.has_request_context():
+        message = "Request to " + str(flask.request.endpoint) + " completed"
+        if hasattr(flask.g, "start_time"):
+            duration = time.perf_counter() - flask.g.start_time
+            message += " in " + str(duration) + "s"
+        print(message, flush=True)
 
 
 def kill_task(current_app: flask.Flask) -> None:

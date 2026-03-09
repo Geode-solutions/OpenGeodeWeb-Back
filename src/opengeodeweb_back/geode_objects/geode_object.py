@@ -5,9 +5,13 @@ from typing import Any
 
 # Third party imports
 import opengeode as og
+from opengeodeweb_microservice.database.data_types import (
+    GeodeObjectType,
+    ViewerType,
+    ViewerElementsType,
+)
 
 # Local application imports
-from .types import GeodeObjectType, ViewerType, ViewerElementsType
 
 
 class GeodeObject(ABC):
