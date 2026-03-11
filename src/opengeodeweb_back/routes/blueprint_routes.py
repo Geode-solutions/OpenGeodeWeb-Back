@@ -22,7 +22,6 @@ from opengeodeweb_microservice.database.data_types import geode_object_type
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
 from opengeodeweb_back.routes import schemas
-from opengeodeweb_back.routes.models import blueprint_models
 from opengeodeweb_back.geode_objects import geode_objects
 from opengeodeweb_back.geode_objects.geode_mesh import GeodeMesh
 from opengeodeweb_back.geode_objects.geode_graph import GeodeGraph
@@ -33,13 +32,6 @@ from opengeodeweb_back.geode_objects.geode_surface_mesh3d import GeodeSurfaceMes
 from opengeodeweb_back.geode_objects.geode_solid_mesh3d import GeodeSolidMesh3D
 
 routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
-
-
-routes.register_blueprint(
-    blueprint_models.routes,
-    url_prefix=blueprint_models.routes.url_prefix,
-    name=blueprint_models.routes.name,
-)
 
 schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas"))
 

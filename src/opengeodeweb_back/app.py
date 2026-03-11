@@ -10,7 +10,6 @@ from flask_cors import cross_origin
 from werkzeug.exceptions import HTTPException
 from opengeodeweb_back import utils_functions, app_config
 from opengeodeweb_back.routes import blueprint_routes
-from opengeodeweb_back.routes.models import blueprint_models
 from opengeodeweb_back.routes.create import blueprint_create
 from opengeodeweb_microservice.database import connection
 
@@ -84,11 +83,6 @@ def register_ogw_back_blueprints(app: flask.Flask) -> None:
         blueprint_routes.routes,
         url_prefix="/opengeodeweb_back",
         name="opengeodeweb_back",
-    )
-    app.register_blueprint(
-        blueprint_models.routes,
-        url_prefix="/opengeodeweb_back/models",
-        name="opengeodeweb_models",
     )
     app.register_blueprint(
         blueprint_create.routes,
