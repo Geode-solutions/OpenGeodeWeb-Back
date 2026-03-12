@@ -4,9 +4,9 @@ from abc import abstractmethod
 
 # Third party imports
 import opengeode as og
+from opengeodeweb_microservice.database.data_types import ViewerType, ViewerElementsType
 
 # Local application imports
-from .types import ViewerType, ViewerElementsType
 from .geode_object import GeodeObject
 
 ComponentRegistry = dict[og.ComponentType, list[og.uuid]]

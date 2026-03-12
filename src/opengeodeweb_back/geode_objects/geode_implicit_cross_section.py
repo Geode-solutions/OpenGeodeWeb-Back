@@ -5,9 +5,9 @@ from __future__ import annotations
 import opengeode as og
 import opengeode_geosciences as og_geosciences
 import geode_viewables as viewables
+from opengeodeweb_microservice.database.data_types import GeodeModelType
 
 # Local application imports
-from .types import GeodeModelType
 from .geode_cross_section import GeodeCrossSection
 
 

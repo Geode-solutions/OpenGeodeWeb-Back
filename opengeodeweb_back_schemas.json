@@ -32,26 +32,6 @@
         "additionalProperties": false
       }
     },
-    "models": {
-      "model_components": {
-        "$id": "opengeodeweb_back/models/model_components",
-        "route": "/model_components",
-        "methods": [
-          "POST"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "required": [
-          "id"
-        ],
-        "additionalProperties": false
-      }
-    },
     "vertex_attribute_names": {
       "$id": "opengeodeweb_back/vertex_attribute_names",
       "route": "/vertex_attribute_names",

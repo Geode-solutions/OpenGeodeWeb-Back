@@ -4,12 +4,15 @@ import os
 # Third party imports
 import werkzeug
 import flask
+from opengeodeweb_microservice.database.data import Data
+from opengeodeweb_microservice.database.data_types import (
+    GeodeObjectType,
+    geode_object_type,
+)
 
 # Local application imports
 from .geode_objects import geode_objects
-from .geode_objects.types import GeodeObjectType, geode_object_type
 from .geode_objects.geode_object import GeodeObject
-from opengeodeweb_microservice.database.data import Data
 
 
 def data_file_path(data_id: str, filename: str | None = None) -> str:

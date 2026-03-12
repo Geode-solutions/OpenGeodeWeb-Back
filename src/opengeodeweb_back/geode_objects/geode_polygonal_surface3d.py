@@ -4,9 +4,9 @@ from __future__ import annotations
 # Third party imports
 import opengeode as og
 import geode_viewables as viewables
+from opengeodeweb_microservice.database.data_types import GeodeMeshType
 
 # Local application imports
-from .types import GeodeMeshType
 from .geode_surface_mesh3d import GeodeSurfaceMesh3D
 
 
