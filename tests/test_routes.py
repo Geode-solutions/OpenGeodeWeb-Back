@@ -431,7 +431,7 @@ def test_geode_object_inheritance(client: FlaskClient) -> None:
 
 def test_model_components(client: FlaskClient) -> None:
     geode_object_type = "BRep"
-    filename = "cube.og_brep"
+    filename = "LS2.og_brep"
     response = test_save_viewable_file(client, geode_object_type, filename)
     assert response.status_code == 200
     assert "mesh_components" in response.get_json()
