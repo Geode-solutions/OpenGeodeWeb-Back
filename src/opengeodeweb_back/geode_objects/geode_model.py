@@ -38,3 +38,6 @@ class GeodeModel(GeodeObject):
 
     @abstractmethod
     def component_name(self, id: og.uuid) -> str: ...
+
+    @abstractmethod
+    def is_active(self, id: og.uuid) -> bool: ...

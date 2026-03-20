@@ -456,6 +456,7 @@ def test_model_components(client: FlaskClient) -> None:
         assert isinstance(mesh_component["internals"], list)
         for internal_uuid in mesh_component["internals"]:
             assert isinstance(internal_uuid, str)
+        assert isinstance(mesh_component["is_active"], bool)
     assert name_is_uuid is True
     assert name_is_not_uuid is True
     assert "collection_components" in response.get_json()
@@ -468,6 +469,7 @@ def test_model_components(client: FlaskClient) -> None:
         assert isinstance(collection_component["items"], list)
         for item_uuid in collection_component["items"]:
             assert isinstance(item_uuid, str)
+        assert isinstance(collection_component["is_active"], bool)
 
 
 def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:

@@ -229,6 +229,7 @@ def model_components(
                 "type": component_type,
                 "boundaries": boundaries_uuid,
                 "internals": internals_uuid,
+                "is_active": model.is_active(id),
             }
             mesh_components.append(mesh_component_object)
 
@@ -248,6 +249,7 @@ def model_components(
                 "name": component_name,
                 "type": component_type,
                 "items": items_uuid,
+                "is_active": model.is_active(id),
             }
             collection_components.append(collection_component_object)
     return {

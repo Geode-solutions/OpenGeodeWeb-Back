@@ -93,6 +93,9 @@ class GeodeSection(GeodeModel):
     def component_name(self, id: og.uuid) -> str:
         return self.section.section_component(id).name() or ""
 
+    def is_active(self, id: og.uuid) -> bool:
+        return self.section.section_component(id).is_active()
+
     def inspect(self) -> og_inspector.SectionInspectionResult:
         return og_inspector.inspect_section(self.section)
 
