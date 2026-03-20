@@ -89,7 +89,7 @@ class GeodeBRep(GeodeModel):
         return self.brep.items(id)
 
     def component_name(self, id: og.uuid) -> str:
-        return self.brep.brep_component(id).name()
+        return self.brep.brep_component(id).name() or ""
 
     def inspect(self) -> og_inspector.BRepInspectionResult:
         return og_inspector.inspect_brep(self.brep)

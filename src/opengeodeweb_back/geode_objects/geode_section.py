@@ -91,7 +91,7 @@ class GeodeSection(GeodeModel):
         return self.section.items(id)
 
     def component_name(self, id: og.uuid) -> str:
-        return self.section.section_component(id).name()
+        return self.section.section_component(id).name() or ""
 
     def inspect(self) -> og_inspector.SectionInspectionResult:
         return og_inspector.inspect_section(self.section)
