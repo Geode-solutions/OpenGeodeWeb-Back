@@ -35,3 +35,6 @@ class GeodeModel(GeodeObject):
 
     @abstractmethod
     def items(self, id: og.uuid) -> list[og.ComponentID]: ...
+
+    @abstractmethod
+    def component_name(self, id: og.uuid) -> str | None: ...
