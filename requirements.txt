@@ -16,7 +16,7 @@ flask[async]>=3
     #   flask-cors
 flask-cors==6.0.1
     # via -r requirements.in
-geode-common==33.19.1
+geode-common==33.20.0
     # via
     #   -r requirements.in
     #   geode-viewables

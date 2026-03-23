@@ -223,7 +223,7 @@ def model_components(
             mesh_component_object = {
                 "viewer_id": viewer_id,
                 "geode_id": geode_id,
-                "name": geode_id,
+                "name": component_name,
                 "type": component_type,
                 "boundaries": boundaries_uuid,
                 "internals": internals_uuid,
@@ -237,7 +237,6 @@ def model_components(
         component_type = collection_component.get()
         for id in ids:
             geode_id = id.string()
-            component_name = geode_id
             items = model.items(id)
             items_uuid = [item.id().string() for item in items]
             collection_component_object = {
