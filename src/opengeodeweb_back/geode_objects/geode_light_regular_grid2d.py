@@ -24,6 +24,9 @@ class GeodeLightRegularGrid2D(GeodeGrid2D):
     def native_extension(self) -> str:
         return self.light_regular_grid.native_extension()
 
+    def builder(self) -> og.IdentifierBuilder:
+        return og.IdentifierBuilder(self.light_regular_grid)
+
     @classmethod
     def load(cls, filename: str) -> GeodeLightRegularGrid2D:
         return GeodeLightRegularGrid2D(og.load_light_regular_grid2D(filename))
