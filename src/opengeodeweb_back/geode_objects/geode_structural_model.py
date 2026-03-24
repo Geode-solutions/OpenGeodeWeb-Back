@@ -75,3 +75,6 @@ class GeodeStructuralModel(GeodeBRep):
         return viewables.save_light_viewable_structural_model(
             self.structural_model, filename_without_extension
         )
+
+    def component_name(self, id: og.uuid) -> str | None:
+        return self.structural_model.structural_model_component(id).name()
