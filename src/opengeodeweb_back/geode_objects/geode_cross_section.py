@@ -73,3 +73,6 @@ class GeodeCrossSection(GeodeSection):
         return viewables.save_light_viewable_cross_section(
             self.cross_section, filename_without_extension
         )
+
+    def component_name(self, id: og.uuid) -> str | None:
+        return self.cross_section.cross_section_component(id).name()
