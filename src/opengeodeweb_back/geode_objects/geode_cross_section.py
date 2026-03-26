@@ -76,3 +76,6 @@ class GeodeCrossSection(GeodeSection):
 
     def component_name(self, id: og.uuid) -> str | None:
         return self.cross_section.cross_section_component(id).name()
+
+    def component(self, id: og.uuid) -> og.Component2D:
+        return self.cross_section.cross_section_component(id)
