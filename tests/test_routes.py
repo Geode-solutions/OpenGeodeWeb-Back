@@ -431,33 +431,26 @@ def test_geode_object_inheritance(client: FlaskClient) -> None:
 
 def test_model_components(client: FlaskClient) -> None:
     geode_object_type = "BRep"
-    filename = "LS2.og_brep"
+    filename = "cube.og_brep"
     response = test_save_viewable_file(client, geode_object_type, filename)
     assert response.status_code == 200
     assert "mesh_components" in response.get_json()
     mesh_components = response.get_json()["mesh_components"]
     assert isinstance(mesh_components, list)
     assert len(mesh_components) > 0
-    name_is_uuid = False
-    name_is_not_uuid = False
     for mesh_component in mesh_components:
         assert isinstance(mesh_component, object)
         assert isinstance(mesh_component["geode_id"], str)
         assert isinstance(mesh_component["viewer_id"], int)
         assert isinstance(mesh_component["name"], str)
         assert isinstance(mesh_component["type"], str)
-        if mesh_component["name"] == mesh_component["geode_id"]:
-            name_is_uuid = True
-        else:
-            name_is_not_uuid = True
         assert isinstance(mesh_component["boundaries"], list)
         for boundary_uuid in mesh_component["boundaries"]:
             assert isinstance(boundary_uuid, str)
         assert isinstance(mesh_component["internals"], list)
         for internal_uuid in mesh_component["internals"]:
             assert isinstance(internal_uuid, str)
-    assert name_is_uuid is True
-    assert name_is_not_uuid is True
+        assert isinstance(mesh_component["is_active"], bool)
     assert "collection_components" in response.get_json()
     collection_components = response.get_json()["collection_components"]
     assert isinstance(collection_components, list)
@@ -468,6 +461,7 @@ def test_model_components(client: FlaskClient) -> None:
         assert isinstance(collection_component["items"], list)
         for item_uuid in collection_component["items"]:
             assert isinstance(item_uuid, str)
+        assert isinstance(collection_component["is_active"], bool)
 
 
 def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:

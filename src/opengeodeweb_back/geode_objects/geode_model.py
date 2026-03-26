@@ -1,6 +1,7 @@
 # Standard library imports
 from __future__ import annotations
 from abc import abstractmethod
+from typing import Union
 
 # Third party imports
 import opengeode as og
@@ -37,4 +38,4 @@ class GeodeModel(GeodeObject):
     def items(self, id: og.uuid) -> list[og.ComponentID]: ...
 
     @abstractmethod
-    def component_name(self, id: og.uuid) -> str | None: ...
+    def component(self, id: og.uuid) -> og.Component2D | og.Component3D: ...

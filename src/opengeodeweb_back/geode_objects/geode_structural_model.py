@@ -78,3 +78,6 @@ class GeodeStructuralModel(GeodeBRep):
 
     def component_name(self, id: og.uuid) -> str | None:
         return self.structural_model.structural_model_component(id).name()
+
+    def component(self, id: og.uuid) -> og.Component3D:
+        return self.structural_model.structural_model_component(id)

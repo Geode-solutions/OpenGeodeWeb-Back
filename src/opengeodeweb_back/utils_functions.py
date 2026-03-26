@@ -213,8 +213,9 @@ def model_components(
     for mesh_component, ids in model_mesh_components.items():
         component_type = mesh_component.get()
         for id in ids:
+            component = model.component(id)
             geode_id = id.string()
-            component_name = model.component_name(id)
+            component_name = component.name()
             if not component_name:
                 component_name = geode_id
             viewer_id = uuid_to_flat_index[geode_id]
@@ -229,6 +230,7 @@ def model_components(
                 "type": component_type,
                 "boundaries": boundaries_uuid,
                 "internals": internals_uuid,
+                "is_active": component.is_active(),
             }
             mesh_components.append(mesh_component_object)
 
@@ -237,8 +239,9 @@ def model_components(
     for collection_component, ids in model_collection_components.items():
         component_type = collection_component.get()
         for id in ids:
+            component = model.component(id)
             geode_id = id.string()
-            component_name = model.component_name(id)
+            component_name = component.name()
             if not component_name:
                 component_name = geode_id
             items = model.items(id)
@@ -248,6 +251,7 @@ def model_components(
                 "name": component_name,
                 "type": component_type,
                 "items": items_uuid,
+                "is_active": component.is_active(),
             }
             collection_components.append(collection_component_object)
     return {
