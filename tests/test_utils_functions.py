@@ -207,6 +207,7 @@ def test_generate_native_viewable_and_light_viewable_from_file(
         )
 
     assert isinstance(result, dict)
+    assert result["name"] == "test"
     assert isinstance(result["native_file"], str)
     assert result["native_file"] == "native.og_brep"
     assert isinstance(result["viewable_file"], str)
@@ -215,6 +216,17 @@ def test_generate_native_viewable_and_light_viewable_from_file(
     assert re.match(r"[0-9a-f]{32}", result["id"])
     assert isinstance(result["viewer_type"], str)
     assert isinstance(result["binary_light_viewable"], str)
+
+
+def test_generate_native_viewable_and_light_viewable_from_file_with_multi_dots(
+    client: FlaskClient,
+) -> None:
+    app = client.application
+    with app.app_context():
+        result = utils_functions.generate_native_viewable_and_light_viewable_from_file(
+            GeodeBRep.geode_object_type(), "cube.test.og_brep"
+        )
+    assert result["name"] == "cube.test"
 
 
 def test_send_file_multiple_returns_zip(client: FlaskClient, tmp_path: Path) -> None:
