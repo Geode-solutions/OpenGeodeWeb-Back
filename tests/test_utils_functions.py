@@ -207,6 +207,7 @@ def test_generate_native_viewable_and_light_viewable_from_file(
         )
 
     assert isinstance(result, dict)
+    assert result["name"] == "test"
     assert isinstance(result["native_file"], str)
     assert result["native_file"] == "native.og_brep"
     assert isinstance(result["viewable_file"], str)
