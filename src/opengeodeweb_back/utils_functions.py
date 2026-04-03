@@ -333,5 +333,5 @@ def generate_native_viewable_and_light_viewable_from_file(
     data_path = create_data_folder_from_id(data.id)
     full_input_filename = geode_functions.upload_file_path(input_file)
     geode_object = generic_geode_object.load(full_input_filename)
-    geode_object.builder().set_name(input_file.split(".")[0])
+    geode_object.builder().set_name(os.path.splitext(input_file)[0])
     return save_all_viewables_and_return_info(geode_object, data, data_path)
