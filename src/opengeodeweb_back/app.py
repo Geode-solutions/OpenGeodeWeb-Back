@@ -132,6 +132,7 @@ def run_server(app: Flask) -> None:
     parser.add_argument(
         "-origins",
         "--allowed_origins",
+        nargs="+",
         default=app.config.get("ORIGINS"),
         help="Origins that are allowed to connect to the server",
     )
@@ -148,7 +149,8 @@ def run_server(app: Flask) -> None:
     )
     app.config.update(UPLOAD_FOLDER=args.upload_folder_path)
     app.config.update(MINUTES_BEFORE_TIMEOUT=args.timeout)
-    flask_cors.CORS(app, origins=args.allowed_origins)
+    origins = args.allowed_origins.split(",")
+    flask_cors.CORS(app, origins=origins)
     print(f"{args=}", flush=True)
 
     db_filename: str = app.config.get("DATABASE_FILENAME") or "project.db"
