@@ -23,12 +23,6 @@ def create_app(name: str) -> flask.Flask:
     )
     if FLASK_DEBUG == False:
         app.config.from_object(app_config.ProdConfig)
-        SECONDS_BETWEEN_SHUTDOWNS: float = float(
-            app.config.get("SECONDS_BETWEEN_SHUTDOWNS") or 60.0
-        )
-        utils_functions.set_interval(
-            utils_functions.kill_task, SECONDS_BETWEEN_SHUTDOWNS, app
-        )
     else:
         app.config.from_object(app_config.DevConfig)
 
@@ -63,6 +57,13 @@ def create_app(name: str) -> flask.Flask:
     def return_error() -> Response:
         flask.abort(500, f"Test")
         return flask.make_response({}, 500)
+
+    @app.route(
+        "/health",
+        methods=["GET"],
+    )
+    def health() -> Response:
+        return flask.make_response(utils_functions.kill_task(flask.current_app), 200)
 
     @app.route("/", methods=["POST"])
     @cross_origin()

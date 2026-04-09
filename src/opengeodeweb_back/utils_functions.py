@@ -78,7 +78,7 @@ def teardown_request(
         print(message, flush=True)
 
 
-def kill_task(current_app: flask.Flask) -> None:
+def kill_task(current_app: flask.Flask) -> bool:
     REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER", 0))
     LAST_PING_TIME = float(current_app.config.get("LAST_PING_TIME", 0))
     LAST_REQUEST_TIME = float(current_app.config.get("LAST_REQUEST_TIME", 0))
@@ -88,13 +88,14 @@ def kill_task(current_app: flask.Flask) -> None:
     minutes_since_last_ping = (current_time - LAST_PING_TIME) / 60
 
     if REQUEST_COUNTER > 0:
-        return
+        return False
     if MINUTES_BEFORE_TIMEOUT == 0:
-        return
+        return False
     if minutes_since_last_ping > MINUTES_BEFORE_TIMEOUT:
-        kill_server()
+        return True
     if minutes_since_last_request > MINUTES_BEFORE_TIMEOUT:
-        kill_server()
+        return True
+    return False
 
 
 def kill_server() -> None:
