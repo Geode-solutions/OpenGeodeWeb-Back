@@ -86,7 +86,14 @@ def kill_task(current_app: flask.Flask) -> bool:
     current_time = time.time()
     minutes_since_last_request = (current_time - LAST_REQUEST_TIME) / 60
     minutes_since_last_ping = (current_time - LAST_PING_TIME) / 60
-
+    print(
+        "kill_task",
+        REQUEST_COUNTER,
+        MINUTES_BEFORE_TIMEOUT,
+        minutes_since_last_ping,
+        minutes_since_last_request,
+        flush=True,
+    )
     if REQUEST_COUNTER > 1:
         return False
     if MINUTES_BEFORE_TIMEOUT == 0:
