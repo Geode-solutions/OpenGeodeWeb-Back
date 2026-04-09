@@ -63,8 +63,9 @@ def create_app(name: str) -> flask.Flask:
         methods=["GET"],
     )
     def health() -> Response:
-        health = utils_functions.kill_task(flask.current_app)
-        return flask.make_response({"health": health}, 200)
+        if utils_functions.kill_task(flask.current_app):
+            return flask.make_response({}, 500)
+        return flask.make_response({}, 200)
 
     @app.route("/", methods=["POST"])
     @cross_origin()
