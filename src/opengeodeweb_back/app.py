@@ -145,7 +145,7 @@ def run_server(app: Flask) -> None:
         default=app.config.get("MINUTES_BEFORE_TIMEOUT"),
         help="Number of minutes before the server times out",
     )
-    args = parser.parse_args()
+    args, _ = parser.parse_known_args()
     app.config.update(DATA_FOLDER_PATH=args.data_folder_path)
     app.config.update(
         EXTENSIONS_FOLDER_PATH=os.path.join(str(args.data_folder_path), "extensions")
