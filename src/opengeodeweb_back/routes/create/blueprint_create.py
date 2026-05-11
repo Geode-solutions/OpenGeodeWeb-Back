@@ -36,3 +36,24 @@ def point() -> flask.Response:
         pointset
     )
     return flask.make_response(result, 200)
+
+
+@routes.route(
+    schemas_dict["point_set"]["route"],
+    methods=schemas_dict["point_set"]["methods"],
+)
+def point_set() -> flask.Response:
+    """Endpoint to create a point set in 3D space."""
+    json_data = utils_functions.validate_request(flask.request, schemas_dict["point_set"])
+    params = schemas.PointSet.from_dict(json_data)
+
+    pointset = GeodePointSet3D()
+    builder = pointset.builder()
+    builder.set_name(params.name)
+    for point in params.points:
+        builder.create_point(opengeode.Point3D([point.x, point.y, point.z]))
+
+    result = utils_functions.generate_native_viewable_and_light_viewable_from_object(
+        pointset
+    )
+    return flask.make_response(result, 200)

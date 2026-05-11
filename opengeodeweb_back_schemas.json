@@ -30,6 +30,48 @@
           "z"
         ],
         "additionalProperties": false
+      },
+      "point_set": {
+        "$id": "opengeodeweb_back/create/point_set",
+        "route": "/point_set",
+        "methods": [
+          "POST"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "points": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                },
+                "z": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "x",
+                "y",
+                "z"
+              ]
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "name",
+          "points"
+        ],
+        "additionalProperties": false
       }
     },
     "vertex_attribute_names": {
