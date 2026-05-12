@@ -1,2 +1,2 @@
-from .point_set import PointSet
-from .edged_curve import EdgedCurve
+from .point_set import *
+from .edged_curve import *
