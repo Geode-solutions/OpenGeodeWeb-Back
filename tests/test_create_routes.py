@@ -39,6 +39,25 @@ def test_create_point(client: FlaskClient, point_data: test_utils.JsonData) -> N
     test_utils.test_route_wrong_params(client, route, lambda: copy.deepcopy(point_data))
 
 
+def test_create_point_set_multiple(client: FlaskClient) -> None:
+    """Test the creation of a point set with multiple points."""
+    route: str = "/opengeodeweb_back/create/point_set"
+    data = {
+        "name": "multiple_points",
+        "points": [
+            {"x": 1.0, "y": 2.0, "z": 3.0},
+            {"x": 4.0, "y": 5.0, "z": 6.0},
+            {"x": 7.0, "y": 8.0, "z": 9.0},
+        ],
+    }
+    response = client.post(route, json=data)
+    assert response.status_code == 200
+
+    response_data = response.get_json()
+    assert response_data["name"] == data["name"]
+    assert response_data["geode_object_type"] == "PointSet3D"
+
+
 def test_create_point_with_invalid_data(client: FlaskClient) -> None:
     """Test the point creation endpoint with invalid data."""
     route: str = "/opengeodeweb_back/create/point_set"
