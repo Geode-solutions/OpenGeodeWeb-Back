@@ -22,7 +22,9 @@ schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas
 )
 def point_set() -> flask.Response:
     """Endpoint to create a point set in 3D space."""
-    json_data = utils_functions.validate_request(flask.request, schemas_dict["point_set"])
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["point_set"]
+    )
     params = schemas.PointSet.from_dict(json_data)
 
     pointset = GeodePointSet3D()
