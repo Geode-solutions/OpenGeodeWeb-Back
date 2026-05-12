@@ -17,28 +17,6 @@ schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas
 
 
 @routes.route(
-    schemas_dict["point"]["route"],
-    methods=schemas_dict["point"]["methods"],
-)
-def point() -> flask.Response:
-    """Endpoint to create a single point in 3D space."""
-    json_data = utils_functions.validate_request(flask.request, schemas_dict["point"])
-    params = schemas.Point.from_dict(json_data)
-
-    # Create the point
-    pointset = GeodePointSet3D()
-    builder = pointset.builder()
-    builder.set_name(params.name)
-    builder.create_point(opengeode.Point3D([params.x, params.y, params.z]))
-
-    # Save and get info
-    result = utils_functions.generate_native_viewable_and_light_viewable_from_object(
-        pointset
-    )
-    return flask.make_response(result, 200)
-
-
-@routes.route(
     schemas_dict["point_set"]["route"],
     methods=schemas_dict["point_set"]["methods"],
 )
