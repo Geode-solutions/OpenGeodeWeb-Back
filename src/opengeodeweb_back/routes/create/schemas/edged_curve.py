@@ -4,7 +4,7 @@ from typing import List
 
 
 @dataclass
-class Point(DataClassJsonMixin):
+class EdgedCurvePoint(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print(self, flush=True)
 
@@ -20,4 +20,4 @@ class EdgedCurve(DataClassJsonMixin):
 
     edges: List[List[int]]
     name: str
-    points: List[Point]
+    points: List[EdgedCurvePoint]

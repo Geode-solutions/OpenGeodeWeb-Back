@@ -59,6 +59,7 @@
           "points": {
             "type": "array",
             "items": {
+              "title": "EdgedCurvePoint",
               "type": "object",
               "properties": {
                 "x": {
@@ -101,6 +102,7 @@
         "additionalProperties": false
       }
     },
+    "models": {},
     "vertex_attribute_names": {
       "$id": "opengeodeweb_back/vertex_attribute_names",
       "route": "/vertex_attribute_names",

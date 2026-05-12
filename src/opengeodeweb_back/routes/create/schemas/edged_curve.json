@@ -10,6 +10,7 @@
     "points": {
       "type": "array",
       "items": {
+        "title": "EdgedCurvePoint",
         "type": "object",
         "properties": {
           "x": { "type": "number" },
