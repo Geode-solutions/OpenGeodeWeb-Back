@@ -1,0 +1,37 @@
+{
+  "route": "/edged_curve",
+  "methods": ["POST"],
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "points": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "x": { "type": "number" },
+          "y": { "type": "number" },
+          "z": { "type": "number" }
+        },
+        "required": ["x", "y", "z"],
+        "additionalProperties": false
+      },
+      "minItems": 2
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": { "type": "integer" },
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "minItems": 1
+    }
+  },
+  "required": ["name", "points", "edges"],
+  "additionalProperties": false
+}
