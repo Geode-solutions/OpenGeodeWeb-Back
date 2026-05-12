@@ -16,7 +16,8 @@
           "y": { "type": "number" },
           "z": { "type": "number" }
         },
-        "required": ["x", "y", "z"]
+        "required": ["x", "y", "z"],
+        "additionalProperties": false
       },
       "minItems": 1
     }
