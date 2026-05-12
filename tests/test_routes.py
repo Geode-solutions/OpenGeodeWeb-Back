@@ -583,12 +583,10 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
 
 
 def test_save_viewable_workflow_from_object(client: FlaskClient) -> None:
-    route = "/opengeodeweb_back/create/point"
+    route = "/opengeodeweb_back/create/point_set"
     point_data = {
         "name": "workflow_point_3d",
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0,
+        "points": [{"x": 0.0, "y": 0.0, "z": 0.0}],
     }
 
     response = client.post(route, json=point_data)
