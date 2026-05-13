@@ -1,9 +1,9 @@
 {
   "opengeodeweb_back": {
     "create": {
-      "point": {
-        "$id": "opengeodeweb_back/create/point",
-        "route": "/point",
+      "point_set": {
+        "$id": "opengeodeweb_back/create/point_set",
+        "route": "/point_set",
         "methods": [
           "POST"
         ],
@@ -13,21 +13,34 @@
             "type": "string",
             "minLength": 1
           },
-          "x": {
-            "type": "number"
-          },
-          "y": {
-            "type": "number"
-          },
-          "z": {
-            "type": "number"
+          "points": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                },
+                "z": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "x",
+                "y",
+                "z"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1
           }
         },
         "required": [
           "name",
-          "x",
-          "y",
-          "z"
+          "points"
         ],
         "additionalProperties": false
       }
