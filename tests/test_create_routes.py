@@ -84,6 +84,7 @@ def test_create_point_with_invalid_data(client: FlaskClient) -> None:
     response = client.post(route, json=invalid_data)
     assert response.status_code == 400
 
+
 def test_create_curve(client: FlaskClient, curve_data: test_utils.JsonData) -> None:
     """Test the creation of a curve with valid data."""
     route: str = "/opengeodeweb_back/create/edged_curve"
