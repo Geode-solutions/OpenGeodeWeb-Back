@@ -36,3 +36,29 @@ def point_set() -> flask.Response:
         pointset
     )
     return flask.make_response(result, 200)
+
+
+@routes.route(
+    schemas_dict["edged_curve"]["route"],
+    methods=schemas_dict["edged_curve"]["methods"],
+)
+def edged_curve() -> flask.Response:
+    """Endpoint to create an edged curve in 3D space."""
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["edged_curve"]
+    )
+    params = schemas.EdgedCurve.from_dict(json_data)
+
+    edged_curve_obj = GeodeEdgedCurve3D()
+    builder = edged_curve_obj.builder()
+    builder.set_name(params.name)
+    for point in params.points:
+        builder.create_point(opengeode.Point3D([point.x, point.y, point.z]))
+
+    for edge in params.edges:
+        builder.create_edge_with_vertices(edge[0], edge[1])
+
+    result = utils_functions.generate_native_viewable_and_light_viewable_from_object(
+        edged_curve_obj
+    )
+    return flask.make_response(result, 200)
