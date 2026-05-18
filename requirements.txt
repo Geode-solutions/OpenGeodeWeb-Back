@@ -14,13 +14,13 @@ flask[async]>=3
     # via
     #   -r requirements.in
     #   flask-cors
-flask-cors==6.0.1
+flask-cors==6.0.2
     # via -r requirements.in
-geode-common==33.20.0
+geode-common==33.21.5
     # via
     #   -r requirements.in
     #   geode-viewables
-geode-viewables==3.3.5
+geode-viewables==3.3.8
     # via -r requirements.in
 itsdangerous>=2
     # via flask
@@ -31,7 +31,7 @@ markupsafe>=3
     #   flask
     #   jinja2
     #   werkzeug
-opengeode-core==16.3.2
+opengeode-core==17.0.1
     # via
     #   -r requirements.in
     #   geode-common
@@ -40,24 +40,23 @@ opengeode-core==16.3.2
     #   opengeode-geosciencesio
     #   opengeode-inspector
     #   opengeode-io
-opengeode-geosciences==9.5.11
+opengeode-geosciences==9.5.14
     # via
     #   -r requirements.in
     #   geode-viewables
     #   opengeode-geosciencesio
-opengeode-geosciencesio==5.8.11
+opengeode-geosciencesio==5.8.14
     # via -r requirements.in
-opengeode-inspector==6.8.18
+opengeode-inspector==6.8.21
     # via -r requirements.in
-opengeode-io==7.4.9
+opengeode-io==7.6.2
     # via
     #   -r requirements.in
     #   geode-viewables
     #   opengeode-geosciencesio
-werkzeug==3.1.2
+werkzeug==3.1.8
     # via
     #   -r requirements.in
     #   flask
     #   flask-cors
 
-opengeodeweb-microservice==1.*,>=1.1.3

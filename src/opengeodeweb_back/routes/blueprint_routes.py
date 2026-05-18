@@ -64,7 +64,10 @@ def upload_file() -> flask.Response:
         flask.abort(400, "Filename is required")
     filename = werkzeug.utils.secure_filename(os.path.basename(file.filename))
     print(f"{filename=}", flush=True)
-    file.save(os.path.join(UPLOAD_FOLDER, filename))
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(file_path)
+    if filename.lower().endswith(".csv.json"):
+        shutil.copyfile(file_path, os.path.join(UPLOAD_FOLDER, filename[:-9] + ".json"))
     return flask.make_response({"message": "File uploaded"}, 201)
 
 
@@ -432,10 +435,11 @@ def export_project() -> flask.Response:
 
         for data_id, native_file in rows:
             base_dir = os.path.join(project_folder, data_id)
-
-            native_path = os.path.join(base_dir, str(native_file))
-            if os.path.isfile(native_path):
-                zip_file.write(native_path, os.path.join(data_id, str(native_file)))
+            if os.path.isdir(base_dir):
+                for f_name in os.listdir(base_dir):
+                    file_path = os.path.join(base_dir, f_name)
+                    if os.path.isfile(file_path):
+                        zip_file.write(file_path, os.path.join(data_id, f_name))
 
         zip_file.writestr("snapshot.json", flask.json.dumps(params.snapshot))
 
