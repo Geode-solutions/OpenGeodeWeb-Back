@@ -11,7 +11,9 @@ from opengeodeweb_back import geode_functions, utils_functions
 import opengeodeweb_back.routes.create.schemas as schemas
 from opengeodeweb_back.geode_objects.geode_point_set3d import GeodePointSet3D
 from opengeodeweb_back.geode_objects.geode_edged_curve3d import GeodeEdgedCurve3D
-from opengeodeweb_back.geode_objects.geode_polygonal_surface3d import GeodePolygonalSurface3D
+from opengeodeweb_back.geode_objects.geode_polygonal_surface3d import (
+    GeodePolygonalSurface3D,
+)
 
 routes = flask.Blueprint("create", __name__, url_prefix="/create")
 schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas"))
@@ -91,4 +93,3 @@ def polygonal_surface() -> flask.Response:
         polygonal_surface_obj
     )
     return flask.make_response(result, 200)
-

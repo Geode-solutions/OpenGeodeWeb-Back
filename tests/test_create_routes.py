@@ -151,4 +151,3 @@ def test_create_polygonal_surface(
     test_utils.test_route_wrong_params(
         client, route, lambda: copy.deepcopy(surface_data)
     )
-
