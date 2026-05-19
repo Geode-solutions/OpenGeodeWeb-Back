@@ -11,6 +11,7 @@ from opengeodeweb_back import geode_functions, utils_functions
 import opengeodeweb_back.routes.create.schemas as schemas
 from opengeodeweb_back.geode_objects.geode_point_set3d import GeodePointSet3D
 from opengeodeweb_back.geode_objects.geode_edged_curve3d import GeodeEdgedCurve3D
+from opengeodeweb_back.geode_objects.geode_polygonal_surface3d import GeodePolygonalSurface3D
 
 routes = flask.Blueprint("create", __name__, url_prefix="/create")
 schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas"))
@@ -62,3 +63,32 @@ def edged_curve() -> flask.Response:
         edged_curve_obj
     )
     return flask.make_response(result, 200)
+
+
+@routes.route(
+    schemas_dict["polygonal_surface"]["route"],
+    methods=schemas_dict["polygonal_surface"]["methods"],
+)
+def polygonal_surface() -> flask.Response:
+    """Endpoint to create a polygonal surface in 3D space."""
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["polygonal_surface"]
+    )
+    params = schemas.PolygonalSurface.from_dict(json_data)
+
+    polygonal_surface_obj = GeodePolygonalSurface3D()
+    builder = polygonal_surface_obj.builder()
+    builder.set_name(params.name)
+    for point in params.points:
+        builder.create_point(opengeode.Point3D([point.x, point.y, point.z]))
+
+    for polygon in params.polygons:
+        builder.create_polygon(polygon)
+
+    builder.compute_polygon_adjacencies()
+
+    result = utils_functions.generate_native_viewable_and_light_viewable_from_object(
+        polygonal_surface_obj
+    )
+    return flask.make_response(result, 200)
+
