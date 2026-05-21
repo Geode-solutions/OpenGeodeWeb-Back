@@ -5,7 +5,7 @@ from PyInstaller.utils.hooks import copy_metadata
 
 datas = []
 datas += collect_data_files('opengeodeweb_back')
-datas += copy_metadata('opengeodeweb_back', recursive=True)
+datas += copy_metadata('opengeodeweb-back', recursive=True)
 
 
 a = Analysis(
