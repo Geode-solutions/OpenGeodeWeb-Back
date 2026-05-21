@@ -1,0 +1,37 @@
+{
+  "route": "/polygonal_surface",
+  "methods": ["POST"],
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "points": {
+      "type": "array",
+      "items": {
+        "title": "PolygonalSurfacePoint",
+        "type": "object",
+        "properties": {
+          "x": { "type": "number" },
+          "y": { "type": "number" },
+          "z": { "type": "number" }
+        },
+        "required": ["x", "y", "z"],
+        "additionalProperties": false
+      },
+      "minItems": 3
+    },
+    "polygons": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": { "type": "integer" },
+        "minItems": 3
+      },
+      "minItems": 1
+    }
+  },
+  "required": ["name", "points", "polygons"],
+  "additionalProperties": false
+}
