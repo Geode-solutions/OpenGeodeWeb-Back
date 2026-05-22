@@ -5,6 +5,11 @@ from .save_viewable_file import *
 from .polyhedron_attribute_names import *
 from .polygon_attribute_names import *
 from .ping import *
+from .model_vertex_attribute_names import *
+from .model_polyhedron_attribute_names import *
+from .model_polygon_attribute_names import *
+from .model_edge_attribute_names import *
+from .model_cell_attribute_names import *
 from .missing_files import *
 from .kill import *
 from .inspect_file import *

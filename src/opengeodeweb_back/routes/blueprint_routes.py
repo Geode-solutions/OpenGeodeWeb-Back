@@ -30,6 +30,7 @@ from opengeodeweb_back.geode_objects.geode_grid3d import GeodeGrid3D
 from opengeodeweb_back.geode_objects.geode_surface_mesh2d import GeodeSurfaceMesh2D
 from opengeodeweb_back.geode_objects.geode_surface_mesh3d import GeodeSurfaceMesh3D
 from opengeodeweb_back.geode_objects.geode_solid_mesh3d import GeodeSolidMesh3D
+from opengeodeweb_back.geode_objects.geode_model import GeodeModel
 
 routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
 
@@ -385,6 +386,191 @@ def edge_attribute_names() -> flask.Response:
         {"attributes": attributes_metadata(attribute_manager)},
         200,
     )
+
+
+def get_model_attributes_metadata(
+    geode_object: GeodeModel,
+    component_id: str | None = None,
+    component_type: str | None = None,
+    field_type: str = "points",
+) -> list[dict[str, str | float]]:
+    model = getattr(geode_object, "brep", None) or getattr(geode_object, "section", None)
+    if not model:
+        return []
+
+    components = []
+    if component_id:
+        components = [geode_object.component(og.uuid(component_id))]
+    else:
+        types_to_get = [component_type] if component_type else ["Block", "Surface", "Line", "Corner"]
+        for component_type_name in types_to_get:
+            if component_type_name == "Block" and hasattr(model, "blocks"):
+                components.extend(list(model.blocks()))
+            elif component_type_name == "Surface" and hasattr(model, "surfaces"):
+                components.extend(list(model.surfaces()))
+            elif component_type_name == "Line" and hasattr(model, "lines"):
+                components.extend(list(model.lines()))
+            elif component_type_name == "Corner" and hasattr(model, "corners"):
+                components.extend(list(model.corners()))
+
+    all_attributes: dict[str, dict[str, str | float]] = {}
+    for component in components:
+        component_mesh = component.mesh()
+        if field_type == "points":
+            attribute_manager = component_mesh.vertex_attribute_manager()
+        else:
+            if hasattr(component_mesh, "cell_attribute_manager"):
+                attribute_manager = component_mesh.cell_attribute_manager()
+            elif hasattr(component_mesh, "polygon_attribute_manager"):
+                attribute_manager = component_mesh.polygon_attribute_manager()
+            elif hasattr(component_mesh, "polyhedron_attribute_manager"):
+                attribute_manager = component_mesh.polyhedron_attribute_manager()
+            elif hasattr(component_mesh, "edge_attribute_manager"):
+                attribute_manager = component_mesh.edge_attribute_manager()
+            else:
+                continue
+
+        for attribute_meta in attributes_metadata(attribute_manager):
+            attribute_name = attribute_meta["attribute_name"]
+            if attribute_name not in all_attributes:
+                all_attributes[attribute_name] = attribute_meta.copy()
+            else:
+                if attribute_meta["min_value"] != -1.0:
+                    if all_attributes[attribute_name]["min_value"] == -1.0:
+                        all_attributes[attribute_name]["min_value"] = attribute_meta["min_value"]
+                    else:
+                        all_attributes[attribute_name]["min_value"] = min(
+                            all_attributes[attribute_name]["min_value"], attribute_meta["min_value"]
+                        )
+                if attribute_meta["max_value"] != -1.0:
+                    if all_attributes[attribute_name]["max_value"] == -1.0:
+                        all_attributes[attribute_name]["max_value"] = attribute_meta["max_value"]
+                    else:
+                        all_attributes[attribute_name]["max_value"] = max(
+                            all_attributes[attribute_name]["max_value"], attribute_meta["max_value"]
+                        )
+
+    return list(all_attributes.values())
+
+
+@routes.route(
+    schemas_dict["model_vertex_attribute_names"]["route"],
+    methods=schemas_dict["model_vertex_attribute_names"]["methods"],
+)
+def model_vertex_attribute_names() -> flask.Response:
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["model_vertex_attribute_names"]
+    )
+    params = schemas.ModelVertexAttributeNames.from_dict(json_data)
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeModel):
+        flask.abort(400, f"{params.id} is not a GeodeModel")
+    
+    component_id = getattr(params, "component_id", None)
+    component_type = getattr(params, "component_type", None)
+    attributes = get_model_attributes_metadata(
+        geode_object,
+        component_id=component_id,
+        component_type=component_type,
+        field_type="points",
+    )
+    return flask.make_response({"attributes": attributes}, 200)
+
+
+@routes.route(
+    schemas_dict["model_cell_attribute_names"]["route"],
+    methods=schemas_dict["model_cell_attribute_names"]["methods"],
+)
+def model_cell_attribute_names() -> flask.Response:
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["model_cell_attribute_names"]
+    )
+    params = schemas.ModelCellAttributeNames.from_dict(json_data)
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeModel):
+        flask.abort(400, f"{params.id} is not a GeodeModel")
+    
+    component_id = getattr(params, "component_id", None)
+    component_type = getattr(params, "component_type", None)
+    attributes = get_model_attributes_metadata(
+        geode_object,
+        component_id=component_id,
+        component_type=component_type,
+        field_type="cells",
+    )
+    return flask.make_response({"attributes": attributes}, 200)
+
+
+@routes.route(
+    schemas_dict["model_edge_attribute_names"]["route"],
+    methods=schemas_dict["model_edge_attribute_names"]["methods"],
+)
+def model_edge_attribute_names() -> flask.Response:
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["model_edge_attribute_names"]
+    )
+    params = schemas.ModelEdgeAttributeNames.from_dict(json_data)
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeModel):
+        flask.abort(400, f"{params.id} is not a GeodeModel")
+    
+    component_id = getattr(params, "component_id", None)
+    component_type = getattr(params, "component_type", None)
+    attributes = get_model_attributes_metadata(
+        geode_object,
+        component_id=component_id,
+        component_type=component_type,
+        field_type="cells",
+    )
+    return flask.make_response({"attributes": attributes}, 200)
+
+
+@routes.route(
+    schemas_dict["model_polygon_attribute_names"]["route"],
+    methods=schemas_dict["model_polygon_attribute_names"]["methods"],
+)
+def model_polygon_attribute_names() -> flask.Response:
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["model_polygon_attribute_names"]
+    )
+    params = schemas.ModelPolygonAttributeNames.from_dict(json_data)
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeModel):
+        flask.abort(400, f"{params.id} is not a GeodeModel")
+    
+    component_id = getattr(params, "component_id", None)
+    component_type = getattr(params, "component_type", None)
+    attributes = get_model_attributes_metadata(
+        geode_object,
+        component_id=component_id,
+        component_type=component_type,
+        field_type="cells",
+    )
+    return flask.make_response({"attributes": attributes}, 200)
+
+
+@routes.route(
+    schemas_dict["model_polyhedron_attribute_names"]["route"],
+    methods=schemas_dict["model_polyhedron_attribute_names"]["methods"],
+)
+def model_polyhedron_attribute_names() -> flask.Response:
+    json_data = utils_functions.validate_request(
+        flask.request, schemas_dict["model_polyhedron_attribute_names"]
+    )
+    params = schemas.ModelPolyhedronAttributeNames.from_dict(json_data)
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeModel):
+        flask.abort(400, f"{params.id} is not a GeodeModel")
+    
+    component_id = getattr(params, "component_id", None)
+    component_type = getattr(params, "component_type", None)
+    attributes = get_model_attributes_metadata(
+        geode_object,
+        component_id=component_id,
+        component_type=component_type,
+        field_type="cells",
+    )
+    return flask.make_response({"attributes": attributes}, 200)
 
 
 @routes.route(

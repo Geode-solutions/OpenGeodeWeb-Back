@@ -158,6 +158,7 @@
         "additionalProperties": false
       }
     },
+    "models": {},
     "vertex_attribute_names": {
       "$id": "opengeodeweb_back/vertex_attribute_names",
       "route": "/vertex_attribute_names",
@@ -278,6 +279,136 @@
       "type": "object",
       "properties": {},
       "required": [],
+      "additionalProperties": false
+    },
+    "model_vertex_attribute_names": {
+      "$id": "opengeodeweb_back/model_vertex_attribute_names",
+      "route": "/model_vertex_attribute_names",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component_type": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "model_polyhedron_attribute_names": {
+      "$id": "opengeodeweb_back/model_polyhedron_attribute_names",
+      "route": "/model_polyhedron_attribute_names",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component_type": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "model_polygon_attribute_names": {
+      "$id": "opengeodeweb_back/model_polygon_attribute_names",
+      "route": "/model_polygon_attribute_names",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component_type": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "model_edge_attribute_names": {
+      "$id": "opengeodeweb_back/model_edge_attribute_names",
+      "route": "/model_edge_attribute_names",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component_type": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "model_cell_attribute_names": {
+      "$id": "opengeodeweb_back/model_cell_attribute_names",
+      "route": "/model_cell_attribute_names",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component_type": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id"
+      ],
       "additionalProperties": false
     },
     "missing_files": {
