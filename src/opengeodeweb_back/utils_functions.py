@@ -25,6 +25,7 @@ from . import geode_functions
 from .geode_objects import geode_objects
 from .geode_objects.geode_model import GeodeModel
 from .geode_objects.geode_object import GeodeObject
+from .geode_objects.geode_vertex_set import GeodeVertexSet
 
 
 def increment_request_counter(current_app: flask.Flask) -> None:
@@ -312,6 +313,8 @@ def save_all_viewables_and_return_info(
             "binary_light_viewable": binary_light_viewable.decode("utf-8"),
             "geode_object_type": data.geode_object,
         }
+        if isinstance(geode_object, GeodeVertexSet):
+            response["nb_vertices"] = geode_object.vertex_set.nb_vertices()
         if isinstance(geode_object, GeodeModel):
             response |= model_components(data.id, geode_object, data.viewable_file)
         return response
