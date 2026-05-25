@@ -625,8 +625,8 @@ def test_model_component_vertex_attribute_names(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/model_component_vertex_attribute_names"
     model_id, by_type = _load_brep_components(client)
 
-    corner_ids = by_type.get("Corner3D", [])
-    assert len(corner_ids) > 0, "cube.og_brep should have Corner3D components"
+    corner_ids = by_type.get("Corner", [])
+    assert len(corner_ids) > 0, "cube.og_brep should have Corner components"
     component_id = corner_ids[0]
 
     response = client.post(route, json={"id": model_id, "component_id": component_id})
@@ -642,8 +642,8 @@ def test_model_component_edge_attribute_names(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/model_component_edge_attribute_names"
     model_id, by_type = _load_brep_components(client)
 
-    line_ids = by_type.get("Line3D", [])
-    assert len(line_ids) > 0, "cube.og_brep should have Line3D components"
+    line_ids = by_type.get("Line", [])
+    assert len(line_ids) > 0, "cube.og_brep should have Line components"
     component_id = line_ids[0]
 
     response = client.post(route, json={"id": model_id, "component_id": component_id})
@@ -659,8 +659,8 @@ def test_model_component_polygon_attribute_names(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/model_component_polygon_attribute_names"
     model_id, by_type = _load_brep_components(client)
 
-    surface_ids = by_type.get("Surface3D", [])
-    assert len(surface_ids) > 0, "cube.og_brep should have Surface3D components"
+    surface_ids = by_type.get("Surface", [])
+    assert len(surface_ids) > 0, "cube.og_brep should have Surface components"
     component_id = surface_ids[0]
 
     response = client.post(route, json={"id": model_id, "component_id": component_id})
@@ -676,8 +676,8 @@ def test_model_component_polyhedron_attribute_names(client: FlaskClient) -> None
     route = "/opengeodeweb_back/model_component_polyhedron_attribute_names"
     model_id, by_type = _load_brep_components(client)
 
-    block_ids = by_type.get("Block3D", [])
-    assert len(block_ids) > 0, "cube.og_brep should have Block3D components"
+    block_ids = by_type.get("Block", [])
+    assert len(block_ids) > 0, "cube.og_brep should have Block components"
     component_id = block_ids[0]
 
     response = client.post(route, json={"id": model_id, "component_id": component_id})
