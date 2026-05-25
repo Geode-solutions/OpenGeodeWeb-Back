@@ -3,7 +3,7 @@ import os
 import time
 import shutil
 import math
-from typing import Any
+from typing import Any, Union, cast
 
 # Third party imports
 import flask
@@ -31,6 +31,16 @@ from opengeodeweb_back.geode_objects.geode_grid3d import GeodeGrid3D
 from opengeodeweb_back.geode_objects.geode_surface_mesh2d import GeodeSurfaceMesh2D
 from opengeodeweb_back.geode_objects.geode_surface_mesh3d import GeodeSurfaceMesh3D
 from opengeodeweb_back.geode_objects.geode_solid_mesh3d import GeodeSolidMesh3D
+
+ComponentMesh = Union[
+    og.Corner2D,
+    og.Corner3D,
+    og.Line2D,
+    og.Line3D,
+    og.Surface2D,
+    og.Surface3D,
+    og.Block3D,
+]
 
 routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
 
@@ -400,7 +410,7 @@ def model_component_vertex_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
-    component = geode_object.component(og.uuid(params.component_id))
+    component = cast(ComponentMesh, geode_object.component(og.uuid(params.component_id)))
     mesh = component.mesh()
     attribute_manager = mesh.vertex_attribute_manager()
     return flask.make_response(
@@ -421,7 +431,7 @@ def model_component_edge_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
-    component = geode_object.component(og.uuid(params.component_id))
+    component = cast(ComponentMesh, geode_object.component(og.uuid(params.component_id)))
     mesh = component.mesh()
     if not hasattr(mesh, "edge_attribute_manager"):
         flask.abort(400, "Component does not have edges")
@@ -444,7 +454,7 @@ def model_component_polygon_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
-    component = geode_object.component(og.uuid(params.component_id))
+    component = cast(ComponentMesh, geode_object.component(og.uuid(params.component_id)))
     mesh = component.mesh()
     if not hasattr(mesh, "polygon_attribute_manager"):
         flask.abort(400, "Component does not have polygons")
@@ -467,7 +477,7 @@ def model_component_polyhedron_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
-    component = geode_object.component(og.uuid(params.component_id))
+    component = cast(ComponentMesh, geode_object.component(og.uuid(params.component_id)))
     mesh = component.mesh()
     if not hasattr(mesh, "polyhedron_attribute_manager"):
         flask.abort(400, "Component does not have polyhedra")
