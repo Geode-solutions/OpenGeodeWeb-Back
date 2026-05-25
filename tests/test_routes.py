@@ -596,3 +596,95 @@ def test_save_viewable_workflow_from_object(client: FlaskClient) -> None:
     assert isinstance(data_id, str) and len(data_id) > 0
     assert response.get_json()["geode_object_type"] == "PointSet3D"
     assert response.get_json()["viewable_file"].endswith(".vtp")
+
+
+def _load_brep_components(client: FlaskClient) -> tuple[str, dict[str, list[str]]]:
+    """Load cube.og_brep and return (model_id, {component_type: [geode_id, ...]})."""
+    response = test_save_viewable_file(client, "BRep", "cube.og_brep")
+    assert response.status_code == 200
+    model_id: str = response.get_json()["id"]
+    mesh_components: list[dict] = response.get_json()["mesh_components"]
+    by_type: dict[str, list[str]] = {}
+    for mc in mesh_components:
+        component_type = mc["type"]
+        by_type.setdefault(component_type, []).append(mc["geode_id"])
+    return model_id, by_type
+
+
+def _assert_attributes_response(response) -> None:
+    assert response.status_code == 200
+    attributes = response.get_json()["attributes"]
+    assert isinstance(attributes, list)
+    for attribute in attributes:
+        assert "attribute_name" in attribute
+        assert "min_value" in attribute
+        assert "max_value" in attribute
+
+
+def test_model_component_vertex_attribute_names(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/model_component_vertex_attribute_names"
+    model_id, by_type = _load_brep_components(client)
+
+    corner_ids = by_type.get("Corner3D", [])
+    assert len(corner_ids) > 0, "cube.og_brep should have Corner3D components"
+    component_id = corner_ids[0]
+
+    response = client.post(route, json={"id": model_id, "component_id": component_id})
+    _assert_attributes_response(response)
+
+    def get_full_data() -> test_utils.JsonData:
+        return {"id": model_id, "component_id": component_id}
+
+    test_utils.test_route_wrong_params(client, route, get_full_data)
+
+
+def test_model_component_edge_attribute_names(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/model_component_edge_attribute_names"
+    model_id, by_type = _load_brep_components(client)
+
+    line_ids = by_type.get("Line3D", [])
+    assert len(line_ids) > 0, "cube.og_brep should have Line3D components"
+    component_id = line_ids[0]
+
+    response = client.post(route, json={"id": model_id, "component_id": component_id})
+    _assert_attributes_response(response)
+
+    def get_full_data() -> test_utils.JsonData:
+        return {"id": model_id, "component_id": component_id}
+
+    test_utils.test_route_wrong_params(client, route, get_full_data)
+
+
+def test_model_component_polygon_attribute_names(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/model_component_polygon_attribute_names"
+    model_id, by_type = _load_brep_components(client)
+
+    surface_ids = by_type.get("Surface3D", [])
+    assert len(surface_ids) > 0, "cube.og_brep should have Surface3D components"
+    component_id = surface_ids[0]
+
+    response = client.post(route, json={"id": model_id, "component_id": component_id})
+    _assert_attributes_response(response)
+
+    def get_full_data() -> test_utils.JsonData:
+        return {"id": model_id, "component_id": component_id}
+
+    test_utils.test_route_wrong_params(client, route, get_full_data)
+
+
+def test_model_component_polyhedron_attribute_names(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/model_component_polyhedron_attribute_names"
+    model_id, by_type = _load_brep_components(client)
+
+    block_ids = by_type.get("Block3D", [])
+    assert len(block_ids) > 0, "cube.og_brep should have Block3D components"
+    component_id = block_ids[0]
+
+    response = client.post(route, json={"id": model_id, "component_id": component_id})
+    _assert_attributes_response(response)
+
+    def get_full_data() -> test_utils.JsonData:
+        return {"id": model_id, "component_id": component_id}
+
+    test_utils.test_route_wrong_params(client, route, get_full_data)
+
