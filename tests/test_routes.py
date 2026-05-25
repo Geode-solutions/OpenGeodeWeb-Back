@@ -687,4 +687,3 @@ def test_model_component_polyhedron_attribute_names(client: FlaskClient) -> None
         return {"id": model_id, "component_id": component_id}
 
     test_utils.test_route_wrong_params(client, route, get_full_data)
-
