@@ -410,7 +410,9 @@ def model_component_vertex_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
-    component = cast(ComponentMesh, geode_object.component(og.uuid(params.component_id)))
+    component = cast(
+        ComponentMesh, geode_object.component(og.uuid(params.component_id))
+    )
     mesh = component.mesh()
     attribute_manager = mesh.vertex_attribute_manager()
     return flask.make_response(
@@ -431,7 +433,9 @@ def model_component_edge_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
-    component = cast(ComponentMesh, geode_object.component(og.uuid(params.component_id)))
+    component = cast(
+        ComponentMesh, geode_object.component(og.uuid(params.component_id))
+    )
     mesh = component.mesh()
     if not hasattr(mesh, "edge_attribute_manager"):
         flask.abort(400, "Component does not have edges")
@@ -454,7 +458,9 @@ def model_component_polygon_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
-    component = cast(ComponentMesh, geode_object.component(og.uuid(params.component_id)))
+    component = cast(
+        ComponentMesh, geode_object.component(og.uuid(params.component_id))
+    )
     mesh = component.mesh()
     if not hasattr(mesh, "polygon_attribute_manager"):
         flask.abort(400, "Component does not have polygons")
@@ -477,7 +483,9 @@ def model_component_polyhedron_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
-    component = cast(ComponentMesh, geode_object.component(og.uuid(params.component_id)))
+    component = cast(
+        ComponentMesh, geode_object.component(og.uuid(params.component_id))
+    )
     mesh = component.mesh()
     if not hasattr(mesh, "polyhedron_attribute_manager"):
         flask.abort(400, "Component does not have polyhedra")
