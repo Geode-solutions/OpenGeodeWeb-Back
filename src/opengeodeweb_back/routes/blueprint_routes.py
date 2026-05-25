@@ -478,7 +478,6 @@ def model_component_polyhedron_attribute_names() -> flask.Response:
     )
 
 
-
 @routes.route(
     schemas_dict["ping"]["route"],
     methods=schemas_dict["ping"]["methods"],
