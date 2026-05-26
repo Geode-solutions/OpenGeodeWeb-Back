@@ -303,6 +303,9 @@ def save_all_viewables_and_return_info(
         name = geode_object.identifier.name()
         if not name:
             flask.abort(400, "Geode object has no name defined.")
+            
+        with open(os.path.join(data_path, "name.txt"), "w") as f:
+            f.write(name)
 
         response: dict[str, Any] = {
             "native_file": data.native_file,
