@@ -1,0 +1,17 @@
+{
+  "route": "/model_component_polygon_attribute_names",
+  "methods": ["POST"],
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "component_id": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": ["id", "component_id"],
+  "additionalProperties": false
+}
