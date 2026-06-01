@@ -3,6 +3,7 @@ opengeode-io==7.6.4
 opengeode-inspector==6.8.22
 opengeode-geosciences==9.5.14
 opengeode-geosciencesio==5.8.14
+gunicorn==26.0.0
 geode-common==33.21.6
 geode-viewables==3.3.8
 flask[async]==3.1.2

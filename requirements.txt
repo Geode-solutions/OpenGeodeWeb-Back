@@ -22,6 +22,8 @@ geode-common==33.21.6
     #   geode-viewables
 geode-viewables==3.3.8
     # via -r requirements.in
+gunicorn==26.0.0
+    # via -r requirements.in
 itsdangerous>=2
     # via flask
 jinja2>=3
