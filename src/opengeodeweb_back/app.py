@@ -2,6 +2,7 @@
 
 import argparse
 import os
+from threading import Timer
 from typing import Any
 import flask
 import flask_cors  # type: ignore
@@ -76,7 +77,7 @@ def create_app(name: str) -> flask.Flask:
     @cross_origin()
     def kill() -> None:
         print("Manual server kill, shutting down...", flush=True)
-        os._exit(0)
+        Timer(1.5, os._exit, [0]).start()
 
     return app
 
