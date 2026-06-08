@@ -3,6 +3,7 @@ import os
 import time
 import shutil
 import math
+from threading import Timer
 from typing import Any, Union, get_args
 
 # Third party imports
@@ -510,7 +511,8 @@ def ping() -> flask.Response:
 def kill() -> flask.Response:
     print("Manual server kill, shutting down...", flush=True)
     utils_functions.teardown_request(flask.current_app)
-    os._exit(0)
+    Timer(1.5, os._exit, [0]).start()
+
     return flask.make_response({"message": "Flask server is dead"}, 200)
 
 

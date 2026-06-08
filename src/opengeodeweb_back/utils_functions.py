@@ -106,11 +106,6 @@ def kill_task(current_app: flask.Flask) -> bool:
     return False
 
 
-def kill_server() -> None:
-    print("Server timed out due to inactivity, shutting down...", flush=True)
-    os._exit(0)
-
-
 def versions(list_packages: list[str]) -> list[dict[str, str]]:
     list_with_versions = []
     for package in list_packages:
