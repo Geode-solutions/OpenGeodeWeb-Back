@@ -535,23 +535,23 @@ def export_project() -> flask.Response:
     export_vease_path = os.path.join(project_folder, filename)
 
     with get_session() as session:
-        rows = session.query(Data.id, Data.native_file).all()
+        data_ids = [row.id for row in session.query(Data.id).all()]
 
     with zipfile.ZipFile(
         export_vease_path, "w", compression=zipfile.ZIP_DEFLATED
     ) as zip_file:
         database_root_path = os.path.join(project_folder, "project.db")
-        if os.path.isfile(database_root_path):
-            zip_file.write(database_root_path, "project.db")
+        zip_file.write(database_root_path, "project.db")
 
-        for data_id, native_file in rows:
+        for data_id in data_ids:
             base_dir = os.path.join(project_folder, data_id)
-            if os.path.isdir(base_dir):
-                for root, directories, files in os.walk(base_dir):
-                    for file_name in files:
-                        file_path = os.path.join(root, file_name)
-                        relative_path = os.path.relpath(file_path, base_dir)
-                        zip_file.write(file_path, os.path.join(data_id, relative_path))
+            for root, directories, files in os.walk(base_dir):
+                for file_name in files:
+                    file_path = os.path.join(root, file_name)
+                    zip_file.write(
+                        file_path,
+                        os.path.join(data_id, os.path.relpath(file_path, base_dir)),
+                    )
 
         zip_file.writestr("snapshot.json", flask.json.dumps(params.snapshot))
 
@@ -624,21 +624,19 @@ def import_project() -> flask.Response:
                 if viewable_name:
                     vpath = geode_functions.data_file_path(data.id, viewable_name)
                     viewable_dir = os.path.join(data_path, "viewable")
-                    has_components = os.path.isdir(viewable_dir) and bool(
-                        os.listdir(viewable_dir)
-                    )
                     if os.path.isfile(vpath) and (
-                        data.viewer_object != "model" or has_components
+                        data.viewer_object != "model"
+                        or (os.path.isdir(viewable_dir) and os.listdir(viewable_dir))
                     ):
                         continue
 
-                native_file = str(data.native_file or "")
+                native_file = data.native_file
                 if not native_file:
-                    continue
+                    flask.abort(400, "Missing native file")
 
                 native_full = geode_functions.data_file_path(data.id, native_file)
                 if not os.path.isfile(native_full):
-                    continue
+                    flask.abort(400, f"Missing native file: {native_file}")
 
                 geode_object = geode_functions.geode_object_from_string(
                     data.geode_object
