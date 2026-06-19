@@ -624,8 +624,12 @@ def import_project() -> flask.Response:
                 if viewable_name:
                     vpath = geode_functions.data_file_path(data.id, viewable_name)
                     viewable_dir = os.path.join(data_path, "viewable")
-                    has_components = os.path.isdir(viewable_dir) and bool(os.listdir(viewable_dir))
-                    if os.path.isfile(vpath) and (data.viewer_object != "model" or has_components):
+                    has_components = os.path.isdir(viewable_dir) and bool(
+                        os.listdir(viewable_dir)
+                    )
+                    if os.path.isfile(vpath) and (
+                        data.viewer_object != "model" or has_components
+                    ):
                         continue
 
                 native_file = str(data.native_file or "")
