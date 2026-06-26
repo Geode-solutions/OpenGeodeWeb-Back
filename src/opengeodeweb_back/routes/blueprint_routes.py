@@ -547,10 +547,11 @@ def export_project() -> flask.Response:
         for data_id, native_file in rows:
             base_dir = os.path.join(project_folder, data_id)
             if os.path.isdir(base_dir):
-                for f_name in os.listdir(base_dir):
-                    file_path = os.path.join(base_dir, f_name)
-                    if os.path.isfile(file_path):
-                        zip_file.write(file_path, os.path.join(data_id, f_name))
+                for root, directories, files in os.walk(base_dir):
+                    for file_name in files:
+                        file_path = os.path.join(root, file_name)
+                        relative_path = os.path.relpath(file_path, base_dir)
+                        zip_file.write(file_path, os.path.join(data_id, relative_path))
 
         zip_file.writestr("snapshot.json", flask.json.dumps(params.snapshot))
 
@@ -622,7 +623,13 @@ def import_project() -> flask.Response:
                 viewable_name = data.viewable_file
                 if viewable_name:
                     vpath = geode_functions.data_file_path(data.id, viewable_name)
-                    if os.path.isfile(vpath):
+                    viewable_dir = os.path.join(data_path, "viewable")
+                    has_components = os.path.isdir(viewable_dir) and bool(
+                        os.listdir(viewable_dir)
+                    )
+                    if os.path.isfile(vpath) and (
+                        data.viewer_object != "model" or has_components
+                    ):
                         continue
 
                 native_file = str(data.native_file or "")
