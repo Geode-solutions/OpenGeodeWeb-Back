@@ -39,6 +39,7 @@ class GeodeBRep(GeodeModel):
 
     @classmethod
     def load(cls, filename: str) -> GeodeBRep:
+        print(f"Loading {filename}", flush=True)
         return GeodeBRep(og.load_brep(filename))
 
     @classmethod
@@ -65,6 +66,7 @@ class GeodeBRep(GeodeModel):
         return og.is_brep_saveable(self.brep, filename)
 
     def save(self, filename: str) -> list[str]:
+        print(f"Saving {filename}", flush=True)
         return og.save_brep(self.brep, filename)
 
     def save_viewable(self, filename_without_extension: str) -> str:

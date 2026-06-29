@@ -26,7 +26,6 @@ class ProdConfig(Config):
     ORIGINS = ""
     MINUTES_BEFORE_TIMEOUT = "1"
     SECONDS_BETWEEN_SHUTDOWNS = "10"
-    PROJECT_FOLDER_PATH = "/project"
 
 
 class DevConfig(Config):

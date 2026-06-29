@@ -22,7 +22,7 @@ app = create_app(__name__)
 
 @pytest.fixture(scope="session", autouse=True)
 def configure_test_environment() -> Generator[None, None, None]:
-    base_path = Path(__file__).parent
+    base_path =  Path(__file__).parent.absolute()
     test_data_path = base_path / "data"
 
     shutil.rmtree("./data", ignore_errors=True)
@@ -30,7 +30,7 @@ def configure_test_environment() -> Generator[None, None, None]:
 
     app.config["TESTING"] = True
     app.config["SERVER_NAME"] = "TEST"
-    app.config["PROJECT_FOLDER_PATH"] = "./"
+    app.config["DATA_FOLDER_PATH"] = "./data/"
     app.config["UPLOAD_FOLDER_PATH"] = "./tests/data/"
 
     db_path = os.path.join(base_path, "data", "project.db")
