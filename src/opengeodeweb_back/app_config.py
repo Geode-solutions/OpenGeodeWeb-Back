@@ -5,6 +5,7 @@ import time
 # Third party imports
 # Local application imports
 
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
 class Config(object):
     FLASK_DEBUG = os.environ.get("FLASK_DEBUG", default=False)
@@ -33,4 +34,6 @@ class DevConfig(Config):
     ORIGINS = "*"
     MINUTES_BEFORE_TIMEOUT = "1"
     SECONDS_BETWEEN_SHUTDOWNS = "10"
-    PROJECT_FOLDER_PATH = os.path.dirname(os.path.abspath(__file__))
+    PROJECT_FOLDER_PATH = base_dir
+    DATA_FOLDER_PATH = os.path.join(PROJECT_FOLDER_PATH, "data")
+    EXTENSIONS_FOLDER_PATH = os.path.join(PROJECT_FOLDER_PATH, "extensions")
