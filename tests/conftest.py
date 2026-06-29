@@ -22,7 +22,7 @@ app = create_app(__name__)
 
 @pytest.fixture(scope="session", autouse=True)
 def configure_test_environment() -> Generator[None, None, None]:
-    base_path =  Path(__file__).parent.absolute()
+    base_path = Path(__file__).parent.absolute()
     test_data_path = base_path / "data"
 
     shutil.rmtree("./data", ignore_errors=True)
