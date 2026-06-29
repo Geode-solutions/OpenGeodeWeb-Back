@@ -147,9 +147,9 @@ def run_server(app: Flask) -> None:
         app.config.from_object(app_config.ProdConfig(args.project_folder_path))
 
     if "host" in args:
-         app.config.update(HOST=args.host)
+        app.config.update(HOST=args.host)
     if "port" in args:
-         app.config.update(HOST=args.port)
+        app.config.update(HOST=args.port)
     if "debug" in args:
         app.config.update(FLASK_DEBUG=args.debug)
     if "data_folder_path" in args:
@@ -160,11 +160,6 @@ def run_server(app: Flask) -> None:
         app.config.update(ALLOWED_ORIGINS=args.allowed_origins)
     if "timeout" in args:
         app.config.update(MINUTES_BEFORE_TIMEOUT=args.timeout)
-    
-
-
-
-    
 
     db_filename: str = app.config.get("DATABASE_FILENAME") or "project.db"
     db_path = os.path.join(str(app.config.get("DATA_FOLDER_PATH")), db_filename)

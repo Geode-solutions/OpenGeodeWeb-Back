@@ -32,7 +32,6 @@ class ProdConfig(Config):
     SECONDS_BETWEEN_SHUTDOWNS = "10"
 
 
-
 class DevConfig(Config):
     SSL = None
     ORIGINS = "*"
