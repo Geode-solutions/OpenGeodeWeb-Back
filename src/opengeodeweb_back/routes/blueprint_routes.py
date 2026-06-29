@@ -79,7 +79,9 @@ def upload_file() -> flask.Response:
     file_path = os.path.join(UPLOAD_FOLDER_PATH, filename)
     file.save(file_path)
     if filename.lower().endswith(".csv.json"):
-        shutil.copyfile(file_path, os.path.join(UPLOAD_FOLDER_PATH, filename[:-9] + ".json"))
+        shutil.copyfile(
+            file_path, os.path.join(UPLOAD_FOLDER_PATH, filename[:-9] + ".json")
+        )
     return flask.make_response({"message": "File uploaded"}, 201)
 
 
@@ -594,7 +596,6 @@ def import_project() -> flask.Response:
             os.makedirs(data_folder_path, exist_ok=True)
     except PermissionError:
         flask.abort(423, "Project files are locked; cannot overwrite")
-
 
     zip_file.stream.seek(0)
     with zipfile.ZipFile(zip_file.stream) as zip_archive:
