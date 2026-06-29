@@ -127,6 +127,13 @@ def run_server(app: Flask) -> None:
         help="Path to the folder where the project is stored",
     )
     parser.add_argument(
+        "-dfp",
+        "--data_folder_path",
+        type=str,
+        default=app.config.get("DATA_FOLDER_PATH"),
+        help="Path to the folder where the data is stored",
+    )
+    parser.add_argument(
         "-ufp",
         "--upload_folder_path",
         type=str,
