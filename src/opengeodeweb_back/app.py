@@ -18,15 +18,6 @@ from opengeodeweb_microservice.database import connection
 def create_app(name: str) -> flask.Flask:
     app = flask.Flask(name)
 
-    """ Config variables """
-    FLASK_DEBUG = (
-        True if os.environ.get("FLASK_DEBUG", default=None) == "True" else False
-    )
-    if FLASK_DEBUG == False:
-        app.config.from_object(app_config.ProdConfig)
-    else:
-        app.config.from_object(app_config.DevConfig)
-
     @app.before_request
     def before_request() -> flask.Response | None:
         if flask.request.method == "OPTIONS":
@@ -102,14 +93,12 @@ def run_server(app: Flask) -> None:
     parser.add_argument(
         "--host",
         type=str,
-        default=app.config.get("HOST"),
         help="Host to run on",
     )
     parser.add_argument(
         "-p",
         "--port",
         type=int,
-        default=app.config.get("PORT"),
         help="Port to listen on",
     )
     parser.add_argument(
@@ -123,45 +112,62 @@ def run_server(app: Flask) -> None:
         "-pfp",
         "--project_folder_path",
         type=str,
-        default=app.config.get("PROJECT_FOLDER_PATH"),
         help="Path to the folder where the project is stored",
     )
     parser.add_argument(
         "-dfp",
         "--data_folder_path",
         type=str,
-        default=app.config.get("DATA_FOLDER_PATH"),
         help="Path to the folder where the data is stored",
     )
     parser.add_argument(
         "-ufp",
         "--upload_folder_path",
         type=str,
-        default=app.config.get("UPLOAD_FOLDER_PATH"),
         help="Path to the folder where uploads are stored",
     )
     parser.add_argument(
         "-origins",
         "--allowed_origins",
         nargs="+",
-        default=app.config.get("ORIGINS"),
         help="Origins that are allowed to connect to the server",
     )
     parser.add_argument(
         "-t",
         "--timeout",
-        default=app.config.get("MINUTES_BEFORE_TIMEOUT"),
         help="Number of minutes before the server times out",
     )
     args, _ = parser.parse_known_args()
-    app.config.update(PROJECT_FOLDER_PATH=args.project_folder_path)
-    app.config.update(UPLOAD_FOLDER_PATH=args.upload_folder_path)
-    app.config.update(MINUTES_BEFORE_TIMEOUT=args.timeout)
-    flask_cors.CORS(app, origins=args.allowed_origins)
     print(f"{args=}", flush=True)
+    if not "project_folder_path" in args:
+        raise ValueError("project_folder_path must be provided")
+    if args.debug:
+        app.config.from_object(app_config.DevConfig(args.project_folder_path))
+    else:
+        app.config.from_object(app_config.ProdConfig(args.project_folder_path))
+
+    if "host" in args:
+         app.config.update(HOST=args.host)
+    if "port" in args:
+         app.config.update(HOST=args.port)
+    if "debug" in args:
+        app.config.update(FLASK_DEBUG=args.debug)
+    if "data_folder_path" in args:
+        app.config.update(DATA_FOLDER_PATH=args.data_folder_path)
+    if "upload_folder_path" in args:
+        app.config.update(UPLOAD_FOLDER_PATH=args.upload_folder_path)
+    if "allowed_origins" in args:
+        app.config.update(ALLOWED_ORIGINS=args.allowed_origins)
+    if "timeout" in args:
+        app.config.update(MINUTES_BEFORE_TIMEOUT=args.timeout)
+    
+
+
+
+    
 
     db_filename: str = app.config.get("DATABASE_FILENAME") or "project.db"
-    db_path = os.path.join(str(args.data_folder_path), db_filename)
+    db_path = os.path.join(str(app.config.get("DATA_FOLDER_PATH")), db_filename)
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -169,9 +175,9 @@ def run_server(app: Flask) -> None:
     connection.init_database(db_path)
     print(f"Database initialized at: {db_path}", flush=True)
     app.run(
-        debug=args.debug,
-        host=args.host,
-        port=args.port,
+        debug=app.config.get("FLASK_DEBUG"),
+        host=app.config.get("HOST"),
+        port=app.config.get("PORT"),
         ssl_context=app.config.get("SSL"),
     )
 

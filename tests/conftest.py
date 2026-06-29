@@ -30,6 +30,7 @@ def configure_test_environment() -> Generator[None, None, None]:
 
     app.config["TESTING"] = True
     app.config["SERVER_NAME"] = "TEST"
+    app.config["PROJECT_FOLDER_PATH"] = base_path
     app.config["DATA_FOLDER_PATH"] = "./data/"
     app.config["UPLOAD_FOLDER_PATH"] = "./tests/data/"
 
