@@ -264,7 +264,9 @@ def test_send_file_single_returns_octet_binary(
         file_path.write_bytes(b"hello 1")
         with app.test_request_context():
             response = utils_functions.send_file(
-                app.config["UPLOAD_FOLDER_PATH"], [str(file_path)], "tmp_send_file_1.txt"
+                app.config["UPLOAD_FOLDER_PATH"],
+                [str(file_path)],
+                "tmp_send_file_1.txt",
             )
             assert response.status_code == 200
             assert response.mimetype == "application/octet-binary"
