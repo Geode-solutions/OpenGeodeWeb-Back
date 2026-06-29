@@ -7,6 +7,7 @@ import time
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
+
 class Config(object):
     FLASK_DEBUG = os.environ.get("FLASK_DEBUG", default=False)
     HOST = "localhost"
