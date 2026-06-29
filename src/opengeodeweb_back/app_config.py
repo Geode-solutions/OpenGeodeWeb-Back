@@ -23,7 +23,6 @@ class Config(object):
         self.DATA_FOLDER_PATH = os.path.join(project_folder_path, "data")
         self.EXTENSIONS_FOLDER_PATH = os.path.join(project_folder_path, "extensions")
         self.UPLOAD_FOLDER_PATH = os.path.join(project_folder_path, "uploads")
-        self.EXTENSIONS_FOLDER_PATH = os.path.join(project_folder_path, "extensions")
 
 
 class ProdConfig(Config):
