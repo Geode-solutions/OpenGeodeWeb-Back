@@ -66,20 +66,20 @@ def allowed_files() -> flask.Response:
     methods=schemas_dict["upload_file"]["methods"],
 )
 def upload_file() -> flask.Response:
-    UPLOAD_FOLDER = flask.current_app.config["UPLOAD_FOLDER"]
-    print(f"{UPLOAD_FOLDER=}", flush=True)
-    if not os.path.exists(UPLOAD_FOLDER):
-        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    UPLOAD_FOLDER_PATH = flask.current_app.config["UPLOAD_FOLDER_PATH"]
+    print(f"{UPLOAD_FOLDER_PATH=}", flush=True)
+    if not os.path.exists(UPLOAD_FOLDER_PATH):
+        os.makedirs(UPLOAD_FOLDER_PATH, exist_ok=True)
 
     file = flask.request.files["file"]
     if file.filename is None:
         flask.abort(400, "Filename is required")
     filename = werkzeug.utils.secure_filename(os.path.basename(file.filename))
     print(f"{filename=}", flush=True)
-    file_path = os.path.join(UPLOAD_FOLDER, filename)
+    file_path = os.path.join(UPLOAD_FOLDER_PATH, filename)
     file.save(file_path)
     if filename.lower().endswith(".csv.json"):
-        shutil.copyfile(file_path, os.path.join(UPLOAD_FOLDER, filename[:-9] + ".json"))
+        shutil.copyfile(file_path, os.path.join(UPLOAD_FOLDER_PATH, filename[:-9] + ".json"))
     return flask.make_response({"message": "File uploaded"}, 201)
 
 
@@ -585,10 +585,16 @@ def import_project() -> flask.Response:
 
     try:
         if os.path.exists(data_folder_path):
-            shutil.rmtree(data_folder_path)
-        os.makedirs(data_folder_path, exist_ok=True)
+            for item in os.scandir(data_folder_path):
+                if item.is_dir(follow_symlinks=False):
+                    shutil.rmtree(item.path)
+                else:
+                    os.remove(item.path)
+        else:
+            os.makedirs(data_folder_path, exist_ok=True)
     except PermissionError:
         flask.abort(423, "Project files are locked; cannot overwrite")
+
 
     zip_file.stream.seek(0)
     with zipfile.ZipFile(zip_file.stream) as zip_archive:

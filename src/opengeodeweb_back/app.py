@@ -102,14 +102,14 @@ def run_server(app: Flask) -> None:
     parser.add_argument(
         "--host",
         type=str,
-        default=app.config.get("DEFAULT_HOST"),
+        default=app.config.get("HOST"),
         help="Host to run on",
     )
     parser.add_argument(
         "-p",
         "--port",
         type=int,
-        default=app.config.get("DEFAULT_PORT"),
+        default=app.config.get("PORT"),
         help="Port to listen on",
     )
     parser.add_argument(
@@ -120,17 +120,17 @@ def run_server(app: Flask) -> None:
         action="store_true",
     )
     parser.add_argument(
-        "-dfp",
-        "--data_folder_path",
+        "-pfp",
+        "--project_folder_path",
         type=str,
-        default=app.config.get("DEFAULT_DATA_FOLDER_PATH"),
-        help="Path to the folder where data is stored",
+        default=app.config.get("PROJECT_FOLDER_PATH"),
+        help="Path to the folder where the project is stored",
     )
     parser.add_argument(
         "-ufp",
         "--upload_folder_path",
         type=str,
-        default=app.config.get("UPLOAD_FOLDER"),
+        default=app.config.get("UPLOAD_FOLDER_PATH"),
         help="Path to the folder where uploads are stored",
     )
     parser.add_argument(
@@ -147,11 +147,8 @@ def run_server(app: Flask) -> None:
         help="Number of minutes before the server times out",
     )
     args, _ = parser.parse_known_args()
-    app.config.update(DATA_FOLDER_PATH=args.data_folder_path)
-    app.config.update(
-        EXTENSIONS_FOLDER_PATH=os.path.join(str(args.data_folder_path), "extensions")
-    )
-    app.config.update(UPLOAD_FOLDER=args.upload_folder_path)
+    app.config.update(PROJECT_FOLDER_PATH=args.project_folder_path)
+    app.config.update(UPLOAD_FOLDER_PATH=args.upload_folder_path)
     app.config.update(MINUTES_BEFORE_TIMEOUT=args.timeout)
     flask_cors.CORS(app, origins=args.allowed_origins)
     print(f"{args=}", flush=True)
