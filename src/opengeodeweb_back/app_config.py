@@ -28,7 +28,6 @@ class ProdConfig(Config):
     SECONDS_BETWEEN_SHUTDOWNS = "10"
     PROJECT_FOLDER_PATH = "/project"
 
-t
 class DevConfig(Config):
     SSL = None
     ORIGINS = "*"
