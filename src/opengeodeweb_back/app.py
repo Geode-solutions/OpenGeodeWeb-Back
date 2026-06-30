@@ -161,7 +161,7 @@ def run_server(app: Flask) -> None:
         app.config.update(ALLOWED_ORIGINS=args.allowed_origins)
     if "timeout" in args:
         app.config.update(MINUTES_BEFORE_TIMEOUT=args.timeout)
-    
+
     db_filename: str = app.config.get("DATABASE_FILENAME")
     db_path = os.path.join(str(app.config.get("DATA_FOLDER_PATH")), db_filename)
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
