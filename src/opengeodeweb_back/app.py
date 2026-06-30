@@ -98,7 +98,7 @@ def run_server(app: Flask) -> None:
     parser.add_argument(
         "-p",
         "--port",
-        type=int,
+        type=str,
         help="Port to listen on",
     )
     parser.add_argument(
