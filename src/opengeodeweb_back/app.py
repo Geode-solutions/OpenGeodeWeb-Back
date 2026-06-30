@@ -152,7 +152,6 @@ def run_server(app: Flask) -> None:
     else:
         app.config.from_object(app_config.ProdConfig(args.project_folder_path))
 
-    print(app.config, flush=True)
     if args.host is not None:
         app.config.update(HOST=args.host)
     else:
