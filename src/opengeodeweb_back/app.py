@@ -135,32 +135,60 @@ def run_server(app: Flask) -> None:
     parser.add_argument(
         "-t",
         "--timeout",
+
         help="Number of minutes before the server times out",
     )
     args, _ = parser.parse_known_args()
-    print(f"{args=}", flush=True)
 
-    if not "project_folder_path" in args:
+
+
+    if args.project_folder_path is None:
         raise ValueError("project_folder_path must be provided")
+    else:
+        args.project_folder_path = os.path.abspath(args.project_folder_path)
+
     if args.debug:
         app.config.from_object(app_config.DevConfig(args.project_folder_path))
     else:
         app.config.from_object(app_config.ProdConfig(args.project_folder_path))
 
-    if "host" in args:
+    print(app.config, flush=True)
+    if args.host is not None:
         app.config.update(HOST=args.host)
-    if "port" in args:
+    else:
+        args.host = app.config.get("HOST")
+
+    if args.port is not None:
         app.config.update(PORT=args.port)
-    if "debug" in args:
+    else:
+        args.port = app.config.get("PORT")
+
+    if args.debug is not None:
         app.config.update(FLASK_DEBUG=args.debug)
-    if "data_folder_path" in args:
+    else:
+        args.debug = app.config.get("FLASK_DEBUG")
+
+    if args.data_folder_path is not None:
         app.config.update(DATA_FOLDER_PATH=args.data_folder_path)
-    if "upload_folder_path" in args:
+    else:
+        args.data_folder_path = app.config.get("DATA_FOLDER_PATH")
+
+    if args.upload_folder_path is not None:
         app.config.update(UPLOAD_FOLDER_PATH=args.upload_folder_path)
-    if "allowed_origins" in args:
+    else:
+        args.upload_folder_path = app.config.get("UPLOAD_FOLDER_PATH")
+
+    if args.allowed_origins is not None:
         app.config.update(ALLOWED_ORIGINS=args.allowed_origins)
-    if "timeout" in args:
+    else:
+        args.allowed_origins = app.config.get("ALLOWED_ORIGINS")
+
+    if args.timeout is not None:
         app.config.update(MINUTES_BEFORE_TIMEOUT=args.timeout)
+    else:
+        args.timeout = app.config.get("MINUTES_BEFORE_TIMEOUT")
+
+    print(f"{args=}", flush=True)
 
     db_filename = app.config.get("DATABASE_FILENAME")
     if not isinstance(db_filename, str):
