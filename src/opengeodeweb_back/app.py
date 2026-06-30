@@ -150,7 +150,7 @@ def run_server(app: Flask) -> None:
     if "host" in args:
         app.config.update(HOST=args.host)
     if "port" in args:
-        app.config.update(HOST=args.port)
+        app.config.update(PORT=args.port)
     if "debug" in args:
         app.config.update(FLASK_DEBUG=args.debug)
     if "data_folder_path" in args:
