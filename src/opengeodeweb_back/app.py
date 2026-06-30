@@ -198,6 +198,8 @@ def run_server(app: Flask) -> None:
 
     connection.init_database(db_path)
     print(f"Database initialized at: {db_path}", flush=True)
+
+    flask_cors.CORS(app, origins=args.allowed_origins)
     app.run(
         debug=app.config.get("FLASK_DEBUG"),
         host=app.config.get("HOST"),
