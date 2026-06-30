@@ -135,12 +135,9 @@ def run_server(app: Flask) -> None:
     parser.add_argument(
         "-t",
         "--timeout",
-
         help="Number of minutes before the server times out",
     )
     args, _ = parser.parse_known_args()
-
-
 
     if args.project_folder_path is None:
         raise ValueError("project_folder_path must be provided")
