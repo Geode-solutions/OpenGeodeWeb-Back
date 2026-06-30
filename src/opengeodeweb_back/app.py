@@ -139,7 +139,7 @@ def run_server(app: Flask) -> None:
     )
     args, _ = parser.parse_known_args()
     print(f"{args=}", flush=True)
-    
+
     if not "project_folder_path" in args:
         raise ValueError("project_folder_path must be provided")
     if args.debug:
@@ -148,9 +148,9 @@ def run_server(app: Flask) -> None:
         app.config.from_object(app_config.ProdConfig(args.project_folder_path))
 
     if "host" in args:
-         app.config.update(HOST=args.host)
+        app.config.update(HOST=args.host)
     if "port" in args:
-         app.config.update(HOST=args.port)
+        app.config.update(HOST=args.port)
     if "debug" in args:
         app.config.update(FLASK_DEBUG=args.debug)
     if "data_folder_path" in args:
