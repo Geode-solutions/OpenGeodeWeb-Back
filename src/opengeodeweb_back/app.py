@@ -139,6 +139,7 @@ def run_server(app: Flask) -> None:
     )
     args, _ = parser.parse_known_args()
     print(f"{args=}", flush=True)
+    
     if not "project_folder_path" in args:
         raise ValueError("project_folder_path must be provided")
     if args.debug:
@@ -161,12 +162,7 @@ def run_server(app: Flask) -> None:
     if "timeout" in args:
         app.config.update(MINUTES_BEFORE_TIMEOUT=args.timeout)
     
-
-
-
-    
-
-    db_filename: str = app.config.get("DATABASE_FILENAME") or "project.db"
+    db_filename: str = app.config.get("DATABASE_FILENAME")
     db_path = os.path.join(str(app.config.get("DATA_FOLDER_PATH")), db_filename)
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
