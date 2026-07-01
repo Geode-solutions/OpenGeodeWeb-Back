@@ -87,104 +87,102 @@ def register_ogw_back_blueprints(app: flask.Flask) -> None:
 
 
 def run_server(app: Flask) -> None:
+    pre_parser = argparse.ArgumentParser(add_help=False)
+    pre_parser.add_argument(
+        "-d",
+        "--debug",
+        action="store_true",
+        default=False)
+    pre_parser.add_argument(
+        "-pfp",
+        "--project_folder_path",
+        type=str
+    )
+    pre_args, _ = pre_parser.parse_known_args()
+
+    if pre_args.project_folder_path is None:
+        raise ValueError("project_folder_path must be provided")
+    project_folder_path = os.path.abspath(pre_args.project_folder_path)
+
+    if pre_args.debug:
+        app.config.from_object(app_config.DevConfig(project_folder_path))
+    else:
+        app.config.from_object(app_config.ProdConfig(project_folder_path))
+
     parser = argparse.ArgumentParser(
         prog="OpenGeodeWeb-Back", description="Backend server for OpenGeodeWeb"
     )
     parser.add_argument(
         "--host",
+        default=app.config.get("HOST"),
         type=str,
-        help="Host to run on",
+        help="Host to run on"
     )
     parser.add_argument(
         "-p",
         "--port",
+        default=app.config.get("PORT"),
         type=str,
-        help="Port to listen on",
+        help="Port to listen on"
     )
     parser.add_argument(
         "-d",
         "--debug",
-        default=app.config.get("FLASK_DEBUG"),
-        help="Whether to run in debug mode",
+        default=pre_args.debug,
         action="store_true",
+        help="Whether to run in debug mode",
     )
     parser.add_argument(
         "-pfp",
         "--project_folder_path",
+        default=project_folder_path,
         type=str,
-        help="Path to the folder where the project is stored",
+        help="Path to the folder where the project is stored"
     )
     parser.add_argument(
         "-dfp",
         "--data_folder_path",
+        default=app.config.get("DATA_FOLDER_PATH"),
         type=str,
         help="Path to the folder where the data is stored",
     )
     parser.add_argument(
         "-ufp",
         "--upload_folder_path",
+        default=app.config.get("UPLOAD_FOLDER_PATH"),
         type=str,
         help="Path to the folder where uploads are stored",
     )
     parser.add_argument(
         "-origins",
         "--allowed_origins",
+        default=app.config.get("ORIGINS"),
         nargs="+",
         help="Origins that are allowed to connect to the server",
     )
     parser.add_argument(
         "-t",
         "--timeout",
+        default=app.config.get("MINUTES_BEFORE_TIMEOUT"),
+        type=int,
         help="Number of minutes before the server times out",
     )
-    args, _ = parser.parse_known_args()
+    args = parser.parse_args()
 
-    if args.project_folder_path is None:
-        raise ValueError("project_folder_path must be provided")
-    else:
-        args.project_folder_path = os.path.abspath(args.project_folder_path)
-
-    if args.debug:
-        app.config.from_object(app_config.DevConfig(args.project_folder_path))
-    else:
-        app.config.from_object(app_config.ProdConfig(args.project_folder_path))
-
-    if args.host is not None:
-        app.config.update(HOST=args.host)
-    else:
-        args.host = app.config.get("HOST")
-
-    if args.port is not None:
-        app.config.update(PORT=args.port)
-    else:
-        args.port = app.config.get("PORT")
-
-    if args.debug is not None:
-        app.config.update(FLASK_DEBUG=args.debug)
-    else:
-        args.debug = app.config.get("FLASK_DEBUG")
-
-    if args.data_folder_path is not None:
-        app.config.update(DATA_FOLDER_PATH=args.data_folder_path)
-    else:
-        args.data_folder_path = app.config.get("DATA_FOLDER_PATH")
-
-    if args.upload_folder_path is not None:
-        app.config.update(UPLOAD_FOLDER_PATH=args.upload_folder_path)
-    else:
-        args.upload_folder_path = app.config.get("UPLOAD_FOLDER_PATH")
-
-    if args.allowed_origins is not None:
-        app.config.update(ALLOWED_ORIGINS=args.allowed_origins)
-    else:
-        args.allowed_origins = app.config.get("ALLOWED_ORIGINS")
-
-    if args.timeout is not None:
-        app.config.update(MINUTES_BEFORE_TIMEOUT=args.timeout)
-    else:
-        args.timeout = app.config.get("MINUTES_BEFORE_TIMEOUT")
+    args.project_folder_path = os.path.abspath(args.project_folder_path)
 
     print(f"{args=}", flush=True)
+
+    app.config.update(
+        HOST=args.host,
+        PORT=args.port,
+        FLASK_DEBUG=args.debug,
+        PROJECT_FOLDER_PATH=args.project_folder_path,
+        DATA_FOLDER_PATH=args.data_folder_path,
+        UPLOAD_FOLDER_PATH=args.upload_folder_path,
+        ALLOWED_ORIGINS=args.allowed_origins,
+        MINUTES_BEFORE_TIMEOUT=args.timeout,
+    )
 
     db_filename = app.config.get("DATABASE_FILENAME")
     if not isinstance(db_filename, str):
