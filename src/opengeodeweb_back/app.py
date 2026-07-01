@@ -88,16 +88,8 @@ def register_ogw_back_blueprints(app: flask.Flask) -> None:
 
 def run_server(app: Flask) -> None:
     pre_parser = argparse.ArgumentParser(add_help=False)
-    pre_parser.add_argument(
-        "-d",
-        "--debug",
-        action="store_true",
-        default=False)
-    pre_parser.add_argument(
-        "-pfp",
-        "--project_folder_path",
-        type=str
-    )
+    pre_parser.add_argument("-d", "--debug", action="store_true", default=False)
+    pre_parser.add_argument("-pfp", "--project_folder_path", type=str)
     pre_args, _ = pre_parser.parse_known_args()
 
     if pre_args.project_folder_path is None:
@@ -113,17 +105,14 @@ def run_server(app: Flask) -> None:
         prog="OpenGeodeWeb-Back", description="Backend server for OpenGeodeWeb"
     )
     parser.add_argument(
-        "--host",
-        default=app.config.get("HOST"),
-        type=str,
-        help="Host to run on"
+        "--host", default=app.config.get("HOST"), type=str, help="Host to run on"
     )
     parser.add_argument(
         "-p",
         "--port",
         default=app.config.get("PORT"),
         type=str,
-        help="Port to listen on"
+        help="Port to listen on",
     )
     parser.add_argument(
         "-d",
@@ -137,7 +126,7 @@ def run_server(app: Flask) -> None:
         "--project_folder_path",
         default=project_folder_path,
         type=str,
-        help="Path to the folder where the project is stored"
+        help="Path to the folder where the project is stored",
     )
     parser.add_argument(
         "-dfp",
