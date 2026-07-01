@@ -18,15 +18,6 @@ from opengeodeweb_microservice.database import connection
 def create_app(name: str) -> flask.Flask:
     app = flask.Flask(name)
 
-    """ Config variables """
-    FLASK_DEBUG = (
-        True if os.environ.get("FLASK_DEBUG", default=None) == "True" else False
-    )
-    if FLASK_DEBUG == False:
-        app.config.from_object(app_config.ProdConfig)
-    else:
-        app.config.from_object(app_config.DevConfig)
-
     @app.before_request
     def before_request() -> flask.Response | None:
         if flask.request.method == "OPTIONS":
@@ -102,14 +93,12 @@ def run_server(app: Flask) -> None:
     parser.add_argument(
         "--host",
         type=str,
-        default=app.config.get("DEFAULT_HOST"),
         help="Host to run on",
     )
     parser.add_argument(
         "-p",
         "--port",
-        type=int,
-        default=app.config.get("DEFAULT_PORT"),
+        type=str,
         help="Port to listen on",
     )
     parser.add_argument(
@@ -120,54 +109,101 @@ def run_server(app: Flask) -> None:
         action="store_true",
     )
     parser.add_argument(
+        "-pfp",
+        "--project_folder_path",
+        type=str,
+        help="Path to the folder where the project is stored",
+    )
+    parser.add_argument(
         "-dfp",
         "--data_folder_path",
         type=str,
-        default=app.config.get("DEFAULT_DATA_FOLDER_PATH"),
-        help="Path to the folder where data is stored",
+        help="Path to the folder where the data is stored",
     )
     parser.add_argument(
         "-ufp",
         "--upload_folder_path",
         type=str,
-        default=app.config.get("UPLOAD_FOLDER"),
         help="Path to the folder where uploads are stored",
     )
     parser.add_argument(
         "-origins",
         "--allowed_origins",
         nargs="+",
-        default=app.config.get("ORIGINS"),
         help="Origins that are allowed to connect to the server",
     )
     parser.add_argument(
         "-t",
         "--timeout",
-        default=app.config.get("MINUTES_BEFORE_TIMEOUT"),
         help="Number of minutes before the server times out",
     )
     args, _ = parser.parse_known_args()
-    app.config.update(DATA_FOLDER_PATH=args.data_folder_path)
-    app.config.update(
-        EXTENSIONS_FOLDER_PATH=os.path.join(str(args.data_folder_path), "extensions")
-    )
-    app.config.update(UPLOAD_FOLDER=args.upload_folder_path)
-    app.config.update(MINUTES_BEFORE_TIMEOUT=args.timeout)
-    flask_cors.CORS(app, origins=args.allowed_origins)
+
+    if args.project_folder_path is None:
+        raise ValueError("project_folder_path must be provided")
+    else:
+        args.project_folder_path = os.path.abspath(args.project_folder_path)
+
+    if args.debug:
+        app.config.from_object(app_config.DevConfig(args.project_folder_path))
+    else:
+        app.config.from_object(app_config.ProdConfig(args.project_folder_path))
+
+    if args.host is not None:
+        app.config.update(HOST=args.host)
+    else:
+        args.host = app.config.get("HOST")
+
+    if args.port is not None:
+        app.config.update(PORT=args.port)
+    else:
+        args.port = app.config.get("PORT")
+
+    if args.debug is not None:
+        app.config.update(FLASK_DEBUG=args.debug)
+    else:
+        args.debug = app.config.get("FLASK_DEBUG")
+
+    if args.data_folder_path is not None:
+        app.config.update(DATA_FOLDER_PATH=args.data_folder_path)
+    else:
+        args.data_folder_path = app.config.get("DATA_FOLDER_PATH")
+
+    if args.upload_folder_path is not None:
+        app.config.update(UPLOAD_FOLDER_PATH=args.upload_folder_path)
+    else:
+        args.upload_folder_path = app.config.get("UPLOAD_FOLDER_PATH")
+
+    if args.allowed_origins is not None:
+        app.config.update(ALLOWED_ORIGINS=args.allowed_origins)
+    else:
+        args.allowed_origins = app.config.get("ALLOWED_ORIGINS")
+
+    if args.timeout is not None:
+        app.config.update(MINUTES_BEFORE_TIMEOUT=args.timeout)
+    else:
+        args.timeout = app.config.get("MINUTES_BEFORE_TIMEOUT")
+
     print(f"{args=}", flush=True)
 
-    db_filename: str = app.config.get("DATABASE_FILENAME") or "project.db"
-    db_path = os.path.join(str(args.data_folder_path), db_filename)
+    db_filename = app.config.get("DATABASE_FILENAME")
+    if not isinstance(db_filename, str):
+        raise TypeError(
+            f"DATABASE_FILENAME config must be a string, got {db_filename!r}"
+        )
+    db_path = os.path.join(str(app.config.get("DATA_FOLDER_PATH")), db_filename)
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     connection.init_database(db_path)
     print(f"Database initialized at: {db_path}", flush=True)
+
+    flask_cors.CORS(app, origins=args.allowed_origins)
     app.run(
-        debug=args.debug,
-        host=args.host,
-        port=args.port,
+        debug=app.config.get("FLASK_DEBUG"),
+        host=app.config.get("HOST"),
+        port=app.config.get("PORT"),
         ssl_context=app.config.get("SSL"),
     )
 

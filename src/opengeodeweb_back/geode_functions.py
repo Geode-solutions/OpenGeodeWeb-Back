@@ -46,7 +46,7 @@ def get_data_info(data_id: str) -> Data:
 
 
 def upload_file_path(filename: str) -> str:
-    upload_folder = flask.current_app.config["UPLOAD_FOLDER"]
+    upload_folder = flask.current_app.config["UPLOAD_FOLDER_PATH"]
     secure_filename = werkzeug.utils.secure_filename(filename)
     return os.path.abspath(os.path.join(upload_folder, secure_filename))
 
