@@ -185,11 +185,11 @@ def inspect_file() -> flask.Response:
     )
     params = schemas.InspectFile.from_dict(json_data)
     file_path = geode_functions.upload_file_path(params.filename)
-    geode_object_class = geode_functions.geode_object_from_string(
+    geode_object = geode_functions.geode_object_from_string(
         params.geode_object_type
     )
     try:
-        validity_result = geode_object_class.validate(file_path)
+        validity_result = geode_object.validate(file_path)
         nb_issues = validity_result.nb_issues()
     except NotImplementedError:
         nb_issues = 0
