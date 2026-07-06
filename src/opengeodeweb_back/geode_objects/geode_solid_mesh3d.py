@@ -36,6 +36,10 @@ class GeodeSolidMesh3D(GeodeVertexSet):
     def inspect(self) -> og_inspector.SolidInspectionResult:
         return og_inspector.inspect_solid3D(self.solid_mesh)
 
+    @classmethod
+    def validate(cls, filename: str) -> og_inspector.ObjectValidity:
+        return og_inspector.is_solid_valid3D(cls.load(filename).solid_mesh)  # type: ignore[attr-defined]
+
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
     ) -> None:

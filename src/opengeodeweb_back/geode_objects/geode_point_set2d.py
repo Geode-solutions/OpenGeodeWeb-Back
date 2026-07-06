@@ -80,6 +80,10 @@ class GeodePointSet2D(GeodeVertexSet):
     def inspect(self) -> og_inspector.PointSetInspectionResult:
         return og_inspector.inspect_point_set2D(self.point_set)
 
+    @classmethod
+    def validate(cls, filename: str) -> og_inspector.ObjectValidity:
+        return og_inspector.is_pointset_valid2D(cls.load(filename).point_set)
+
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
     ) -> None:

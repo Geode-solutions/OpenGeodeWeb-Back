@@ -84,3 +84,7 @@ class GeodeObject(ABC):
 
     @abstractmethod
     def inspect(self) -> Any: ...
+
+    @classmethod
+    def validate(cls, filename: str) -> Any:
+        raise NotImplementedError

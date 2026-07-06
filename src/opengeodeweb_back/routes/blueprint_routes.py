@@ -185,43 +185,24 @@ def inspect_file() -> flask.Response:
     )
     params = schemas.InspectFile.from_dict(json_data)
     file_path = geode_functions.upload_file_path(params.filename)
-    geode_object = geode_functions.geode_object_from_string(
+    geode_object_class = geode_functions.geode_object_from_string(
         params.geode_object_type
-    ).load(file_path)
-    inspection_data = geode_object.inspect()
-    inspection_result = extract_inspector_result(inspection_data)
-    return flask.make_response({"inspection_result": inspection_result}, 200)
+    )
+    try:
+        validity_result = geode_object_class.validate(file_path)
+        nb_issues = validity_result.nb_issues()
+    except NotImplementedError:
+        nb_issues = 0
 
-
-def extract_inspector_result(inspection_data: Any) -> dict[str, Any]:
-    new_object = {}
-
-    if hasattr(inspection_data, "inspection_type"):
-        new_object["title"] = inspection_data.inspection_type()
-        new_object["nb_issues"] = 0
-        new_object["children"] = []
-        for child in dir(inspection_data):
-            if child.startswith("__") or child in [
-                "inspection_type",
-                "string",
-                "nb_issues",
-            ]:
-                continue
-            child_instance = getattr(inspection_data, child)
-            if callable(child_instance):
-                continue
-            child_object = extract_inspector_result(child_instance)
-            new_object["children"].append(child_object)
-            if "nb_issues" in child_object:
-                new_object["nb_issues"] += child_object["nb_issues"]
-    elif hasattr(inspection_data, "description"):
-        new_object["title"] = inspection_data.description()
-        nb_issues = inspection_data.nb_issues()
-        new_object["nb_issues"] = nb_issues
-        if nb_issues > 0:
-            issues = inspection_data.string().split("\n")
-            new_object["issues"] = issues
-    return new_object
+    return flask.make_response(
+        {
+            "inspection_result": {
+                "title": "Geometry Validity",
+                "nb_issues": nb_issues,
+            }
+        },
+        200,
+    )
 
 
 @routes.route(
