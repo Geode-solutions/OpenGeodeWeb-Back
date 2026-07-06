@@ -95,8 +95,8 @@ class GeodeBRep(GeodeModel):
         return og_inspector.inspect_brep(self.brep)
 
     @classmethod
-    def validate(cls, filename: str) -> og_inspector.ObjectValidity:
-        return og_inspector.is_brep_valid(cls.load(filename).brep)
+    def validate(geode_object_class, filename: str) -> og_inspector.ObjectValidity:
+        return og_inspector.is_brep_valid(geode_object_class.load(filename).brep)
 
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo

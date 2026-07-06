@@ -81,8 +81,8 @@ class GeodePointSet3D(GeodeVertexSet):
         return og_inspector.inspect_point_set3D(self.point_set)
 
     @classmethod
-    def validate(cls, filename: str) -> og_inspector.ObjectValidity:
-        return og_inspector.is_pointset_valid3D(cls.load(filename).point_set)
+    def validate(geode_object_class, filename: str) -> og_inspector.ObjectValidity:
+        return og_inspector.is_pointset_valid3D(geode_object_class.load(filename).point_set)
 
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
