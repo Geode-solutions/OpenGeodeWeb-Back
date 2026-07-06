@@ -84,7 +84,9 @@ class GeodeEdgedCurve3D(GeodeGraph):
 
     @classmethod
     def validate(geode_object_class, filename: str) -> og_inspector.ObjectValidity:
-        return og_inspector.is_edged_curve_valid3D(geode_object_class.load(filename).edged_curve)
+        return og_inspector.is_edged_curve_valid3D(
+            geode_object_class.load(filename).edged_curve
+        )
 
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
