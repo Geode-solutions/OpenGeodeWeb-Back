@@ -96,9 +96,8 @@ class GeodeSection(GeodeModel):
     def inspect(self) -> og_inspector.SectionInspectionResult:
         return og_inspector.inspect_section(self.section)
 
-    @classmethod
-    def validate(geode_object_class, filename: str) -> og_inspector.ObjectValidity:
-        return og_inspector.is_section_valid(geode_object_class.load(filename).section)
+    def validate(self) -> og_inspector.ObjectValidity:
+        return og_inspector.is_section_valid(self.section)
 
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo

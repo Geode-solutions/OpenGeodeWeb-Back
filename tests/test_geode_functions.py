@@ -26,6 +26,11 @@ def test_input_output() -> None:
             if generic_geode_object.is_loadable(file_absolute_path).value() == 0.0:
                 continue
             geode_object = generic_geode_object.load(file_absolute_path)
+            try:
+                validity = geode_object.validate()
+                assert type(validity.nb_issues()) is int
+            except TypeError:
+                pass
             data_name = geode_object.identifier.name() or os.path.basename(
                 file_absolute_path
             )

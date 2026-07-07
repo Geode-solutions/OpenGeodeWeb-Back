@@ -174,35 +174,6 @@ def crs_converter_geographic_coordinate_systems() -> flask.Response:
         crs_list.append(crs)
     return flask.make_response({"crs_list": crs_list}, 200)
 
-
-@routes.route(
-    schemas_dict["inspect_file"]["route"],
-    methods=schemas_dict["inspect_file"]["methods"],
-)
-def inspect_file() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["inspect_file"]
-    )
-    params = schemas.InspectFile.from_dict(json_data)
-    file_path = geode_functions.upload_file_path(params.filename)
-    geode_object = geode_functions.geode_object_from_string(params.geode_object_type)
-    try:
-        validity_result = geode_object.validate(file_path)
-        nb_issues = validity_result.nb_issues()
-    except NotImplementedError:
-        nb_issues = 0
-
-    return flask.make_response(
-        {
-            "inspection_result": {
-                "title": "Geometry Validity",
-                "nb_issues": nb_issues,
-            }
-        },
-        200,
-    )
-
-
 @routes.route(
     schemas_dict["geode_objects_and_output_extensions"]["route"],
     methods=schemas_dict["geode_objects_and_output_extensions"]["methods"],

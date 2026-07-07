@@ -121,27 +121,6 @@ def test_geographic_coordinate_systems(client: FlaskClient) -> None:
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_inspect_file(client: FlaskClient) -> None:
-    route = f"/opengeodeweb_back/inspect_file"
-
-    def get_full_data() -> test_utils.JsonData:
-        return {
-            "geode_object_type": "BRep",
-            "filename": "corbi.og_brep",
-        }
-
-    json = get_full_data()
-
-    # Normal test with geode_object 'BRep'
-    response = client.post(route, json=json)
-    assert response.status_code == 200
-    inspection_result = response.get_json()["inspection_result"]
-    assert type(inspection_result) is dict
-
-    # Test all params
-    test_utils.test_route_wrong_params(client, route, get_full_data)
-
-
 def test_geode_objects_and_output_extensions(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/geode_objects_and_output_extensions"
 
