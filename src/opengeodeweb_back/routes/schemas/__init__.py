@@ -1,4 +1,5 @@
 from .vertex_attribute_names import *
+from .validate import *
 from .upload_file import *
 from .texture_coordinates import *
 from .save_viewable_file import *

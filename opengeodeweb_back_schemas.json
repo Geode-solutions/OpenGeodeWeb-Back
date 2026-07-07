@@ -158,6 +158,7 @@
         "additionalProperties": false
       }
     },
+    "models": {},
     "vertex_attribute_names": {
       "$id": "opengeodeweb_back/vertex_attribute_names",
       "route": "/vertex_attribute_names",
@@ -169,6 +170,23 @@
         "id": {
           "type": "string",
           "minLength": 1
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "validate": {
+      "$id": "opengeodeweb_back/validate",
+      "route": "/validate",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
         }
       },
       "required": [

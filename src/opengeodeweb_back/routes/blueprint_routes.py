@@ -176,6 +176,25 @@ def crs_converter_geographic_coordinate_systems() -> flask.Response:
 
 
 @routes.route(
+    schemas_dict["validate"]["route"],
+    methods=schemas_dict["validate"]["methods"],
+)
+def validate_object() -> flask.Response:
+    utils_functions.validate_request(flask.request, schemas_dict["validate"])
+    params = schemas.Validate.from_dict(flask.request.get_json())
+    geode_object = geode_functions.load_geode_object(params.id)
+    validity = geode_object.validate()
+    return flask.make_response(
+        {
+            "is_valid": validity.nb_issues() == 0,
+            "nb_issues": validity.nb_issues(),
+            "issues": validity.invalidities,
+        },
+        200,
+    )
+
+
+@routes.route(
     schemas_dict["geode_objects_and_output_extensions"]["route"],
     methods=schemas_dict["geode_objects_and_output_extensions"]["methods"],
 )

@@ -121,6 +121,32 @@ def test_geographic_coordinate_systems(client: FlaskClient) -> None:
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
+def test_validate_object(client: FlaskClient) -> None:
+    response_save = test_save_viewable_file(client, "BRep", "cube.og_brep")
+    assert response_save.status_code == 200
+    model_id = response_save.get_json()["id"]
+    response = client.post("/opengeodeweb_back/validate", json={"id": model_id})
+    assert response.status_code == 200
+    json_data = response.get_json()
+    assert json_data["is_valid"] is True
+    assert json_data["nb_issues"] == 0
+    assert type(json_data["issues"]) is list
+
+
+def test_validate_invalid_object(client: FlaskClient) -> None:
+    response_save = test_save_viewable_file(
+        client, "BRep", "wrong_boundary_surface_model.og_brep"
+    )
+    assert response_save.status_code == 200
+    model_id = response_save.get_json()["id"]
+    response = client.post("/opengeodeweb_back/validate", json={"id": model_id})
+    assert response.status_code == 200
+    json_data = response.get_json()
+    assert json_data["is_valid"] is False
+    assert json_data["nb_issues"] == 1
+    assert type(json_data["issues"]) is list
+
+
 def test_geode_objects_and_output_extensions(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/geode_objects_and_output_extensions"
 
