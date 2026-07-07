@@ -280,7 +280,9 @@ def texture_coordinates() -> flask.Response:
     return flask.make_response({"texture_coordinates": texture_coordinates}, 200)
 
 
-def attributes_metadata(manager: og.AttributeManager) -> list[dict[str, str | int | float | list[float]]]:
+def attributes_metadata(
+    manager: og.AttributeManager,
+) -> list[dict[str, str | int | float | list[float]]]:
     attributes: list[dict[str, str | int | float | list[float]]] = []
     nb_elements = manager.nb_elements()
     for name in manager.attribute_names():
@@ -292,8 +294,15 @@ def attributes_metadata(manager: og.AttributeManager) -> list[dict[str, str | in
             nb_items = attribute.nb_items()
             min_values, max_values = [], []
             for item in range(nb_items):
-                values = [attribute.generic_item_value(idx, item) for idx in range(nb_elements)]
-                valid = [value for value in values if value is not None and not math.isnan(value)]
+                values = [
+                    attribute.generic_item_value(idx, item)
+                    for idx in range(nb_elements)
+                ]
+                valid = [
+                    value
+                    for value in values
+                    if value is not None and not math.isnan(value)
+                ]
                 min_values.append(min(valid) if valid else -1.0)
                 max_values.append(max(valid) if valid else -1.0)
             min_value, max_value = min_values[0], max_values[0]
