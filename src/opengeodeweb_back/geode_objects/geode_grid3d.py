@@ -31,7 +31,7 @@ class GeodeGrid3D(GeodeMesh):
         return None
 
     def validate(self) -> og_inspector.ObjectValidity:
-        result=og_inspector.ObjectValidity()
+        result = og_inspector.ObjectValidity()
         return result
 
     @abstractmethod

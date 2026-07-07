@@ -406,29 +406,6 @@
       "required": [],
       "additionalProperties": false
     },
-    "inspect_file": {
-      "$id": "opengeodeweb_back/inspect_file",
-      "route": "/inspect_file",
-      "methods": [
-        "POST"
-      ],
-      "type": "object",
-      "properties": {
-        "filename": {
-          "type": "string",
-          "minLength": 1
-        },
-        "geode_object_type": {
-          "type": "string",
-          "minLength": 1
-        }
-      },
-      "required": [
-        "filename",
-        "geode_object_type"
-      ],
-      "additionalProperties": false
-    },
     "import_project": {
       "$id": "opengeodeweb_back/import_project",
       "route": "/import_project",

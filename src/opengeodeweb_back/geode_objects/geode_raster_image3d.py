@@ -85,7 +85,7 @@ class GeodeRasterImage3D(GeodeMesh):
 
     def inspect(self) -> None:
         return None
-    
+
     def validate(self) -> og_inspector.ObjectValidity:
         result = og_inspector.ObjectValidity()
         return result
