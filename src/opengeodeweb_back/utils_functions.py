@@ -286,15 +286,20 @@ def save_all_viewables_and_return_info(
                 ),
             ],
         )
-        with open(light_path, "rb") as f:
-            binary_light_viewable = f.read()
+        if geode_object.is_viewable():
+            with open(light_path, "rb") as f:
+                binary_light_viewable = f.read()
+            binary_light_viewable_str = binary_light_viewable.decode("utf-8")
+            data.viewable_file = os.path.basename(viewable_path)
+            data.light_viewable_file = os.path.basename(light_path)
+        else:
+            binary_light_viewable_str = ""
+            data.viewable_file = ""
+            data.light_viewable_file = ""
+
         data.native_file = os.path.basename(native_files[0])
-        data.viewable_file = os.path.basename(viewable_path)
-        data.light_viewable_file = os.path.basename(light_path)
 
         assert data.native_file is not None
-        assert data.viewable_file is not None
-        assert data.light_viewable_file is not None
         name = geode_object.identifier.name()
         if not name:
             flask.abort(400, "Geode object has no name defined.")
@@ -305,12 +310,12 @@ def save_all_viewables_and_return_info(
             "id": data.id,
             "name": name,
             "viewer_type": data.viewer_object,
-            "binary_light_viewable": binary_light_viewable.decode("utf-8"),
+            "binary_light_viewable": binary_light_viewable_str,
             "geode_object_type": data.geode_object,
         }
         if isinstance(geode_object, GeodeVertexSet):
             response["nb_vertices"] = geode_object.vertex_set.nb_vertices()
-        if isinstance(geode_object, GeodeModel):
+        if isinstance(geode_object, GeodeModel) and geode_object.is_viewable():
             response |= model_components(data.id, geode_object, data.viewable_file)
         return response
 
