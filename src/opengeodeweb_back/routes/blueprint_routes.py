@@ -483,8 +483,7 @@ def ping() -> flask.Response:
 def kill() -> flask.Response:
     print("Manual server kill, shutting down...", flush=True)
     utils_functions.teardown_request(flask.current_app)
-    Timer(1.5, os._exit, [0]).start()
-
+    Timer(0.5, os._exit, [0]).start()
     return flask.make_response({"message": "Flask server is dead"}, 200)
 
 
