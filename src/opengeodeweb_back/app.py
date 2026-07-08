@@ -64,12 +64,6 @@ def create_app(name: str) -> flask.Flask:
     def root() -> Response:
         return flask.make_response({}, 200)
 
-    @app.route("/kill", methods=["POST"])
-    @cross_origin()
-    def kill() -> None:
-        print("Manual server kill, shutting down...", flush=True)
-        Timer(0.5, os._exit, [0]).start()
-
     return app
 
 
