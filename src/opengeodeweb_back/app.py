@@ -68,7 +68,7 @@ def create_app(name: str) -> flask.Flask:
     @cross_origin()
     def kill() -> None:
         print("Manual server kill, shutting down...", flush=True)
-        Timer(1.5, os._exit, [0]).start()
+        Timer(0.5, os._exit, [0]).start()
 
     return app
 
