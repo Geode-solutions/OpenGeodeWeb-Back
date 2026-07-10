@@ -176,52 +176,22 @@ def crs_converter_geographic_coordinate_systems() -> flask.Response:
 
 
 @routes.route(
-    schemas_dict["inspect_file"]["route"],
-    methods=schemas_dict["inspect_file"]["methods"],
+    schemas_dict["validate"]["route"],
+    methods=schemas_dict["validate"]["methods"],
 )
-def inspect_file() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["inspect_file"]
+def validate_object() -> flask.Response:
+    utils_functions.validate_request(flask.request, schemas_dict["validate"])
+    params = schemas.Validate.from_dict(flask.request.get_json())
+    geode_object = geode_functions.load_geode_object(params.id)
+    validity = geode_object.validate()
+    return flask.make_response(
+        {
+            "is_valid": validity.nb_issues() == 0,
+            "nb_issues": validity.nb_issues(),
+            "issues": validity.invalidities,
+        },
+        200,
     )
-    params = schemas.InspectFile.from_dict(json_data)
-    file_path = geode_functions.upload_file_path(params.filename)
-    geode_object = geode_functions.geode_object_from_string(
-        params.geode_object_type
-    ).load(file_path)
-    inspection_data = geode_object.inspect()
-    inspection_result = extract_inspector_result(inspection_data)
-    return flask.make_response({"inspection_result": inspection_result}, 200)
-
-
-def extract_inspector_result(inspection_data: Any) -> dict[str, Any]:
-    new_object = {}
-
-    if hasattr(inspection_data, "inspection_type"):
-        new_object["title"] = inspection_data.inspection_type()
-        new_object["nb_issues"] = 0
-        new_object["children"] = []
-        for child in dir(inspection_data):
-            if child.startswith("__") or child in [
-                "inspection_type",
-                "string",
-                "nb_issues",
-            ]:
-                continue
-            child_instance = getattr(inspection_data, child)
-            if callable(child_instance):
-                continue
-            child_object = extract_inspector_result(child_instance)
-            new_object["children"].append(child_object)
-            if "nb_issues" in child_object:
-                new_object["nb_issues"] += child_object["nb_issues"]
-    elif hasattr(inspection_data, "description"):
-        new_object["title"] = inspection_data.description()
-        nb_issues = inspection_data.nb_issues()
-        new_object["nb_issues"] = nb_issues
-        if nb_issues > 0:
-            issues = inspection_data.string().split("\n")
-            new_object["issues"] = issues
-    return new_object
 
 
 @routes.route(
@@ -529,8 +499,7 @@ def ping() -> flask.Response:
 def kill() -> flask.Response:
     print("Manual server kill, shutting down...", flush=True)
     utils_functions.teardown_request(flask.current_app)
-    Timer(1.5, os._exit, [0]).start()
-
+    Timer(0.5, os._exit, [0]).start()
     return flask.make_response({"message": "Flask server is dead"}, 200)
 
 

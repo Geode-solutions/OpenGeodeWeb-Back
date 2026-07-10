@@ -63,3 +63,23 @@ def test_input_output() -> None:
                         assert type(saved_files) is list
                         for saved_file in saved_files:
                             os.remove(saved_file)
+
+
+def test_validate() -> None:
+    # Test on BRep (uses is_brep_valid)
+    brep_path = os.path.join(data_folder, "cube.og_brep")
+    brep_object = geode_objects["BRep"].load(brep_path)
+    brep_validity = brep_object.validate()
+    assert type(brep_validity.nb_issues()) is int
+
+    # Test on PointSet2D (uses is_pointset_valid2D)
+    pts_path = os.path.join(data_folder, "test.og_pts2d")
+    pts_object = geode_objects["PointSet2D"].load(pts_path)
+    pts_validity = pts_object.validate()
+    assert type(pts_validity.nb_issues()) is int
+
+    # Test on CrossSection (uses is_section_valid)
+    section_path = os.path.join(data_folder, "test.og_xsctn")
+    section_object = geode_objects["CrossSection"].load(section_path)
+    section_validity = section_object.validate()
+    assert type(section_validity.nb_issues()) is int

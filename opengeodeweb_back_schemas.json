@@ -176,6 +176,23 @@
       ],
       "additionalProperties": false
     },
+    "validate": {
+      "$id": "opengeodeweb_back/validate",
+      "route": "/validate",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
     "upload_file": {
       "$id": "opengeodeweb_back/upload_file",
       "route": "/upload_file",
@@ -404,29 +421,6 @@
       "type": "object",
       "properties": {},
       "required": [],
-      "additionalProperties": false
-    },
-    "inspect_file": {
-      "$id": "opengeodeweb_back/inspect_file",
-      "route": "/inspect_file",
-      "methods": [
-        "POST"
-      ],
-      "type": "object",
-      "properties": {
-        "filename": {
-          "type": "string",
-          "minLength": 1
-        },
-        "geode_object_type": {
-          "type": "string",
-          "minLength": 1
-        }
-      },
-      "required": [
-        "filename",
-        "geode_object_type"
-      ],
       "additionalProperties": false
     },
     "import_project": {
