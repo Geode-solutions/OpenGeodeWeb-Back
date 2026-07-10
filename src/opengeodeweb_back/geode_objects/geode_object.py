@@ -5,6 +5,7 @@ from typing import Any
 
 # Third party imports
 import opengeode as og
+import opengeode_inspector as og_inspector
 from opengeodeweb_microservice.database.data_types import (
     GeodeObjectType,
     ViewerType,
@@ -84,3 +85,6 @@ class GeodeObject(ABC):
 
     @abstractmethod
     def inspect(self) -> Any: ...
+
+    @abstractmethod
+    def validate(self) -> og_inspector.ObjectValidity: ...
