@@ -270,22 +270,23 @@ def save_all_viewables_and_return_info(
     data_path: str,
 ) -> dict[str, Any]:
     with ThreadPoolExecutor() as executor:
-        native_files, viewable_path, light_path = executor.map(
-            lambda args: args[0](args[1]),
-            [
-                (
-                    geode_object.save,
-                    os.path.join(
-                        data_path, "native." + geode_object.native_extension()
-                    ),
-                ),
+        tasks = [
+            (
+                geode_object.save,
+                os.path.join(data_path, "native." + geode_object.native_extension()),
+            )
+        ]
+        if geode_object.is_viewable():
+            tasks.extend([
                 (geode_object.save_viewable, os.path.join(data_path, "viewable")),
-                (
-                    geode_object.save_light_viewable,
-                    os.path.join(data_path, "light_viewable"),
-                ),
-            ],
-        )
+                (geode_object.save_light_viewable, os.path.join(data_path, "light_viewable")),
+            ])
+        
+        results = list(executor.map(lambda args: args[0](args[1]), tasks))
+        native_files = results[0]
+        if geode_object.is_viewable():
+            viewable_path = results[1]
+            light_path = results[2]
         if geode_object.is_viewable():
             with open(light_path, "rb") as f:
                 binary_light_viewable = f.read()
@@ -293,7 +294,7 @@ def save_all_viewables_and_return_info(
             data.viewable_file = os.path.basename(viewable_path)
             data.light_viewable_file = os.path.basename(light_path)
         else:
-            binary_light_viewable_str = ""
+            binary_light_viewable_str = "not_viewable"
             data.viewable_file = ""
             data.light_viewable_file = ""
 
