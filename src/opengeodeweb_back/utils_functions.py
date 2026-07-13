@@ -277,11 +277,16 @@ def save_all_viewables_and_return_info(
             )
         ]
         if geode_object.is_viewable():
-            tasks.extend([
-                (geode_object.save_viewable, os.path.join(data_path, "viewable")),
-                (geode_object.save_light_viewable, os.path.join(data_path, "light_viewable")),
-            ])
-        
+            tasks.extend(
+                [
+                    (geode_object.save_viewable, os.path.join(data_path, "viewable")),
+                    (
+                        geode_object.save_light_viewable,
+                        os.path.join(data_path, "light_viewable"),
+                    ),
+                ]
+            )
+
         results = list(executor.map(lambda args: args[0](args[1]), tasks))
         native_files = results[0]
         if geode_object.is_viewable():
