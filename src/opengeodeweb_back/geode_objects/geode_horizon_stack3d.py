@@ -13,8 +13,14 @@ from .geode_model import GeodeModel, ComponentRegistry
 class GeodeHorizonStack3D(GeodeModel):
     horizon_stack: og_geosciences.HorizonsStack3D
 
-    def __init__(self, horizon_stack: og_geosciences.HorizonsStack3D | None = None) -> None:
-        self.horizon_stack = horizon_stack if horizon_stack is not None else og_geosciences.HorizonsStack3D()
+    def __init__(
+        self, horizon_stack: og_geosciences.HorizonsStack3D | None = None
+    ) -> None:
+        self.horizon_stack = (
+            horizon_stack
+            if horizon_stack is not None
+            else og_geosciences.HorizonsStack3D()
+        )
         super().__init__(self.horizon_stack)
 
     @classmethod
@@ -30,7 +36,7 @@ class GeodeHorizonStack3D(GeodeModel):
 
     @classmethod
     def is_viewable(cls) -> bool:
-        return False # Or True if there's a viewable output
+        return False  # Or True if there's a viewable output
 
     def builder(self) -> og_geosciences.HorizonsStackBuilder3D:
         return og_geosciences.HorizonsStackBuilder3D(self.horizon_stack)
@@ -72,7 +78,9 @@ class GeodeHorizonStack3D(GeodeModel):
 
     def is_saveable(self, filename: str) -> bool:
         if hasattr(og_geosciences, "is_horizons_stack_saveable3D"):
-            return og_geosciences.is_horizons_stack_saveable3D(self.horizon_stack, filename)
+            return og_geosciences.is_horizons_stack_saveable3D(
+                self.horizon_stack, filename
+            )
         return True
 
     def save(self, filename: str) -> list[str]:
@@ -102,7 +110,7 @@ class GeodeHorizonStack3D(GeodeModel):
         return []
 
     def component(self, id: og.uuid) -> og.Component3D:
-        return None # Needs proper implementation if HorizonsStack contains components
+        return None  # Needs proper implementation if HorizonsStack contains components
 
     def inspect(self) -> None:
         return None
