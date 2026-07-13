@@ -1,4 +1,5 @@
 from .vertex_attribute_names import *
+from .validate import *
 from .upload_file import *
 from .texture_coordinates import *
 from .save_viewable_file import *
@@ -11,7 +12,6 @@ from .model_component_polygon_attribute_names import *
 from .model_component_edge_attribute_names import *
 from .missing_files import *
 from .kill import *
-from .inspect_file import *
 from .import_project import *
 from .geographic_coordinate_systems import *
 from .geode_objects_and_output_extensions import *

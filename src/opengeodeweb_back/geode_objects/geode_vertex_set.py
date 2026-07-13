@@ -3,6 +3,7 @@ from __future__ import annotations
 
 # Third party imports
 import opengeode as og
+import opengeode_inspector as og_inspector
 from opengeodeweb_microservice.database.data_types import (
     GeodeMeshType,
     ViewerElementsType,
@@ -81,6 +82,10 @@ class GeodeVertexSet(GeodeMesh):
 
     def inspect(self) -> object:
         return None
+
+    def validate(self) -> og_inspector.ObjectValidity:
+        result = og_inspector.ObjectValidity()
+        return result
 
     def vertex_attribute_manager(self) -> og.AttributeManager:
         return self.vertex_set.vertex_attribute_manager()
