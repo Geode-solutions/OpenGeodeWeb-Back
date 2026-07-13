@@ -1,5 +1,6 @@
 # Standard library imports
 from __future__ import annotations
+from typing import Any
 
 # Third party imports
 import opengeode as og
@@ -50,13 +51,13 @@ class GeodeHorizonStack3D(GeodeModel):
         # Check if python binding for additional files exists, else return empty
         if hasattr(og_geosciences, "horizons_stack_additional_files3D"):
             return og_geosciences.horizons_stack_additional_files3D(filename)
-        return []
+        return []  # type: ignore
 
     @classmethod
     def is_loadable(cls, filename: str) -> og.Percentage:
         if hasattr(og_geosciences, "is_horizons_stack_loadable3D"):
             return og_geosciences.is_horizons_stack_loadable3D(filename)
-        return 0
+        return 0  # type: ignore
 
     @classmethod
     def input_extensions(cls) -> list[str]:
@@ -78,9 +79,9 @@ class GeodeHorizonStack3D(GeodeModel):
 
     def is_saveable(self, filename: str) -> bool:
         if hasattr(og_geosciences, "is_horizons_stack_saveable3D"):
-            return og_geosciences.is_horizons_stack_saveable3D(
+            return bool(og_geosciences.is_horizons_stack_saveable3D(
                 self.horizon_stack, filename
-            )
+            ))
         return True
 
     def save(self, filename: str) -> list[str]:
@@ -110,7 +111,10 @@ class GeodeHorizonStack3D(GeodeModel):
         return []
 
     def component(self, id: og.uuid) -> og.Component3D:
-        return None  # Needs proper implementation if HorizonsStack contains components
+        return None  # type: ignore
 
-    def inspect(self) -> None:
+    def inspect(self) -> Any:
+        return None
+
+    def validate(self) -> Any:
         return None

@@ -270,7 +270,7 @@ def save_all_viewables_and_return_info(
     data_path: str,
 ) -> dict[str, Any]:
     with ThreadPoolExecutor() as executor:
-        tasks = [
+        tasks: list[tuple[Callable[[str], Any], str]] = [
             (
                 geode_object.save,
                 os.path.join(data_path, "native." + geode_object.native_extension()),
