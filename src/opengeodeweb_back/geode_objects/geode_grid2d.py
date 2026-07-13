@@ -4,6 +4,7 @@ from abc import abstractmethod
 
 # Third party imports
 import opengeode as og
+import opengeode_inspector as og_inspector
 from opengeodeweb_microservice.database.data_types import ViewerElementsType
 
 # Local application imports
@@ -28,6 +29,10 @@ class GeodeGrid2D(GeodeMesh):
 
     def inspect(self) -> object:
         return None
+
+    def validate(self) -> og_inspector.ObjectValidity:
+        result = og_inspector.ObjectValidity()
+        return result
 
     @abstractmethod
     def cell_attribute_manager(self) -> og.AttributeManager: ...

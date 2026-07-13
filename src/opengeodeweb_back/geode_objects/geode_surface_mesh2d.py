@@ -38,6 +38,9 @@ class GeodeSurfaceMesh2D(GeodeVertexSet):
     def inspect(self) -> og_inspector.SurfaceInspectionResult:
         return og_inspector.inspect_surface2D(self.surface_mesh)
 
+    def validate(self) -> og_inspector.ObjectValidity:
+        return og_inspector.is_surface_valid2D(self.surface_mesh)
+
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
     ) -> None:
