@@ -37,7 +37,8 @@ class GeodeHorizonStack3D(GeodeModel):
 
     @classmethod
     def is_viewable(cls) -> bool:
-        return False  
+        return False
+
     def builder(self) -> og_geosciences.HorizonsStackBuilder3D:
         return og_geosciences.HorizonsStackBuilder3D(self.horizon_stack)
 
