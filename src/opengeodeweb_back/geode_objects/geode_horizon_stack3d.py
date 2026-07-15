@@ -47,15 +47,11 @@ class GeodeHorizonStack3D(GeodeModel):
 
     @classmethod
     def additional_files(cls, filename: str) -> og.AdditionalFiles:
-        if hasattr(og_geosciences, "horizons_stack_additional_files3D"):
-            return og_geosciences.horizons_stack_additional_files3D(filename)
-        return []  # type: ignore
+        return og_geosciences.horizons_stack_additional_files3D(filename)
 
     @classmethod
     def is_loadable(cls, filename: str) -> og.Percentage:
-        if hasattr(og_geosciences, "is_horizons_stack_loadable3D"):
-            return og_geosciences.is_horizons_stack_loadable3D(filename)
-        return 0  # type: ignore
+        return og_geosciences.is_horizons_stack_loadable3D(filename)
 
     @classmethod
     def input_extensions(cls) -> list[str]:
@@ -111,7 +107,7 @@ class GeodeHorizonStack3D(GeodeModel):
         return []
 
     def component(self, id: og.uuid) -> og.Component3D:
-        return None  # type: ignore
+        raise NotImplementedError("HorizonStack3D has no mesh components")
 
     def inspect(self) -> Any:
         return None

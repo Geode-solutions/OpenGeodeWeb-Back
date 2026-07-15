@@ -200,18 +200,20 @@ def create_data_folder_from_id(data_id: str) -> str:
 def model_components(
     data_id: str, model: GeodeModel, viewable_file: str
 ) -> dict[str, Any]:
-    vtm_file_path = geode_functions.data_file_path(data_id, viewable_file)
-    tree = ET.parse(vtm_file_path)
-    root = tree.find("vtkMultiBlockDataSet")
-    if root is None:
-        flask.abort(500, "Failed to read viewable file")
-    uuid_to_flat_index = {}
-    current_index = 0
-    assert root is not None
-    for elem in root.iter():
-        if "uuid" in elem.attrib and elem.tag == "DataSet":
-            uuid_to_flat_index[elem.attrib["uuid"]] = current_index
-        current_index += 1
+    uuid_to_flat_index: dict[str, int] = {}
+    if viewable_file:
+        vtm_file_path = geode_functions.data_file_path(data_id, viewable_file)
+        tree = ET.parse(vtm_file_path)
+        root = tree.find("vtkMultiBlockDataSet")
+        if root is None:
+            flask.abort(500, "Failed to read viewable file")
+        current_index = 0
+        assert root is not None
+        for elem in root.iter():
+            if "uuid" in elem.attrib and elem.tag == "DataSet":
+                uuid_to_flat_index[elem.attrib["uuid"]] = current_index
+            current_index += 1
+
     model_mesh_components = model.mesh_components()
     mesh_components = []
     for mesh_component, ids in model_mesh_components.items():
@@ -292,7 +294,6 @@ def save_all_viewables_and_return_info(
         if geode_object.is_viewable():
             viewable_path = results[1]
             light_path = results[2]
-        if geode_object.is_viewable():
             with open(light_path, "rb") as f:
                 binary_light_viewable = f.read()
             binary_light_viewable_str = binary_light_viewable.decode("utf-8")
@@ -321,7 +322,7 @@ def save_all_viewables_and_return_info(
         }
         if isinstance(geode_object, GeodeVertexSet):
             response["nb_vertices"] = geode_object.vertex_set.nb_vertices()
-        if isinstance(geode_object, GeodeModel) and geode_object.is_viewable():
+        if isinstance(geode_object, GeodeModel):
             response |= model_components(data.id, geode_object, data.viewable_file)
         return response
 
