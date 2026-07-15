@@ -37,8 +37,7 @@ class GeodeHorizonStack3D(GeodeModel):
 
     @classmethod
     def is_viewable(cls) -> bool:
-        return False  # Or True if there's a viewable output
-
+        return False  
     def builder(self) -> og_geosciences.HorizonsStackBuilder3D:
         return og_geosciences.HorizonsStackBuilder3D(self.horizon_stack)
 
@@ -48,7 +47,6 @@ class GeodeHorizonStack3D(GeodeModel):
 
     @classmethod
     def additional_files(cls, filename: str) -> og.AdditionalFiles:
-        # Check if python binding for additional files exists, else return empty
         if hasattr(og_geosciences, "horizons_stack_additional_files3D"):
             return og_geosciences.horizons_stack_additional_files3D(filename)
         return []  # type: ignore
