@@ -14,6 +14,11 @@ from opengeodeweb_back.routes import blueprint_routes
 from opengeodeweb_back.routes.create import blueprint_create
 from opengeodeweb_microservice.database import connection
 
+import queue
+import threading
+import json
+from typing import Any, Dict, Generator, Tuple
+
 
 def create_app(name: str) -> flask.Flask:
     app = flask.Flask(name)
@@ -28,6 +33,40 @@ def create_app(name: str) -> flask.Flask:
             return response
         utils_functions.before_request(flask.current_app)
         return None
+
+    def wants_event_stream() -> bool:
+        accept = flask.request.headers.get("Accept", "")
+        return "text/event-stream" in accept
+
+    _event_queue: queue.Queue[tuple[str, dict[str, Any]]] = queue.Queue()
+    _lock = threading.Lock()
+
+    def publish_event(event: str, data: dict[str, Any]) -> None:
+        _event_queue.put((event, data))
+
+    def stream_events() -> Generator[str, None, None]:
+        while True:
+            event, data = _event_queue.get()
+            yield f"event: {event}\ndata: {json.dumps(data)}\n\n"  
+
+    @app.after_request
+    def after_request(response: flask.Response) -> flask.Response:
+        if flask.request.endpoint == "events":
+            return response
+
+        if wants_event_stream():
+            event_name = flask.request.endpoint
+            print("wants_event_stream", wants_event_stream(), event_name, flush=True)
+            if event_name is None:
+                return response
+
+            payload: dict[str, Any]
+            try:
+                payload = response.get_json()
+            except Exception:
+                payload = {"status": response.status_code}
+            publish_event(event_name, payload)
+        return response
 
     @app.teardown_request
     def teardown_request(exception: BaseException | None) -> None:
@@ -46,6 +85,10 @@ def create_app(name: str) -> flask.Flask:
         "/error",
         methods=["POST"],
     )
+
+    @app.route("/events")
+    def events() -> flask.Response:
+        return flask.Response(stream_events(), mimetype="text/event-stream")
     def return_error() -> Response:
         flask.abort(500, f"Test")
         return flask.make_response({}, 500)
