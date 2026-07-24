@@ -68,9 +68,7 @@ class GeodeHorizonStack3D(GeodeModel):
 
     def is_saveable(self, filename: str) -> bool:
         return bool(
-            og_geosciences.is_horizons_stack_saveable3D(
-                self.horizon_stack, filename
-            )
+            og_geosciences.is_horizons_stack_saveable3D(self.horizon_stack, filename)
         )
 
     def save(self, filename: str) -> list[str]:
