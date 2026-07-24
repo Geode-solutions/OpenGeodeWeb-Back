@@ -56,35 +56,25 @@ class GeodeHorizonStack3D(GeodeModel):
 
     @classmethod
     def input_extensions(cls) -> list[str]:
-        if hasattr(og_geosciences, "HorizonsStackInputFactory3D"):
-            return og_geosciences.HorizonsStackInputFactory3D.list_creators()
-        return []
+        return og_geosciences.HorizonsStackInputFactory3D.list_creators()
 
     @classmethod
     def output_extensions(cls) -> list[str]:
-        if hasattr(og_geosciences, "HorizonsStackOutputFactory3D"):
-            return og_geosciences.HorizonsStackOutputFactory3D.list_creators()
-        return []
+        return og_geosciences.HorizonsStackOutputFactory3D.list_creators()
 
     @classmethod
     def object_priority(cls, filename: str) -> int:
-        if hasattr(og_geosciences, "horizons_stack_object_priority3D"):
-            return og_geosciences.horizons_stack_object_priority3D(filename)
-        return 0
+        return og_geosciences.horizons_stack_object_priority3D(filename)
 
     def is_saveable(self, filename: str) -> bool:
-        if hasattr(og_geosciences, "is_horizons_stack_saveable3D"):
-            return bool(
-                og_geosciences.is_horizons_stack_saveable3D(
-                    self.horizon_stack, filename
-                )
+        return bool(
+            og_geosciences.is_horizons_stack_saveable3D(
+                self.horizon_stack, filename
             )
-        return True
+        )
 
     def save(self, filename: str) -> list[str]:
-        if hasattr(og_geosciences, "save_horizons_stack3D"):
-            return og_geosciences.save_horizons_stack3D(self.horizon_stack, filename)
-        return []
+        return og_geosciences.save_horizons_stack3D(self.horizon_stack, filename)
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return ""
