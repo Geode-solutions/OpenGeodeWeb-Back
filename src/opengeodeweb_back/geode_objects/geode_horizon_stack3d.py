@@ -67,10 +67,7 @@ class GeodeHorizonStack3D(GeodeModel):
         return og_geosciences.horizons_stack_object_priority3D(filename)
 
     def is_saveable(self, filename: str) -> bool:
-        import os
-
-        ext = os.path.splitext(filename)[1][1:]
-        return ext in self.output_extensions()
+        return og_geosciences.is_horizons_stack_saveable3D(self.horizon_stack, filename)
 
     def save(self, filename: str) -> list[str]:
         return og_geosciences.save_horizons_stack3D(self.horizon_stack, filename)
