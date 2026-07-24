@@ -200,18 +200,20 @@ def create_data_folder_from_id(data_id: str) -> str:
 def model_components(
     data_id: str, model: GeodeModel, viewable_file: str
 ) -> dict[str, Any]:
-    vtm_file_path = geode_functions.data_file_path(data_id, viewable_file)
-    tree = ET.parse(vtm_file_path)
-    root = tree.find("vtkMultiBlockDataSet")
-    if root is None:
-        flask.abort(500, "Failed to read viewable file")
-    uuid_to_flat_index = {}
-    current_index = 0
-    assert root is not None
-    for elem in root.iter():
-        if "uuid" in elem.attrib and elem.tag == "DataSet":
-            uuid_to_flat_index[elem.attrib["uuid"]] = current_index
-        current_index += 1
+    uuid_to_flat_index: dict[str, int] = {}
+    if viewable_file:
+        vtm_file_path = geode_functions.data_file_path(data_id, viewable_file)
+        tree = ET.parse(vtm_file_path)
+        root = tree.find("vtkMultiBlockDataSet")
+        if root is None:
+            flask.abort(500, "Failed to read viewable file")
+        current_index = 0
+        assert root is not None
+        for elem in root.iter():
+            if "uuid" in elem.attrib and elem.tag == "DataSet":
+                uuid_to_flat_index[elem.attrib["uuid"]] = current_index
+            current_index += 1
+
     model_mesh_components = model.mesh_components()
     mesh_components = []
     for mesh_component, ids in model_mesh_components.items():
@@ -270,27 +272,39 @@ def save_all_viewables_and_return_info(
     data_path: str,
 ) -> dict[str, Any]:
     with ThreadPoolExecutor() as executor:
-        native_files, viewable_path, light_path = executor.map(
-            lambda args: args[0](args[1]),
-            [
-                (
-                    geode_object.save,
-                    os.path.join(
-                        data_path, "native." + geode_object.native_extension()
+        tasks: list[tuple[Callable[[str], Any], str]] = [
+            (
+                geode_object.save,
+                os.path.join(data_path, "native." + geode_object.native_extension()),
+            )
+        ]
+        if geode_object.is_viewable():
+            tasks.extend(
+                [
+                    (geode_object.save_viewable, os.path.join(data_path, "viewable")),
+                    (
+                        geode_object.save_light_viewable,
+                        os.path.join(data_path, "light_viewable"),
                     ),
-                ),
-                (geode_object.save_viewable, os.path.join(data_path, "viewable")),
-                (
-                    geode_object.save_light_viewable,
-                    os.path.join(data_path, "light_viewable"),
-                ),
-            ],
-        )
-        with open(light_path, "rb") as f:
-            binary_light_viewable = f.read()
+                ]
+            )
+
+        results = list(executor.map(lambda args: args[0](args[1]), tasks))
+        native_files = results[0]
+        if geode_object.is_viewable():
+            viewable_path = results[1]
+            light_path = results[2]
+            with open(light_path, "rb") as f:
+                binary_light_viewable = f.read()
+            binary_light_viewable_str = binary_light_viewable.decode("utf-8")
+            data.viewable_file = os.path.basename(viewable_path)
+            data.light_viewable_file = os.path.basename(light_path)
+        else:
+            binary_light_viewable_str = "not_viewable"
+            data.viewable_file = ""
+            data.light_viewable_file = ""
+
         data.native_file = os.path.basename(native_files[0])
-        data.viewable_file = os.path.basename(viewable_path)
-        data.light_viewable_file = os.path.basename(light_path)
 
         assert data.native_file is not None
         assert data.viewable_file is not None
@@ -305,7 +319,7 @@ def save_all_viewables_and_return_info(
             "id": data.id,
             "name": name,
             "viewer_type": data.viewer_object,
-            "binary_light_viewable": binary_light_viewable.decode("utf-8"),
+            "binary_light_viewable": binary_light_viewable_str,
             "geode_object_type": data.geode_object,
         }
         if isinstance(geode_object, GeodeVertexSet):

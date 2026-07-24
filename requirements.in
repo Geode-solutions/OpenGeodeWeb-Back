@@ -1,8 +1,8 @@
-opengeode-core==17.3.7
+opengeode-core==17.4.4
 opengeode-io==7.7.0
 opengeode-inspector==6.11.6
 opengeode-inspector-geosciences==1.1.0
-opengeode-geosciences==9.6.0
+opengeode-geosciences==9.6.1rc1
 opengeode-geosciencesio==5.9.0
 geode-common==33.24.2
 geode-viewables==3.4.0
