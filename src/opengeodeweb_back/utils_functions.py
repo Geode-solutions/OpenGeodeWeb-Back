@@ -198,7 +198,7 @@ def create_data_folder_from_id(data_id: str) -> str:
 
 
 def model_components(
-    data_id: str, model: GeodeModel, viewable_file: str
+    data_id: str, model: GeodeModel, viewable_file: str | None
 ) -> dict[str, Any]:
     uuid_to_flat_index: dict[str, int] = {}
     if viewable_file:
