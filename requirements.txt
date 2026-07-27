@@ -41,7 +41,7 @@ opengeode-core==17.4.4
     #   opengeode-inspector
     #   opengeode-inspector-geosciences
     #   opengeode-io
-opengeode-geosciences==9.6.1rc1
+opengeode-geosciences==9.6.1
     # via
     #   -r requirements.in
     #   geode-viewables
