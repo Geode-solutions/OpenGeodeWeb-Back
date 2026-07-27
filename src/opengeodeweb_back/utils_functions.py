@@ -332,7 +332,7 @@ def save_all_viewables_and_return_info(
         return response
 
 
-def generate_native_viewable_and_light_viewable_from_object(
+def generate_files_from_object(
     geode_object: GeodeObject,
 ) -> dict[str, Any]:
     data = Data.create(
@@ -344,7 +344,7 @@ def generate_native_viewable_and_light_viewable_from_object(
     return save_all_viewables_and_return_info(geode_object, data, data_path)
 
 
-def generate_native_viewable_and_light_viewable_from_file(
+def generate_files_from_file(
     geode_object_type: GeodeObjectType, input_file: str
 ) -> dict[str, Any]:
     generic_geode_object = geode_objects[geode_object_type]

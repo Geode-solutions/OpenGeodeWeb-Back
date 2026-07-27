@@ -226,7 +226,7 @@ def save_viewable_file() -> flask.Response:
     )
     params = schemas.SaveViewableFile.from_dict(json_data)
     return flask.make_response(
-        utils_functions.generate_native_viewable_and_light_viewable_from_file(
+        utils_functions.generate_files_from_file(
             geode_object_type=geode_object_type(params.geode_object_type),
             input_file=params.filename,
         ),
