@@ -169,11 +169,7 @@ def test_generate_files_from_object(
     with app.app_context():
         geode_object = GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
 
-        result = (
-            utils_functions.generate_files_from_object(
-                geode_object
-            )
-        )
+        result = utils_functions.generate_files_from_object(geode_object)
 
         assert isinstance(result, dict)
         assert isinstance(result["native_file"], str)

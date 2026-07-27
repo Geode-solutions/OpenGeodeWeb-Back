@@ -35,9 +35,7 @@ def point_set() -> flask.Response:
     for point in params.points:
         builder.create_point(opengeode.Point3D([point.x, point.y, point.z]))
 
-    result = utils_functions.generate_files_from_object(
-        pointset
-    )
+    result = utils_functions.generate_files_from_object(pointset)
     return flask.make_response(result, 200)
 
 
@@ -61,9 +59,7 @@ def edged_curve() -> flask.Response:
     for edge in params.edges:
         builder.create_edge_with_vertices(edge[0], edge[1])
 
-    result = utils_functions.generate_files_from_object(
-        edged_curve_obj
-    )
+    result = utils_functions.generate_files_from_object(edged_curve_obj)
     return flask.make_response(result, 200)
 
 
@@ -89,7 +85,5 @@ def polygonal_surface() -> flask.Response:
 
     builder.compute_polygon_adjacencies()
 
-    result = utils_functions.generate_files_from_object(
-        polygonal_surface_obj
-    )
+    result = utils_functions.generate_files_from_object(polygonal_surface_obj)
     return flask.make_response(result, 200)
