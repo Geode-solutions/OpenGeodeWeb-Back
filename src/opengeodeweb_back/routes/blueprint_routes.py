@@ -250,29 +250,45 @@ def texture_coordinates() -> flask.Response:
     return flask.make_response({"texture_coordinates": texture_coordinates}, 200)
 
 
-def attributes_metadata(manager: og.AttributeManager) -> list[dict[str, str | float]]:
-    attributes: list[dict[str, str | float]] = []
+def attributes_metadata(
+    manager: og.AttributeManager,
+) -> list[dict[str, str | int | float | list[float]]]:
+    attributes: list[dict[str, str | int | float | list[float]]] = []
     nb_elements = manager.nb_elements()
     for name in manager.attribute_names():
         attribute = manager.find_generic_attribute(name)
+        nb_items = 1
         min_value, max_value = -1.0, -1.0
+        min_values, max_values = [-1.0], [-1.0]
         if attribute.is_genericable():
-            values = []
             nb_items = attribute.nb_items()
-            for index in range(nb_elements):
-                for item in range(nb_items):
-                    value = attribute.generic_item_value(index, item)
-                    values.append(value)
-
-            valid_values = [
-                value for value in values if value is not None and not math.isnan(value)
-            ]
-            if valid_values:
-                min_value, max_value = min(valid_values), max(valid_values)
+            min_values, max_values = [], []
+            for item in range(nb_items):
+                values = [
+                    attribute.generic_item_value(idx, item)
+                    for idx in range(nb_elements)
+                ]
+                valid = [
+                    value
+                    for value in values
+                    if value is not None and not math.isnan(value)
+                ]
+                min_values.append(min(valid) if valid else -1.0)
+                max_values.append(max(valid) if valid else -1.0)
+            min_value, max_value = min_values[0], max_values[0]
 
         attributes.append(
-            {"attribute_name": name, "min_value": min_value, "max_value": max_value}
+            {
+                "attribute_name": name,
+                "nb_items": nb_items,
+                "min_value": min_value,
+                "max_value": max_value,
+                "min_values": min_values,
+                "max_values": max_values,
+            }
         )
+        print(f"[ATTRIBUTES] Number of items: {nb_items}")
+        print(f"[ATTRIBUTES] Attributes: {attributes}")
     return attributes
 
 
