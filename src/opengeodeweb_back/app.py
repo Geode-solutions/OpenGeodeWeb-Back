@@ -51,20 +51,17 @@ def create_app(name: str) -> flask.Flask:
 
     @app.after_request
     def after_request(response: flask.Response) -> flask.Response:
-        if flask.request.endpoint == "events":
+        endpoint = flask.request.endpoint
+        if endpoint == "events" or endpoint == None:
             return response
 
         if wants_event_stream():
-            event_name = flask.request.endpoint
-            if event_name is None:
-                return response
-
             payload: dict[str, Any]
             try:
                 payload = response.get_json()
             except Exception:
                 payload = {"status": response.status_code}
-            publish_event(event_name, payload)
+            publish_event(endpoint, payload)
         return response
 
     @app.teardown_request
