@@ -47,7 +47,7 @@ def create_app(name: str) -> flask.Flask:
     def stream_events() -> Generator[str, None, None]:
         while True:
             event, data = _event_queue.get()
-            yield f"event: {event}\ndata: {json.dumps(data)}\n\n"  
+            yield f"event: {event}\ndata: {json.dumps(data)}\n\n"
 
     @app.after_request
     def after_request(response: flask.Response) -> flask.Response:
@@ -84,10 +84,10 @@ def create_app(name: str) -> flask.Flask:
         "/error",
         methods=["POST"],
     )
-
     @app.route("/events")
     def events() -> flask.Response:
         return flask.Response(stream_events(), mimetype="text/event-stream")
+
     def return_error() -> Response:
         flask.abort(500, f"Test")
         return flask.make_response({}, 500)
