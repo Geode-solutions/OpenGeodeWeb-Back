@@ -56,7 +56,6 @@ def create_app(name: str) -> flask.Flask:
 
         if wants_event_stream():
             event_name = flask.request.endpoint
-            print("wants_event_stream", wants_event_stream(), event_name, flush=True)
             if event_name is None:
                 return response
 
