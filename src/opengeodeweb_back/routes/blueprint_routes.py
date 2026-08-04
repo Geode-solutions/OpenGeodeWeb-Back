@@ -31,6 +31,7 @@ from opengeodeweb_back.geode_objects.geode_grid2d import GeodeGrid2D
 from opengeodeweb_back.geode_objects.geode_grid3d import GeodeGrid3D
 from opengeodeweb_back.geode_objects.geode_surface_mesh2d import GeodeSurfaceMesh2D
 from opengeodeweb_back.geode_objects.geode_surface_mesh3d import GeodeSurfaceMesh3D
+
 ComponentMesh = (
     og.Corner2D,
     og.Corner3D,
@@ -267,9 +268,7 @@ def attributes_metadata(
             for item in range(nb_items):
                 valid_values: list[float] = []
                 for attribute_manager in managers:
-                    component_attribute = attribute_manager.find_generic_attribute(
-                        name
-                    )
+                    component_attribute = attribute_manager.find_generic_attribute(name)
                     if component_attribute.is_genericable():
                         nb_elements = attribute_manager.nb_elements()
                         values = [
