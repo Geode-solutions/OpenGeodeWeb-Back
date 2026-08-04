@@ -77,14 +77,14 @@ def create_app(name: str) -> flask.Flask:
         print("\033[91mError:\033[0m \033[91m" + str(exception) + "\033[0m", flush=True)
         return flask.make_response({"description": str(exception)}, 500)
 
-    @app.route(
-        "/error",
-        methods=["POST"],
-    )
     @app.route("/events")
     def events() -> flask.Response:
         return flask.Response(stream_events(), mimetype="text/event-stream")
 
+    @app.route(
+        "/error",
+        methods=["POST"],
+    )
     def return_error() -> Response:
         flask.abort(500, f"Test")
         return flask.make_response({}, 500)
