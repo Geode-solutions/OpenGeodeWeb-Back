@@ -198,20 +198,22 @@ def create_data_folder_from_id(data_id: str) -> str:
 
 
 def model_components(
-    data_id: str, model: GeodeModel, viewable_file: str
+    data_id: str, model: GeodeModel, viewable_file: str | None
 ) -> dict[str, Any]:
-    vtm_file_path = geode_functions.data_file_path(data_id, viewable_file)
-    tree = ET.parse(vtm_file_path)
-    root = tree.find("vtkMultiBlockDataSet")
-    if root is None:
-        flask.abort(500, "Failed to read viewable file")
-    uuid_to_flat_index = {}
-    current_index = 0
-    assert root is not None
-    for elem in root.iter():
-        if "uuid" in elem.attrib and elem.tag == "DataSet":
-            uuid_to_flat_index[elem.attrib["uuid"]] = current_index
-        current_index += 1
+    uuid_to_flat_index: dict[str, int] = {}
+    if viewable_file:
+        vtm_file_path = geode_functions.data_file_path(data_id, viewable_file)
+        tree = ET.parse(vtm_file_path)
+        root = tree.find("vtkMultiBlockDataSet")
+        if root is None:
+            flask.abort(500, "Failed to read viewable file")
+        current_index = 0
+        assert root is not None
+        for elem in root.iter():
+            if "uuid" in elem.attrib and elem.tag == "DataSet":
+                uuid_to_flat_index[elem.attrib["uuid"]] = current_index
+            current_index += 1
+
     model_mesh_components = model.mesh_components()
     mesh_components = []
     for mesh_component, ids in model_mesh_components.items():
@@ -270,44 +272,59 @@ def save_all_viewables_and_return_info(
     data_path: str,
 ) -> dict[str, Any]:
     with ThreadPoolExecutor() as executor:
-        native_files, viewable_path, light_path = executor.map(
-            lambda args: args[0](args[1]),
-            [
-                (
-                    geode_object.save,
-                    os.path.join(
-                        data_path, "native." + geode_object.native_extension()
+        tasks: list[tuple[Callable[[str], Any], str]] = [
+            (
+                geode_object.save,
+                os.path.join(data_path, "native." + geode_object.native_extension()),
+            )
+        ]
+        if geode_object.is_viewable():
+            tasks.extend(
+                [
+                    (geode_object.save_viewable, os.path.join(data_path, "viewable")),
+                    (
+                        geode_object.save_light_viewable,
+                        os.path.join(data_path, "light_viewable"),
                     ),
-                ),
-                (geode_object.save_viewable, os.path.join(data_path, "viewable")),
-                (
-                    geode_object.save_light_viewable,
-                    os.path.join(data_path, "light_viewable"),
-                ),
-            ],
-        )
-        with open(light_path, "rb") as f:
-            binary_light_viewable = f.read()
+                ]
+            )
+
+        results = list(executor.map(lambda args: args[0](args[1]), tasks))
+        native_files = results[0]
+        if geode_object.is_viewable():
+            viewable_path = results[1]
+            light_path = results[2]
+            with open(light_path, "rb") as f:
+                binary_light_viewable = f.read()
+            binary_light_viewable_str = binary_light_viewable.decode("utf-8")
+            data.viewable_file = os.path.basename(viewable_path)
+            data.light_viewable_file = os.path.basename(light_path)
+        else:
+            binary_light_viewable_str = None
+            data.viewable_file = None
+            data.light_viewable_file = None
+
         data.native_file = os.path.basename(native_files[0])
-        data.viewable_file = os.path.basename(viewable_path)
-        data.light_viewable_file = os.path.basename(light_path)
 
         assert data.native_file is not None
-        assert data.viewable_file is not None
-        assert data.light_viewable_file is not None
+        if geode_object.is_viewable():
+            assert data.viewable_file is not None
+            assert data.light_viewable_file is not None
         name = geode_object.identifier.name()
         if not name:
             flask.abort(400, "Geode object has no name defined.")
 
         response: dict[str, Any] = {
             "native_file": data.native_file,
-            "viewable_file": data.viewable_file,
             "id": data.id,
             "name": name,
             "viewer_type": data.viewer_object,
-            "binary_light_viewable": binary_light_viewable.decode("utf-8"),
+            "is_viewable": geode_object.is_viewable(),
             "geode_object_type": data.geode_object,
         }
+        if geode_object.is_viewable():
+            response["viewable_file"] = data.viewable_file
+            response["binary_light_viewable"] = binary_light_viewable_str
         if isinstance(geode_object, GeodeVertexSet):
             response["nb_vertices"] = geode_object.vertex_set.nb_vertices()
         if isinstance(geode_object, GeodeModel):
@@ -315,7 +332,7 @@ def save_all_viewables_and_return_info(
         return response
 
 
-def generate_native_viewable_and_light_viewable_from_object(
+def generate_files_from_object(
     geode_object: GeodeObject,
 ) -> dict[str, Any]:
     data = Data.create(
@@ -327,7 +344,7 @@ def generate_native_viewable_and_light_viewable_from_object(
     return save_all_viewables_and_return_info(geode_object, data, data_path)
 
 
-def generate_native_viewable_and_light_viewable_from_file(
+def generate_files_from_file(
     geode_object_type: GeodeObjectType, input_file: str
 ) -> dict[str, Any]:
     generic_geode_object = geode_objects[geode_object_type]

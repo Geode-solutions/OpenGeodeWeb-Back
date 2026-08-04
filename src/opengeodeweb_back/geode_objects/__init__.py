@@ -31,6 +31,7 @@ from .geode_structural_model import GeodeStructuralModel
 from .geode_cross_section import GeodeCrossSection
 from .geode_implicit_structural_model import GeodeImplicitStructuralModel
 from .geode_implicit_cross_section import GeodeImplicitCrossSection
+from .geode_horizon_stack3d import GeodeHorizonStack3D
 
 geode_objects: dict[GeodeObjectType, type[GeodeObject]] = {
     "VertexSet": GeodeVertexSet,
@@ -58,4 +59,5 @@ geode_objects: dict[GeodeObjectType, type[GeodeObject]] = {
     "CrossSection": GeodeCrossSection,
     "ImplicitStructuralModel": GeodeImplicitStructuralModel,
     "ImplicitCrossSection": GeodeImplicitCrossSection,
+    "HorizonStack3D": GeodeHorizonStack3D,
 }
