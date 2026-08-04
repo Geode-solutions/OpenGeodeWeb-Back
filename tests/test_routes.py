@@ -676,13 +676,12 @@ def test_model_component_vertex_attribute_names(client: FlaskClient) -> None:
 
     corner_ids = by_type.get("Corner", [])
     assert len(corner_ids) > 0, "cube.og_brep should have Corner components"
-    component_id = corner_ids[0]
 
-    response = client.post(route, json={"id": model_id, "component_id": component_id})
+    response = client.post(route, json={"id": model_id, "component_ids": corner_ids})
     _assert_attributes_response(response)
 
     def get_full_data() -> test_utils.JsonData:
-        return {"id": model_id, "component_id": component_id}
+        return {"id": model_id, "component_ids": corner_ids}
 
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
@@ -693,13 +692,12 @@ def test_model_component_edge_attribute_names(client: FlaskClient) -> None:
 
     line_ids = by_type.get("Line", [])
     assert len(line_ids) > 0, "cube.og_brep should have Line components"
-    component_id = line_ids[0]
 
-    response = client.post(route, json={"id": model_id, "component_id": component_id})
+    response = client.post(route, json={"id": model_id, "component_ids": line_ids})
     _assert_attributes_response(response)
 
     def get_full_data() -> test_utils.JsonData:
-        return {"id": model_id, "component_id": component_id}
+        return {"id": model_id, "component_ids": line_ids}
 
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
@@ -710,13 +708,12 @@ def test_model_component_polygon_attribute_names(client: FlaskClient) -> None:
 
     surface_ids = by_type.get("Surface", [])
     assert len(surface_ids) > 0, "cube.og_brep should have Surface components"
-    component_id = surface_ids[0]
 
-    response = client.post(route, json={"id": model_id, "component_id": component_id})
+    response = client.post(route, json={"id": model_id, "component_ids": surface_ids})
     _assert_attributes_response(response)
 
     def get_full_data() -> test_utils.JsonData:
-        return {"id": model_id, "component_id": component_id}
+        return {"id": model_id, "component_ids": surface_ids}
 
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
@@ -727,12 +724,11 @@ def test_model_component_polyhedron_attribute_names(client: FlaskClient) -> None
 
     block_ids = by_type.get("Block", [])
     assert len(block_ids) > 0, "cube.og_brep should have Block components"
-    component_id = block_ids[0]
 
-    response = client.post(route, json={"id": model_id, "component_id": component_id})
+    response = client.post(route, json={"id": model_id, "component_ids": block_ids})
     _assert_attributes_response(response)
 
     def get_full_data() -> test_utils.JsonData:
-        return {"id": model_id, "component_id": component_id}
+        return {"id": model_id, "component_ids": block_ids}
 
     test_utils.test_route_wrong_params(client, route, get_full_data)

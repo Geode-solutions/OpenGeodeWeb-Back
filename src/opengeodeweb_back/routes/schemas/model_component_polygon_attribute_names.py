@@ -7,5 +7,5 @@ class ModelComponentPolygonAttributeNames(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print(self, flush=True)
 
-    component_id: str
+    component_ids: list[str]
     id: str

@@ -309,14 +309,18 @@
           "type": "string",
           "minLength": 1
         },
-        "component_id": {
-          "type": "string",
-          "minLength": 1
+        "component_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
         }
       },
       "required": [
         "id",
-        "component_id"
+        "component_ids"
       ],
       "additionalProperties": false
     },
@@ -332,14 +336,18 @@
           "type": "string",
           "minLength": 1
         },
-        "component_id": {
-          "type": "string",
-          "minLength": 1
+        "component_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
         }
       },
       "required": [
         "id",
-        "component_id"
+        "component_ids"
       ],
       "additionalProperties": false
     },
@@ -355,14 +363,18 @@
           "type": "string",
           "minLength": 1
         },
-        "component_id": {
-          "type": "string",
-          "minLength": 1
+        "component_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
         }
       },
       "required": [
         "id",
-        "component_id"
+        "component_ids"
       ],
       "additionalProperties": false
     },
@@ -378,14 +390,18 @@
           "type": "string",
           "minLength": 1
         },
-        "component_id": {
-          "type": "string",
-          "minLength": 1
+        "component_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
         }
       },
       "required": [
         "id",
-        "component_id"
+        "component_ids"
       ],
       "additionalProperties": false
     },

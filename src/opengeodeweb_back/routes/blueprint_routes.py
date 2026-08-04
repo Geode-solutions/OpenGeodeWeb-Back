@@ -1,10 +1,10 @@
 # Standard library imports
+from opengeodeweb_back.geode_objects.geode_solid_mesh3d import GeodeSolidMesh3D
 import os
 import time
 import shutil
 import math
 from threading import Timer
-from typing import Any, Union, get_args
 
 # Third party imports
 import flask
@@ -31,9 +31,7 @@ from opengeodeweb_back.geode_objects.geode_grid2d import GeodeGrid2D
 from opengeodeweb_back.geode_objects.geode_grid3d import GeodeGrid3D
 from opengeodeweb_back.geode_objects.geode_surface_mesh2d import GeodeSurfaceMesh2D
 from opengeodeweb_back.geode_objects.geode_surface_mesh3d import GeodeSurfaceMesh3D
-from opengeodeweb_back.geode_objects.geode_solid_mesh3d import GeodeSolidMesh3D
-
-ComponentMesh = Union[
+ComponentMesh = (
     og.Corner2D,
     og.Corner3D,
     og.Line2D,
@@ -41,7 +39,10 @@ ComponentMesh = Union[
     og.Surface2D,
     og.Surface3D,
     og.Block3D,
-]
+)
+ComponentLine = (og.Line2D, og.Line3D)
+ComponentSurface = (og.Surface2D, og.Surface3D)
+ComponentBlock = og.Block3D
 
 routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
 
@@ -251,44 +252,48 @@ def texture_coordinates() -> flask.Response:
 
 
 def attributes_metadata(
-    manager: og.AttributeManager,
+    manager: og.AttributeManager | list[og.AttributeManager],
 ) -> list[dict[str, str | int | float | list[float]]]:
+    managers = manager if isinstance(manager, list) else [manager]
     attributes: list[dict[str, str | int | float | list[float]]] = []
-    nb_elements = manager.nb_elements()
-    for name in manager.attribute_names():
-        attribute = manager.find_generic_attribute(name)
+    first_manager = managers[0]
+    for name in first_manager.attribute_names():
+        attribute = first_manager.find_generic_attribute(name)
         nb_items = 1
-        min_value, max_value = -1.0, -1.0
         min_values, max_values = [-1.0], [-1.0]
         if attribute.is_genericable():
             nb_items = attribute.nb_items()
             min_values, max_values = [], []
             for item in range(nb_items):
-                values = [
-                    attribute.generic_item_value(idx, item)
-                    for idx in range(nb_elements)
-                ]
-                valid = [
-                    value
-                    for value in values
-                    if value is not None and not math.isnan(value)
-                ]
-                min_values.append(min(valid) if valid else -1.0)
-                max_values.append(max(valid) if valid else -1.0)
-            min_value, max_value = min_values[0], max_values[0]
+                valid_values: list[float] = []
+                for attribute_manager in managers:
+                    component_attribute = attribute_manager.find_generic_attribute(
+                        name
+                    )
+                    if component_attribute.is_genericable():
+                        nb_elements = attribute_manager.nb_elements()
+                        values = [
+                            component_attribute.generic_item_value(index, item)
+                            for index in range(nb_elements)
+                        ]
+                        valid_values.extend(
+                            value
+                            for value in values
+                            if value is not None and not math.isnan(value)
+                        )
+                min_values.append(min(valid_values) if valid_values else -1.0)
+                max_values.append(max(valid_values) if valid_values else -1.0)
 
         attributes.append(
             {
                 "attribute_name": name,
                 "nb_items": nb_items,
-                "min_value": min_value,
-                "max_value": max_value,
+                "min_value": min_values[0],
+                "max_value": max_values[0],
                 "min_values": min_values,
                 "max_values": max_values,
             }
         )
-        print(f"[ATTRIBUTES] Number of items: {nb_items}")
-        print(f"[ATTRIBUTES] Attributes: {attributes}")
     return attributes
 
 
@@ -399,13 +404,16 @@ def model_component_vertex_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
-    component = geode_object.component(og.uuid(params.component_id))
-    if not isinstance(component, get_args(ComponentMesh)):
-        flask.abort(400, f"{params.component_id} is not a valid ComponentMesh")
-    mesh = component.mesh()
-    attribute_manager = mesh.vertex_attribute_manager()
+    managers = [
+        component.mesh().vertex_attribute_manager()
+        for component_id in params.component_ids
+        if isinstance(
+            (component := geode_object.component(og.uuid(component_id))),
+            ComponentMesh,
+        )
+    ]
     return flask.make_response(
-        {"attributes": attributes_metadata(attribute_manager)},
+        {"attributes": attributes_metadata(managers)},
         200,
     )
 
@@ -422,15 +430,16 @@ def model_component_edge_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
-    component = geode_object.component(og.uuid(params.component_id))
-    if not isinstance(component, get_args(ComponentMesh)):
-        flask.abort(400, f"{params.component_id} is not a valid ComponentMesh")
-    mesh = component.mesh()
-    if not hasattr(mesh, "edge_attribute_manager"):
-        flask.abort(400, "Component does not have edges")
-    attribute_manager = mesh.edge_attribute_manager()
+    managers = [
+        component.mesh().edge_attribute_manager()
+        for component_id in params.component_ids
+        if isinstance(
+            (component := geode_object.component(og.uuid(component_id))),
+            ComponentLine,
+        )
+    ]
     return flask.make_response(
-        {"attributes": attributes_metadata(attribute_manager)},
+        {"attributes": attributes_metadata(managers)},
         200,
     )
 
@@ -447,15 +456,16 @@ def model_component_polygon_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
-    component = geode_object.component(og.uuid(params.component_id))
-    if not isinstance(component, get_args(ComponentMesh)):
-        flask.abort(400, f"{params.component_id} is not a valid ComponentMesh")
-    mesh = component.mesh()
-    if not hasattr(mesh, "polygon_attribute_manager"):
-        flask.abort(400, "Component does not have polygons")
-    attribute_manager = mesh.polygon_attribute_manager()
+    managers = [
+        component.mesh().polygon_attribute_manager()
+        for component_id in params.component_ids
+        if isinstance(
+            (component := geode_object.component(og.uuid(component_id))),
+            ComponentSurface,
+        )
+    ]
     return flask.make_response(
-        {"attributes": attributes_metadata(attribute_manager)},
+        {"attributes": attributes_metadata(managers)},
         200,
     )
 
@@ -472,15 +482,16 @@ def model_component_polyhedron_attribute_names() -> flask.Response:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
-    component = geode_object.component(og.uuid(params.component_id))
-    if not isinstance(component, get_args(ComponentMesh)):
-        flask.abort(400, f"{params.component_id} is not a valid ComponentMesh")
-    mesh = component.mesh()
-    if not hasattr(mesh, "polyhedron_attribute_manager"):
-        flask.abort(400, "Component does not have polyhedra")
-    attribute_manager = mesh.polyhedron_attribute_manager()
+    managers = [
+        component.mesh().polyhedron_attribute_manager()
+        for component_id in params.component_ids
+        if isinstance(
+            (component := geode_object.component(og.uuid(component_id))),
+            ComponentBlock,
+        )
+    ]
     return flask.make_response(
-        {"attributes": attributes_metadata(attribute_manager)},
+        {"attributes": attributes_metadata(managers)},
         200,
     )
 
