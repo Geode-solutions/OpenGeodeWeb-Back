@@ -162,18 +162,14 @@ def test_save_all_viewables_commits_to_db(client: FlaskClient) -> None:
         assert db_entry_before.native_file == result["native_file"]
 
 
-def test_generate_native_viewable_and_light_viewable_from_object(
+def test_generate_files_from_object(
     client: FlaskClient,
 ) -> None:
     app = client.application
     with app.app_context():
         geode_object = GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
 
-        result = (
-            utils_functions.generate_native_viewable_and_light_viewable_from_object(
-                geode_object
-            )
-        )
+        result = utils_functions.generate_files_from_object(geode_object)
 
         assert isinstance(result, dict)
         assert isinstance(result["native_file"], str)
@@ -197,12 +193,12 @@ def test_generate_native_viewable_and_light_viewable_from_object(
         assert os.path.exists(os.path.join(data_path, data.light_viewable_file))
 
 
-def test_generate_native_viewable_and_light_viewable_from_file(
+def test_generate_files_from_file(
     client: FlaskClient,
 ) -> None:
     app = client.application
     with app.app_context():
-        result = utils_functions.generate_native_viewable_and_light_viewable_from_file(
+        result = utils_functions.generate_files_from_file(
             GeodeBRep.geode_object_type(), "test.og_brep"
         )
 
@@ -218,12 +214,12 @@ def test_generate_native_viewable_and_light_viewable_from_file(
     assert isinstance(result["binary_light_viewable"], str)
 
 
-def test_generate_native_viewable_and_light_viewable_from_file_with_multi_dots(
+def test_generate_files_from_file_with_multi_dots(
     client: FlaskClient,
 ) -> None:
     app = client.application
     with app.app_context():
-        result = utils_functions.generate_native_viewable_and_light_viewable_from_file(
+        result = utils_functions.generate_files_from_file(
             GeodeBRep.geode_object_type(), "cube.test.og_brep"
         )
     assert result["name"] == "cube.test"
