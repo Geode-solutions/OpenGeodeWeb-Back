@@ -285,7 +285,9 @@ def attributes_metadata(
                 valid_values: list[float] = []
                 for attribute_manager in attribute_managers:
                     valid_values.extend(
-                        extract_valid_attribute_values(attribute_manager, name, item_index)
+                        extract_valid_attribute_values(
+                            attribute_manager, name, item_index
+                        )
                     )
                 min_values.append(min(valid_values) if valid_values else -1.0)
                 max_values.append(max(valid_values) if valid_values else -1.0)
