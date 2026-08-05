@@ -276,31 +276,19 @@ def attributes_metadata(
     first_manager = attribute_managers[0]
     for name in first_manager.attribute_names():
         attribute = first_manager.find_generic_attribute(name)
-        if not attribute.is_genericable():
-            attributes.append(
-                {
-                    "attribute_name": name,
-                    "nb_items": 1,
-                    "min_value": -1.0,
-                    "max_value": -1.0,
-                    "min_values": [-1.0],
-                    "max_values": [-1.0],
-                }
-            )
-            continue
-
-        nb_items = attribute.nb_items()
-        min_values: list[float] = []
-        max_values: list[float] = []
-        for item_index in range(nb_items):
-            valid_values: list[float] = []
-            for attribute_manager in attribute_managers:
-                valid_values.extend(
-                    extract_valid_attribute_values(attribute_manager, name, item_index)
-                )
-            min_values.append(min(valid_values) if valid_values else -1.0)
-            max_values.append(max(valid_values) if valid_values else -1.0)
-
+        nb_items = 1
+        min_values, max_values = [-1.0], [-1.0]
+        if attribute.is_genericable():
+            nb_items = attribute.nb_items()
+            min_values, max_values = [], []
+            for item_index in range(nb_items):
+                valid_values: list[float] = []
+                for attribute_manager in attribute_managers:
+                    valid_values.extend(
+                        extract_valid_attribute_values(attribute_manager, name, item_index)
+                    )
+                min_values.append(min(valid_values) if valid_values else -1.0)
+                max_values.append(max(valid_values) if valid_values else -1.0)
         attributes.append(
             {
                 "attribute_name": name,
