@@ -252,36 +252,54 @@ def texture_coordinates() -> flask.Response:
     return flask.make_response({"texture_coordinates": texture_coordinates}, 200)
 
 
+def extract_valid_attribute_values(
+    attribute_manager: og.AttributeManager,
+    attribute_name: str,
+    item_index: int,
+) -> list[float]:
+    component_attribute = attribute_manager.find_generic_attribute(attribute_name)
+    if not component_attribute.is_genericable():
+        return []
+    valid_values: list[float] = []
+    for index in range(attribute_manager.nb_elements()):
+        value = component_attribute.generic_item_value(index, item_index)
+        if value is not None and not math.isnan(value):
+            valid_values.append(value)
+    return valid_values
+
+
 def attributes_metadata(
     manager: og.AttributeManager | list[og.AttributeManager],
 ) -> list[dict[str, str | int | float | list[float]]]:
-    managers = manager if isinstance(manager, list) else [manager]
+    attribute_managers = manager if isinstance(manager, list) else [manager]
     attributes: list[dict[str, str | int | float | list[float]]] = []
-    first_manager = managers[0]
+    first_manager = attribute_managers[0]
     for name in first_manager.attribute_names():
         attribute = first_manager.find_generic_attribute(name)
-        nb_items = 1
-        min_values, max_values = [-1.0], [-1.0]
-        if attribute.is_genericable():
-            nb_items = attribute.nb_items()
-            min_values, max_values = [], []
-            for item in range(nb_items):
-                valid_values: list[float] = []
-                for attribute_manager in managers:
-                    component_attribute = attribute_manager.find_generic_attribute(name)
-                    if component_attribute.is_genericable():
-                        nb_elements = attribute_manager.nb_elements()
-                        values = [
-                            component_attribute.generic_item_value(index, item)
-                            for index in range(nb_elements)
-                        ]
-                        valid_values.extend(
-                            value
-                            for value in values
-                            if value is not None and not math.isnan(value)
-                        )
-                min_values.append(min(valid_values) if valid_values else -1.0)
-                max_values.append(max(valid_values) if valid_values else -1.0)
+        if not attribute.is_genericable():
+            attributes.append(
+                {
+                    "attribute_name": name,
+                    "nb_items": 1,
+                    "min_value": -1.0,
+                    "max_value": -1.0,
+                    "min_values": [-1.0],
+                    "max_values": [-1.0],
+                }
+            )
+            continue
+
+        nb_items = attribute.nb_items()
+        min_values: list[float] = []
+        max_values: list[float] = []
+        for item_index in range(nb_items):
+            valid_values: list[float] = []
+            for attribute_manager in attribute_managers:
+                valid_values.extend(
+                    extract_valid_attribute_values(attribute_manager, name, item_index)
+                )
+            min_values.append(min(valid_values) if valid_values else -1.0)
+            max_values.append(max(valid_values) if valid_values else -1.0)
 
         attributes.append(
             {
