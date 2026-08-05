@@ -14,6 +14,11 @@ from opengeodeweb_back.routes import blueprint_routes
 from opengeodeweb_back.routes.create import blueprint_create
 from opengeodeweb_microservice.database import connection
 
+import queue
+import threading
+import json
+from typing import Any, Dict, Generator, Tuple
+
 
 def create_app(name: str) -> flask.Flask:
     app = flask.Flask(name)
@@ -29,6 +34,36 @@ def create_app(name: str) -> flask.Flask:
         utils_functions.before_request(flask.current_app)
         return None
 
+    def wants_event_stream() -> bool:
+        accept = flask.request.headers.get("Accept", "")
+        return "text/event-stream" in accept
+
+    _event_queue: queue.Queue[tuple[str, dict[str, Any]]] = queue.Queue()
+    _lock = threading.Lock()
+
+    def publish_event(event: str, data: dict[str, Any]) -> None:
+        _event_queue.put((event, data))
+
+    def stream_events() -> Generator[str, None, None]:
+        while True:
+            event, data = _event_queue.get()
+            yield f"event: {event}\ndata: {json.dumps(data)}\n\n"
+
+    @app.after_request
+    def after_request(response: flask.Response) -> flask.Response:
+        endpoint = flask.request.endpoint
+        if endpoint == "events" or endpoint == None:
+            return response
+
+        if wants_event_stream():
+            payload: dict[str, Any]
+            try:
+                payload = response.get_json()
+            except Exception:
+                payload = {"status": response.status_code}
+            publish_event(endpoint, payload)
+        return response
+
     @app.teardown_request
     def teardown_request(exception: BaseException | None) -> None:
         utils_functions.teardown_request(flask.current_app, exception)
@@ -41,6 +76,10 @@ def create_app(name: str) -> flask.Flask:
     def handle_generic_exception(exception: Exception) -> Response:
         print("\033[91mError:\033[0m \033[91m" + str(exception) + "\033[0m", flush=True)
         return flask.make_response({"description": str(exception)}, 500)
+
+    @app.route("/events")
+    def events() -> flask.Response:
+        return flask.Response(stream_events(), mimetype="text/event-stream")
 
     @app.route(
         "/error",
