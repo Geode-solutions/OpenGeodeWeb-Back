@@ -2,38 +2,38 @@
   "name": "@geode/opengeodeweb-back",
   "version": "0.0.0",
   "description": "",
-  "scripts": {
-    "json": "npx opengeodeweb-microservice-generate opengeodeweb_back routes route /",
-    "test": "npm run json",
-    "build": "npm run json"
+  "homepage": "https://github.com/Geode-solutions/OpenGeodeWeb-Back",
+  "bugs": {
+    "url": "https://github.com/Geode-solutions/OpenGeodeWeb-Back/issues"
   },
-  "dependencies": {
-    "@geode/opengeodeweb-microservice": "0.0.0"
+  "license": "MIT",
+  "author": {
+    "name": "Geode-solutions",
+    "email": "contact@geode-solutions.com",
+    "url": "https://geode-solutions.com/"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Geode-solutions/OpenGeodeWeb-Back.git"
+  },
+  "files": [
+    "opengeodeweb_back_schemas.json"
+  ],
   "exports": {
     "./opengeodeweb_back_schemas.json": {
       "import": "./opengeodeweb_back_schemas.json",
       "require": "./opengeodeweb_back_schemas.json"
     }
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Geode-solutions/OpenGeodeWeb-Back.git"
-  },
-  "author": {
-    "name": "Geode-solutions",
-    "email": "contact@geode-solutions.com",
-    "url": "https://geode-solutions.com/"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Geode-solutions/OpenGeodeWeb-Back/issues"
-  },
-  "homepage": "https://github.com/Geode-solutions/OpenGeodeWeb-Back",
   "publishConfig": {
     "access": "public"
   },
-  "files": [
-    "opengeodeweb_back_schemas.json"
-  ]
+  "scripts": {
+    "json": "npx opengeodeweb-microservice-generate --startDir src/opengeodeweb_back/routes --key route --separator /",
+    "test": "npm run json",
+    "build": "npm run json"
+  },
+  "dependencies": {
+    "@geode/opengeodeweb-microservice": "0.0.0"
+  }
 }
