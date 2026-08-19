@@ -226,9 +226,9 @@ def model_components(
                 component_name = geode_id
             viewer_id = uuid_to_flat_index[geode_id]
             boundaries = model.boundaries(id)
-            boundaries_uuid = [boundary.id().string() for boundary in boundaries]
+            boundaries_uuid = [boundary.id.string() for boundary in boundaries]
             internals = model.internals(id)
-            internals_uuid = [internal.id().string() for internal in internals]
+            internals_uuid = [internal.id.string() for internal in internals]
             mesh_component_object = {
                 "viewer_id": viewer_id,
                 "geode_id": geode_id,
@@ -251,7 +251,7 @@ def model_components(
             if not component_name:
                 component_name = geode_id
             items = model.items(id)
-            items_uuid = [item.id().string() for item in items]
+            items_uuid = [item.id.string() for item in items]
             collection_component_object = {
                 "geode_id": geode_id,
                 "name": component_name,

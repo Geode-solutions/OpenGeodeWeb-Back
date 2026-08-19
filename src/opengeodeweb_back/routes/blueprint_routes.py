@@ -254,10 +254,11 @@ def texture_coordinates() -> flask.Response:
 
 def extract_valid_attribute_values(
     attribute_manager: og.AttributeManager,
-    attribute_name: str,
+    attribute_id: og.uuid,
     item_index: int,
 ) -> list[float]:
-    component_attribute = attribute_manager.find_generic_attribute(attribute_name)
+    component_attribute = attribute_manager.find_generic_attribute(attribute_id)
+    print("type(component_attribute)", type(component_attribute), flush=True)
     if not component_attribute.is_genericable():
         return []
     valid_values: list[float] = []
@@ -274,8 +275,8 @@ def attributes_metadata(
     attribute_managers = manager if isinstance(manager, list) else [manager]
     attributes: list[dict[str, str | int | float | list[float]]] = []
     first_manager = attribute_managers[0]
-    for name in first_manager.attribute_names():
-        attribute = first_manager.find_generic_attribute(name)
+    for id in first_manager.attribute_ids():
+        attribute = first_manager.find_generic_attribute(id)
         nb_items = 1
         min_values, max_values = [-1.0], [-1.0]
         if attribute.is_genericable():
@@ -286,14 +287,15 @@ def attributes_metadata(
                 for attribute_manager in attribute_managers:
                     valid_values.extend(
                         extract_valid_attribute_values(
-                            attribute_manager, name, item_index
+                            attribute_manager, id, item_index
                         )
                     )
                 min_values.append(min(valid_values) if valid_values else -1.0)
                 max_values.append(max(valid_values) if valid_values else -1.0)
         attributes.append(
             {
-                "attribute_name": name,
+                "attribute_name": attribute.name(),
+                "attribute_id": id.string(),
                 "nb_items": nb_items,
                 "min_value": min_values[0],
                 "max_value": max_values[0],
