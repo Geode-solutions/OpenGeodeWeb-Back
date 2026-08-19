@@ -258,7 +258,8 @@ def extract_valid_attribute_values(
     item_index: int,
 ) -> list[float]:
     component_attribute = attribute_manager.find_generic_attribute(attribute_id)
-    print("type(component_attribute)", type(component_attribute), flush=True)
+    if component_attribute is None:
+        return []
     if not component_attribute.is_genericable():
         return []
     valid_values: list[float] = []
@@ -277,6 +278,11 @@ def attributes_metadata(
     first_manager = attribute_managers[0]
     for id in first_manager.attribute_ids():
         attribute = first_manager.find_generic_attribute(id)
+        if attribute is None:
+            continue
+        attribute_name = attribute.name()
+        if attribute_name is None:
+            continue
         nb_items = 1
         min_values, max_values = [-1.0], [-1.0]
         if attribute.is_genericable():
@@ -294,7 +300,7 @@ def attributes_metadata(
                 max_values.append(max(valid_values) if valid_values else -1.0)
         attributes.append(
             {
-                "attribute_name": attribute.name(),
+                "attribute_name": attribute_name,
                 "attribute_id": id.string(),
                 "nb_items": nb_items,
                 "min_value": min_values[0],
