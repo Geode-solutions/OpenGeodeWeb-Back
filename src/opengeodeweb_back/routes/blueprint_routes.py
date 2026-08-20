@@ -281,28 +281,23 @@ def attributes_metadata(
     first_manager = attribute_managers[0]
     for id in first_manager.attribute_ids():
         attribute = first_manager.find_generic_attribute(id)
-        if attribute is None:
-            continue
+        nb_items = 1
         attribute_name = attribute.name()
+        min_values, max_values = [-1.0], [-1.0]
         if attribute_name is None:
             continue
-        if not attribute.is_genericable():
-            continue
-        nb_items = attribute.nb_items()
-        min_values, max_values = [], []
-        for item_index in range(nb_items):
-            valid_values: list[float] = []
-            for attribute_manager in attribute_managers:
-                valid_values.extend(
-                    extract_valid_attribute_values(
-                        attribute_manager, attribute_name, item_index
+        if attribute.is_genericable():
+            nb_items = attribute.nb_items()
+            for item_index in range(nb_items):
+                valid_values: list[float] = []
+                for attribute_manager in attribute_managers:
+                    valid_values.extend(
+                        extract_valid_attribute_values(
+                            attribute_manager, attribute_name, item_index
+                        )
                     )
-                )
-            if valid_values:
-                min_values.append(min(valid_values))
-                max_values.append(max(valid_values) )
-        if not min_values or not max_values:
-            continue
+                    min_values.append(min(valid_values) if valid_values else -1.0)
+                    max_values.append(max(valid_values) if valid_values else -1.0)
         attributes.append(
             {
                 "attribute_name": attribute_name,
