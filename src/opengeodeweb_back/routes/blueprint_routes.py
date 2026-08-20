@@ -314,7 +314,6 @@ def attributes_metadata(
                 "max_values": max_values,
             }
         )
-    print(f"{attributes=}", flush=True)
     return attributes
 
 
