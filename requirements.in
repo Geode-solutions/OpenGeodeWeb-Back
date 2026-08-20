@@ -1,6 +1,6 @@
 opengeode-core==18.0.0
-opengeode-io==7.8.0
-opengeode-geosciences==9.7.0
+opengeode-io==7.8.1
+opengeode-geosciences==9.7.1
 opengeode-geosciencesio==5.10.0
 opengeode-inspector==6.12.0
 opengeode-inspector-geosciences==1.2.0
