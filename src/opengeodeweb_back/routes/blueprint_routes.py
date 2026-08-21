@@ -257,10 +257,14 @@ def extract_valid_attribute_values(
     attribute_name: str,
     item_index: int,
 ) -> list[float]:
-    attribute_ids_matching_name = attribute_manager.attribute_ids_matching_name(attribute_name)
+    attribute_ids_matching_name = attribute_manager.attribute_ids_matching_name(
+        attribute_name
+    )
     if not isinstance(attribute_ids_matching_name, list):
         return []
-    component_attribute = attribute_manager.find_generic_attribute(attribute_ids_matching_name[0])
+    component_attribute = attribute_manager.find_generic_attribute(
+        attribute_ids_matching_name[0]
+    )
     if component_attribute is None:
         return []
     if not component_attribute.is_genericable():
