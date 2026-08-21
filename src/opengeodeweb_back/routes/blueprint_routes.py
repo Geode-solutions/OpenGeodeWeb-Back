@@ -257,14 +257,10 @@ def extract_valid_attribute_values(
     attribute_name: str,
     item_index: int,
 ) -> list[float]:
-    attribute_ids_matching_name = attribute_manager.attribute_ids_matching_name(
-        attribute_name
-    )
+    attribute_ids_matching_name = attribute_manager.attribute_ids_matching_name(attribute_name)
     if not isinstance(attribute_ids_matching_name, list):
         return []
-    component_attribute = attribute_manager.find_generic_attribute(
-        attribute_ids_matching_name[0]
-    )
+    component_attribute = attribute_manager.find_generic_attribute(attribute_ids_matching_name[0])
     if component_attribute is None:
         return []
     if not component_attribute.is_genericable():
@@ -290,18 +286,23 @@ def attributes_metadata(
         min_values, max_values = [-1.0], [-1.0]
         if attribute_name is None:
             continue
-        if attribute.is_genericable():
-            nb_items = attribute.nb_items()
-            for item_index in range(nb_items):
-                valid_values: list[float] = []
-                for attribute_manager in attribute_managers:
-                    valid_values.extend(
-                        extract_valid_attribute_values(
-                            attribute_manager, attribute_name, item_index
-                        )
+        if not attribute.is_genericable():
+            continue
+        nb_items = attribute.nb_items()
+        min_values, max_values = [], []
+        for item_index in range(nb_items):
+            valid_values: list[float] = []
+            for attribute_manager in attribute_managers:
+                valid_values.extend(
+                    extract_valid_attribute_values(
+                        attribute_manager, attribute_name, item_index
                     )
-                    min_values.append(min(valid_values) if valid_values else -1.0)
-                    max_values.append(max(valid_values) if valid_values else -1.0)
+                )
+            if valid_values:
+                min_values.append(min(valid_values))
+                max_values.append(max(valid_values) )
+        if not min_values or not max_values:
+            continue
         attributes.append(
             {
                 "attribute_name": attribute_name,
@@ -329,8 +330,10 @@ def vertex_attribute_names() -> flask.Response:
     if not isinstance(geode_object, GeodeMesh):
         flask.abort(400, f"{params.id} is not a GeodeMesh")
     attribute_manager = geode_object.vertex_attribute_manager()
-    attributes = attributes_metadata(attribute_manager)
-    return flask.make_response({"attributes": attributes}, 200)
+    return flask.make_response(
+        {"attributes": attributes_metadata(attribute_manager)},
+        200,
+    )
 
 
 @routes.route(
@@ -346,8 +349,10 @@ def cell_attribute_names() -> flask.Response:
     if not isinstance(geode_object, GeodeGrid2D | GeodeGrid3D):
         flask.abort(400, f"{params.id} is not a GeodeGrid")
     attribute_manager = geode_object.cell_attribute_manager()
-    attributes = attributes_metadata(attribute_manager)
-    return flask.make_response({"attributes": attributes}, 200)
+    return flask.make_response(
+        {"attributes": attributes_metadata(attribute_manager)},
+        200,
+    )
 
 
 @routes.route(
@@ -363,8 +368,10 @@ def polygon_attribute_names() -> flask.Response:
     if not isinstance(geode_object, GeodeSurfaceMesh2D | GeodeSurfaceMesh3D):
         flask.abort(400, f"{params.id} is not a GeodeSurfaceMesh")
     attribute_manager = geode_object.polygon_attribute_manager()
-    attributes = attributes_metadata(attribute_manager)
-    return flask.make_response({"attributes": attributes}, 200)
+    return flask.make_response(
+        {"attributes": attributes_metadata(attribute_manager)},
+        200,
+    )
 
 
 @routes.route(
@@ -380,8 +387,10 @@ def polyhedron_attribute_names() -> flask.Response:
     if not isinstance(geode_object, GeodeSolidMesh3D):
         flask.abort(400, f"{params.id} is not a GeodeSolidMesh")
     attribute_manager = geode_object.polyhedron_attribute_manager()
-    attributes = attributes_metadata(attribute_manager)
-    return flask.make_response({"attributes": attributes}, 200)
+    return flask.make_response(
+        {"attributes": attributes_metadata(attribute_manager)},
+        200,
+    )
 
 
 @routes.route(
@@ -397,8 +406,10 @@ def edge_attribute_names() -> flask.Response:
     if not isinstance(geode_object, GeodeGraph):
         flask.abort(400, f"{params.id} does not have edges")
     attribute_manager = geode_object.edge_attribute_manager()
-    attributes = attributes_metadata(attribute_manager)
-    return flask.make_response({"attributes": attributes}, 200)
+    return flask.make_response(
+        {"attributes": attributes_metadata(attribute_manager)},
+        200,
+    )
 
 
 @routes.route(
@@ -421,8 +432,10 @@ def model_component_vertex_attribute_names() -> flask.Response:
             ComponentMesh,
         )
     ]
-    attributes = attributes_metadata(managers)
-    return flask.make_response({"attributes": attributes}, 200)
+    return flask.make_response(
+        {"attributes": attributes_metadata(managers)},
+        200,
+    )
 
 
 @routes.route(
@@ -445,8 +458,10 @@ def model_component_edge_attribute_names() -> flask.Response:
             ComponentLine,
         )
     ]
-    attributes = attributes_metadata(managers)
-    return flask.make_response({"attributes": attributes}, 200)
+    return flask.make_response(
+        {"attributes": attributes_metadata(managers)},
+        200,
+    )
 
 
 @routes.route(
@@ -469,9 +484,10 @@ def model_component_polygon_attribute_names() -> flask.Response:
             ComponentSurface,
         )
     ]
-
-    attributes = attributes_metadata(managers)
-    return flask.make_response({"attributes": attributes}, 200)
+    return flask.make_response(
+        {"attributes": attributes_metadata(managers)},
+        200,
+    )
 
 
 @routes.route(
