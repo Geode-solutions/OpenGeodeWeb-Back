@@ -257,12 +257,21 @@ def extract_valid_attribute_values(
     attribute_name: str,
     item_index: int,
 ) -> list[float]:
-    component_attribute = attribute_manager.find_generic_attribute(attribute_name)
+    attribute_ids_matching_name = attribute_manager.attribute_ids_matching_name(
+        attribute_name
+    )
+    if not isinstance(attribute_ids_matching_name, list):
+        return []
+    component_attribute = attribute_manager.find_generic_attribute(
+        attribute_ids_matching_name[0]
+    )
+    if component_attribute is None:
+        return []
     if not component_attribute.is_genericable():
         return []
     valid_values: list[float] = []
-    for index in range(attribute_manager.nb_elements()):
-        value = component_attribute.generic_item_value(index, item_index)
+    for element_index in range(attribute_manager.nb_elements()):
+        value = component_attribute.generic_item_value(element_index, item_index)
         if value is not None and not math.isnan(value):
             valid_values.append(value)
     return valid_values
@@ -274,29 +283,37 @@ def attributes_metadata(
     attribute_managers = manager if isinstance(manager, list) else [manager]
     attributes: list[dict[str, str | int | float | list[float]]] = []
     first_manager = attribute_managers[0]
-    for name in first_manager.attribute_names():
-        attribute = first_manager.find_generic_attribute(name)
-        nb_items = 1
-        min_values, max_values = [-1.0], [-1.0]
-        if attribute.is_genericable():
-            nb_items = attribute.nb_items()
-            min_values, max_values = [], []
-            for item_index in range(nb_items):
-                valid_values: list[float] = []
-                for attribute_manager in attribute_managers:
-                    valid_values.extend(
-                        extract_valid_attribute_values(
-                            attribute_manager, name, item_index
-                        )
+    for id in first_manager.attribute_ids():
+        attribute = first_manager.find_generic_attribute(id)
+        if attribute is None:
+            continue
+        attribute_name = attribute.name()
+        if attribute_name is None:
+            continue
+        if not attribute.is_genericable():
+            continue
+        nb_items = attribute.nb_items()
+        min_values, max_values = [], []
+        for item_index in range(nb_items):
+            valid_values: list[float] = []
+            for attribute_manager in attribute_managers:
+                valid_values.extend(
+                    extract_valid_attribute_values(
+                        attribute_manager, attribute_name, item_index
                     )
-                min_values.append(min(valid_values) if valid_values else -1.0)
-                max_values.append(max(valid_values) if valid_values else -1.0)
+                )
+            if valid_values:
+                min_values.append(min(valid_values))
+                max_values.append(max(valid_values))
+        if not min_values or not max_values:
+            continue
         attributes.append(
             {
-                "attribute_name": name,
+                "attribute_name": attribute_name,
+                "attribute_id": id.string(),
                 "nb_items": nb_items,
-                "min_value": min_values[0],
-                "max_value": max_values[0],
+                "min_value": min(min_values),
+                "max_value": max(max_values),
                 "min_values": min_values,
                 "max_values": max_values,
             }
@@ -497,10 +514,9 @@ def model_component_polyhedron_attribute_names() -> flask.Response:
             ComponentBlock,
         )
     ]
-    return flask.make_response(
-        {"attributes": attributes_metadata(managers)},
-        200,
-    )
+    attributes = attributes_metadata(managers)
+    print(f"{attributes=}", flush=True)
+    return flask.make_response({"attributes": attributes}, 200)
 
 
 @routes.route(
