@@ -51,7 +51,9 @@ def create_app(name: str) -> flask.Flask:
 
     @app.after_request
     def after_request(response: flask.Response) -> flask.Response:
-        endpoint = flask.request.endpoint
+        endpoint = (
+            flask.request.endpoint.replace(".", "/") if flask.request.endpoint else None
+        )
         if endpoint == "events" or endpoint == None:
             return response
 
