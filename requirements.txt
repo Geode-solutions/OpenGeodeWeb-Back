@@ -20,7 +20,7 @@ geode-common==33.26.3
     # via
     #   -r requirements.in
     #   geode-viewables
-geode-viewables==3.5.1
+geode-viewables==3.5.0
     # via -r requirements.in
 itsdangerous==2.*, >=2.2.0
     # via flask
