@@ -9,7 +9,7 @@ dynamic = ["dependencies"]
 authors = [{ name = "Geode-solutions", email = "team-web@geode-solutions.com" }]
 description = "OpenGeodeWeb-Back is an open source framework that proposes handy python functions and wrappers for the OpenGeode ecosystem"
 readme = "README.md"
-requires-python = ">=3.9, <3.13"
+requires-python = ">=3.12, <3.15"
 classifiers = [
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: MIT License",
