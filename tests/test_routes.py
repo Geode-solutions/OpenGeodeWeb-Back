@@ -236,7 +236,7 @@ def test_vertex_attribute_names(client: FlaskClient, test_id: str) -> None:
     route = f"/opengeodeweb_back/vertex_attribute_names"
 
     with client.application.app_context():
-        file = os.path.join(data_dir, "test.vtp")
+        file = os.path.join(data_dir, "vertex_attribute.vtp")
         data = Data.create(
             geode_object=GeodePolygonalSurface3D.geode_object_type(),
             viewer_object=GeodePolygonalSurface3D.viewer_type(),
@@ -263,6 +263,10 @@ def test_vertex_attribute_names(client: FlaskClient, test_id: str) -> None:
         assert "max_values" in attribute
         assert "has_nan" in attribute
         assert type(attribute["has_nan"]) is bool
+        if attribute["attribute_name"] == "gradient_3d_attribute":
+            assert attribute["has_nan"] is True
+        elif attribute["attribute_name"] == "geode_implicit_attribute":
+            assert attribute["has_nan"] is False
     print(
         f"[ATTRIBUTES]: ",
         [attribute["nb_items"] for attribute in attributes],
@@ -312,7 +316,7 @@ def test_polygon_attribute_names(client: FlaskClient, test_id: str) -> None:
     route = f"/opengeodeweb_back/polygon_attribute_names"
 
     with client.application.app_context():
-        file = os.path.join(data_dir, "test.vtp")
+        file = os.path.join(data_dir, "polygon_attribute.vtp")
         data = Data.create(
             geode_object=GeodePolygonalSurface3D.geode_object_type(),
             viewer_object=GeodePolygonalSurface3D.viewer_type(),
@@ -339,6 +343,10 @@ def test_polygon_attribute_names(client: FlaskClient, test_id: str) -> None:
         assert "max_values" in attribute
         assert "has_nan" in attribute
         assert type(attribute["has_nan"]) is bool
+        if attribute["attribute_name"] == "gradient_3d_attribute":
+            assert attribute["has_nan"] is True
+        elif attribute["attribute_name"] == "implicit_on_polygons":
+            assert attribute["has_nan"] is False
     print(
         f"[ATTRIBUTES]: ",
         [attribute["nb_items"] for attribute in attributes],
