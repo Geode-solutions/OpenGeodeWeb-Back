@@ -256,32 +256,35 @@ def extract_valid_attribute_values(
     attribute_manager: og.AttributeManager,
     attribute_name: str,
     item_index: int,
-) -> list[float]:
+) -> tuple[list[float], bool]:
     attribute_ids_matching_name = attribute_manager.attribute_ids_matching_name(
         attribute_name
     )
     if not isinstance(attribute_ids_matching_name, list):
-        return []
+        return [], False
     component_attribute = attribute_manager.find_generic_attribute(
         attribute_ids_matching_name[0]
     )
     if component_attribute is None:
-        return []
+        return [], False
     if not component_attribute.is_genericable():
-        return []
+        return [], False
     valid_values: list[float] = []
+    has_nan = False
     for element_index in range(attribute_manager.nb_elements()):
         value = component_attribute.generic_item_value(element_index, item_index)
-        if value is not None and not math.isnan(value):
+        if value is None or math.isnan(value):
+            has_nan = True
+        else:
             valid_values.append(value)
-    return valid_values
+    return valid_values, has_nan
 
 
 def attributes_metadata(
     manager: og.AttributeManager | list[og.AttributeManager],
-) -> list[dict[str, str | int | float | list[float]]]:
+) -> list[dict[str, str | int | float | bool | list[float]]]:
     attribute_managers = manager if isinstance(manager, list) else [manager]
-    attributes: list[dict[str, str | int | float | list[float]]] = []
+    attributes: list[dict[str, str | int | float | bool | list[float]]] = []
     first_manager = attribute_managers[0]
     for id in first_manager.attribute_ids():
         attribute = first_manager.find_generic_attribute(id)
@@ -294,14 +297,16 @@ def attributes_metadata(
             continue
         nb_items = attribute.nb_items()
         min_values, max_values = [], []
+        attribute_has_nan = False
         for item_index in range(nb_items):
             valid_values: list[float] = []
             for attribute_manager in attribute_managers:
-                valid_values.extend(
-                    extract_valid_attribute_values(
-                        attribute_manager, attribute_name, item_index
-                    )
+                extracted_values, has_nan = extract_valid_attribute_values(
+                    attribute_manager, attribute_name, item_index
                 )
+                valid_values.extend(extracted_values)
+                if has_nan:
+                    attribute_has_nan = True
             if valid_values:
                 min_values.append(min(valid_values))
                 max_values.append(max(valid_values))
@@ -316,6 +321,7 @@ def attributes_metadata(
                 "max_value": max(max_values),
                 "min_values": min_values,
                 "max_values": max_values,
+                "no_data": attribute_has_nan,
             }
         )
     return attributes
