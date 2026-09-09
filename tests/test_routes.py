@@ -261,6 +261,8 @@ def test_vertex_attribute_names(client: FlaskClient, test_id: str) -> None:
         assert "nb_items" in attribute
         assert "min_values" in attribute
         assert "max_values" in attribute
+        assert "no_data" in attribute
+        assert isinstance(attribute["no_data"], bool)
     print(
         f"[ATTRIBUTES]: ",
         [attribute["nb_items"] for attribute in attributes],
@@ -297,6 +299,8 @@ def test_cell_attribute_names(client: FlaskClient, test_id: str) -> None:
         assert "nb_items" in attribute
         assert "min_values" in attribute
         assert "max_values" in attribute
+        assert "no_data" in attribute
+        assert isinstance(attribute["no_data"], bool)
     print(
         f"[ATTRIBUTES]: ",
         [attribute["nb_items"] for attribute in attributes],
@@ -333,6 +337,8 @@ def test_polygon_attribute_names(client: FlaskClient, test_id: str) -> None:
         assert "nb_items" in attribute
         assert "min_values" in attribute
         assert "max_values" in attribute
+        assert "no_data" in attribute
+        assert isinstance(attribute["no_data"], bool)
     print(
         f"[ATTRIBUTES]: ",
         [attribute["nb_items"] for attribute in attributes],
@@ -370,6 +376,8 @@ def test_polyhedron_attribute_names(client: FlaskClient, test_id: str) -> None:
         assert "nb_items" in attribute
         assert "min_values" in attribute
         assert "max_values" in attribute
+        assert "no_data" in attribute
+        assert isinstance(attribute["no_data"], bool)
         if attribute["attribute_name"] == "Range":
             assert attribute["min_value"] == 0.0
             assert attribute["max_value"] == 579.0
@@ -411,6 +419,8 @@ def test_edge_attribute_names(client: FlaskClient, test_id: str) -> None:
         assert "nb_items" in attribute
         assert "min_values" in attribute
         assert "max_values" in attribute
+        assert "no_data" in attribute
+        assert isinstance(attribute["no_data"], bool)
     print(
         f"[ATTRIBUTES]: ",
         [attribute["nb_items"] for attribute in attributes],
@@ -668,6 +678,8 @@ def _assert_attributes_response(response) -> None:
         assert "nb_items" in attribute
         assert "min_values" in attribute
         assert "max_values" in attribute
+        assert "no_data" in attribute
+        assert isinstance(attribute["no_data"], bool)
 
 
 def test_model_component_vertex_attribute_names(client: FlaskClient) -> None:
