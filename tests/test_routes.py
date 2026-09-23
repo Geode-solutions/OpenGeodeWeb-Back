@@ -770,3 +770,24 @@ def test_extract_valid_attribute_values_with_sentinel_no_value() -> None:
     )
     assert has_nan is True
     assert valid_values == [42.0]
+
+
+def test_extract_valid_attribute_values_with_non_transferable_attribute() -> None:
+    mesh = og.TriangulatedSurface3D.create()
+    builder = og.TriangulatedSurfaceBuilder3D.create(mesh)
+    vertex_0 = builder.create_point(og.Point3D([0, 0, 0]))
+    builder.create_triangle([vertex_0, vertex_0, vertex_0])
+
+    attribute_manager = mesh.vertex_attribute_manager()
+    properties = og.AttributeProperties()
+    properties.transferable = False
+    attribute_manager.create_attribute_variable_double(
+        "internal_attribute", og.AttributeValuesDouble(), properties
+    )
+
+    valid_values, has_nan = extract_valid_attribute_values(
+        attribute_manager, "internal_attribute", 0
+    )
+    assert has_nan is False
+    assert valid_values == []
+

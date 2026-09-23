@@ -261,16 +261,18 @@ def extract_valid_attribute_values(
     if not isinstance(attribute_ids, list):
         return [], False
     attribute = attribute_manager.find_generic_attribute(attribute_ids[0])
-    if attribute is None or not attribute.is_genericable():
+    if (
+        attribute is None
+        or not attribute.is_genericable()
+        or not attribute.properties().transferable
+    ):
         return [], False
 
     nb_items = attribute.nb_items()
     default_values = getattr(attribute, "default_values", None)
     no_value = default_values().no_value if default_values else None
-    if (
-        no_value is None
-        and attribute_name != "points"
-        and ("Point" in attribute.type() or "Vector" in attribute.type())
+    if no_value is None and (
+        "Point" in attribute.type() or "Vector" in attribute.type()
     ):
         no_value = [0.0] * nb_items
 
@@ -310,7 +312,7 @@ def attributes_metadata(
         attribute_name = attribute.name()
         if attribute_name is None:
             continue
-        if not attribute.is_genericable():
+        if not attribute.is_genericable() or not attribute.properties().transferable:
             continue
         nb_items = attribute.nb_items()
         min_values, max_values = [], []
