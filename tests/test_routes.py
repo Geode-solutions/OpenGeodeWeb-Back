@@ -770,4 +770,3 @@ def test_extract_valid_attribute_values_with_sentinel_no_value() -> None:
     )
     assert has_nan is True
     assert valid_values == [42.0]
-
