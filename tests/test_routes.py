@@ -2,6 +2,7 @@
 import os
 
 # Third party imports
+import opengeode as og
 from werkzeug.datastructures import FileStorage
 from flask.testing import FlaskClient
 from werkzeug.test import TestResponse
@@ -13,6 +14,7 @@ import zipfile
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_back import geode_functions, test_utils
+from opengeodeweb_back.routes.blueprint_routes import extract_valid_attribute_values
 from opengeodeweb_back.geode_objects.geode_polygonal_surface3d import (
     GeodePolygonalSurface3D,
 )
@@ -744,3 +746,28 @@ def test_model_component_polyhedron_attribute_names(client: FlaskClient) -> None
         return {"id": model_id, "component_ids": block_ids}
 
     test_utils.test_route_wrong_params(client, route, get_full_data)
+
+
+def test_extract_valid_attribute_values_with_sentinel_no_value() -> None:
+    mesh = og.TriangulatedSurface3D.create()
+    builder = og.TriangulatedSurfaceBuilder3D.create(mesh)
+    vertex_0 = builder.create_point(og.Point3D([0, 0, 0]))
+    vertex_1 = builder.create_point(og.Point3D([1, 0, 0]))
+    builder.create_triangle([vertex_0, vertex_1, vertex_0])
+
+    attribute_manager = mesh.vertex_attribute_manager()
+    values_config = og.AttributeValuesDouble()
+    values_config.no_value = -999.0
+    attribute_id = attribute_manager.create_attribute_variable_double(
+        "variable_double", values_config, og.AttributeProperties()
+    )
+    attribute = attribute_manager.find_attribute_variable_double(attribute_id)
+    attribute.set_value(vertex_0, -999.0)
+    attribute.set_value(vertex_1, 42.0)
+
+    valid_values, has_nan = extract_valid_attribute_values(
+        attribute_manager, "variable_double", 0
+    )
+    assert has_nan is True
+    assert valid_values == [42.0]
+

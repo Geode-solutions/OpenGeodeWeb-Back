@@ -269,14 +269,40 @@ def extract_valid_attribute_values(
         return [], False
     if not component_attribute.is_genericable():
         return [], False
+    nb_items = component_attribute.nb_items()
+    default_values = getattr(component_attribute, "default_values", None)
+    no_value = default_values().no_value if default_values else None
+    if (
+        no_value is None
+        and attribute_name != "points"
+        and (
+            "Point" in component_attribute.type()
+            or "Vector" in component_attribute.type()
+        )
+    ):
+        no_value = [0.0] * nb_items
+    typed_value_getter = getattr(component_attribute, "value", None)
+
     valid_values: list[float] = []
     has_nan = False
     for element_index in range(attribute_manager.nb_elements()):
         value = component_attribute.generic_item_value(element_index, item_index)
         if value is None or math.isnan(value):
             has_nan = True
-        else:
-            valid_values.append(value)
+            continue
+        if no_value is not None:
+            if typed_value_getter is not None:
+                if typed_value_getter(element_index) == no_value:
+                    has_nan = True
+                    continue
+            elif value == no_value[item_index] and all(
+                component_attribute.generic_item_value(element_index, index)
+                == no_value[index]
+                for index in range(nb_items)
+            ):
+                has_nan = True
+                continue
+        valid_values.append(value)
     return valid_values, has_nan
 
 
