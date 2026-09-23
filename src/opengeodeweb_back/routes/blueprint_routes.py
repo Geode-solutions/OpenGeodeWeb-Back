@@ -257,52 +257,43 @@ def extract_valid_attribute_values(
     attribute_name: str,
     item_index: int,
 ) -> tuple[list[float], bool]:
-    attribute_ids_matching_name = attribute_manager.attribute_ids_matching_name(
-        attribute_name
-    )
-    if not isinstance(attribute_ids_matching_name, list):
+    attribute_ids = attribute_manager.attribute_ids_matching_name(attribute_name)
+    if not isinstance(attribute_ids, list):
         return [], False
-    component_attribute = attribute_manager.find_generic_attribute(
-        attribute_ids_matching_name[0]
-    )
-    if component_attribute is None:
+    attribute = attribute_manager.find_generic_attribute(attribute_ids[0])
+    if attribute is None or not attribute.is_genericable():
         return [], False
-    if not component_attribute.is_genericable():
-        return [], False
-    nb_items = component_attribute.nb_items()
-    default_values = getattr(component_attribute, "default_values", None)
+
+    nb_items = attribute.nb_items()
+    default_values = getattr(attribute, "default_values", None)
     no_value = default_values().no_value if default_values else None
     if (
         no_value is None
         and attribute_name != "points"
-        and (
-            "Point" in component_attribute.type()
-            or "Vector" in component_attribute.type()
-        )
+        and ("Point" in attribute.type() or "Vector" in attribute.type())
     ):
         no_value = [0.0] * nb_items
-    typed_value_getter = getattr(component_attribute, "value", None)
+
+    value_getter = getattr(
+        attribute,
+        "value",
+        lambda element_index: [
+            attribute.generic_item_value(element_index, i) for i in range(nb_items)
+        ],
+    )
 
     valid_values: list[float] = []
     has_nan = False
     for element_index in range(attribute_manager.nb_elements()):
-        value = component_attribute.generic_item_value(element_index, item_index)
-        if value is None or math.isnan(value):
+        value = attribute.generic_item_value(element_index, item_index)
+        if (
+            value is None
+            or math.isnan(value)
+            or (no_value is not None and value_getter(element_index) == no_value)
+        ):
             has_nan = True
-            continue
-        if no_value is not None:
-            if typed_value_getter is not None:
-                if typed_value_getter(element_index) == no_value:
-                    has_nan = True
-                    continue
-            elif value == no_value[item_index] and all(
-                component_attribute.generic_item_value(element_index, index)
-                == no_value[index]
-                for index in range(nb_items)
-            ):
-                has_nan = True
-                continue
-        valid_values.append(value)
+        else:
+            valid_values.append(value)
     return valid_values, has_nan
 
 
