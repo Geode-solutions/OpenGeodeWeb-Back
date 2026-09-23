@@ -790,4 +790,3 @@ def test_extract_valid_attribute_values_with_non_transferable_attribute() -> Non
     )
     assert has_nan is False
     assert valid_values == []
-
