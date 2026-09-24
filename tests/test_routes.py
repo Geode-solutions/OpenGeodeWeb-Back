@@ -691,9 +691,9 @@ def _load_brep_components(client: FlaskClient) -> tuple[str, dict[str, list[str]
     model_id: str = response.get_json()["id"]
     mesh_components: list[dict[str, object]] = response.get_json()["mesh_components"]
     by_type: dict[str, list[str]] = {}
-    for mc in mesh_components:
-        component_type = mc["type"]
-        geode_id = mc["geode_id"]
+    for mesh_component in mesh_components:
+        component_type = mesh_component["type"]
+        geode_id = mesh_component["geode_id"]
         assert isinstance(component_type, str)
         assert isinstance(geode_id, str)
         by_type.setdefault(component_type, []).append(geode_id)
