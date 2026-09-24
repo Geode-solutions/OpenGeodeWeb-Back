@@ -79,6 +79,36 @@ def test_upload_file(client: FlaskClient, filename: str = "test.og_brep") -> Non
     assert response.status_code == 201
 
 
+def test_upload_file_raw(client: FlaskClient, filename: str = "test.og_brep") -> None:
+    file = os.path.join(data_dir, filename)
+    with open(file, "rb") as opened_file:
+        file_bytes = opened_file.read()
+
+    raw_filename = "raw_upload_test.og_brep"
+    response = client.put(
+        f"/opengeodeweb_back/upload_file?filename={raw_filename}",
+        data=file_bytes,
+        content_type="application/octet-stream",
+    )
+    assert response.status_code == 201
+
+    uploaded_path = os.path.join(data_dir, raw_filename)
+    try:
+        with open(uploaded_path, "rb") as uploaded_file:
+            assert uploaded_file.read() == file_bytes
+    finally:
+        os.remove(uploaded_path)
+
+
+def test_upload_file_raw_missing_filename(client: FlaskClient) -> None:
+    response = client.put(
+        f"/opengeodeweb_back/upload_file",
+        data=b"some raw bytes",
+        content_type="application/octet-stream",
+    )
+    assert response.status_code == 400
+
+
 def test_missing_files(client: FlaskClient) -> None:
     route = f"/opengeodeweb_back/missing_files"
 
@@ -495,7 +525,7 @@ def test_model_components(client: FlaskClient) -> None:
     assert isinstance(mesh_components, list)
     assert len(mesh_components) > 0
     for mesh_component in mesh_components:
-        assert isinstance(mesh_component, object)
+        assert isinstance(mesh_component, dict)
         assert isinstance(mesh_component["geode_id"], str)
         assert isinstance(mesh_component["viewer_id"], int)
         assert isinstance(mesh_component["name"], str)
@@ -511,7 +541,7 @@ def test_model_components(client: FlaskClient) -> None:
     collection_components = response.get_json()["collection_components"]
     assert isinstance(collection_components, list)
     for collection_component in collection_components:
-        assert isinstance(collection_component, object)
+        assert isinstance(collection_component, dict)
         assert isinstance(collection_component["geode_id"], str)
         assert isinstance(collection_component["name"], str)
         assert isinstance(collection_component["items"], list)
@@ -659,15 +689,18 @@ def _load_brep_components(client: FlaskClient) -> tuple[str, dict[str, list[str]
     response = test_save_viewable_file(client, "BRep", "cube.og_brep")
     assert response.status_code == 200
     model_id: str = response.get_json()["id"]
-    mesh_components: list[dict] = response.get_json()["mesh_components"]
+    mesh_components: list[dict[str, object]] = response.get_json()["mesh_components"]
     by_type: dict[str, list[str]] = {}
-    for mc in mesh_components:
-        component_type = mc["type"]
-        by_type.setdefault(component_type, []).append(mc["geode_id"])
+    for mesh_component in mesh_components:
+        component_type = mesh_component["type"]
+        geode_id = mesh_component["geode_id"]
+        assert isinstance(component_type, str)
+        assert isinstance(geode_id, str)
+        by_type.setdefault(component_type, []).append(geode_id)
     return model_id, by_type
 
 
-def _assert_attributes_response(response) -> None:
+def _assert_attributes_response(response: TestResponse) -> None:
     assert response.status_code == 200
     attributes = response.get_json()["attributes"]
     assert isinstance(attributes, list)
