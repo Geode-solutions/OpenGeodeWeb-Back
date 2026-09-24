@@ -73,13 +73,26 @@ def upload_file() -> flask.Response:
     if not os.path.exists(UPLOAD_FOLDER_PATH):
         os.makedirs(UPLOAD_FOLDER_PATH, exist_ok=True)
 
-    file = flask.request.files["file"]
-    if file.filename is None:
-        flask.abort(400, "Filename is required")
-    filename = werkzeug.utils.secure_filename(os.path.basename(file.filename))
+    # Multipart callers (e.g. Vease) still send the file as a "file" form part;
+    # streaming callers PUT the raw bytes as the body with ?filename= as a query param.
+    if flask.request.mimetype == "multipart/form-data":
+        file = flask.request.files["file"]
+        if file.filename is None:
+            flask.abort(400, "Filename is required")
+        filename = werkzeug.utils.secure_filename(os.path.basename(file.filename))
+        file_path = os.path.join(UPLOAD_FOLDER_PATH, filename)
+        file.save(file_path)
+    else:
+        raw_filename = flask.request.args.get("filename")
+        if not raw_filename:
+            flask.abort(400, "Filename is required")
+        filename = werkzeug.utils.secure_filename(os.path.basename(raw_filename))
+        file_path = os.path.join(UPLOAD_FOLDER_PATH, filename)
+        chunk_size = 1024 * 1024
+        with open(file_path, "wb") as destination:
+            while chunk := flask.request.stream.read(chunk_size):
+                destination.write(chunk)
     print(f"{filename=}", flush=True)
-    file_path = os.path.join(UPLOAD_FOLDER_PATH, filename)
-    file.save(file_path)
     if filename.lower().endswith(".csv.json"):
         shutil.copyfile(
             file_path, os.path.join(UPLOAD_FOLDER_PATH, filename[:-9] + ".json")
