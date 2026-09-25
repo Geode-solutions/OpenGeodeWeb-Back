@@ -111,7 +111,9 @@ def test_upload_file_raw_missing_filename(client: FlaskClient) -> None:
     assert response.status_code == 400
 
 
-def test_upload_file_chunked(client: FlaskClient, filename: str = "test.og_brep") -> None:
+def test_upload_file_chunked(
+    client: FlaskClient, filename: str = "test.og_brep"
+) -> None:
     file = os.path.join(data_dir, filename)
     with open(file, "rb") as opened_file:
         file_bytes = opened_file.read()
