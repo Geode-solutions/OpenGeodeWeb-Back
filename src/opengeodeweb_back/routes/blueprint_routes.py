@@ -4,6 +4,7 @@ import os
 import time
 import shutil
 import math
+import typing
 from threading import Timer
 
 # Third party imports
@@ -63,6 +64,18 @@ def allowed_files() -> flask.Response:
     return flask.make_response({"extensions": list(extensions)}, 200)
 
 
+def _write_stream(path: str, stream: typing.IO[bytes], mode: str = "wb") -> None:
+    read_buffer_size = 1024 * 1024
+    with open(path, mode) as destination:
+        while chunk := stream.read(read_buffer_size):
+            destination.write(chunk)
+
+
+def _finalize_upload(filename: str) -> flask.Response:
+    print(f"{filename=}", flush=True)
+    return flask.make_response({"message": "File uploaded"}, 201)
+
+
 @routes.route(
     schemas_dict["upload_file"]["route"],
     methods=schemas_dict["upload_file"]["methods"],
@@ -73,8 +86,12 @@ def upload_file() -> flask.Response:
     if not os.path.exists(UPLOAD_FOLDER_PATH):
         os.makedirs(UPLOAD_FOLDER_PATH, exist_ok=True)
 
-    # Multipart callers (e.g. Vease) still send the file as a "file" form part;
-    # streaming callers PUT the raw bytes as the body with ?filename= as a query param.
+    # Multipart callers (e.g. Vease) still send the whole file as a "file" form
+    # part. Everything else PUTs raw bytes with ?filename= as a query param:
+    # either the whole file in one request, or one of several chunks (when
+    # ?chunk_index=/?total_chunks= are also present) that get appended in
+    # order and assembled into the final file once the last one arrives. This
+    # keeps every request under cloud hosting's hard request-size limit.
     if flask.request.mimetype == "multipart/form-data":
         file = flask.request.files["file"]
         if file.filename is None:
@@ -82,22 +99,30 @@ def upload_file() -> flask.Response:
         filename = werkzeug.utils.secure_filename(os.path.basename(file.filename))
         file_path = os.path.join(UPLOAD_FOLDER_PATH, filename)
         file.save(file_path)
-    else:
-        raw_filename = flask.request.args.get("filename")
-        if not raw_filename:
-            flask.abort(400, "Filename is required")
-        filename = werkzeug.utils.secure_filename(os.path.basename(raw_filename))
-        file_path = os.path.join(UPLOAD_FOLDER_PATH, filename)
-        chunk_size = 1024 * 1024
-        with open(file_path, "wb") as destination:
-            while chunk := flask.request.stream.read(chunk_size):
-                destination.write(chunk)
-    print(f"{filename=}", flush=True)
-    if filename.lower().endswith(".csv.json"):
-        shutil.copyfile(
-            file_path, os.path.join(UPLOAD_FOLDER_PATH, filename[:-9] + ".json")
-        )
-    return flask.make_response({"message": "File uploaded"}, 201)
+        return _finalize_upload(filename)
+
+    raw_filename = flask.request.args.get("filename")
+    if not raw_filename:
+        flask.abort(400, "Filename is required")
+    filename = werkzeug.utils.secure_filename(os.path.basename(raw_filename))
+    file_path = os.path.join(UPLOAD_FOLDER_PATH, filename)
+
+    total_chunks = flask.request.args.get("total_chunks", type=int)
+    if total_chunks is None:
+        _write_stream(file_path, flask.request.stream)
+        return _finalize_upload(filename)
+
+    chunk_index = flask.request.args.get("chunk_index", type=int)
+    if chunk_index is None or not 0 <= chunk_index < total_chunks:
+        flask.abort(400, "Invalid chunk_index")
+
+    part_path = f"{file_path}.part"
+    _write_stream(part_path, flask.request.stream, "wb" if chunk_index == 0 else "ab")
+    if chunk_index < total_chunks - 1:
+        return flask.make_response({"message": "Chunk received"}, 200)
+
+    os.replace(part_path, file_path)
+    return _finalize_upload(filename)
 
 
 @routes.route(
