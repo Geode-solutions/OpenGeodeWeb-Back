@@ -111,6 +111,58 @@ def test_upload_file_raw_missing_filename(client: FlaskClient) -> None:
     assert response.status_code == 400
 
 
+def test_upload_file_chunked(client: FlaskClient, filename: str = "test.og_brep") -> None:
+    file = os.path.join(data_dir, filename)
+    with open(file, "rb") as opened_file:
+        file_bytes = opened_file.read()
+
+    chunk_filename = "chunked_upload_test.og_brep"
+    chunk_size = max(1, len(file_bytes) // 3)
+    chunks = [
+        file_bytes[index : index + chunk_size]
+        for index in range(0, len(file_bytes), chunk_size)
+    ]
+    total_chunks = len(chunks)
+
+    uploaded_path = os.path.join(data_dir, chunk_filename)
+    try:
+        for chunk_index, chunk in enumerate(chunks):
+            response = client.put(
+                f"/opengeodeweb_back/upload_file"
+                f"?filename={chunk_filename}"
+                f"&chunk_index={chunk_index}"
+                f"&total_chunks={total_chunks}",
+                data=chunk,
+                content_type="application/octet-stream",
+            )
+            if chunk_index < total_chunks - 1:
+                assert response.status_code == 200
+                assert not os.path.exists(uploaded_path)
+            else:
+                assert response.status_code == 201
+
+        with open(uploaded_path, "rb") as uploaded_file:
+            assert uploaded_file.read() == file_bytes
+    finally:
+        if os.path.exists(uploaded_path):
+            os.remove(uploaded_path)
+        part_path = f"{uploaded_path}.part"
+        if os.path.exists(part_path):
+            os.remove(part_path)
+
+
+def test_upload_file_chunked_invalid_chunk_index(client: FlaskClient) -> None:
+    response = client.put(
+        "/opengeodeweb_back/upload_file"
+        "?filename=invalid_chunk_index.og_brep"
+        "&chunk_index=2"
+        "&total_chunks=2",
+        data=b"some raw bytes",
+        content_type="application/octet-stream",
+    )
+    assert response.status_code == 400
+
+
 def test_missing_files(client: FlaskClient) -> None:
     route = f"/opengeodeweb_back/missing_files"
 
