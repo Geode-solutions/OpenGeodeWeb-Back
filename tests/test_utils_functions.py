@@ -1,4 +1,5 @@
 # Standard library imports
+import base64
 import re
 import os
 
@@ -180,7 +181,11 @@ def test_generate_files_from_object(
         assert re.match(r"[0-9a-f]{32}", result["id"])
         assert isinstance(result["viewer_type"], str)
         assert isinstance(result["binary_light_viewable"], str)
-        assert result["binary_light_viewable"].startswith('<?xml version="1.0"?>')
+        light_viewable_bytes = base64.b64decode(
+            result["binary_light_viewable"], validate=True
+        )
+        assert light_viewable_bytes.startswith(b'<?xml version="1.0"?>')
+        assert b'<AppendedData encoding="raw">' in light_viewable_bytes
 
         data = Data.get(result["id"])
         assert data is not None
@@ -191,6 +196,8 @@ def test_generate_files_from_object(
         assert os.path.exists(os.path.join(data_path, result["native_file"]))
         assert os.path.exists(os.path.join(data_path, result["viewable_file"]))
         assert os.path.exists(os.path.join(data_path, data.light_viewable_file))
+        with open(os.path.join(data_path, data.light_viewable_file), "rb") as f:
+            assert f.read() == light_viewable_bytes
 
 
 def test_generate_files_from_file(
