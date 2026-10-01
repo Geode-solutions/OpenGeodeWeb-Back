@@ -4,10 +4,10 @@ import os
 # Third party imports
 import flask
 import opengeode
-from opengeodeweb_microservice.schemas import get_schemas_dict
 
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
+from opengeodeweb_back.typed_route import typed_route
 import opengeodeweb_back.routes.create.schemas as schemas
 from opengeodeweb_back.geode_objects.geode_point_set3d import GeodePointSet3D
 from opengeodeweb_back.geode_objects.geode_edged_curve3d import GeodeEdgedCurve3D
@@ -16,18 +16,10 @@ from opengeodeweb_back.geode_objects.geode_polygonal_surface3d import (
 )
 
 routes = flask.Blueprint("create", __name__, url_prefix="/create")
-schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas"))
 
 
-@routes.route(
-    schemas_dict["point_set"]["route"],
-    methods=schemas_dict["point_set"]["methods"],
-)
-def point_set() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["point_set"]
-    )
-    params = schemas.PointSet.from_dict(json_data)
+@typed_route(routes, schemas.point_set_route)
+def point_set(params: schemas.PointSet) -> schemas.PointSetResponse:
 
     pointset = GeodePointSet3D()
     builder = pointset.builder()
@@ -35,20 +27,14 @@ def point_set() -> flask.Response:
     for point in params.points:
         builder.create_point(opengeode.Point3D([point.x, point.y, point.z]))
 
-    result = utils_functions.generate_files_from_object(pointset)
-    return flask.make_response(result, 200)
-
-
-@routes.route(
-    schemas_dict["edged_curve"]["route"],
-    methods=schemas_dict["edged_curve"]["methods"],
-)
-def edged_curve() -> flask.Response:
-    """Endpoint to create an edged curve in 3D space."""
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["edged_curve"]
+    return schemas.PointSetResponse.from_dict(
+        utils_functions.generate_files_from_object(pointset)
     )
-    params = schemas.EdgedCurve.from_dict(json_data)
+
+
+@typed_route(routes, schemas.edged_curve_route)
+def edged_curve(params: schemas.EdgedCurve) -> schemas.EdgedCurveResponse:
+    """Endpoint to create an edged curve in 3D space."""
 
     edged_curve_obj = GeodeEdgedCurve3D()
     builder = edged_curve_obj.builder()
@@ -59,20 +45,16 @@ def edged_curve() -> flask.Response:
     for edge in params.edges:
         builder.create_edge_with_vertices(edge[0], edge[1])
 
-    result = utils_functions.generate_files_from_object(edged_curve_obj)
-    return flask.make_response(result, 200)
-
-
-@routes.route(
-    schemas_dict["polygonal_surface"]["route"],
-    methods=schemas_dict["polygonal_surface"]["methods"],
-)
-def polygonal_surface() -> flask.Response:
-    """Endpoint to create a polygonal surface in 3D space."""
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["polygonal_surface"]
+    return schemas.EdgedCurveResponse.from_dict(
+        utils_functions.generate_files_from_object(edged_curve_obj)
     )
-    params = schemas.PolygonalSurface.from_dict(json_data)
+
+
+@typed_route(routes, schemas.polygonal_surface_route)
+def polygonal_surface(
+    params: schemas.PolygonalSurface,
+) -> schemas.PolygonalSurfaceResponse:
+    """Endpoint to create a polygonal surface in 3D space."""
 
     polygonal_surface_obj = GeodePolygonalSurface3D()
     builder = polygonal_surface_obj.builder()
@@ -85,5 +67,6 @@ def polygonal_surface() -> flask.Response:
 
     builder.compute_polygon_adjacencies()
 
-    result = utils_functions.generate_files_from_object(polygonal_surface_obj)
-    return flask.make_response(result, 200)
+    return schemas.PolygonalSurfaceResponse.from_dict(
+        utils_functions.generate_files_from_object(polygonal_surface_obj)
+    )

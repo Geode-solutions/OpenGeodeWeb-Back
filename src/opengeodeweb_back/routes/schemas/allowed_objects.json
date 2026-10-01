@@ -13,5 +13,33 @@
   "required": [
     "filename"
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "allowed_objects": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "properties": {
+            "is_loadable": {
+              "type": "number"
+            },
+            "object_priority": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "is_loadable",
+            "object_priority"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "allowed_objects"
+    ],
+    "additionalProperties": false
+  }
 }

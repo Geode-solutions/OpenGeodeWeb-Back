@@ -13,5 +13,37 @@
   "required": [
     "geode_object_type"
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "crs_list": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "code": {
+              "type": "string"
+            },
+            "authority": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "code",
+            "authority"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "crs_list"
+    ],
+    "additionalProperties": false
+  }
 }

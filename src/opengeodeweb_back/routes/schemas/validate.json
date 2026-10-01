@@ -12,5 +12,28 @@
   "required": [
     "id"
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "is_valid": {
+        "type": "boolean"
+      },
+      "nb_issues": {
+        "type": "integer"
+      },
+      "issues": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [
+      "is_valid",
+      "nb_issues",
+      "issues"
+    ],
+    "additionalProperties": false
+  }
 }

@@ -17,23 +17,27 @@
     "url": "git+https://github.com/Geode-solutions/OpenGeodeWeb-Back.git"
   },
   "files": [
-    "opengeodeweb_back_schemas.json"
+    "opengeodeweb_back_schemas.json",
+    "opengeodeweb_back_typed_schemas.js",
+    "opengeodeweb_back_typed_schemas.d.ts"
   ],
   "exports": {
     "./opengeodeweb_back_schemas.json": {
       "import": "./opengeodeweb_back_schemas.json",
       "require": "./opengeodeweb_back_schemas.json"
+    },
+    "./opengeodeweb_back_typed_schemas.js": {
+      "types": "./opengeodeweb_back_typed_schemas.d.ts",
+      "default": "./opengeodeweb_back_typed_schemas.js"
     }
   },
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
-    "json": "npx opengeodeweb-microservice-generate --startDir src/opengeodeweb_back/routes --key route --separator /",
+    "json": "npx opengeodeweb-microservice-generate --startDir src/opengeodeweb_back/routes --key route --separator / --requireResponse",
     "test": "npm run json",
     "build": "npm run json"
   },
-  "dependencies": {
-    "@geode/opengeodeweb-microservice": "0.0.0"
-  }
+  "dependencies": {}
 }

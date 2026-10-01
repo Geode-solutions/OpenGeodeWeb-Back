@@ -1,6 +1,8 @@
 {
   "route": "/polygonal_surface",
-  "methods": ["POST"],
+  "methods": [
+    "POST"
+  ],
   "type": "object",
   "properties": {
     "name": {
@@ -13,11 +15,21 @@
         "title": "PolygonalSurfacePoint",
         "type": "object",
         "properties": {
-          "x": { "type": "number" },
-          "y": { "type": "number" },
-          "z": { "type": "number" }
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "z": {
+            "type": "number"
+          }
         },
-        "required": ["x", "y", "z"],
+        "required": [
+          "x",
+          "y",
+          "z"
+        ],
         "additionalProperties": false
       },
       "minItems": 3
@@ -26,12 +38,138 @@
       "type": "array",
       "items": {
         "type": "array",
-        "items": { "type": "integer" },
+        "items": {
+          "type": "integer"
+        },
         "minItems": 3
       },
       "minItems": 1
     }
   },
-  "required": ["name", "points", "polygons"],
-  "additionalProperties": false
+  "required": [
+    "name",
+    "points",
+    "polygons"
+  ],
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "native_file": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "viewer_type": {
+        "type": "string"
+      },
+      "is_viewable": {
+        "type": "boolean"
+      },
+      "geode_object_type": {
+        "type": "string"
+      },
+      "viewable_file": {
+        "type": "string"
+      },
+      "binary_light_viewable": {
+        "type": "string"
+      },
+      "nb_vertices": {
+        "type": "integer"
+      },
+      "mesh_components": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "viewer_id": {
+              "type": "integer"
+            },
+            "geode_id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "boundaries": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "internals": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "is_active": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "viewer_id",
+            "geode_id",
+            "name",
+            "type",
+            "boundaries",
+            "internals",
+            "is_active"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "collection_components": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "geode_id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "is_active": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "geode_id",
+            "name",
+            "type",
+            "items",
+            "is_active"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "native_file",
+      "id",
+      "name",
+      "viewer_type",
+      "is_viewable",
+      "geode_object_type"
+    ],
+    "additionalProperties": false
+  }
 }
