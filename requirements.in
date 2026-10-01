@@ -4,7 +4,7 @@ opengeode-geosciences==9.8.0
 opengeode-geosciencesio==5.10.2
 opengeode-inspector==6.12.1
 opengeode-inspector-geosciences==1.2.1
-geode-common==33.26.3
+geode-common==33.26.5
 geode-viewables==3.5.0
 flask[async]==3.1.2
 flask-cors==6.0.2
