@@ -33,7 +33,5 @@
     "test": "npm run json",
     "build": "npm run json"
   },
-  "dependencies": {
-    "@geode/opengeodeweb-microservice": "0.0.0"
-  }
+  "dependencies": {}
 }
