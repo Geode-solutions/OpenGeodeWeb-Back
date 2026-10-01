@@ -16,7 +16,7 @@ import importlib.metadata as metadata
 import shutil
 from werkzeug.exceptions import HTTPException
 import werkzeug
-from opengeodeweb_microservice.schemas import SchemaDict
+from opengeodeweb_microservice.schemas import ErrorResponse, SchemaDict
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_microservice.database.data_types import GeodeObjectType
@@ -179,16 +179,24 @@ def send_file(
 
 def handle_exception(exception: HTTPException) -> flask.Response:
     print("\033[91mError:\033[0m \033[91m" + str(exception) + "\033[0m", flush=True)
-    response = flask.jsonify(
-        {
-            "code": exception.code,
-            "name": exception.name,
-            "description": exception.description or "An error occurred",
-        }
+    code = exception.code or 500
+    error = ErrorResponse(
+        code=code,
+        name=exception.name,
+        description=exception.description or "An error occurred",
     )
+    response = flask.jsonify(error.to_dict())
     response.content_type = "application/json"
-    response.status_code = exception.code or 500
+    response.status_code = code
     return response
+
+
+def handle_unexpected_exception(exception: Exception) -> flask.Response:
+    print("\033[91mError:\033[0m \033[91m" + str(exception) + "\033[0m", flush=True)
+    error = ErrorResponse(
+        code=500, name="Internal Server Error", description=str(exception)
+    )
+    return flask.make_response(error.to_dict(), 500)
 
 
 def create_data_folder_from_id(data_id: str) -> str:

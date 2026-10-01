@@ -13,5 +13,20 @@
   "required": [
     "id"
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "texture_coordinates": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [
+      "texture_coordinates"
+    ],
+    "additionalProperties": false
+  }
 }

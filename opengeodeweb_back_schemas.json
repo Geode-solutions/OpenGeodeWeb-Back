@@ -55,7 +55,127 @@
           "points",
           "polygons"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "response": {
+          "type": "object",
+          "properties": {
+            "native_file": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "viewer_type": {
+              "type": "string"
+            },
+            "is_viewable": {
+              "type": "boolean"
+            },
+            "geode_object_type": {
+              "type": "string"
+            },
+            "viewable_file": {
+              "type": "string"
+            },
+            "binary_light_viewable": {
+              "type": "string"
+            },
+            "nb_vertices": {
+              "type": "integer"
+            },
+            "mesh_components": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "viewer_id": {
+                    "type": "integer"
+                  },
+                  "geode_id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "boundaries": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "internals": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "viewer_id",
+                  "geode_id",
+                  "name",
+                  "type",
+                  "boundaries",
+                  "internals",
+                  "is_active"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "collection_components": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "geode_id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "geode_id",
+                  "name",
+                  "type",
+                  "items",
+                  "is_active"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "native_file",
+            "id",
+            "name",
+            "viewer_type",
+            "is_viewable",
+            "geode_object_type"
+          ],
+          "additionalProperties": false
+        }
       },
       "point_set": {
         "$id": "opengeodeweb_back/create/point_set",
@@ -98,7 +218,127 @@
           "name",
           "points"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "response": {
+          "type": "object",
+          "properties": {
+            "native_file": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "viewer_type": {
+              "type": "string"
+            },
+            "is_viewable": {
+              "type": "boolean"
+            },
+            "geode_object_type": {
+              "type": "string"
+            },
+            "viewable_file": {
+              "type": "string"
+            },
+            "binary_light_viewable": {
+              "type": "string"
+            },
+            "nb_vertices": {
+              "type": "integer"
+            },
+            "mesh_components": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "viewer_id": {
+                    "type": "integer"
+                  },
+                  "geode_id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "boundaries": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "internals": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "viewer_id",
+                  "geode_id",
+                  "name",
+                  "type",
+                  "boundaries",
+                  "internals",
+                  "is_active"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "collection_components": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "geode_id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "geode_id",
+                  "name",
+                  "type",
+                  "items",
+                  "is_active"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "native_file",
+            "id",
+            "name",
+            "viewer_type",
+            "is_viewable",
+            "geode_object_type"
+          ],
+          "additionalProperties": false
+        }
       },
       "edged_curve": {
         "$id": "opengeodeweb_back/create/edged_curve",
@@ -155,7 +395,127 @@
           "points",
           "edges"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "response": {
+          "type": "object",
+          "properties": {
+            "native_file": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "viewer_type": {
+              "type": "string"
+            },
+            "is_viewable": {
+              "type": "boolean"
+            },
+            "geode_object_type": {
+              "type": "string"
+            },
+            "viewable_file": {
+              "type": "string"
+            },
+            "binary_light_viewable": {
+              "type": "string"
+            },
+            "nb_vertices": {
+              "type": "integer"
+            },
+            "mesh_components": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "viewer_id": {
+                    "type": "integer"
+                  },
+                  "geode_id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "boundaries": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "internals": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "viewer_id",
+                  "geode_id",
+                  "name",
+                  "type",
+                  "boundaries",
+                  "internals",
+                  "is_active"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "collection_components": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "geode_id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "geode_id",
+                  "name",
+                  "type",
+                  "items",
+                  "is_active"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "native_file",
+            "id",
+            "name",
+            "viewer_type",
+            "is_viewable",
+            "geode_object_type"
+          ],
+          "additionalProperties": false
+        }
       }
     },
     "vertex_attribute_names": {
@@ -174,7 +534,65 @@
       "required": [
         "id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "attributes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "attribute_name": {
+                  "type": "string"
+                },
+                "attribute_id": {
+                  "type": "string"
+                },
+                "nb_items": {
+                  "type": "integer"
+                },
+                "min_value": {
+                  "type": "number"
+                },
+                "max_value": {
+                  "type": "number"
+                },
+                "min_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "max_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "no_data": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "attribute_name",
+                "attribute_id",
+                "nb_items",
+                "min_value",
+                "max_value",
+                "min_values",
+                "max_values",
+                "no_data"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "attributes"
+        ],
+        "additionalProperties": false
+      }
     },
     "validate": {
       "$id": "opengeodeweb_back/validate",
@@ -191,7 +609,30 @@
       "required": [
         "id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "is_valid": {
+            "type": "boolean"
+          },
+          "nb_issues": {
+            "type": "integer"
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "is_valid",
+          "nb_issues",
+          "issues"
+        ],
+        "additionalProperties": false
+      }
     },
     "upload_file": {
       "$id": "opengeodeweb_back/upload_file",
@@ -207,7 +648,19 @@
           "minLength": 1
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "additionalProperties": false
+      }
     },
     "texture_coordinates": {
       "$id": "opengeodeweb_back/texture_coordinates",
@@ -225,7 +678,22 @@
       "required": [
         "id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "texture_coordinates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "texture_coordinates"
+        ],
+        "additionalProperties": false
+      }
     },
     "save_viewable_file": {
       "$id": "opengeodeweb_back/save_viewable_file",
@@ -248,7 +716,127 @@
         "geode_object_type",
         "filename"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "native_file": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "viewer_type": {
+            "type": "string"
+          },
+          "is_viewable": {
+            "type": "boolean"
+          },
+          "geode_object_type": {
+            "type": "string"
+          },
+          "viewable_file": {
+            "type": "string"
+          },
+          "binary_light_viewable": {
+            "type": "string"
+          },
+          "nb_vertices": {
+            "type": "integer"
+          },
+          "mesh_components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "viewer_id": {
+                  "type": "integer"
+                },
+                "geode_id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "boundaries": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "internals": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "is_active": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "viewer_id",
+                "geode_id",
+                "name",
+                "type",
+                "boundaries",
+                "internals",
+                "is_active"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "collection_components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "geode_id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "is_active": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "geode_id",
+                "name",
+                "type",
+                "items",
+                "is_active"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "native_file",
+          "id",
+          "name",
+          "viewer_type",
+          "is_viewable",
+          "geode_object_type"
+        ],
+        "additionalProperties": false
+      }
     },
     "polyhedron_attribute_names": {
       "$id": "opengeodeweb_back/polyhedron_attribute_names",
@@ -266,7 +854,65 @@
       "required": [
         "id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "attributes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "attribute_name": {
+                  "type": "string"
+                },
+                "attribute_id": {
+                  "type": "string"
+                },
+                "nb_items": {
+                  "type": "integer"
+                },
+                "min_value": {
+                  "type": "number"
+                },
+                "max_value": {
+                  "type": "number"
+                },
+                "min_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "max_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "no_data": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "attribute_name",
+                "attribute_id",
+                "nb_items",
+                "min_value",
+                "max_value",
+                "min_values",
+                "max_values",
+                "no_data"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "attributes"
+        ],
+        "additionalProperties": false
+      }
     },
     "polygon_attribute_names": {
       "$id": "opengeodeweb_back/polygon_attribute_names",
@@ -284,7 +930,65 @@
       "required": [
         "id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "attributes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "attribute_name": {
+                  "type": "string"
+                },
+                "attribute_id": {
+                  "type": "string"
+                },
+                "nb_items": {
+                  "type": "integer"
+                },
+                "min_value": {
+                  "type": "number"
+                },
+                "max_value": {
+                  "type": "number"
+                },
+                "min_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "max_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "no_data": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "attribute_name",
+                "attribute_id",
+                "nb_items",
+                "min_value",
+                "max_value",
+                "min_values",
+                "max_values",
+                "no_data"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "attributes"
+        ],
+        "additionalProperties": false
+      }
     },
     "ping": {
       "$id": "opengeodeweb_back/ping",
@@ -295,7 +999,19 @@
       "type": "object",
       "properties": {},
       "required": [],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "additionalProperties": false
+      }
     },
     "model_component_vertex_attribute_names": {
       "$id": "opengeodeweb_back/model_component_vertex_attribute_names",
@@ -322,7 +1038,65 @@
         "id",
         "component_ids"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "attributes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "attribute_name": {
+                  "type": "string"
+                },
+                "attribute_id": {
+                  "type": "string"
+                },
+                "nb_items": {
+                  "type": "integer"
+                },
+                "min_value": {
+                  "type": "number"
+                },
+                "max_value": {
+                  "type": "number"
+                },
+                "min_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "max_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "no_data": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "attribute_name",
+                "attribute_id",
+                "nb_items",
+                "min_value",
+                "max_value",
+                "min_values",
+                "max_values",
+                "no_data"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "attributes"
+        ],
+        "additionalProperties": false
+      }
     },
     "model_component_polyhedron_attribute_names": {
       "$id": "opengeodeweb_back/model_component_polyhedron_attribute_names",
@@ -349,7 +1123,65 @@
         "id",
         "component_ids"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "attributes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "attribute_name": {
+                  "type": "string"
+                },
+                "attribute_id": {
+                  "type": "string"
+                },
+                "nb_items": {
+                  "type": "integer"
+                },
+                "min_value": {
+                  "type": "number"
+                },
+                "max_value": {
+                  "type": "number"
+                },
+                "min_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "max_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "no_data": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "attribute_name",
+                "attribute_id",
+                "nb_items",
+                "min_value",
+                "max_value",
+                "min_values",
+                "max_values",
+                "no_data"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "attributes"
+        ],
+        "additionalProperties": false
+      }
     },
     "model_component_polygon_attribute_names": {
       "$id": "opengeodeweb_back/model_component_polygon_attribute_names",
@@ -376,7 +1208,65 @@
         "id",
         "component_ids"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "attributes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "attribute_name": {
+                  "type": "string"
+                },
+                "attribute_id": {
+                  "type": "string"
+                },
+                "nb_items": {
+                  "type": "integer"
+                },
+                "min_value": {
+                  "type": "number"
+                },
+                "max_value": {
+                  "type": "number"
+                },
+                "min_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "max_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "no_data": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "attribute_name",
+                "attribute_id",
+                "nb_items",
+                "min_value",
+                "max_value",
+                "min_values",
+                "max_values",
+                "no_data"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "attributes"
+        ],
+        "additionalProperties": false
+      }
     },
     "model_component_edge_attribute_names": {
       "$id": "opengeodeweb_back/model_component_edge_attribute_names",
@@ -403,7 +1293,65 @@
         "id",
         "component_ids"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "attributes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "attribute_name": {
+                  "type": "string"
+                },
+                "attribute_id": {
+                  "type": "string"
+                },
+                "nb_items": {
+                  "type": "integer"
+                },
+                "min_value": {
+                  "type": "number"
+                },
+                "max_value": {
+                  "type": "number"
+                },
+                "min_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "max_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "no_data": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "attribute_name",
+                "attribute_id",
+                "nb_items",
+                "min_value",
+                "max_value",
+                "min_values",
+                "max_values",
+                "no_data"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "attributes"
+        ],
+        "additionalProperties": false
+      }
     },
     "missing_files": {
       "$id": "opengeodeweb_back/missing_files",
@@ -426,7 +1374,33 @@
         "geode_object_type",
         "filename"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "has_missing_files": {
+            "type": "boolean"
+          },
+          "mandatory_files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "additional_files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "has_missing_files",
+          "mandatory_files",
+          "additional_files"
+        ],
+        "additionalProperties": false
+      }
     },
     "kill": {
       "$id": "opengeodeweb_back/kill",
@@ -437,7 +1411,19 @@
       "type": "object",
       "properties": {},
       "required": [],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "additionalProperties": false
+      }
     },
     "import_project": {
       "$id": "opengeodeweb_back/import_project",
@@ -448,7 +1434,19 @@
       "type": "object",
       "properties": {},
       "required": [],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "snapshot": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "snapshot"
+        ],
+        "additionalProperties": false
+      }
     },
     "geographic_coordinate_systems": {
       "$id": "opengeodeweb_back/geographic_coordinate_systems",
@@ -466,7 +1464,39 @@
       "required": [
         "geode_object_type"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "crs_list": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "authority": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "code",
+                "authority"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "crs_list"
+        ],
+        "additionalProperties": false
+      }
     },
     "geode_objects_and_output_extensions": {
       "$id": "opengeodeweb_back/geode_objects_and_output_extensions",
@@ -489,7 +1519,25 @@
         "geode_object_type",
         "filename"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "geode_objects_and_output_extensions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "required": [
+          "geode_objects_and_output_extensions"
+        ],
+        "additionalProperties": false
+      }
     },
     "geode_object_inheritance": {
       "$id": "opengeodeweb_back/geode_object_inheritance",
@@ -507,7 +1555,29 @@
       "required": [
         "geode_object_type"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "parents": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "parents",
+          "children"
+        ],
+        "additionalProperties": false
+      }
     },
     "export_project": {
       "$id": "opengeodeweb_back/export_project",
@@ -529,7 +1599,10 @@
         "snapshot",
         "filename"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "format": "binary"
+      }
     },
     "edge_attribute_names": {
       "$id": "opengeodeweb_back/edge_attribute_names",
@@ -547,7 +1620,65 @@
       "required": [
         "id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "attributes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "attribute_name": {
+                  "type": "string"
+                },
+                "attribute_id": {
+                  "type": "string"
+                },
+                "nb_items": {
+                  "type": "integer"
+                },
+                "min_value": {
+                  "type": "number"
+                },
+                "max_value": {
+                  "type": "number"
+                },
+                "min_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "max_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "no_data": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "attribute_name",
+                "attribute_id",
+                "nb_items",
+                "min_value",
+                "max_value",
+                "min_values",
+                "max_values",
+                "no_data"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "attributes"
+        ],
+        "additionalProperties": false
+      }
     },
     "cell_attribute_names": {
       "$id": "opengeodeweb_back/cell_attribute_names",
@@ -565,7 +1696,65 @@
       "required": [
         "id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "attributes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "attribute_name": {
+                  "type": "string"
+                },
+                "attribute_id": {
+                  "type": "string"
+                },
+                "nb_items": {
+                  "type": "integer"
+                },
+                "min_value": {
+                  "type": "number"
+                },
+                "max_value": {
+                  "type": "number"
+                },
+                "min_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "max_values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "no_data": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "attribute_name",
+                "attribute_id",
+                "nb_items",
+                "min_value",
+                "max_value",
+                "min_values",
+                "max_values",
+                "no_data"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "attributes"
+        ],
+        "additionalProperties": false
+      }
     },
     "allowed_objects": {
       "$id": "opengeodeweb_back/allowed_objects",
@@ -583,7 +1772,35 @@
       "required": [
         "filename"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "allowed_objects": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "is_loadable": {
+                  "type": "number"
+                },
+                "object_priority": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "is_loadable",
+                "object_priority"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "allowed_objects"
+        ],
+        "additionalProperties": false
+      }
     },
     "allowed_files": {
       "$id": "opengeodeweb_back/allowed_files",
@@ -594,7 +1811,22 @@
       "type": "object",
       "properties": {},
       "required": [],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "extensions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "extensions"
+        ],
+        "additionalProperties": false
+      }
     }
   }
 }

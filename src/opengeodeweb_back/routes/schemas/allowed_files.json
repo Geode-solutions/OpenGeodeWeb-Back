@@ -6,5 +6,20 @@
   "type": "object",
   "properties": {},
   "required": [],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "extensions": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [
+      "extensions"
+    ],
+    "additionalProperties": false
+  }
 }

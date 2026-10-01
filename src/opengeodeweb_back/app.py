@@ -76,8 +76,7 @@ def create_app(name: str) -> flask.Flask:
 
     @app.errorhandler(Exception)
     def handle_generic_exception(exception: Exception) -> Response:
-        print("\033[91mError:\033[0m \033[91m" + str(exception) + "\033[0m", flush=True)
-        return flask.make_response({"description": str(exception)}, 500)
+        return utils_functions.handle_unexpected_exception(exception)
 
     @app.route("/events")
     def events() -> flask.Response:

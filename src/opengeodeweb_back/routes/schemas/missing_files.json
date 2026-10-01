@@ -18,5 +18,31 @@
     "geode_object_type",
     "filename"
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "has_missing_files": {
+        "type": "boolean"
+      },
+      "mandatory_files": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "additional_files": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [
+      "has_missing_files",
+      "mandatory_files",
+      "additional_files"
+    ],
+    "additionalProperties": false
+  }
 }
