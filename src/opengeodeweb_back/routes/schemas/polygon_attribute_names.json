@@ -13,5 +13,63 @@
   "required": [
     "id"
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "attributes": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "attribute_name": {
+              "type": "string"
+            },
+            "attribute_id": {
+              "type": "string"
+            },
+            "nb_items": {
+              "type": "integer"
+            },
+            "min_value": {
+              "type": "number"
+            },
+            "max_value": {
+              "type": "number"
+            },
+            "min_values": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "max_values": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "no_data": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "attribute_name",
+            "attribute_id",
+            "nb_items",
+            "min_value",
+            "max_value",
+            "min_values",
+            "max_values",
+            "no_data"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "attributes"
+    ],
+    "additionalProperties": false
+  }
 }

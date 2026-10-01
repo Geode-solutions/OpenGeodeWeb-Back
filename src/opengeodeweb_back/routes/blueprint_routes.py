@@ -15,7 +15,6 @@ import opengeode as og
 import opengeode_io as og_io
 import opengeode_geosciences as og_geosciences
 import opengeode_geosciencesio as og_geosciencesio
-from opengeodeweb_microservice.schemas import get_schemas_dict
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_microservice.database import connection
@@ -23,6 +22,7 @@ from opengeodeweb_microservice.database.data_types import geode_object_type
 
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
+from opengeodeweb_back.typed_route import parse_params, raw_route, typed_route
 from opengeodeweb_back.routes import schemas
 from opengeodeweb_back.geode_objects import geode_objects
 from opengeodeweb_back.geode_objects.geode_mesh import GeodeMesh
@@ -48,20 +48,15 @@ ComponentBlock = og.Block3D
 
 routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
 
-schemas_dict = get_schemas_dict(os.path.join(os.path.dirname(__file__), "schemas"))
 
 
-@routes.route(
-    schemas_dict["allowed_files"]["route"],
-    methods=schemas_dict["allowed_files"]["methods"],
-)
-def allowed_files() -> flask.Response:
-    utils_functions.validate_request(flask.request, schemas_dict["allowed_files"])
+@typed_route(routes, schemas.allowed_files_route)
+def allowed_files(params: schemas.AllowedFiles) -> schemas.AllowedFilesResponse:
     extensions: set[str] = set()
     for geode_object in geode_objects.values():
         for extension in geode_object.input_extensions():
             extensions.add(extension)
-    return flask.make_response({"extensions": list(extensions)}, 200)
+    return schemas.AllowedFilesResponse(extensions=list(extensions))
 
 
 def _write_stream(path: str, stream: typing.IO[bytes], mode: str = "wb") -> None:
@@ -71,15 +66,16 @@ def _write_stream(path: str, stream: typing.IO[bytes], mode: str = "wb") -> None
             destination.write(chunk)
 
 
+def _upload_response(message: str, status: int) -> flask.Response:
+    return flask.make_response(schemas.UploadFileResponse(message=message).to_dict(), status)
+
+
 def _finalize_upload(filename: str) -> flask.Response:
     print(f"{filename=}", flush=True)
-    return flask.make_response({"message": "File uploaded"}, 201)
+    return _upload_response("File uploaded", 201)
 
 
-@routes.route(
-    schemas_dict["upload_file"]["route"],
-    methods=schemas_dict["upload_file"]["methods"],
-)
+@raw_route(routes, schemas.upload_file_route)
 def upload_file() -> flask.Response:
     UPLOAD_FOLDER_PATH = flask.current_app.config["UPLOAD_FOLDER_PATH"]
     print(f"{UPLOAD_FOLDER_PATH=}", flush=True)
@@ -119,47 +115,35 @@ def upload_file() -> flask.Response:
     part_path = f"{file_path}.part"
     _write_stream(part_path, flask.request.stream, "wb" if chunk_index == 0 else "ab")
     if chunk_index < total_chunks - 1:
-        return flask.make_response({"message": "Chunk received"}, 200)
+        return _upload_response("Chunk received", 200)
 
     os.replace(part_path, file_path)
     return _finalize_upload(filename)
 
 
-@routes.route(
-    schemas_dict["allowed_objects"]["route"],
-    methods=schemas_dict["allowed_objects"]["methods"],
-)
-def allowed_objects() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["allowed_objects"]
-    )
-    params = schemas.AllowedObjects.from_dict(json_data)
+@typed_route(routes, schemas.allowed_objects_route)
+def allowed_objects(
+    params: schemas.AllowedObjects,
+) -> schemas.AllowedObjectsResponse:
     file_absolute_path = geode_functions.upload_file_path(params.filename)
     file_extension = utils_functions.extension_from_filename(
         os.path.basename(file_absolute_path)
     )
-    allowed_objects = {}
+    allowed_objects: dict[str, schemas.allowed_objects.AllowedObject] = {}
     for geode_object_type, geode_object in geode_objects.items():
         if file_extension not in geode_object.input_extensions():
             continue
         loadability_score = geode_object.is_loadable(file_absolute_path)
         priority_score = geode_object.object_priority(file_absolute_path)
-        allowed_objects[geode_object_type] = {
-            "is_loadable": loadability_score.value(),
-            "object_priority": priority_score,
-        }
-    return flask.make_response({"allowed_objects": allowed_objects}, 200)
+        allowed_objects[geode_object_type] = schemas.allowed_objects.AllowedObject(
+            is_loadable=loadability_score.value(),
+            object_priority=priority_score,
+        )
+    return schemas.AllowedObjectsResponse(allowed_objects=allowed_objects)
 
 
-@routes.route(
-    schemas_dict["missing_files"]["route"],
-    methods=schemas_dict["missing_files"]["methods"],
-)
-def missing_files() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["missing_files"]
-    )
-    params = schemas.MissingFiles.from_dict(json_data)
+@typed_route(routes, schemas.missing_files_route)
+def missing_files(params: schemas.MissingFiles) -> schemas.MissingFilesResponse:
     file_path = geode_functions.upload_file_path(params.filename)
     geode_object = geode_functions.geode_object_from_string(params.geode_object_type)
     additional_files = geode_object.additional_files(
@@ -180,69 +164,47 @@ def missing_files() -> flask.Response:
         if file.is_missing
     ]
 
-    return flask.make_response(
-        {
-            "has_missing_files": has_missing_files,
-            "mandatory_files": mandatory_files,
-            "additional_files": additional_files_array,
-        },
-        200,
+    return schemas.MissingFilesResponse(
+        has_missing_files=has_missing_files,
+        mandatory_files=mandatory_files,
+        additional_files=additional_files_array,
     )
 
 
-@routes.route(
-    schemas_dict["geographic_coordinate_systems"]["route"],
-    methods=schemas_dict["geographic_coordinate_systems"]["methods"],
-)
-def crs_converter_geographic_coordinate_systems() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["geographic_coordinate_systems"]
-    )
-    params = schemas.GeographicCoordinateSystems.from_dict(json_data)
+@typed_route(routes, schemas.geographic_coordinate_systems_route)
+def crs_converter_geographic_coordinate_systems(
+    params: schemas.GeographicCoordinateSystems,
+) -> schemas.GeographicCoordinateSystemsResponse:
     geode_object = geode_functions.geode_object_from_string(params.geode_object_type)
     infos = (
         og_geosciences.GeographicCoordinateSystem3D.geographic_coordinate_systems()
         if geode_object.is_3D()
         else og_geosciences.GeographicCoordinateSystem2D.geographic_coordinate_systems()
     )
-    crs_list = []
-    for info in infos:
-        crs = {}
-        crs["name"] = info.name
-        crs["code"] = info.code
-        crs["authority"] = info.authority
-        crs_list.append(crs)
-    return flask.make_response({"crs_list": crs_list}, 200)
+    crs_list = [
+        schemas.geographic_coordinate_systems.CRSList(
+            name=info.name, code=info.code, authority=info.authority
+        )
+        for info in infos
+    ]
+    return schemas.GeographicCoordinateSystemsResponse(crs_list=crs_list)
 
 
-@routes.route(
-    schemas_dict["validate"]["route"],
-    methods=schemas_dict["validate"]["methods"],
-)
-def validate_object() -> flask.Response:
-    utils_functions.validate_request(flask.request, schemas_dict["validate"])
-    params = schemas.Validate.from_dict(flask.request.get_json())
+@typed_route(routes, schemas.validate_route)
+def validate_object(params: schemas.Validate) -> schemas.ValidateResponse:
     geode_object = geode_functions.load_geode_object(params.id)
     validity = geode_object.validate()
-    return flask.make_response(
-        {
-            "is_valid": validity.nb_issues() == 0,
-            "nb_issues": validity.nb_issues(),
-            "issues": validity.invalidities,
-        },
-        200,
+    return schemas.ValidateResponse(
+        is_valid=validity.nb_issues() == 0,
+        nb_issues=validity.nb_issues(),
+        issues=validity.invalidities,
     )
 
 
-@routes.route(
-    schemas_dict["geode_objects_and_output_extensions"]["route"],
-    methods=schemas_dict["geode_objects_and_output_extensions"]["methods"],
-)
-def geode_objects_and_output_extensions() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["geode_objects_and_output_extensions"]
-    )
-    params = schemas.GeodeObjectsAndOutputExtensions.from_dict(json_data)
+@typed_route(routes, schemas.geode_objects_and_output_extensions_route)
+def geode_objects_and_output_extensions(
+    params: schemas.GeodeObjectsAndOutputExtensions,
+) -> schemas.GeodeObjectsAndOutputExtensionsResponse:
     file_path = geode_functions.upload_file_path(params.filename)
     geode_object = geode_functions.geode_object_from_string(
         params.geode_object_type
@@ -250,44 +212,35 @@ def geode_objects_and_output_extensions() -> flask.Response:
     geode_objects_and_output_extensions = (
         geode_functions.geode_object_output_extensions(geode_object)
     )
-    return flask.make_response(
-        {"geode_objects_and_output_extensions": geode_objects_and_output_extensions},
-        200,
+    return schemas.GeodeObjectsAndOutputExtensionsResponse(
+        geode_objects_and_output_extensions={
+            str(object_type): extensions
+            for object_type, extensions in geode_objects_and_output_extensions.items()
+        }
     )
 
 
-@routes.route(
-    schemas_dict["save_viewable_file"]["route"],
-    methods=schemas_dict["save_viewable_file"]["methods"],
-)
-def save_viewable_file() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["save_viewable_file"]
-    )
-    params = schemas.SaveViewableFile.from_dict(json_data)
-    return flask.make_response(
+@typed_route(routes, schemas.save_viewable_file_route)
+def save_viewable_file(
+    params: schemas.SaveViewableFile,
+) -> schemas.SaveViewableFileResponse:
+    return schemas.SaveViewableFileResponse.from_dict(
         utils_functions.generate_files_from_file(
             geode_object_type=geode_object_type(params.geode_object_type),
             input_file=params.filename,
-        ),
-        200,
+        )
     )
 
 
-@routes.route(
-    schemas_dict["texture_coordinates"]["route"],
-    methods=schemas_dict["texture_coordinates"]["methods"],
-)
-def texture_coordinates() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["texture_coordinates"]
-    )
-    params = schemas.TextureCoordinates.from_dict(json_data)
+@typed_route(routes, schemas.texture_coordinates_route)
+def texture_coordinates(
+    params: schemas.TextureCoordinates,
+) -> schemas.TextureCoordinatesResponse:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeSurfaceMesh2D | GeodeSurfaceMesh3D):
         flask.abort(400, f"{params.id} is not a GeodeSurfaceMesh")
     texture_coordinates = geode_object.texture_manager().texture_names()
-    return flask.make_response({"texture_coordinates": texture_coordinates}, 200)
+    return schemas.TextureCoordinatesResponse(texture_coordinates=texture_coordinates)
 
 
 def extract_valid_attribute_values(
@@ -384,110 +337,75 @@ def attributes_metadata(
     return attributes
 
 
-@routes.route(
-    schemas_dict["vertex_attribute_names"]["route"],
-    methods=schemas_dict["vertex_attribute_names"]["methods"],
-)
-def vertex_attribute_names() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["vertex_attribute_names"]
-    )
-    params = schemas.VertexAttributeNames.from_dict(json_data)
+@typed_route(routes, schemas.vertex_attribute_names_route)
+def vertex_attribute_names(
+    params: schemas.VertexAttributeNames,
+) -> schemas.VertexAttributeNamesResponse:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeMesh):
         flask.abort(400, f"{params.id} is not a GeodeMesh")
     attribute_manager = geode_object.vertex_attribute_manager()
-    return flask.make_response(
-        {"attributes": attributes_metadata(attribute_manager)},
-        200,
+    return schemas.VertexAttributeNamesResponse.from_dict(
+        {"attributes": attributes_metadata(attribute_manager)}
     )
 
 
-@routes.route(
-    schemas_dict["cell_attribute_names"]["route"],
-    methods=schemas_dict["cell_attribute_names"]["methods"],
-)
-def cell_attribute_names() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["cell_attribute_names"]
-    )
-    params = schemas.CellAttributeNames.from_dict(json_data)
+@typed_route(routes, schemas.cell_attribute_names_route)
+def cell_attribute_names(
+    params: schemas.CellAttributeNames,
+) -> schemas.CellAttributeNamesResponse:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeGrid2D | GeodeGrid3D):
         flask.abort(400, f"{params.id} is not a GeodeGrid")
     attribute_manager = geode_object.cell_attribute_manager()
-    return flask.make_response(
-        {"attributes": attributes_metadata(attribute_manager)},
-        200,
+    return schemas.CellAttributeNamesResponse.from_dict(
+        {"attributes": attributes_metadata(attribute_manager)}
     )
 
 
-@routes.route(
-    schemas_dict["polygon_attribute_names"]["route"],
-    methods=schemas_dict["polygon_attribute_names"]["methods"],
-)
-def polygon_attribute_names() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["polygon_attribute_names"]
-    )
-    params = schemas.PolygonAttributeNames.from_dict(json_data)
+@typed_route(routes, schemas.polygon_attribute_names_route)
+def polygon_attribute_names(
+    params: schemas.PolygonAttributeNames,
+) -> schemas.PolygonAttributeNamesResponse:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeSurfaceMesh2D | GeodeSurfaceMesh3D):
         flask.abort(400, f"{params.id} is not a GeodeSurfaceMesh")
     attribute_manager = geode_object.polygon_attribute_manager()
-    return flask.make_response(
-        {"attributes": attributes_metadata(attribute_manager)},
-        200,
+    return schemas.PolygonAttributeNamesResponse.from_dict(
+        {"attributes": attributes_metadata(attribute_manager)}
     )
 
 
-@routes.route(
-    schemas_dict["polyhedron_attribute_names"]["route"],
-    methods=schemas_dict["polyhedron_attribute_names"]["methods"],
-)
-def polyhedron_attribute_names() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["polyhedron_attribute_names"]
-    )
-    params = schemas.PolyhedronAttributeNames.from_dict(json_data)
+@typed_route(routes, schemas.polyhedron_attribute_names_route)
+def polyhedron_attribute_names(
+    params: schemas.PolyhedronAttributeNames,
+) -> schemas.PolyhedronAttributeNamesResponse:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeSolidMesh3D):
         flask.abort(400, f"{params.id} is not a GeodeSolidMesh")
     attribute_manager = geode_object.polyhedron_attribute_manager()
-    return flask.make_response(
-        {"attributes": attributes_metadata(attribute_manager)},
-        200,
+    return schemas.PolyhedronAttributeNamesResponse.from_dict(
+        {"attributes": attributes_metadata(attribute_manager)}
     )
 
 
-@routes.route(
-    schemas_dict["edge_attribute_names"]["route"],
-    methods=schemas_dict["edge_attribute_names"]["methods"],
-)
-def edge_attribute_names() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["edge_attribute_names"]
-    )
-    params = schemas.EdgeAttributeNames.from_dict(json_data)
+@typed_route(routes, schemas.edge_attribute_names_route)
+def edge_attribute_names(
+    params: schemas.EdgeAttributeNames,
+) -> schemas.EdgeAttributeNamesResponse:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeGraph):
         flask.abort(400, f"{params.id} does not have edges")
     attribute_manager = geode_object.edge_attribute_manager()
-    return flask.make_response(
-        {"attributes": attributes_metadata(attribute_manager)},
-        200,
+    return schemas.EdgeAttributeNamesResponse.from_dict(
+        {"attributes": attributes_metadata(attribute_manager)}
     )
 
 
-@routes.route(
-    schemas_dict["model_component_vertex_attribute_names"]["route"],
-    methods=schemas_dict["model_component_vertex_attribute_names"]["methods"],
-)
-def model_component_vertex_attribute_names() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["model_component_vertex_attribute_names"]
-    )
-    params = schemas.ModelComponentVertexAttributeNames.from_dict(json_data)
+@typed_route(routes, schemas.model_component_vertex_attribute_names_route)
+def model_component_vertex_attribute_names(
+    params: schemas.ModelComponentVertexAttributeNames,
+) -> schemas.ModelComponentVertexAttributeNamesResponse:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
@@ -499,21 +417,15 @@ def model_component_vertex_attribute_names() -> flask.Response:
             ComponentMesh,
         )
     ]
-    return flask.make_response(
-        {"attributes": attributes_metadata(managers)},
-        200,
+    return schemas.ModelComponentVertexAttributeNamesResponse.from_dict(
+        {"attributes": attributes_metadata(managers)}
     )
 
 
-@routes.route(
-    schemas_dict["model_component_edge_attribute_names"]["route"],
-    methods=schemas_dict["model_component_edge_attribute_names"]["methods"],
-)
-def model_component_edge_attribute_names() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["model_component_edge_attribute_names"]
-    )
-    params = schemas.ModelComponentEdgeAttributeNames.from_dict(json_data)
+@typed_route(routes, schemas.model_component_edge_attribute_names_route)
+def model_component_edge_attribute_names(
+    params: schemas.ModelComponentEdgeAttributeNames,
+) -> schemas.ModelComponentEdgeAttributeNamesResponse:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
@@ -525,21 +437,15 @@ def model_component_edge_attribute_names() -> flask.Response:
             ComponentLine,
         )
     ]
-    return flask.make_response(
-        {"attributes": attributes_metadata(managers)},
-        200,
+    return schemas.ModelComponentEdgeAttributeNamesResponse.from_dict(
+        {"attributes": attributes_metadata(managers)}
     )
 
 
-@routes.route(
-    schemas_dict["model_component_polygon_attribute_names"]["route"],
-    methods=schemas_dict["model_component_polygon_attribute_names"]["methods"],
-)
-def model_component_polygon_attribute_names() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["model_component_polygon_attribute_names"]
-    )
-    params = schemas.ModelComponentPolygonAttributeNames.from_dict(json_data)
+@typed_route(routes, schemas.model_component_polygon_attribute_names_route)
+def model_component_polygon_attribute_names(
+    params: schemas.ModelComponentPolygonAttributeNames,
+) -> schemas.ModelComponentPolygonAttributeNamesResponse:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
@@ -551,21 +457,15 @@ def model_component_polygon_attribute_names() -> flask.Response:
             ComponentSurface,
         )
     ]
-    return flask.make_response(
-        {"attributes": attributes_metadata(managers)},
-        200,
+    return schemas.ModelComponentPolygonAttributeNamesResponse.from_dict(
+        {"attributes": attributes_metadata(managers)}
     )
 
 
-@routes.route(
-    schemas_dict["model_component_polyhedron_attribute_names"]["route"],
-    methods=schemas_dict["model_component_polyhedron_attribute_names"]["methods"],
-)
-def model_component_polyhedron_attribute_names() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["model_component_polyhedron_attribute_names"]
-    )
-    params = schemas.ModelComponentPolyhedronAttributeNames.from_dict(json_data)
+@typed_route(routes, schemas.model_component_polyhedron_attribute_names_route)
+def model_component_polyhedron_attribute_names(
+    params: schemas.ModelComponentPolyhedronAttributeNames,
+) -> schemas.ModelComponentPolyhedronAttributeNamesResponse:
     geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
@@ -577,38 +477,28 @@ def model_component_polyhedron_attribute_names() -> flask.Response:
             ComponentBlock,
         )
     ]
-    attributes = attributes_metadata(managers)
-    print(f"{attributes=}", flush=True)
-    return flask.make_response({"attributes": attributes}, 200)
+    return schemas.ModelComponentPolyhedronAttributeNamesResponse.from_dict(
+        {"attributes": attributes_metadata(managers)}
+    )
 
 
-@routes.route(
-    schemas_dict["ping"]["route"],
-    methods=schemas_dict["ping"]["methods"],
-)
-def ping() -> flask.Response:
-    utils_functions.validate_request(flask.request, schemas_dict["ping"])
+@typed_route(routes, schemas.ping_route)
+def ping(params: schemas.Ping) -> schemas.PingResponse:
     flask.current_app.config.update(LAST_PING_TIME=time.time())
-    return flask.make_response({"message": "Flask server is running"}, 200)
+    return schemas.PingResponse(message="Flask server is running")
 
 
-@routes.route(schemas_dict["kill"]["route"], methods=schemas_dict["kill"]["methods"])
-def kill() -> flask.Response:
+@typed_route(routes, schemas.kill_route)
+def kill(params: schemas.Kill) -> schemas.KillResponse:
     print("Manual server kill, shutting down...", flush=True)
     utils_functions.teardown_request(flask.current_app)
     Timer(0.5, os._exit, [0]).start()
-    return flask.make_response({"message": "Flask server is dead"}, 200)
+    return schemas.KillResponse(message="Flask server is dead")
 
 
-@routes.route(
-    schemas_dict["export_project"]["route"],
-    methods=schemas_dict["export_project"]["methods"],
-)
+@raw_route(routes, schemas.export_project_route)
 def export_project() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["export_project"]
-    )
-    params = schemas.ExportProject.from_dict(json_data)
+    params = parse_params(schemas.export_project_route)
 
     project_folder: str = flask.current_app.config["DATA_FOLDER_PATH"]
     os.makedirs(project_folder, exist_ok=True)
@@ -642,12 +532,8 @@ def export_project() -> flask.Response:
     return utils_functions.send_file(project_folder, [export_vease_path], filename)
 
 
-@routes.route(
-    schemas_dict["import_project"]["route"],
-    methods=schemas_dict["import_project"]["methods"],
-)
-def import_project() -> flask.Response:
-    utils_functions.validate_request(flask.request, schemas_dict["import_project"])
+@typed_route(routes, schemas.import_project_route)
+def import_project(params: schemas.ImportProject) -> schemas.ImportProjectResponse:
     if "file" not in flask.request.files:
         flask.abort(400, "No .vease file provided under 'file'")
     zip_file = flask.request.files["file"]
@@ -743,18 +629,13 @@ def import_project() -> flask.Response:
             snapshot = flask.json.loads(raw)
         except KeyError:
             snapshot = {}
-    return flask.make_response({"snapshot": snapshot}, 200)
+    return schemas.ImportProjectResponse(snapshot=snapshot)
 
 
-@routes.route(
-    schemas_dict["geode_object_inheritance"]["route"],
-    methods=schemas_dict["geode_object_inheritance"]["methods"],
-)
-def geode_object_inheritance() -> flask.Response:
-    json_data = utils_functions.validate_request(
-        flask.request, schemas_dict["geode_object_inheritance"]
-    )
-    params = schemas.GeodeObjectInheritance.from_dict(json_data)
+@typed_route(routes, schemas.geode_object_inheritance_route)
+def geode_object_inheritance(
+    params: schemas.GeodeObjectInheritance,
+) -> schemas.GeodeObjectInheritanceResponse:
     geode_object_type = params.geode_object_type
     target_class = geode_functions.geode_object_from_string(geode_object_type)
 
@@ -778,8 +659,8 @@ def geode_object_inheritance() -> flask.Response:
     subclass_classes = get_all_subclasses(target_class)
 
     # Filter GeodeObjectType to only include registered related objects, excluding target
-    parents = []
-    children = []
+    parents: list[str] = []
+    children: list[str] = []
     for geode_object_type_str, geode_class in geode_objects.items():
         if geode_class == target_class:
             continue
@@ -788,4 +669,4 @@ def geode_object_inheritance() -> flask.Response:
         if geode_class in subclass_classes:
             children.append(geode_object_type_str)
 
-    return flask.make_response({"parents": parents, "children": children}, 200)
+    return schemas.GeodeObjectInheritanceResponse(parents=parents, children=children)

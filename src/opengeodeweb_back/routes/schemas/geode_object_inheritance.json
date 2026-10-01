@@ -13,5 +13,27 @@
   "required": [
     "geode_object_type"
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "parents": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "children": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [
+      "parents",
+      "children"
+    ],
+    "additionalProperties": false
+  }
 }

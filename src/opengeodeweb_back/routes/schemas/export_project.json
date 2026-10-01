@@ -17,5 +17,8 @@
     "snapshot",
     "filename"
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "response": {
+    "format": "binary"
+  }
 }

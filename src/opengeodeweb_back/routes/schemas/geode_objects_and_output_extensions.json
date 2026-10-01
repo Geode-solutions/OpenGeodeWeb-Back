@@ -18,5 +18,23 @@
     "geode_object_type",
     "filename"
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "geode_objects_and_output_extensions": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "required": [
+      "geode_objects_and_output_extensions"
+    ],
+    "additionalProperties": false
+  }
 }
