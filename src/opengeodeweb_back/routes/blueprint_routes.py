@@ -49,7 +49,6 @@ ComponentBlock = og.Block3D
 routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
 
 
-
 @typed_route(routes, schemas.allowed_files_route)
 def allowed_files(params: schemas.AllowedFiles) -> schemas.AllowedFilesResponse:
     extensions: set[str] = set()
@@ -67,7 +66,9 @@ def _write_stream(path: str, stream: typing.IO[bytes], mode: str = "wb") -> None
 
 
 def _upload_response(message: str, status: int) -> flask.Response:
-    return flask.make_response(schemas.UploadFileResponse(message=message).to_dict(), status)
+    return flask.make_response(
+        schemas.UploadFileResponse(message=message).to_dict(), status
+    )
 
 
 def _finalize_upload(filename: str) -> flask.Response:

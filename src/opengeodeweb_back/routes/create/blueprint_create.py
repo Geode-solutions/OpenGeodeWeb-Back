@@ -51,7 +51,9 @@ def edged_curve(params: schemas.EdgedCurve) -> schemas.EdgedCurveResponse:
 
 
 @typed_route(routes, schemas.polygonal_surface_route)
-def polygonal_surface(params: schemas.PolygonalSurface) -> schemas.PolygonalSurfaceResponse:
+def polygonal_surface(
+    params: schemas.PolygonalSurface,
+) -> schemas.PolygonalSurfaceResponse:
     """Endpoint to create a polygonal surface in 3D space."""
 
     polygonal_surface_obj = GeodePolygonalSurface3D()
