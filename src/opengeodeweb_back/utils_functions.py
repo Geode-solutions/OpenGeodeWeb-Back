@@ -1,4 +1,5 @@
 # Standard library imports
+import base64
 import os
 import threading
 import time
@@ -296,7 +297,9 @@ def save_all_viewables_and_return_info(
             light_path = results[2]
             with open(light_path, "rb") as f:
                 binary_light_viewable = f.read()
-            binary_light_viewable_str = binary_light_viewable.decode("utf-8")
+            binary_light_viewable_str = base64.b64encode(binary_light_viewable).decode(
+                "ascii"
+            )
             data.viewable_file = os.path.basename(viewable_path)
             data.light_viewable_file = os.path.basename(light_path)
         else:
