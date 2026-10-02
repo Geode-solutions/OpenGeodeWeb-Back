@@ -733,7 +733,6 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
     client.application.config["DATA_FOLDER_PATH"] = original_data_folder
 
 
-
 def test_save_viewable_workflow_from_object(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/create/point_set"
     point_data = {

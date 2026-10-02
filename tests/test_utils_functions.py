@@ -297,6 +297,7 @@ def test_generate_files_from_object_returns_geode_id(client: FlaskClient) -> Non
         result = utils_functions.generate_files_from_object(geode_object)
     assert result["geode_id"] == geode_object.identifier.id().string()
 
+
 def test_send_file_multiple_returns_zip(client: FlaskClient, tmp_path: Path) -> None:
     app = client.application
     with app.app_context():
@@ -345,4 +346,3 @@ def test_send_file_single_returns_octet_binary(
                 file_bytes = f.read()
             assert file_bytes == b"hello 1"
             response.close()
-

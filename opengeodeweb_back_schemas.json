@@ -572,7 +572,6 @@
         }
       }
     },
-    "models": {},
     "vertex_attribute_names": {
       "$id": "opengeodeweb_back/vertex_attribute_names",
       "route": "/vertex_attribute_names",

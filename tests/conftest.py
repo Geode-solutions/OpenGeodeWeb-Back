@@ -36,7 +36,9 @@ def configure_test_environment() -> Generator[None, None, None]:
     app.config["UPLOAD_FOLDER_PATH"] = "./tests/data/"
 
     # The database lives in the data folder like in the app (DATA_FOLDER_PATH/project.db), so it is removed with it at session end.
-    db_path = os.path.abspath(os.path.join(app.config["DATA_FOLDER_PATH"], "project.db"))
+    db_path = os.path.abspath(
+        os.path.join(app.config["DATA_FOLDER_PATH"], "project.db")
+    )
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 
     print("Current working directory:", os.getcwd())
