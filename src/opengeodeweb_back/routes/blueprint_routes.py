@@ -649,7 +649,8 @@ def geode_object_inheritance(
         return bases
 
     def get_all_subclasses(geode_class: type) -> set[type]:
-        subclasses = set()
+        subclasses: set[type] = set()
+        subclass_class: type
         for subclass_class in geode_class.__subclasses__():
             subclasses.add(subclass_class)
             subclasses.update(get_all_subclasses(subclass_class))
