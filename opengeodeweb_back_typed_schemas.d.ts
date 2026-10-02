@@ -16,6 +16,7 @@ export interface PolygonalSurfacePoint {
 export interface CreatePolygonalSurfaceResponse {
     binary_light_viewable?: string;
     collection_components?: CreatePolygonalSurfaceResponseCollectionComponent[];
+    geode_id:               string;
     geode_object_type:      string;
     id:                     string;
     is_viewable:            boolean;
@@ -59,6 +60,7 @@ export interface Point {
 export interface CreatePointSetResponse {
     binary_light_viewable?: string;
     collection_components?: CreatePointSetResponseCollectionComponent[];
+    geode_id:               string;
     geode_object_type:      string;
     id:                     string;
     is_viewable:            boolean;
@@ -103,6 +105,7 @@ export interface EdgedCurvePoint {
 export interface CreateEdgedCurveResponse {
     binary_light_viewable?: string;
     collection_components?: CreateEdgedCurveResponseCollectionComponent[];
+    geode_id:               string;
     geode_object_type:      string;
     id:                     string;
     is_viewable:            boolean;
@@ -185,6 +188,7 @@ export interface SaveViewableFileParams {
 export interface SaveViewableFileResponse {
     binary_light_viewable?: string;
     collection_components?: SaveViewableFileResponseCollectionComponent[];
+    geode_id:               string;
     geode_object_type:      string;
     id:                     string;
     is_viewable:            boolean;

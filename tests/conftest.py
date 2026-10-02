@@ -13,6 +13,7 @@ import pytest
 # Local application imports
 from opengeodeweb_back.app import create_app, register_ogw_back_blueprints
 
+from opengeodeweb_microservice.database import connection
 from opengeodeweb_microservice.database.connection import init_database
 
 TEST_ID = "1"
@@ -34,7 +35,10 @@ def configure_test_environment() -> Generator[None, None, None]:
     app.config["DATA_FOLDER_PATH"] = "./data/"
     app.config["UPLOAD_FOLDER_PATH"] = "./tests/data/"
 
-    db_path = os.path.join(base_path, "data", "project.db")
+    # The database lives in the data folder like in the app (DATA_FOLDER_PATH/project.db), so it is removed with it at session end.
+    db_path = os.path.abspath(
+        os.path.join(app.config["DATA_FOLDER_PATH"], "project.db")
+    )
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 
     print("Current working directory:", os.getcwd())
@@ -45,6 +49,10 @@ def configure_test_environment() -> Generator[None, None, None]:
     register_ogw_back_blueprints(app)
     yield
 
+    if connection.scoped_session_registry:
+        connection.scoped_session_registry.remove()
+    if connection.engine:
+        connection.engine.dispose()
     tmp_data_path = app.config.get("DATA_FOLDER_PATH")
     if tmp_data_path and os.path.exists(tmp_data_path):
         shutil.rmtree(tmp_data_path, ignore_errors=True)

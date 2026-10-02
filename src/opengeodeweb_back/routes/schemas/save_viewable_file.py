@@ -45,6 +45,7 @@ class SaveViewableFileResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
+    geode_id: str
     geode_object_type: str
     id: str
     is_viewable: bool

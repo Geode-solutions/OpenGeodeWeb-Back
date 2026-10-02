@@ -7,13 +7,15 @@
   "properties": {
     "id": {
       "type": "string",
-      "minLength": 1
+      "minLength": 32,
+      "maxLength": 32
     },
     "component_ids": {
       "type": "array",
       "items": {
         "type": "string",
-        "minLength": 1
+        "minLength": 36,
+        "maxLength": 36
       },
       "minItems": 1
     }

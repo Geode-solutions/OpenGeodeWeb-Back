@@ -14,8 +14,11 @@ from pathlib import Path
 
 # Local application imports
 from opengeodeweb_microservice.database.data import Data
-from opengeodeweb_back import utils_functions
+from opengeodeweb_back import geode_functions, utils_functions
 from opengeodeweb_back.geode_objects.geode_brep import GeodeBRep
+from opengeodeweb_back.geode_objects.geode_polygonal_surface3d import (
+    GeodePolygonalSurface3D,
+)
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 data_dir = os.path.join(base_dir, "data")
@@ -99,7 +102,9 @@ def test_create_data_folder_from_id(client: FlaskClient) -> None:
 def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
     app = client.application
     with app.app_context():
-        expected_db_path = os.path.join(data_dir, "project.db")
+        expected_db_path = os.path.abspath(
+            os.path.join(app.config["DATA_FOLDER_PATH"], "project.db")
+        )
         expected_uri = f"sqlite:///{expected_db_path}"
 
         assert app.config["SQLALCHEMY_DATABASE_URI"] == expected_uri
@@ -108,6 +113,7 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
         geode_object = GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
 
         data_entry = Data.create(
+            geode_id=geode_object.identifier.id().string(),
             geode_object=geode_object.geode_object_type(),
             viewer_object=geode_object.viewer_type(),
             viewer_elements_type=geode_object.viewer_elements_type(),
@@ -128,6 +134,7 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
         assert isinstance(result["id"], str)
         assert len(result["id"]) == 32
         assert re.match(r"[0-9a-f]{32}", result["id"])
+        assert result["geode_id"] == geode_object.identifier.id().string()
         assert isinstance(result["viewer_type"], str)
         assert isinstance(result["binary_light_viewable"], str)
         assert result["geode_object_type"] == geode_object.geode_object_type()
@@ -147,6 +154,7 @@ def test_save_all_viewables_commits_to_db(client: FlaskClient) -> None:
     with app.app_context():
         geode_object = GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
         data_entry = Data.create(
+            geode_id=geode_object.identifier.id().string(),
             geode_object=geode_object.geode_object_type(),
             viewer_object=geode_object.viewer_type(),
             viewer_elements_type=geode_object.viewer_elements_type(),
@@ -230,6 +238,64 @@ def test_generate_files_from_file_with_multi_dots(
             GeodeBRep.geode_object_type(), "cube.test.og_brep"
         )
     assert result["name"] == "cube.test"
+
+
+def test_generate_files_from_file_returns_geode_id(client: FlaskClient) -> None:
+    app = client.application
+    with app.app_context():
+        result = utils_functions.generate_files_from_file(
+            GeodeBRep.geode_object_type(), "test.og_brep"
+        )
+        expected_geode_id = (
+            GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
+            .identifier.id()
+            .string()
+        )
+        assert result["geode_id"] == expected_geode_id
+        assert len(result["geode_id"]) == 36
+        assert len(result["id"]) == 32
+        data = Data.get(result["id"])
+        assert data is not None
+        assert data.geode_id == expected_geode_id
+
+
+def test_generate_files_from_file_twice_shares_geode_id(client: FlaskClient) -> None:
+    app = client.application
+    with app.app_context():
+        first = utils_functions.generate_files_from_file(
+            GeodeBRep.geode_object_type(), "test.og_brep"
+        )
+        second = utils_functions.generate_files_from_file(
+            GeodeBRep.geode_object_type(), "test.og_brep"
+        )
+    assert first["id"] != second["id"]
+    assert first["geode_id"] == second["geode_id"]
+
+
+def test_generate_files_from_non_native_file_twice_shares_geode_id(
+    client: FlaskClient,
+) -> None:
+    app = client.application
+    with app.app_context():
+        first = utils_functions.generate_files_from_file(
+            GeodePolygonalSurface3D.geode_object_type(), "hat.vtp"
+        )
+        second = utils_functions.generate_files_from_file(
+            GeodePolygonalSurface3D.geode_object_type(), "hat.vtp"
+        )
+        assert first["id"] != second["id"]
+        assert first["geode_id"] == second["geode_id"]
+        native_path = geode_functions.data_file_path(first["id"], first["native_file"])
+        reloaded = GeodePolygonalSurface3D.load(native_path)
+        assert reloaded.identifier.id().string() == first["geode_id"]
+
+
+def test_generate_files_from_object_returns_geode_id(client: FlaskClient) -> None:
+    app = client.application
+    with app.app_context():
+        geode_object = GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
+        result = utils_functions.generate_files_from_object(geode_object)
+    assert result["geode_id"] == geode_object.identifier.id().string()
 
 
 def test_send_file_multiple_returns_zip(client: FlaskClient, tmp_path: Path) -> None:
