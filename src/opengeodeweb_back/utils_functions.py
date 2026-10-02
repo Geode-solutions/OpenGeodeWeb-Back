@@ -1,8 +1,10 @@
 # Standard library imports
 import base64
+import hashlib
 import os
 import threading
 import time
+import uuid
 import xml.etree.ElementTree as ET
 import zipfile
 from collections.abc import Callable
@@ -16,6 +18,7 @@ import importlib.metadata as metadata
 import shutil
 from werkzeug.exceptions import HTTPException
 import werkzeug
+import opengeode as og
 from opengeodeweb_microservice.schemas import ErrorResponse, SchemaDict
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
@@ -206,6 +209,12 @@ def create_data_folder_from_id(data_id: str) -> str:
     return data_path
 
 
+def content_based_uuid(file_path: str) -> og.uuid:
+    with open(file_path, "rb") as file:
+        digest = hashlib.file_digest(file, "sha256").hexdigest()
+    return og.uuid(str(uuid.uuid5(uuid.NAMESPACE_OID, digest)))
+
+
 def model_components(
     data_id: str, model: GeodeModel, viewable_file: str | None
 ) -> dict[str, Any]:
@@ -328,6 +337,7 @@ def save_all_viewables_and_return_info(
         response: dict[str, Any] = {
             "native_file": data.native_file,
             "id": data.id,
+            "geode_id": data.geode_id,
             "name": name,
             "viewer_type": data.viewer_object,
             "is_viewable": geode_object.is_viewable(),
@@ -347,6 +357,7 @@ def generate_files_from_object(
     geode_object: GeodeObject,
 ) -> dict[str, Any]:
     data = Data.create(
+        geode_id=geode_object.identifier.id().string(),
         geode_object=geode_object.geode_object_type(),
         viewer_object=geode_object.viewer_type(),
         viewer_elements_type=geode_object.viewer_elements_type(),
@@ -359,13 +370,16 @@ def generate_files_from_file(
     geode_object_type: GeodeObjectType, input_file: str
 ) -> dict[str, Any]:
     generic_geode_object = geode_objects[geode_object_type]
+    full_input_filename = geode_functions.upload_file_path(input_file)
+    geode_object = generic_geode_object.load(full_input_filename)
+    geode_object.builder().set_name(os.path.splitext(input_file)[0])
+    if not input_file.lower().endswith("." + geode_object.native_extension()):
+        geode_object.builder().set_id(content_based_uuid(full_input_filename))
     data = Data.create(
+        geode_id=geode_object.identifier.id().string(),
         geode_object=geode_object_type,
         viewer_object=generic_geode_object.viewer_type(),
         viewer_elements_type=generic_geode_object.viewer_elements_type(),
     )
     data_path = create_data_folder_from_id(data.id)
-    full_input_filename = geode_functions.upload_file_path(input_file)
-    geode_object = generic_geode_object.load(full_input_filename)
-    geode_object.builder().set_name(os.path.splitext(input_file)[0])
     return save_all_viewables_and_return_info(geode_object, data, data_path)

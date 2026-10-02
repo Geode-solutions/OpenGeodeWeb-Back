@@ -31,6 +31,7 @@ from opengeodeweb_back.geode_objects.geode_edged_curve3d import (
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 data_dir = os.path.join(base_dir, "data")
+DUMMY_GEODE_ID = "00000000-0000-0000-0000-000000000000"
 
 
 def test_allowed_files(client: FlaskClient) -> None:
@@ -296,6 +297,7 @@ def test_texture_coordinates(client: FlaskClient, test_id: str) -> None:
     with client.application.app_context():
         file = os.path.join(data_dir, "hat.vtp")
         data = Data.create(
+            geode_id=DUMMY_GEODE_ID,
             geode_object=GeodePolygonalSurface3D.geode_object_type(),
             viewer_object=GeodePolygonalSurface3D.viewer_type(),
             viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
@@ -324,6 +326,7 @@ def test_vertex_attribute_names(client: FlaskClient, test_id: str) -> None:
     with client.application.app_context():
         file = os.path.join(data_dir, "test.vtp")
         data = Data.create(
+            geode_id=DUMMY_GEODE_ID,
             geode_object=GeodePolygonalSurface3D.geode_object_type(),
             viewer_object=GeodePolygonalSurface3D.viewer_type(),
             viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
@@ -362,6 +365,7 @@ def test_cell_attribute_names(client: FlaskClient, test_id: str) -> None:
     with client.application.app_context():
         file = os.path.join(data_dir, "test.og_rgd2d")
         data = Data.create(
+            geode_id=DUMMY_GEODE_ID,
             geode_object=GeodeRegularGrid2D.geode_object_type(),
             viewer_object=GeodeRegularGrid2D.viewer_type(),
             viewer_elements_type=GeodeRegularGrid2D.viewer_elements_type(),
@@ -400,6 +404,7 @@ def test_polygon_attribute_names(client: FlaskClient, test_id: str) -> None:
     with client.application.app_context():
         file = os.path.join(data_dir, "test.vtp")
         data = Data.create(
+            geode_id=DUMMY_GEODE_ID,
             geode_object=GeodePolygonalSurface3D.geode_object_type(),
             viewer_object=GeodePolygonalSurface3D.viewer_type(),
             viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
@@ -438,6 +443,7 @@ def test_polyhedron_attribute_names(client: FlaskClient, test_id: str) -> None:
     with client.application.app_context():
         file = os.path.join(data_dir, "test.vtu")
         data = Data.create(
+            geode_id=DUMMY_GEODE_ID,
             geode_object=GeodePolyhedralSolid3D.geode_object_type(),
             viewer_object=GeodePolyhedralSolid3D.viewer_type(),
             viewer_elements_type=GeodePolyhedralSolid3D.viewer_elements_type(),
@@ -480,6 +486,7 @@ def test_edge_attribute_names(client: FlaskClient, test_id: str) -> None:
     with client.application.app_context():
         file = os.path.join(data_dir, "test.og_edc3d")
         data = Data.create(
+            geode_id=DUMMY_GEODE_ID,
             geode_object=GeodeEdgedCurve3D.geode_object_type(),
             viewer_object=GeodeEdgedCurve3D.viewer_type(),
             viewer_elements_type=GeodeEdgedCurve3D.viewer_elements_type(),
@@ -517,8 +524,9 @@ def test_edge_attribute_names(client: FlaskClient, test_id: str) -> None:
 def test_database_uri_path(client: FlaskClient) -> None:
     app = client.application
     with app.app_context():
-        base_dir = os.path.abspath(os.path.dirname(__file__))
-        expected_db_path = os.path.join(base_dir, "data", "project.db")
+        expected_db_path = os.path.abspath(
+            os.path.join(app.config["DATA_FOLDER_PATH"], "project.db")
+        )
         expected_uri = f"sqlite:///{expected_db_path}"
 
         assert app.config["SQLALCHEMY_DATABASE_URI"] == expected_uri
@@ -615,8 +623,7 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
     project_folder = client.application.config["DATA_FOLDER_PATH"]
     os.makedirs(project_folder, exist_ok=True)
     database_root_path = os.path.join(project_folder, "project.db")
-    with open(database_root_path, "wb") as f:
-        f.write(b"test_project_db")
+    assert os.path.isfile(database_root_path)
 
     with get_session() as session:
         session.query(Data).delete()
@@ -624,6 +631,7 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
 
         data1 = Data(
             id="test_data_1",
+            geode_id=DUMMY_GEODE_ID,
             geode_object="BRep",
             viewer_object="BRep",
             viewer_elements_type="default",
@@ -631,6 +639,7 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
         )
         data2 = Data(
             id="test_data_2",
+            geode_id=DUMMY_GEODE_ID,
             geode_object="Section",
             viewer_object="Section",
             viewer_elements_type="default",
@@ -692,7 +701,7 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
     temp_db = tmp_path / "temp_project.db"
     conn = sqlite3.connect(str(temp_db))
     conn.execute(
-        "CREATE TABLE datas (id TEXT PRIMARY KEY, geode_object TEXT, viewer_object TEXT, viewer_elements_type TEXT, native_file TEXT, "
+        "CREATE TABLE datas (id TEXT PRIMARY KEY, geode_id TEXT, geode_object TEXT, viewer_object TEXT, viewer_elements_type TEXT, native_file TEXT, "
         "viewable_file TEXT, light_viewable_file TEXT)"
     )
     conn.commit()
@@ -722,6 +731,7 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
         connection.init_database(test_db_path, create_tables=True)
 
     client.application.config["DATA_FOLDER_PATH"] = original_data_folder
+
 
 
 def test_save_viewable_workflow_from_object(client: FlaskClient) -> None:
@@ -877,3 +887,17 @@ def test_extract_valid_attribute_values_with_non_transferable_attribute() -> Non
     )
     assert has_nan is False
     assert valid_values == []
+
+
+def test_data_id_length_is_strict(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/vertex_attribute_names"
+    for wrong_id in ["a" * 31, "a" * 33, DUMMY_GEODE_ID]:
+        response = client.post(route, json={"id": wrong_id})
+        assert response.status_code == 400, wrong_id
+
+
+def test_component_id_length_is_strict(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/model_component_vertex_attribute_names"
+    model_id, _ = _load_brep_components(client)
+    response = client.post(route, json={"id": model_id, "component_ids": ["a" * 32]})
+    assert response.status_code == 400

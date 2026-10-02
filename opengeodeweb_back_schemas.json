@@ -63,7 +63,9 @@
               "type": "string"
             },
             "id": {
-              "type": "string"
+              "type": "string",
+              "minLength": 32,
+              "maxLength": 32
             },
             "name": {
               "type": "string"
@@ -95,7 +97,9 @@
                     "type": "integer"
                   },
                   "geode_id": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 36,
+                    "maxLength": 36
                   },
                   "name": {
                     "type": "string"
@@ -106,13 +110,17 @@
                   "boundaries": {
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "minLength": 36,
+                      "maxLength": 36
                     }
                   },
                   "internals": {
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "minLength": 36,
+                      "maxLength": 36
                     }
                   },
                   "is_active": {
@@ -137,7 +145,9 @@
                 "type": "object",
                 "properties": {
                   "geode_id": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 36,
+                    "maxLength": 36
                   },
                   "name": {
                     "type": "string"
@@ -148,7 +158,9 @@
                   "items": {
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "minLength": 36,
+                      "maxLength": 36
                     }
                   },
                   "is_active": {
@@ -164,6 +176,11 @@
                 ],
                 "additionalProperties": false
               }
+            },
+            "geode_id": {
+              "type": "string",
+              "minLength": 36,
+              "maxLength": 36
             }
           },
           "required": [
@@ -172,7 +189,8 @@
             "name",
             "viewer_type",
             "is_viewable",
-            "geode_object_type"
+            "geode_object_type",
+            "geode_id"
           ],
           "additionalProperties": false
         }
@@ -226,7 +244,9 @@
               "type": "string"
             },
             "id": {
-              "type": "string"
+              "type": "string",
+              "minLength": 32,
+              "maxLength": 32
             },
             "name": {
               "type": "string"
@@ -258,7 +278,9 @@
                     "type": "integer"
                   },
                   "geode_id": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 36,
+                    "maxLength": 36
                   },
                   "name": {
                     "type": "string"
@@ -269,13 +291,17 @@
                   "boundaries": {
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "minLength": 36,
+                      "maxLength": 36
                     }
                   },
                   "internals": {
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "minLength": 36,
+                      "maxLength": 36
                     }
                   },
                   "is_active": {
@@ -300,7 +326,9 @@
                 "type": "object",
                 "properties": {
                   "geode_id": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 36,
+                    "maxLength": 36
                   },
                   "name": {
                     "type": "string"
@@ -311,7 +339,9 @@
                   "items": {
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "minLength": 36,
+                      "maxLength": 36
                     }
                   },
                   "is_active": {
@@ -327,6 +357,11 @@
                 ],
                 "additionalProperties": false
               }
+            },
+            "geode_id": {
+              "type": "string",
+              "minLength": 36,
+              "maxLength": 36
             }
           },
           "required": [
@@ -335,7 +370,8 @@
             "name",
             "viewer_type",
             "is_viewable",
-            "geode_object_type"
+            "geode_object_type",
+            "geode_id"
           ],
           "additionalProperties": false
         }
@@ -403,7 +439,9 @@
               "type": "string"
             },
             "id": {
-              "type": "string"
+              "type": "string",
+              "minLength": 32,
+              "maxLength": 32
             },
             "name": {
               "type": "string"
@@ -435,7 +473,9 @@
                     "type": "integer"
                   },
                   "geode_id": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 36,
+                    "maxLength": 36
                   },
                   "name": {
                     "type": "string"
@@ -446,13 +486,17 @@
                   "boundaries": {
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "minLength": 36,
+                      "maxLength": 36
                     }
                   },
                   "internals": {
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "minLength": 36,
+                      "maxLength": 36
                     }
                   },
                   "is_active": {
@@ -477,7 +521,9 @@
                 "type": "object",
                 "properties": {
                   "geode_id": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 36,
+                    "maxLength": 36
                   },
                   "name": {
                     "type": "string"
@@ -488,7 +534,9 @@
                   "items": {
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "minLength": 36,
+                      "maxLength": 36
                     }
                   },
                   "is_active": {
@@ -504,6 +552,11 @@
                 ],
                 "additionalProperties": false
               }
+            },
+            "geode_id": {
+              "type": "string",
+              "minLength": 36,
+              "maxLength": 36
             }
           },
           "required": [
@@ -512,12 +565,14 @@
             "name",
             "viewer_type",
             "is_viewable",
-            "geode_object_type"
+            "geode_object_type",
+            "geode_id"
           ],
           "additionalProperties": false
         }
       }
     },
+    "models": {},
     "vertex_attribute_names": {
       "$id": "opengeodeweb_back/vertex_attribute_names",
       "route": "/vertex_attribute_names",
@@ -528,7 +583,8 @@
       "properties": {
         "id": {
           "type": "string",
-          "minLength": 1
+          "minLength": 32,
+          "maxLength": 32
         }
       },
       "required": [
@@ -603,7 +659,9 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 32
         }
       },
       "required": [
@@ -672,7 +730,8 @@
       "properties": {
         "id": {
           "type": "string",
-          "minLength": 1
+          "minLength": 32,
+          "maxLength": 32
         }
       },
       "required": [
@@ -724,7 +783,9 @@
             "type": "string"
           },
           "id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 32
           },
           "name": {
             "type": "string"
@@ -756,7 +817,9 @@
                   "type": "integer"
                 },
                 "geode_id": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 36,
+                  "maxLength": 36
                 },
                 "name": {
                   "type": "string"
@@ -767,13 +830,17 @@
                 "boundaries": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 36,
+                    "maxLength": 36
                   }
                 },
                 "internals": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 36,
+                    "maxLength": 36
                   }
                 },
                 "is_active": {
@@ -798,7 +865,9 @@
               "type": "object",
               "properties": {
                 "geode_id": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 36,
+                  "maxLength": 36
                 },
                 "name": {
                   "type": "string"
@@ -809,7 +878,9 @@
                 "items": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 36,
+                    "maxLength": 36
                   }
                 },
                 "is_active": {
@@ -825,6 +896,11 @@
               ],
               "additionalProperties": false
             }
+          },
+          "geode_id": {
+            "type": "string",
+            "minLength": 36,
+            "maxLength": 36
           }
         },
         "required": [
@@ -833,7 +909,8 @@
           "name",
           "viewer_type",
           "is_viewable",
-          "geode_object_type"
+          "geode_object_type",
+          "geode_id"
         ],
         "additionalProperties": false
       }
@@ -848,7 +925,8 @@
       "properties": {
         "id": {
           "type": "string",
-          "minLength": 1
+          "minLength": 32,
+          "maxLength": 32
         }
       },
       "required": [
@@ -924,7 +1002,8 @@
       "properties": {
         "id": {
           "type": "string",
-          "minLength": 1
+          "minLength": 32,
+          "maxLength": 32
         }
       },
       "required": [
@@ -1023,13 +1102,15 @@
       "properties": {
         "id": {
           "type": "string",
-          "minLength": 1
+          "minLength": 32,
+          "maxLength": 32
         },
         "component_ids": {
           "type": "array",
           "items": {
             "type": "string",
-            "minLength": 1
+            "minLength": 36,
+            "maxLength": 36
           },
           "minItems": 1
         }
@@ -1108,13 +1189,15 @@
       "properties": {
         "id": {
           "type": "string",
-          "minLength": 1
+          "minLength": 32,
+          "maxLength": 32
         },
         "component_ids": {
           "type": "array",
           "items": {
             "type": "string",
-            "minLength": 1
+            "minLength": 36,
+            "maxLength": 36
           },
           "minItems": 1
         }
@@ -1193,13 +1276,15 @@
       "properties": {
         "id": {
           "type": "string",
-          "minLength": 1
+          "minLength": 32,
+          "maxLength": 32
         },
         "component_ids": {
           "type": "array",
           "items": {
             "type": "string",
-            "minLength": 1
+            "minLength": 36,
+            "maxLength": 36
           },
           "minItems": 1
         }
@@ -1278,13 +1363,15 @@
       "properties": {
         "id": {
           "type": "string",
-          "minLength": 1
+          "minLength": 32,
+          "maxLength": 32
         },
         "component_ids": {
           "type": "array",
           "items": {
             "type": "string",
-            "minLength": 1
+            "minLength": 36,
+            "maxLength": 36
           },
           "minItems": 1
         }
@@ -1614,7 +1701,8 @@
       "properties": {
         "id": {
           "type": "string",
-          "minLength": 1
+          "minLength": 32,
+          "maxLength": 32
         }
       },
       "required": [
@@ -1690,7 +1778,8 @@
       "properties": {
         "id": {
           "type": "string",
-          "minLength": 1
+          "minLength": 32,
+          "maxLength": 32
         }
       },
       "required": [
