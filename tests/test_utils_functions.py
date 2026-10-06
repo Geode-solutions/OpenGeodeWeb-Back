@@ -1,7 +1,6 @@
 # Standard library imports
 import base64
 import re
-import os
 
 # Third party imports
 import flask
@@ -20,8 +19,8 @@ from opengeodeweb_back.geode_objects.geode_polygonal_surface3d import (
     GeodePolygonalSurface3D,
 )
 
-base_dir = os.path.abspath(os.path.dirname(__file__))
-data_dir = os.path.join(base_dir, "data")
+base_dir = Path(__file__).resolve().parent
+data_dir = base_dir / "data"
 
 
 def test_increment_request_counter(app_context: AppContext) -> None:
@@ -92,25 +91,23 @@ def test_create_data_folder_from_id(client: FlaskClient) -> None:
         test_id = str(uuid.uuid4()).replace("-", "")
         data_path = utils_functions.create_data_folder_from_id(test_id)
         assert isinstance(data_path, str)
-        assert os.path.exists(data_path)
-        assert data_path.startswith(flask.current_app.config["DATA_FOLDER_PATH"])
+        assert Path(data_path).exists()
+        assert Path(data_path).is_relative_to(flask.current_app.config["DATA_FOLDER_PATH"])
         assert test_id in data_path
         shutil.rmtree(data_path, ignore_errors=True)
-        assert not os.path.exists(data_path)
+        assert not Path(data_path).exists()
 
 
 def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
     app = client.application
     with app.app_context():
-        expected_db_path = os.path.abspath(
-            os.path.join(app.config["DATA_FOLDER_PATH"], "project.db")
-        )
+        expected_db_path = (Path(app.config["DATA_FOLDER_PATH"]) / "project.db").resolve()
         expected_uri = f"sqlite:///{expected_db_path}"
 
         assert app.config["SQLALCHEMY_DATABASE_URI"] == expected_uri
-        assert os.path.exists(expected_db_path)
+        assert expected_db_path.exists()
 
-        geode_object = GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
+        geode_object = GeodeBRep.load(str(data_dir / "test.og_brep"))
 
         data_entry = Data.create(
             geode_id=geode_object.identifier.id().string(),
@@ -145,14 +142,14 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
         assert db_entry.viewable_file == result["viewable_file"]
         assert db_entry.geode_object == geode_object.geode_object_type()
 
-        expected_data_path = os.path.join(app.config["DATA_FOLDER_PATH"], result["id"])
-        assert os.path.exists(expected_data_path)
+        expected_data_path = Path(app.config["DATA_FOLDER_PATH"]) / result["id"]
+        assert expected_data_path.exists()
 
 
 def test_save_all_viewables_commits_to_db(client: FlaskClient) -> None:
     app = client.application
     with app.app_context():
-        geode_object = GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
+        geode_object = GeodeBRep.load(str(data_dir / "test.og_brep"))
         data_entry = Data.create(
             geode_id=geode_object.identifier.id().string(),
             geode_object=geode_object.geode_object_type(),
@@ -176,7 +173,7 @@ def test_generate_files_from_object(
 ) -> None:
     app = client.application
     with app.app_context():
-        geode_object = GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
+        geode_object = GeodeBRep.load(str(data_dir / "test.og_brep"))
 
         result = utils_functions.generate_files_from_object(geode_object)
 
@@ -198,12 +195,11 @@ def test_generate_files_from_object(
         assert data.light_viewable_file is not None
         assert data.light_viewable_file.endswith(".vtp")
 
-        data_path = os.path.join(app.config["DATA_FOLDER_PATH"], result["id"])
-        assert os.path.exists(os.path.join(data_path, result["native_file"]))
-        assert os.path.exists(os.path.join(data_path, result["viewable_file"]))
-        assert os.path.exists(os.path.join(data_path, data.light_viewable_file))
-        with open(os.path.join(data_path, data.light_viewable_file), "rb") as f:
-            assert f.read() == light_viewable_bytes
+        data_path = Path(app.config["DATA_FOLDER_PATH"]) / result["id"]
+        assert (data_path / result["native_file"]).exists()
+        assert (data_path / result["viewable_file"]).exists()
+        assert (data_path / data.light_viewable_file).exists()
+        assert (data_path / data.light_viewable_file).read_bytes() == light_viewable_bytes
 
 
 def test_generate_files_from_file(
@@ -244,9 +240,7 @@ def test_generate_files_from_file_returns_geode_id(client: FlaskClient) -> None:
         result = utils_functions.generate_files_from_file(
             GeodeBRep.geode_object_type(), "test.og_brep"
         )
-        expected_geode_id = (
-            GeodeBRep.load(os.path.join(data_dir, "test.og_brep")).identifier.id().string()
-        )
+        expected_geode_id = GeodeBRep.load(str(data_dir / "test.og_brep")).identifier.id().string()
         assert result["geode_id"] == expected_geode_id
         assert len(result["geode_id"]) == 36
         assert len(result["id"]) == 32
@@ -289,7 +283,7 @@ def test_generate_files_from_non_native_file_twice_shares_geode_id(
 def test_generate_files_from_object_returns_geode_id(client: FlaskClient) -> None:
     app = client.application
     with app.app_context():
-        geode_object = GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
+        geode_object = GeodeBRep.load(str(data_dir / "test.og_brep"))
         result = utils_functions.generate_files_from_object(geode_object)
     assert result["geode_id"] == geode_object.identifier.id().string()
 
@@ -311,7 +305,7 @@ def test_send_file_multiple_returns_zip(client: FlaskClient, tmp_path: Path) -> 
             assert response.mimetype == "application/zip"
             new_file_name = response.headers.get("new-file-name")
             assert new_file_name == "bundle.zip"
-            zip_path = os.path.join(app.config["UPLOAD_FOLDER_PATH"], new_file_name)
+            zip_path = Path(app.config["UPLOAD_FOLDER_PATH"]) / new_file_name
             with zipfile.ZipFile(zip_path, "r") as zip_file:
                 zip_entries = zip_file.namelist()
                 assert "tmp_send_file_1.txt" in zip_entries
@@ -335,8 +329,6 @@ def test_send_file_single_returns_octet_binary(client: FlaskClient, tmp_path: Pa
             assert response.mimetype == "application/octet-binary"
             new_file_name = response.headers.get("new-file-name")
             assert new_file_name == "tmp_send_file_1.txt"
-            zip_path = os.path.join(app.config["UPLOAD_FOLDER_PATH"], new_file_name)
-            with open(zip_path, "rb") as f:
-                file_bytes = f.read()
-            assert file_bytes == b"hello 1"
+            sent_path = Path(app.config["UPLOAD_FOLDER_PATH"]) / new_file_name
+            assert sent_path.read_bytes() == b"hello 1"
             response.close()

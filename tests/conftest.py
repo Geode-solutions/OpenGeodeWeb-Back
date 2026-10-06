@@ -36,13 +36,13 @@ def configure_test_environment() -> Generator[None, None, None]:
     app.config["UPLOAD_FOLDER_PATH"] = "./tests/data/"
 
     # The database lives in the data folder like in the app (DATA_FOLDER_PATH/project.db), so it is removed with it at session end.
-    db_path = os.path.abspath(os.path.join(app.config["DATA_FOLDER_PATH"], "project.db"))
+    db_path = (Path(app.config["DATA_FOLDER_PATH"]) / "project.db").resolve()
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 
-    print("Current working directory:", os.getcwd())
-    print("Directory contents:", os.listdir("."))
+    print("Current working directory:", Path.cwd())
+    print("Directory contents:", [path.name for path in Path().iterdir()])
 
-    init_database(db_path)
+    init_database(str(db_path))
     os.environ["TEST_DB_PATH"] = str(db_path)
     register_ogw_back_blueprints(app)
     yield
@@ -52,7 +52,7 @@ def configure_test_environment() -> Generator[None, None, None]:
     if connection.engine:
         connection.engine.dispose()
     tmp_data_path = app.config.get("DATA_FOLDER_PATH")
-    if tmp_data_path and os.path.exists(tmp_data_path):
+    if tmp_data_path and Path(tmp_data_path).exists():
         shutil.rmtree(tmp_data_path, ignore_errors=True)
         print(f"Cleaned up test data folder: {tmp_data_path}", flush=True)
 

@@ -1,7 +1,7 @@
 """Packages"""
 
 import argparse
-import os
+from pathlib import Path
 from threading import Timer
 from typing import Any
 import flask
@@ -124,7 +124,7 @@ def run_server(app: Flask) -> None:
 
     if pre_args.project_folder_path is None:
         raise ValueError("project_folder_path must be provided")
-    project_folder_path = os.path.abspath(pre_args.project_folder_path)
+    project_folder_path = str(Path(pre_args.project_folder_path).resolve())
 
     if pre_args.debug:
         app.config.from_object(app_config.DevConfig(project_folder_path))
@@ -186,7 +186,7 @@ def run_server(app: Flask) -> None:
     )
     args = parser.parse_args()
 
-    args.project_folder_path = os.path.abspath(args.project_folder_path)
+    args.project_folder_path = str(Path(args.project_folder_path).resolve())
 
     print(f"{args=}", flush=True)
 
@@ -204,12 +204,12 @@ def run_server(app: Flask) -> None:
     db_filename = app.config.get("DATABASE_FILENAME")
     if not isinstance(db_filename, str):
         raise TypeError(f"DATABASE_FILENAME config must be a string, got {db_filename!r}")
-    db_path = os.path.join(str(app.config.get("DATA_FOLDER_PATH")), db_filename)
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    db_path = Path(str(app.config.get("DATA_FOLDER_PATH"))) / db_filename
+    db_path.parent.mkdir(parents=True, exist_ok=True)
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-    connection.init_database(db_path)
+    connection.init_database(str(db_path))
     print(f"Database initialized at: {db_path}", flush=True)
 
     flask_cors.CORS(app, origins=args.allowed_origins)

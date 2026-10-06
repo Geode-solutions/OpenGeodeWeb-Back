@@ -1,11 +1,12 @@
 # Standard library imports
 import os
 import time
+from pathlib import Path
 
 # Third party imports
 # Local application imports
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
+base_dir = Path(__file__).resolve().parent
 
 
 class Config(object):
@@ -20,9 +21,9 @@ class Config(object):
 
     def __init__(self, project_folder_path: str):
         self.PROJECT_FOLDER_PATH = project_folder_path
-        self.DATA_FOLDER_PATH = os.path.join(project_folder_path, "data")
-        self.EXTENSIONS_FOLDER_PATH = os.path.join(project_folder_path, "extensions")
-        self.UPLOAD_FOLDER_PATH = os.path.join(project_folder_path, "uploads")
+        self.DATA_FOLDER_PATH = str(Path(project_folder_path) / "data")
+        self.EXTENSIONS_FOLDER_PATH = str(Path(project_folder_path) / "extensions")
+        self.UPLOAD_FOLDER_PATH = str(Path(project_folder_path) / "uploads")
 
 
 class ProdConfig(Config):

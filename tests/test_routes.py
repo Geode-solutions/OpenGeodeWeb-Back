@@ -29,8 +29,8 @@ from opengeodeweb_back.geode_objects.geode_edged_curve3d import (
     GeodeEdgedCurve3D,
 )
 
-base_dir = os.path.abspath(os.path.dirname(__file__))
-data_dir = os.path.join(base_dir, "data")
+base_dir = Path(__file__).resolve().parent
+data_dir = base_dir / "data"
 DUMMY_GEODE_ID = "00000000-0000-0000-0000-000000000000"
 
 
@@ -73,19 +73,17 @@ def test_allowed_objects(client: FlaskClient) -> None:
 
 
 def test_upload_file(client: FlaskClient, filename: str = "test.og_brep") -> None:
-    file = os.path.join(data_dir, filename)
+    file = data_dir / filename
     print(f"{file=}", flush=True)
     response = client.put(
         f"/opengeodeweb_back/upload_file",
-        data={"file": FileStorage(open(file, "rb"))},
+        data={"file": FileStorage(file.open("rb"))},
     )
     assert response.status_code == 201
 
 
 def test_upload_file_raw(client: FlaskClient, filename: str = "test.og_brep") -> None:
-    file = os.path.join(data_dir, filename)
-    with open(file, "rb") as opened_file:
-        file_bytes = opened_file.read()
+    file_bytes = (data_dir / filename).read_bytes()
 
     raw_filename = "raw_upload_test.og_brep"
     response = client.put(
@@ -95,12 +93,11 @@ def test_upload_file_raw(client: FlaskClient, filename: str = "test.og_brep") ->
     )
     assert response.status_code == 201
 
-    uploaded_path = os.path.join(data_dir, raw_filename)
+    uploaded_path = data_dir / raw_filename
     try:
-        with open(uploaded_path, "rb") as uploaded_file:
-            assert uploaded_file.read() == file_bytes
+        assert uploaded_path.read_bytes() == file_bytes
     finally:
-        os.remove(uploaded_path)
+        uploaded_path.unlink()
 
 
 def test_upload_file_raw_missing_filename(client: FlaskClient) -> None:
@@ -113,9 +110,7 @@ def test_upload_file_raw_missing_filename(client: FlaskClient) -> None:
 
 
 def test_upload_file_chunked(client: FlaskClient, filename: str = "test.og_brep") -> None:
-    file = os.path.join(data_dir, filename)
-    with open(file, "rb") as opened_file:
-        file_bytes = opened_file.read()
+    file_bytes = (data_dir / filename).read_bytes()
 
     chunk_filename = "chunked_upload_test.og_brep"
     chunk_size = max(1, len(file_bytes) // 3)
@@ -124,7 +119,7 @@ def test_upload_file_chunked(client: FlaskClient, filename: str = "test.og_brep"
     ]
     total_chunks = len(chunks)
 
-    uploaded_path = os.path.join(data_dir, chunk_filename)
+    uploaded_path = data_dir / chunk_filename
     try:
         for chunk_index, chunk in enumerate(chunks):
             response = client.put(
@@ -137,18 +132,14 @@ def test_upload_file_chunked(client: FlaskClient, filename: str = "test.og_brep"
             )
             if chunk_index < total_chunks - 1:
                 assert response.status_code == 200
-                assert not os.path.exists(uploaded_path)
+                assert not uploaded_path.exists()
             else:
                 assert response.status_code == 201
 
-        with open(uploaded_path, "rb") as uploaded_file:
-            assert uploaded_file.read() == file_bytes
+        assert uploaded_path.read_bytes() == file_bytes
     finally:
-        if os.path.exists(uploaded_path):
-            os.remove(uploaded_path)
-        part_path = f"{uploaded_path}.part"
-        if os.path.exists(part_path):
-            os.remove(part_path)
+        uploaded_path.unlink(missing_ok=True)
+        uploaded_path.with_name(f"{uploaded_path.name}.part").unlink(missing_ok=True)
 
 
 def test_upload_file_chunked_invalid_chunk_index(client: FlaskClient) -> None:
@@ -288,7 +279,7 @@ def test_save_viewable_file(
 
 def test_texture_coordinates(client: FlaskClient, test_id: str) -> None:
     with client.application.app_context():
-        file = os.path.join(data_dir, "hat.vtp")
+        file = str(data_dir / "hat.vtp")
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
             geode_object=GeodePolygonalSurface3D.geode_object_type(),
@@ -300,9 +291,9 @@ def test_texture_coordinates(client: FlaskClient, test_id: str) -> None:
         if session:
             session.commit()
 
-        data_path = geode_functions.data_file_path(data.id, data.native_file)
-        os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        assert os.path.exists(data_path), f"File not found at {data_path}"
+        data_path = Path(geode_functions.data_file_path(data.id, data.native_file))
+        data_path.parent.mkdir(parents=True, exist_ok=True)
+        assert data_path.exists(), f"File not found at {data_path}"
     response = client.post("/opengeodeweb_back/texture_coordinates", json={"id": data.id})
     assert response.status_code == 200
     texture_coordinates = response.get_json()["texture_coordinates"]
@@ -315,7 +306,7 @@ def test_vertex_attribute_names(client: FlaskClient, test_id: str) -> None:
     route = f"/opengeodeweb_back/vertex_attribute_names"
 
     with client.application.app_context():
-        file = os.path.join(data_dir, "test.vtp")
+        file = str(data_dir / "test.vtp")
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
             geode_object=GeodePolygonalSurface3D.geode_object_type(),
@@ -327,9 +318,9 @@ def test_vertex_attribute_names(client: FlaskClient, test_id: str) -> None:
         if session:
             session.commit()
 
-        data_path = geode_functions.data_file_path(data.id, data.native_file)
-        os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        assert os.path.exists(data_path), f"File not found at {data_path}"
+        data_path = Path(geode_functions.data_file_path(data.id, data.native_file))
+        data_path.parent.mkdir(parents=True, exist_ok=True)
+        assert data_path.exists(), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     assert response.status_code == 200
     attributes = response.get_json()["attributes"]
@@ -354,7 +345,7 @@ def test_cell_attribute_names(client: FlaskClient, test_id: str) -> None:
     route = f"/opengeodeweb_back/cell_attribute_names"
 
     with client.application.app_context():
-        file = os.path.join(data_dir, "test.og_rgd2d")
+        file = str(data_dir / "test.og_rgd2d")
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
             geode_object=GeodeRegularGrid2D.geode_object_type(),
@@ -366,9 +357,9 @@ def test_cell_attribute_names(client: FlaskClient, test_id: str) -> None:
         if session:
             session.commit()
 
-        data_path = geode_functions.data_file_path(data.id, data.native_file)
-        os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        assert os.path.exists(data_path), f"File not found at {data_path}"
+        data_path = Path(geode_functions.data_file_path(data.id, data.native_file))
+        data_path.parent.mkdir(parents=True, exist_ok=True)
+        assert data_path.exists(), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     assert response.status_code == 200
     attributes = response.get_json()["attributes"]
@@ -393,7 +384,7 @@ def test_polygon_attribute_names(client: FlaskClient, test_id: str) -> None:
     route = f"/opengeodeweb_back/polygon_attribute_names"
 
     with client.application.app_context():
-        file = os.path.join(data_dir, "test.vtp")
+        file = str(data_dir / "test.vtp")
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
             geode_object=GeodePolygonalSurface3D.geode_object_type(),
@@ -405,9 +396,9 @@ def test_polygon_attribute_names(client: FlaskClient, test_id: str) -> None:
         if session:
             session.commit()
 
-        data_path = geode_functions.data_file_path(data.id, data.native_file)
-        os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        assert os.path.exists(data_path), f"File not found at {data_path}"
+        data_path = Path(geode_functions.data_file_path(data.id, data.native_file))
+        data_path.parent.mkdir(parents=True, exist_ok=True)
+        assert data_path.exists(), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     assert response.status_code == 200
     attributes = response.get_json()["attributes"]
@@ -432,7 +423,7 @@ def test_polyhedron_attribute_names(client: FlaskClient, test_id: str) -> None:
     route = f"/opengeodeweb_back/polyhedron_attribute_names"
 
     with client.application.app_context():
-        file = os.path.join(data_dir, "test.vtu")
+        file = str(data_dir / "test.vtu")
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
             geode_object=GeodePolyhedralSolid3D.geode_object_type(),
@@ -444,9 +435,9 @@ def test_polyhedron_attribute_names(client: FlaskClient, test_id: str) -> None:
         if session:
             session.commit()
 
-        data_path = geode_functions.data_file_path(data.id, data.native_file)
-        os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        assert os.path.exists(data_path), f"File not found at {data_path}"
+        data_path = Path(geode_functions.data_file_path(data.id, data.native_file))
+        data_path.parent.mkdir(parents=True, exist_ok=True)
+        assert data_path.exists(), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     print(response.get_json())
     assert response.status_code == 200
@@ -475,7 +466,7 @@ def test_edge_attribute_names(client: FlaskClient, test_id: str) -> None:
     route = f"/opengeodeweb_back/edge_attribute_names"
 
     with client.application.app_context():
-        file = os.path.join(data_dir, "test.og_edc3d")
+        file = str(data_dir / "test.og_edc3d")
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
             geode_object=GeodeEdgedCurve3D.geode_object_type(),
@@ -487,9 +478,9 @@ def test_edge_attribute_names(client: FlaskClient, test_id: str) -> None:
         if session:
             session.commit()
 
-        data_path = geode_functions.data_file_path(data.id, data.native_file)
-        os.makedirs(os.path.dirname(data_path), exist_ok=True)
-        assert os.path.exists(data_path), f"File not found at {data_path}"
+        data_path = Path(geode_functions.data_file_path(data.id, data.native_file))
+        data_path.parent.mkdir(parents=True, exist_ok=True)
+        assert data_path.exists(), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
     print(response.get_json())
     assert response.status_code == 200
@@ -515,14 +506,12 @@ def test_edge_attribute_names(client: FlaskClient, test_id: str) -> None:
 def test_database_uri_path(client: FlaskClient) -> None:
     app = client.application
     with app.app_context():
-        expected_db_path = os.path.abspath(
-            os.path.join(app.config["DATA_FOLDER_PATH"], "project.db")
-        )
+        expected_db_path = (Path(app.config["DATA_FOLDER_PATH"]) / "project.db").resolve()
         expected_uri = f"sqlite:///{expected_db_path}"
 
         assert app.config["SQLALCHEMY_DATABASE_URI"] == expected_uri
 
-        assert os.path.exists(expected_db_path)
+        assert expected_db_path.exists()
 
 
 def test_geode_object_inheritance(client: FlaskClient) -> None:
@@ -609,10 +598,9 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
     route = "/opengeodeweb_back/export_project"
     snapshot = {"styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}}
     filename = "export_project_test.vease"
-    project_folder = client.application.config["DATA_FOLDER_PATH"]
-    os.makedirs(project_folder, exist_ok=True)
-    database_root_path = os.path.join(project_folder, "project.db")
-    assert os.path.isfile(database_root_path)
+    project_folder = Path(client.application.config["DATA_FOLDER_PATH"])
+    project_folder.mkdir(parents=True, exist_ok=True)
+    assert (project_folder / "project.db").is_file()
 
     with get_session() as session:
         session.query(Data).delete()
@@ -638,15 +626,13 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
         session.add(data2)
         session.commit()
 
-        data1_dir = os.path.join(project_folder, "test_data_1")
-        os.makedirs(data1_dir, exist_ok=True)
-        with open(os.path.join(data1_dir, "native.txt"), "w") as f:
-            f.write("native file content")
+        data1_dir = project_folder / "test_data_1"
+        data1_dir.mkdir(parents=True, exist_ok=True)
+        (data1_dir / "native.txt").write_text("native file content")
 
-        data2_dir = os.path.join(project_folder, "test_data_2")
-        os.makedirs(data2_dir, exist_ok=True)
-        with open(os.path.join(data2_dir, "native.txt"), "w") as f:
-            f.write("native file content")
+        data2_dir = project_folder / "test_data_2"
+        data2_dir.mkdir(parents=True, exist_ok=True)
+        (data2_dir / "native.txt").write_text("native file content")
 
     response = client.post(route, json={"snapshot": snapshot, "filename": filename})
     assert response.status_code == 200
@@ -668,9 +654,7 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
 
     response.close()
 
-    export_path = os.path.join(project_folder, filename)
-    if os.path.exists(export_path):
-        os.remove(export_path)
+    (project_folder / filename).unlink(missing_ok=True)
 
 
 def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
@@ -678,8 +662,8 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
     snapshot = {"styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}}
 
     original_data_folder = client.application.config["DATA_FOLDER_PATH"]
-    client.application.config["DATA_FOLDER_PATH"] = os.path.join(str(tmp_path), "project_data")
-    db_path = os.path.join(client.application.config["DATA_FOLDER_PATH"], "project.db")
+    client.application.config["DATA_FOLDER_PATH"] = str(tmp_path / "project_data")
+    db_path = tmp_path / "project_data" / "project.db"
 
     import sqlite3, zipfile, json
 
@@ -697,7 +681,7 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
         zipf.writestr("snapshot.json", json.dumps(snapshot))
         zipf.write(str(temp_db), "project.db")
 
-    with open(z, "rb") as f:
+    with z.open("rb") as f:
         resp = client.post(
             route,
             data={"file": (f, "import_project_test.vease")},
@@ -706,7 +690,7 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
 
     assert resp.status_code == 200
     assert resp.get_json().get("snapshot") == snapshot
-    assert os.path.exists(db_path)
+    assert db_path.exists()
 
     from opengeodeweb_microservice.database import connection
 

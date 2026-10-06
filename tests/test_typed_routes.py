@@ -1,5 +1,6 @@
 # Standard library imports
 import json
+from pathlib import Path
 
 # Third party imports
 import fastjsonschema  # type: ignore
@@ -15,7 +16,7 @@ from tests.conftest import app
 BLUEPRINTS = ("opengeodeweb_back", "opengeodeweb_create")
 
 
-with open(ERROR_SCHEMA_PATH, "r") as file:
+with Path(ERROR_SCHEMA_PATH).open() as file:
     validate_error = fastjsonschema.compile(json.load(file))
 
 

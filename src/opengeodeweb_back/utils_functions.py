@@ -1,7 +1,6 @@
 # Standard library imports
 import base64
 import hashlib
-import os
 import threading
 import time
 import uuid
@@ -9,6 +8,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 from typing import Any
 
 # Third party imports
@@ -146,7 +146,7 @@ def set_interval(
 
 
 def extension_from_filename(filename: str) -> str:
-    return os.path.splitext(filename)[1][1:]
+    return Path(filename).suffix[1:]
 
 
 def send_file(upload_folder: str, saved_files: list[str], new_file_name: str) -> flask.Response:
@@ -154,18 +154,16 @@ def send_file(upload_folder: str, saved_files: list[str], new_file_name: str) ->
         mimetype = "application/octet-binary"
     else:
         mimetype = "application/zip"
-        new_file_name = os.path.splitext(new_file_name)[0] + ".zip"
-        with zipfile.ZipFile(
-            os.path.join(os.path.abspath(upload_folder), new_file_name), "w"
-        ) as zipObj:
+        new_file_name = Path(new_file_name).stem + ".zip"
+        with zipfile.ZipFile(Path(upload_folder).resolve() / new_file_name, "w") as zipObj:
             for saved_file_path in saved_files:
                 zipObj.write(
                     saved_file_path,
-                    os.path.basename(saved_file_path),
+                    Path(saved_file_path).name,
                 )
 
     response = flask.send_from_directory(
-        directory=os.path.abspath(upload_folder),
+        directory=Path(upload_folder).resolve(),
         path=new_file_name,
         as_attachment=True,
         mimetype=mimetype,
@@ -198,13 +196,13 @@ def handle_unexpected_exception(exception: Exception) -> flask.Response:
 
 def create_data_folder_from_id(data_id: str) -> str:
     base_data_folder = flask.current_app.config["DATA_FOLDER_PATH"]
-    data_path = os.path.join(base_data_folder, data_id)
-    os.makedirs(data_path, exist_ok=True)
-    return data_path
+    data_path = Path(base_data_folder) / data_id
+    data_path.mkdir(parents=True, exist_ok=True)
+    return str(data_path)
 
 
 def content_based_uuid(file_path: str) -> og.uuid:
-    with open(file_path, "rb") as file:
+    with Path(file_path).open("rb") as file:
         digest = hashlib.file_digest(file, "sha256").hexdigest()
     return og.uuid(str(uuid.uuid5(uuid.NAMESPACE_OID, digest)))
 
@@ -285,16 +283,16 @@ def save_all_viewables_and_return_info(
         tasks: list[tuple[Callable[[str], Any], str]] = [
             (
                 geode_object.save,
-                os.path.join(data_path, "native." + geode_object.native_extension()),
+                str(Path(data_path) / ("native." + geode_object.native_extension())),
             )
         ]
         if geode_object.is_viewable():
             tasks.extend(
                 [
-                    (geode_object.save_viewable, os.path.join(data_path, "viewable")),
+                    (geode_object.save_viewable, str(Path(data_path) / "viewable")),
                     (
                         geode_object.save_light_viewable,
-                        os.path.join(data_path, "light_viewable"),
+                        str(Path(data_path) / "light_viewable"),
                     ),
                 ]
             )
@@ -304,17 +302,16 @@ def save_all_viewables_and_return_info(
         if geode_object.is_viewable():
             viewable_path = results[1]
             light_path = results[2]
-            with open(light_path, "rb") as f:
-                binary_light_viewable = f.read()
+            binary_light_viewable = Path(light_path).read_bytes()
             binary_light_viewable_str = base64.b64encode(binary_light_viewable).decode("ascii")
-            data.viewable_file = os.path.basename(viewable_path)
-            data.light_viewable_file = os.path.basename(light_path)
+            data.viewable_file = Path(viewable_path).name
+            data.light_viewable_file = Path(light_path).name
         else:
             binary_light_viewable_str = None
             data.viewable_file = None
             data.light_viewable_file = None
 
-        data.native_file = os.path.basename(native_files[0])
+        data.native_file = Path(native_files[0]).name
 
         assert data.native_file is not None
         if geode_object.is_viewable():
@@ -360,7 +357,7 @@ def generate_files_from_file(geode_object_type: GeodeObjectType, input_file: str
     generic_geode_object = geode_objects[geode_object_type]
     full_input_filename = geode_functions.upload_file_path(input_file)
     geode_object = generic_geode_object.load(full_input_filename)
-    geode_object.builder().set_name(os.path.splitext(input_file)[0])
+    geode_object.builder().set_name(Path(input_file).stem)
     if not input_file.lower().endswith("." + geode_object.native_extension()):
         geode_object.builder().set_id(content_based_uuid(full_input_filename))
     data = Data.create(

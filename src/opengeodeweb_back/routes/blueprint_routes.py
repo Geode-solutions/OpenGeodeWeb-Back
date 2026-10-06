@@ -5,6 +5,7 @@ import time
 import shutil
 import math
 import typing
+from pathlib import Path
 from threading import Timer
 
 # Third party imports
@@ -58,9 +59,9 @@ def allowed_files(params: schemas.AllowedFiles) -> schemas.AllowedFilesResponse:
     return schemas.AllowedFilesResponse(extensions=list(extensions))
 
 
-def _write_stream(path: str, stream: typing.IO[bytes], mode: str = "wb") -> None:
+def _write_stream(path: Path, stream: typing.IO[bytes], mode: str = "wb") -> None:
     read_buffer_size = 1024 * 1024
-    with open(path, mode) as destination:
+    with path.open(mode) as destination:
         while chunk := stream.read(read_buffer_size):
             destination.write(chunk)
 
@@ -78,8 +79,7 @@ def _finalize_upload(filename: str) -> flask.Response:
 def upload_file() -> flask.Response:
     UPLOAD_FOLDER_PATH = flask.current_app.config["UPLOAD_FOLDER_PATH"]
     print(f"{UPLOAD_FOLDER_PATH=}", flush=True)
-    if not os.path.exists(UPLOAD_FOLDER_PATH):
-        os.makedirs(UPLOAD_FOLDER_PATH, exist_ok=True)
+    Path(UPLOAD_FOLDER_PATH).mkdir(parents=True, exist_ok=True)
 
     # Multipart callers (e.g. Vease) still send the whole file as a "file" form
     # part. Everything else PUTs raw bytes with ?filename= as a query param:
@@ -91,16 +91,16 @@ def upload_file() -> flask.Response:
         file = flask.request.files["file"]
         if file.filename is None:
             flask.abort(400, "Filename is required")
-        filename = werkzeug.utils.secure_filename(os.path.basename(file.filename))
-        file_path = os.path.join(UPLOAD_FOLDER_PATH, filename)
+        filename = werkzeug.utils.secure_filename(Path(file.filename).name)
+        file_path = Path(UPLOAD_FOLDER_PATH) / filename
         file.save(file_path)
         return _finalize_upload(filename)
 
     raw_filename = flask.request.args.get("filename")
     if not raw_filename:
         flask.abort(400, "Filename is required")
-    filename = werkzeug.utils.secure_filename(os.path.basename(raw_filename))
-    file_path = os.path.join(UPLOAD_FOLDER_PATH, filename)
+    filename = werkzeug.utils.secure_filename(Path(raw_filename).name)
+    file_path = Path(UPLOAD_FOLDER_PATH) / filename
 
     total_chunks = flask.request.args.get("total_chunks", type=int)
     if total_chunks is None:
@@ -111,12 +111,12 @@ def upload_file() -> flask.Response:
     if chunk_index is None or not 0 <= chunk_index < total_chunks:
         flask.abort(400, "Invalid chunk_index")
 
-    part_path = f"{file_path}.part"
+    part_path = file_path.with_name(f"{file_path.name}.part")
     _write_stream(part_path, flask.request.stream, "wb" if chunk_index == 0 else "ab")
     if chunk_index < total_chunks - 1:
         return _upload_response("Chunk received", 200)
 
-    os.replace(part_path, file_path)
+    part_path.replace(file_path)
     return _finalize_upload(filename)
 
 
@@ -125,7 +125,7 @@ def allowed_objects(
     params: schemas.AllowedObjects,
 ) -> schemas.AllowedObjectsResponse:
     file_absolute_path = geode_functions.upload_file_path(params.filename)
-    file_extension = utils_functions.extension_from_filename(os.path.basename(file_absolute_path))
+    file_extension = utils_functions.extension_from_filename(Path(file_absolute_path).name)
     allowed_objects: dict[str, schemas.allowed_objects.AllowedObject] = {}
     for geode_object_type, geode_object in geode_objects.items():
         if file_extension not in geode_object.input_extensions():
@@ -151,14 +151,10 @@ def missing_files(params: schemas.MissingFiles) -> schemas.MissingFilesResponse:
         for file in additional_files.mandatory_files + additional_files.optional_files
     )
     mandatory_files = [
-        os.path.basename(file.filename)
-        for file in additional_files.mandatory_files
-        if file.is_missing
+        Path(file.filename).name for file in additional_files.mandatory_files if file.is_missing
     ]
     additional_files_array = [
-        os.path.basename(file.filename)
-        for file in additional_files.optional_files
-        if file.is_missing
+        Path(file.filename).name for file in additional_files.optional_files if file.is_missing
     ]
 
     return schemas.MissingFilesResponse(
@@ -496,33 +492,32 @@ def export_project() -> flask.Response:
     params = parse_params(schemas.export_project_route)
 
     project_folder: str = flask.current_app.config["DATA_FOLDER_PATH"]
-    os.makedirs(project_folder, exist_ok=True)
+    Path(project_folder).mkdir(parents=True, exist_ok=True)
 
-    filename: str = werkzeug.utils.secure_filename(os.path.basename(params.filename))
+    filename: str = werkzeug.utils.secure_filename(Path(params.filename).name)
     if not filename.lower().endswith(".vease"):
         flask.abort(400, "Requested filename must end with .vease")
-    export_vease_path = os.path.join(project_folder, filename)
+    export_vease_path = Path(project_folder) / filename
 
     with get_session() as session:
         rows = session.query(Data.id, Data.native_file).all()
 
     with zipfile.ZipFile(export_vease_path, "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
-        database_root_path = os.path.join(project_folder, "project.db")
-        if os.path.isfile(database_root_path):
+        database_root_path = Path(project_folder) / "project.db"
+        if database_root_path.is_file():
             zip_file.write(database_root_path, "project.db")
 
         for data_id, native_file in rows:
-            base_dir = os.path.join(project_folder, data_id)
-            if os.path.isdir(base_dir):
-                for root, directories, files in os.walk(base_dir):
-                    for file_name in files:
-                        file_path = os.path.join(root, file_name)
-                        relative_path = os.path.relpath(file_path, base_dir)
-                        zip_file.write(file_path, os.path.join(data_id, relative_path))
+            base_dir = Path(project_folder) / data_id
+            if base_dir.is_dir():
+                for file_path in base_dir.rglob("*"):
+                    if file_path.is_file():
+                        relative_path = file_path.relative_to(base_dir)
+                        zip_file.write(file_path, Path(data_id) / relative_path)
 
         zip_file.writestr("snapshot.json", flask.json.dumps(params.snapshot))
 
-    return utils_functions.send_file(project_folder, [export_vease_path], filename)
+    return utils_functions.send_file(project_folder, [str(export_vease_path)], filename)
 
 
 @typed_route(routes, schemas.import_project_route)
@@ -531,11 +526,11 @@ def import_project(params: schemas.ImportProject) -> schemas.ImportProjectRespon
         flask.abort(400, "No .vease file provided under 'file'")
     zip_file = flask.request.files["file"]
     assert zip_file.filename is not None
-    filename = werkzeug.utils.secure_filename(os.path.basename(zip_file.filename))
+    filename = werkzeug.utils.secure_filename(Path(zip_file.filename).name)
     if not filename.lower().endswith(".vease"):
         flask.abort(400, "Uploaded file must be a .vease")
 
-    data_folder_path: str = flask.current_app.config["DATA_FOLDER_PATH"]
+    data_folder_path = Path(flask.current_app.config["DATA_FOLDER_PATH"])
 
     # 423 Locked bypass : remove stopped requests
     if connection.scoped_session_registry:
@@ -545,37 +540,37 @@ def import_project(params: schemas.ImportProject) -> schemas.ImportProjectRespon
     connection.engine = connection.session_factory = connection.scoped_session_registry = None
 
     try:
-        if os.path.exists(data_folder_path):
-            for item in os.scandir(data_folder_path):
-                if item.is_dir(follow_symlinks=False):
-                    shutil.rmtree(item.path)
+        if data_folder_path.exists():
+            for item in data_folder_path.iterdir():
+                if item.is_dir() and not item.is_symlink():
+                    shutil.rmtree(item)
                 else:
-                    os.remove(item.path)
+                    item.unlink()
         else:
-            os.makedirs(data_folder_path, exist_ok=True)
+            data_folder_path.mkdir(parents=True, exist_ok=True)
     except PermissionError:
         flask.abort(423, "Project files are locked; cannot overwrite")
 
     zip_file.stream.seek(0)
     with zipfile.ZipFile(zip_file.stream) as zip_archive:
-        project_folder = os.path.abspath(data_folder_path)
+        project_folder = data_folder_path.resolve()
         for member in zip_archive.namelist():
-            target = os.path.abspath(os.path.normpath(os.path.join(project_folder, member)))
-            if not (target == project_folder or target.startswith(project_folder + os.sep)):
+            target = (project_folder / member).resolve()
+            if not target.is_relative_to(project_folder):
                 flask.abort(400, "Vease file contains unsafe paths")
         zip_archive.extractall(project_folder)
 
-        database_root_path = os.path.join(project_folder, "project.db")
-        if not os.path.isfile(database_root_path):
+        database_root_path = project_folder / "project.db"
+        if not database_root_path.is_file():
             flask.abort(400, "Missing project.db at project root")
 
-        connection.init_database(database_root_path, create_tables=False)
+        connection.init_database(str(database_root_path), create_tables=False)
 
         try:
             with get_session() as session:
                 rows = session.query(Data).all()
         except Exception:
-            connection.init_database(database_root_path, create_tables=True)
+            connection.init_database(str(database_root_path), create_tables=True)
             with get_session() as session:
                 rows = session.query(Data).all()
 
@@ -584,10 +579,10 @@ def import_project(params: schemas.ImportProject) -> schemas.ImportProjectRespon
                 data_path = geode_functions.data_file_path(data.id)
                 viewable_name = data.viewable_file
                 if viewable_name:
-                    vpath = geode_functions.data_file_path(data.id, viewable_name)
-                    viewable_dir = os.path.join(data_path, "viewable")
-                    has_components = os.path.isdir(viewable_dir) and bool(os.listdir(viewable_dir))
-                    if os.path.isfile(vpath) and (data.viewer_object != "model" or has_components):
+                    vpath = Path(geode_functions.data_file_path(data.id, viewable_name))
+                    viewable_dir = Path(data_path) / "viewable"
+                    has_components = viewable_dir.is_dir() and any(viewable_dir.iterdir())
+                    if vpath.is_file() and (data.viewer_object != "model" or has_components):
                         continue
 
                 native_file = str(data.native_file or "")
@@ -595,7 +590,7 @@ def import_project(params: schemas.ImportProject) -> schemas.ImportProjectRespon
                     continue
 
                 native_full = geode_functions.data_file_path(data.id, native_file)
-                if not os.path.isfile(native_full):
+                if not Path(native_full).is_file():
                     continue
 
                 geode_object = geode_functions.geode_object_from_string(data.geode_object).load(
