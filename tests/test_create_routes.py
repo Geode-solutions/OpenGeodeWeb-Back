@@ -1,12 +1,17 @@
+from __future__ import annotations
+
 # Standard library imports
 import copy
+from typing import TYPE_CHECKING
 
 # Third party imports
 import pytest
-from flask.testing import FlaskClient
 
 # Local application imports
 from opengeodeweb_back import test_utils
+
+if TYPE_CHECKING:
+    from flask.testing import FlaskClient
 
 
 @pytest.fixture

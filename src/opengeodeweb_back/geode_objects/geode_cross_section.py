@@ -1,14 +1,19 @@
 # Standard library imports
 from __future__ import annotations
 
-# Third party imports
-import opengeode as og
-import opengeode_geosciences as og_geosciences
+from typing import TYPE_CHECKING
+
 import geode_viewables as viewables
-from opengeodeweb_microservice.database.data_types import GeodeModelType
+
+# Third party imports
+import opengeode_geosciences as og_geosciences
 
 # Local application imports
 from .geode_section import GeodeSection
+
+if TYPE_CHECKING:
+    import opengeode as og
+    from opengeodeweb_microservice.database.data_types import GeodeModelType
 
 
 class GeodeCrossSection(GeodeSection):

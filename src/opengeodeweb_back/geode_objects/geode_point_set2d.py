@@ -1,15 +1,20 @@
 # Standard library imports
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+import geode_viewables as viewables
+
 # Third party imports
 import opengeode as og
 import opengeode_geosciences as og_geosciences
 import opengeode_inspector as og_inspector
-import geode_viewables as viewables
-from opengeodeweb_microservice.database.data_types import GeodeMeshType
 
 # Local application imports
 from .geode_vertex_set import GeodeVertexSet
+
+if TYPE_CHECKING:
+    from opengeodeweb_microservice.database.data_types import GeodeMeshType
 
 
 class GeodePointSet2D(GeodeVertexSet):

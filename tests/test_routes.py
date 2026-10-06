@@ -1,33 +1,40 @@
+from __future__ import annotations
+
 # Standard library imports
+import json
 import os
+import sqlite3
+import zipfile
+from pathlib import Path
+from typing import TYPE_CHECKING
 
 # Third party imports
 import opengeode as og
-from werkzeug.datastructures import FileStorage
-from flask.testing import FlaskClient
-from werkzeug.test import TestResponse
-from pathlib import Path
-import json
-import zipfile
+from opengeodeweb_microservice.database import connection
+from opengeodeweb_microservice.database.connection import get_session
 
 # Local application imports
 from opengeodeweb_microservice.database.data import Data
-from opengeodeweb_microservice.database.connection import get_session
+from werkzeug.datastructures import FileStorage
+
 from opengeodeweb_back import geode_functions, test_utils
-from opengeodeweb_back.routes.blueprint_routes import extract_valid_attribute_values
+from opengeodeweb_back.geode_objects.geode_edged_curve3d import (
+    GeodeEdgedCurve3D,
+)
 from opengeodeweb_back.geode_objects.geode_polygonal_surface3d import (
     GeodePolygonalSurface3D,
 )
 from opengeodeweb_back.geode_objects.geode_polyhedral_solid3d import (
     GeodePolyhedralSolid3D,
 )
-
 from opengeodeweb_back.geode_objects.geode_regular_grid2d import (
     GeodeRegularGrid2D,
 )
-from opengeodeweb_back.geode_objects.geode_edged_curve3d import (
-    GeodeEdgedCurve3D,
-)
+from opengeodeweb_back.routes.blueprint_routes import extract_valid_attribute_values
+
+if TYPE_CHECKING:
+    from flask.testing import FlaskClient
+    from werkzeug.test import TestResponse
 
 base_dir = Path(__file__).resolve().parent
 data_dir = base_dir / "data"
@@ -35,7 +42,7 @@ DUMMY_GEODE_ID = "00000000-0000-0000-0000-000000000000"
 
 
 def test_allowed_files(client: FlaskClient) -> None:
-    route = f"/opengeodeweb_back/allowed_files"
+    route = "/opengeodeweb_back/allowed_files"
 
     def get_full_data() -> test_utils.JsonData:
         return {}
@@ -53,7 +60,7 @@ def test_allowed_files(client: FlaskClient) -> None:
 
 
 def test_allowed_objects(client: FlaskClient) -> None:
-    route = f"/opengeodeweb_back/allowed_objects"
+    route = "/opengeodeweb_back/allowed_objects"
 
     def get_full_data() -> test_utils.JsonData:
         return {
@@ -76,7 +83,7 @@ def test_upload_file(client: FlaskClient, filename: str = "test.og_brep") -> Non
     file = data_dir / filename
     print(f"{file=}", flush=True)
     response = client.put(
-        f"/opengeodeweb_back/upload_file",
+        "/opengeodeweb_back/upload_file",
         data={"file": FileStorage(file.open("rb"))},
     )
     assert response.status_code == 201
@@ -102,7 +109,7 @@ def test_upload_file_raw(client: FlaskClient, filename: str = "test.og_brep") ->
 
 def test_upload_file_raw_missing_filename(client: FlaskClient) -> None:
     response = client.put(
-        f"/opengeodeweb_back/upload_file",
+        "/opengeodeweb_back/upload_file",
         data=b"some raw bytes",
         content_type="application/octet-stream",
     )
@@ -155,7 +162,7 @@ def test_upload_file_chunked_invalid_chunk_index(client: FlaskClient) -> None:
 
 
 def test_missing_files(client: FlaskClient) -> None:
-    route = f"/opengeodeweb_back/missing_files"
+    route = "/opengeodeweb_back/missing_files"
 
     def get_full_data() -> test_utils.JsonData:
         return {
@@ -178,7 +185,7 @@ def test_missing_files(client: FlaskClient) -> None:
 
 
 def test_geographic_coordinate_systems(client: FlaskClient) -> None:
-    route = f"/opengeodeweb_back/geographic_coordinate_systems"
+    route = "/opengeodeweb_back/geographic_coordinate_systems"
 
     def get_full_data() -> test_utils.JsonData:
         return {
@@ -234,9 +241,9 @@ def test_geode_objects_and_output_extensions(client: FlaskClient) -> None:
     assert response.status_code == 200
     geode_objects_and_output_extensions = response.get_json()["geode_objects_and_output_extensions"]
     assert type(geode_objects_and_output_extensions) is dict
-    for geode_object, values in geode_objects_and_output_extensions.items():
+    for values in geode_objects_and_output_extensions.values():
         assert type(values) is dict
-        for output_extension, value in values.items():
+        for value in values.values():
             assert type(value) is bool
 
     # Test all params
@@ -249,7 +256,7 @@ def test_save_viewable_file(
     filename: str = "corbi.og_brep",
 ) -> TestResponse:
     test_upload_file(client, filename)
-    route = f"/opengeodeweb_back/save_viewable_file"
+    route = "/opengeodeweb_back/save_viewable_file"
 
     def get_full_data() -> test_utils.JsonData:
         return {
@@ -264,8 +271,8 @@ def test_save_viewable_file(
     assert type(native_file) is str
     viewable_file = response.get_json()["viewable_file"]
     assert type(viewable_file) is str
-    id = response.get_json().get("id")
-    assert type(id) is str
+    data_id = response.get_json().get("id")
+    assert type(data_id) is str
     object_type = response.get_json()["viewer_type"]
     assert type(object_type) is str
     assert object_type in ["model", "mesh"]
@@ -277,7 +284,7 @@ def test_save_viewable_file(
     return response
 
 
-def test_texture_coordinates(client: FlaskClient, test_id: str) -> None:
+def test_texture_coordinates(client: FlaskClient) -> None:
     with client.application.app_context():
         file = str(data_dir / "hat.vtp")
         data = Data.create(
@@ -302,8 +309,8 @@ def test_texture_coordinates(client: FlaskClient, test_id: str) -> None:
         assert type(texture_coordinate) is str
 
 
-def test_vertex_attribute_names(client: FlaskClient, test_id: str) -> None:
-    route = f"/opengeodeweb_back/vertex_attribute_names"
+def test_vertex_attribute_names(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/vertex_attribute_names"
 
     with client.application.app_context():
         file = str(data_dir / "test.vtp")
@@ -335,14 +342,14 @@ def test_vertex_attribute_names(client: FlaskClient, test_id: str) -> None:
         assert "no_data" in attribute
         assert isinstance(attribute["no_data"], bool)
     print(
-        f"[ATTRIBUTES]: ",
+        "[ATTRIBUTES]: ",
         [attribute["nb_items"] for attribute in attributes],
         flush=True,
     )
 
 
-def test_cell_attribute_names(client: FlaskClient, test_id: str) -> None:
-    route = f"/opengeodeweb_back/cell_attribute_names"
+def test_cell_attribute_names(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/cell_attribute_names"
 
     with client.application.app_context():
         file = str(data_dir / "test.og_rgd2d")
@@ -374,14 +381,14 @@ def test_cell_attribute_names(client: FlaskClient, test_id: str) -> None:
         assert "no_data" in attribute
         assert isinstance(attribute["no_data"], bool)
     print(
-        f"[ATTRIBUTES]: ",
+        "[ATTRIBUTES]: ",
         [attribute["nb_items"] for attribute in attributes],
         flush=True,
     )
 
 
-def test_polygon_attribute_names(client: FlaskClient, test_id: str) -> None:
-    route = f"/opengeodeweb_back/polygon_attribute_names"
+def test_polygon_attribute_names(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/polygon_attribute_names"
 
     with client.application.app_context():
         file = str(data_dir / "test.vtp")
@@ -413,14 +420,14 @@ def test_polygon_attribute_names(client: FlaskClient, test_id: str) -> None:
         assert "no_data" in attribute
         assert isinstance(attribute["no_data"], bool)
     print(
-        f"[ATTRIBUTES]: ",
+        "[ATTRIBUTES]: ",
         [attribute["nb_items"] for attribute in attributes],
         flush=True,
     )
 
 
-def test_polyhedron_attribute_names(client: FlaskClient, test_id: str) -> None:
-    route = f"/opengeodeweb_back/polyhedron_attribute_names"
+def test_polyhedron_attribute_names(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/polyhedron_attribute_names"
 
     with client.application.app_context():
         file = str(data_dir / "test.vtu")
@@ -456,14 +463,14 @@ def test_polyhedron_attribute_names(client: FlaskClient, test_id: str) -> None:
             assert attribute["min_value"] == 0.0
             assert attribute["max_value"] == 579.0
     print(
-        f"[ATTRIBUTES]: ",
+        "[ATTRIBUTES]: ",
         [attribute["nb_items"] for attribute in attributes],
         flush=True,
     )
 
 
-def test_edge_attribute_names(client: FlaskClient, test_id: str) -> None:
-    route = f"/opengeodeweb_back/edge_attribute_names"
+def test_edge_attribute_names(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/edge_attribute_names"
 
     with client.application.app_context():
         file = str(data_dir / "test.og_edc3d")
@@ -485,7 +492,7 @@ def test_edge_attribute_names(client: FlaskClient, test_id: str) -> None:
     print(response.get_json())
     assert response.status_code == 200
     attributes = response.get_json()["attributes"]
-    print(f"[ATTRIBUTES]: ", attributes, flush=True)
+    print("[ATTRIBUTES]: ", attributes, flush=True)
     assert type(attributes) is list
     for attribute in attributes:
         assert "attribute_name" in attribute
@@ -497,7 +504,7 @@ def test_edge_attribute_names(client: FlaskClient, test_id: str) -> None:
         assert "no_data" in attribute
         assert isinstance(attribute["no_data"], bool)
     print(
-        f"[ATTRIBUTES]: ",
+        "[ATTRIBUTES]: ",
         [attribute["nb_items"] for attribute in attributes],
         flush=True,
     )
@@ -665,12 +672,11 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
     client.application.config["DATA_FOLDER_PATH"] = str(tmp_path / "project_data")
     db_path = tmp_path / "project_data" / "project.db"
 
-    import sqlite3, zipfile, json
-
     temp_db = tmp_path / "temp_project.db"
     conn = sqlite3.connect(str(temp_db))
     conn.execute(
-        "CREATE TABLE datas (id TEXT PRIMARY KEY, geode_id TEXT, geode_object TEXT, viewer_object TEXT, viewer_elements_type TEXT, native_file TEXT, "
+        "CREATE TABLE datas (id TEXT PRIMARY KEY, geode_id TEXT, geode_object TEXT, "
+        "viewer_object TEXT, viewer_elements_type TEXT, native_file TEXT, "
         "viewable_file TEXT, light_viewable_file TEXT)"
     )
     conn.commit()
@@ -692,8 +698,6 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
     assert resp.get_json().get("snapshot") == snapshot
     assert db_path.exists()
 
-    from opengeodeweb_microservice.database import connection
-
     client.application.config["DATA_FOLDER_PATH"] = original_data_folder
     test_db_path = os.environ.get("TEST_DB_PATH")
     if test_db_path:
@@ -713,7 +717,8 @@ def test_save_viewable_workflow_from_object(client: FlaskClient) -> None:
     assert response.status_code == 200
 
     data_id = response.get_json()["id"]
-    assert isinstance(data_id, str) and len(data_id) > 0
+    assert isinstance(data_id, str)
+    assert len(data_id) > 0
     assert response.get_json()["geode_object_type"] == "PointSet3D"
     assert response.get_json()["viewable_file"].endswith(".vtp")
 

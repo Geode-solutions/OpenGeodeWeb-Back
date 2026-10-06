@@ -1,14 +1,17 @@
 # Standard library imports
 from __future__ import annotations
-from typing import Any
+
+from typing import TYPE_CHECKING, Any
 
 # Third party imports
-import opengeode as og
 import opengeode_geosciences as og_geosciences
-from opengeodeweb_microservice.database.data_types import GeodeModelType
 
 # Local application imports
-from .geode_model import GeodeModel, ComponentRegistry
+from .geode_model import ComponentRegistry, GeodeModel
+
+if TYPE_CHECKING:
+    import opengeode as og
+    from opengeodeweb_microservice.database.data_types import GeodeModelType
 
 
 class GeodeHorizonStack3D(GeodeModel):

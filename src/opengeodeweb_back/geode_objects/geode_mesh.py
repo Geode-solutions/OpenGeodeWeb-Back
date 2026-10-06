@@ -1,13 +1,16 @@
 # Standard library imports
 from __future__ import annotations
+
 from abc import abstractmethod
+from typing import TYPE_CHECKING
 
 # Third party imports
-import opengeode as og
-from opengeodeweb_microservice.database.data_types import ViewerType
-
 # Local application imports
 from .geode_object import GeodeObject
+
+if TYPE_CHECKING:
+    import opengeode as og
+    from opengeodeweb_microservice.database.data_types import ViewerType
 
 
 class GeodeMesh(GeodeObject):

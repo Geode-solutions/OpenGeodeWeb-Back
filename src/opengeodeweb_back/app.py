@@ -1,23 +1,27 @@
 """Packages"""
 
-import argparse
-from pathlib import Path
-from threading import Timer
-from typing import Any
-import flask
-import flask_cors  # type: ignore
-from flask import Flask, Response
-from flask_cors import cross_origin
-from werkzeug.exceptions import HTTPException
-from opengeodeweb_back import utils_functions, app_config
-from opengeodeweb_back.routes import blueprint_routes
-from opengeodeweb_back.routes.create import blueprint_create
-from opengeodeweb_microservice.database import connection
+from __future__ import annotations
 
+import argparse
+import json
 import queue
 import threading
-import json
-from typing import Any, Dict, Generator, Tuple
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
+
+import flask
+import flask_cors  # type: ignore[import-untyped]
+from flask import Flask, Response
+from flask_cors import cross_origin
+from opengeodeweb_microservice.database import connection
+from werkzeug.exceptions import HTTPException
+
+from opengeodeweb_back import app_config, utils_functions
+from opengeodeweb_back.routes import blueprint_routes
+from opengeodeweb_back.routes.create import blueprint_create
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 
 def create_app(name: str) -> flask.Flask:
@@ -42,7 +46,7 @@ def create_app(name: str) -> flask.Flask:
     def publish_event(event: str, data: dict[str, Any]) -> None:
         _event_queue.put((event, data))
 
-    def stream_events() -> Generator[str, None, None]:
+    def stream_events() -> Generator[str]:
         while True:
             event, data = _event_queue.get()
             yield f"event: {event}\ndata: {json.dumps(data)}\n\n"
@@ -50,7 +54,7 @@ def create_app(name: str) -> flask.Flask:
     @app.after_request
     def after_request(response: flask.Response) -> flask.Response:
         endpoint = flask.request.endpoint.replace(".", "/") if flask.request.endpoint else None
-        if endpoint == "events" or endpoint == None:
+        if endpoint in {"events", None}:
             return response
 
         if wants_event_stream():
@@ -83,7 +87,7 @@ def create_app(name: str) -> flask.Flask:
         methods=["POST"],
     )
     def return_error() -> Response:
-        flask.abort(500, f"Test")
+        flask.abort(500, "Test")
         return flask.make_response({}, 500)
 
     @app.route(

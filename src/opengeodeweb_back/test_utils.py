@@ -1,8 +1,15 @@
+from __future__ import annotations
+
 # Standard library imports
-from typing import Callable, Any
+from http import HTTPStatus
+from typing import TYPE_CHECKING, Any
 
 # Third party imports
-from flask.testing import FlaskClient
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from flask.testing import FlaskClient
 
 # Local application imports
 
@@ -31,19 +38,19 @@ def test_route_wrong_params(
             json, target = get_json()
             target.pop(key)
             response = client.post(route, json=json)
-            if response.status_code == 400:
+            if response.status_code == HTTPStatus.BAD_REQUEST:
                 error_description: str = response.get_json()["description"]
                 assert "must contain" in error_description
                 assert f"'{key}'" in error_description
             if isinstance(value, (dict, list)):
-                test_route_wrong_params(client, route, get_full_data, path + [key])
+                test_route_wrong_params(client, route, get_full_data, [*path, key])
 
         json, target = get_json()
         target["dumb_key"] = "dumb_value"
         response = client.post(route, json=json)
-        assert response.status_code == 400
+        assert response.status_code == HTTPStatus.BAD_REQUEST
         error_description = response.get_json()["description"]
         assert "must not contain" in error_description
         assert "'dumb_key'" in error_description
     elif isinstance(data, list) and data:
-        test_route_wrong_params(client, route, get_full_data, path + [0])
+        test_route_wrong_params(client, route, get_full_data, [*path, 0])

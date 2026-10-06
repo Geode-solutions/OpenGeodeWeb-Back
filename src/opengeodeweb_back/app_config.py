@@ -9,7 +9,7 @@ from pathlib import Path
 base_dir = Path(__file__).resolve().parent
 
 
-class Config(object):
+class Config:
     FLASK_DEBUG = os.environ.get("FLASK_DEBUG", default=False)
     HOST = "localhost"
     PORT = "5000"
@@ -19,7 +19,7 @@ class Config(object):
     LAST_PING_TIME = time.time()
     DATABASE_FILENAME = "project.db"
 
-    def __init__(self, project_folder_path: str):
+    def __init__(self, project_folder_path: str) -> None:
         self.PROJECT_FOLDER_PATH = project_folder_path
         self.DATA_FOLDER_PATH = str(Path(project_folder_path) / "data")
         self.EXTENSIONS_FOLDER_PATH = str(Path(project_folder_path) / "extensions")

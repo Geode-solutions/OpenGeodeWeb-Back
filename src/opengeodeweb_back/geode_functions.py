@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 # Standard library imports
 from pathlib import Path
+from typing import TYPE_CHECKING
+
 
 # Third party imports
-import werkzeug
 import flask
+import werkzeug
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.data_types import (
     GeodeObjectType,
@@ -12,7 +16,9 @@ from opengeodeweb_microservice.database.data_types import (
 
 # Local application imports
 from .geode_objects import geode_objects
-from .geode_objects.geode_object import GeodeObject
+
+if TYPE_CHECKING:
+    from .geode_objects.geode_object import GeodeObject
 
 
 def data_file_path(data_id: str, filename: str | None = None) -> str:
@@ -63,7 +69,7 @@ def geode_object_output_extensions(
         if output_extensions is None:
             continue
         object_output_extensions: dict[str, bool] = {}
-        is_saveable_method = getattr(mixin_geode_object, "is_saveable")
+        is_saveable_method = mixin_geode_object.is_saveable  # type: ignore[attr-defined]
         for output_extension in output_extensions:
             bool_is_saveable = is_saveable_method(geode_object, f"test.{output_extension}")
             object_output_extensions[output_extension] = bool_is_saveable

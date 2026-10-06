@@ -1,17 +1,22 @@
 # Standard library imports
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+import geode_viewables as viewables
+
 # Third party imports
 import opengeode as og
 import opengeode_inspector as og_inspector
-import geode_viewables as viewables
-from opengeodeweb_microservice.database.data_types import (
-    GeodeMeshType,
-    ViewerElementsType,
-)
 
 # Local application imports
 from .geode_mesh import GeodeMesh
+
+if TYPE_CHECKING:
+    from opengeodeweb_microservice.database.data_types import (
+        GeodeMeshType,
+        ViewerElementsType,
+    )
 
 
 class GeodeRasterImage3D(GeodeMesh):
@@ -85,8 +90,7 @@ class GeodeRasterImage3D(GeodeMesh):
         return None
 
     def validate(self) -> og_inspector.ObjectValidity:
-        result = og_inspector.ObjectValidity()
-        return result
+        return og_inspector.ObjectValidity()
 
     def vertex_attribute_manager(self) -> og.AttributeManager:
         return og.AttributeManager()

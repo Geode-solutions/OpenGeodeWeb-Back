@@ -1,17 +1,22 @@
+from __future__ import annotations
+
 # Standard library imports
 import json
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 # Third party imports
-import fastjsonschema  # type: ignore
-import pytest
-from flask.testing import FlaskClient
+import fastjsonschema  # type: ignore[import-untyped]
 from opengeodeweb_microservice.schemas import ERROR_SCHEMA_PATH
 
 # Local application imports
 from opengeodeweb_back import geode_functions
 from opengeodeweb_back.typed_route import TYPED_ROUTE_MARKER
 from tests.conftest import app
+
+if TYPE_CHECKING:
+    import pytest
+    from flask.testing import FlaskClient
 
 BLUEPRINTS = ("opengeodeweb_back", "opengeodeweb_create")
 
@@ -44,7 +49,7 @@ def test_http_exception_error_response(client: FlaskClient) -> None:
 def test_unexpected_exception_error_response(
     client: FlaskClient, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    def fail(filename: str) -> str:
+    def fail(_filename: str) -> str:
         raise RuntimeError("unexpected failure")
 
     monkeypatch.setattr(geode_functions, "upload_file_path", fail)

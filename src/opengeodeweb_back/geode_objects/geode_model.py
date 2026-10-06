@@ -1,14 +1,17 @@
 # Standard library imports
 from __future__ import annotations
+
 from abc import abstractmethod
-from typing import Union
+from typing import TYPE_CHECKING
 
 # Third party imports
 import opengeode as og
-from opengeodeweb_microservice.database.data_types import ViewerType, ViewerElementsType
 
 # Local application imports
 from .geode_object import GeodeObject
+
+if TYPE_CHECKING:
+    from opengeodeweb_microservice.database.data_types import ViewerElementsType, ViewerType
 
 ComponentRegistry = dict[og.ComponentType, list[og.uuid]]
 

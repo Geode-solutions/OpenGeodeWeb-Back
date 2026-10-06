@@ -1,37 +1,42 @@
 # Standard library imports
 from __future__ import annotations
 
-# Third party imports
-from opengeodeweb_microservice.database.data_types import GeodeObjectType
+from typing import TYPE_CHECKING
 
-# Local application imports
-from .geode_object import GeodeObject
+# Third party imports
 from .geode_brep import GeodeBRep
-from .geode_vertex_set import GeodeVertexSet
-from .geode_graph import GeodeGraph
-from .geode_point_set2d import GeodePointSet2D
-from .geode_point_set3d import GeodePointSet3D
+from .geode_cross_section import GeodeCrossSection
 from .geode_edged_curve2d import GeodeEdgedCurve2D
 from .geode_edged_curve3d import GeodeEdgedCurve3D
-from .geode_raster_image2d import GeodeRasterImage2D
-from .geode_raster_image3d import GeodeRasterImage3D
-from .geode_polygonal_surface2d import GeodePolygonalSurface2D
-from .geode_polygonal_surface3d import GeodePolygonalSurface3D
-from .geode_triangulated_surface2d import GeodeTriangulatedSurface2D
-from .geode_triangulated_surface3d import GeodeTriangulatedSurface3D
-from .geode_regular_grid2d import GeodeRegularGrid2D
-from .geode_polyhedral_solid3d import GeodePolyhedralSolid3D
-from .geode_tetrahedral_solid3d import GeodeTetrahedralSolid3D
+from .geode_graph import GeodeGraph
+from .geode_horizon_stack3d import GeodeHorizonStack3D
 from .geode_hybrid_solid3d import GeodeHybridSolid3D
-from .geode_regular_grid3d import GeodeRegularGrid3D
+from .geode_implicit_cross_section import GeodeImplicitCrossSection
+from .geode_implicit_structural_model import GeodeImplicitStructuralModel
 from .geode_light_regular_grid2d import GeodeLightRegularGrid2D
 from .geode_light_regular_grid3d import GeodeLightRegularGrid3D
+
+# Local application imports
+from .geode_point_set2d import GeodePointSet2D
+from .geode_point_set3d import GeodePointSet3D
+from .geode_polygonal_surface2d import GeodePolygonalSurface2D
+from .geode_polygonal_surface3d import GeodePolygonalSurface3D
+from .geode_polyhedral_solid3d import GeodePolyhedralSolid3D
+from .geode_raster_image2d import GeodeRasterImage2D
+from .geode_raster_image3d import GeodeRasterImage3D
+from .geode_regular_grid2d import GeodeRegularGrid2D
+from .geode_regular_grid3d import GeodeRegularGrid3D
 from .geode_section import GeodeSection
 from .geode_structural_model import GeodeStructuralModel
-from .geode_cross_section import GeodeCrossSection
-from .geode_implicit_structural_model import GeodeImplicitStructuralModel
-from .geode_implicit_cross_section import GeodeImplicitCrossSection
-from .geode_horizon_stack3d import GeodeHorizonStack3D
+from .geode_tetrahedral_solid3d import GeodeTetrahedralSolid3D
+from .geode_triangulated_surface2d import GeodeTriangulatedSurface2D
+from .geode_triangulated_surface3d import GeodeTriangulatedSurface3D
+from .geode_vertex_set import GeodeVertexSet
+
+if TYPE_CHECKING:
+    from opengeodeweb_microservice.database.data_types import GeodeObjectType
+
+    from .geode_object import GeodeObject
 
 geode_objects: dict[GeodeObjectType, type[GeodeObject]] = {
     "VertexSet": GeodeVertexSet,

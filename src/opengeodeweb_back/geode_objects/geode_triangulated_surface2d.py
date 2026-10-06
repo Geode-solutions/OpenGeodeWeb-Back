@@ -1,13 +1,18 @@
 # Standard library imports
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+import geode_viewables as viewables
+
 # Third party imports
 import opengeode as og
-import geode_viewables as viewables
-from opengeodeweb_microservice.database.data_types import GeodeMeshType
 
 # Local application imports
 from .geode_surface_mesh2d import GeodeSurfaceMesh2D
+
+if TYPE_CHECKING:
+    from opengeodeweb_microservice.database.data_types import GeodeMeshType
 
 
 class GeodeTriangulatedSurface2D(GeodeSurfaceMesh2D):

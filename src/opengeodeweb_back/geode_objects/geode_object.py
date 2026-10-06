@@ -1,16 +1,19 @@
 # Standard library imports
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 # Third party imports
 import opengeode as og
-import opengeode_inspector as og_inspector
-from opengeodeweb_microservice.database.data_types import (
-    GeodeObjectType,
-    ViewerType,
-    ViewerElementsType,
-)
+
+if TYPE_CHECKING:
+    import opengeode_inspector as og_inspector
+    from opengeodeweb_microservice.database.data_types import (
+        GeodeObjectType,
+        ViewerElementsType,
+        ViewerType,
+    )
 
 # Local application imports
 
@@ -57,7 +60,7 @@ class GeodeObject(ABC):
     def additional_files(cls, filename: str) -> og.AdditionalFiles: ...
 
     @abstractmethod
-    def native_extension(cls) -> str: ...
+    def native_extension(self) -> str: ...
 
     @classmethod
     @abstractmethod

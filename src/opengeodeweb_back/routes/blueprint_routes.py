@@ -1,38 +1,38 @@
 # Standard library imports
-from opengeodeweb_back.geode_objects.geode_solid_mesh3d import GeodeSolidMesh3D
-import os
-import time
-import shutil
 import math
+import os
+import shutil
+import time
 import typing
+import zipfile
 from pathlib import Path
 from threading import Timer
 
 # Third party imports
 import flask
-import werkzeug
-import zipfile
 import opengeode as og
-import opengeode_io as og_io
 import opengeode_geosciences as og_geosciences
-import opengeode_geosciencesio as og_geosciencesio
-from opengeodeweb_microservice.database.data import Data
-from opengeodeweb_microservice.database.connection import get_session
+import opengeode_geosciencesio as og_geosciencesio  # noqa: F401 (registers IO plugins)
+import opengeode_io as og_io  # noqa: F401 (registers IO plugins)
+import werkzeug
 from opengeodeweb_microservice.database import connection
+from opengeodeweb_microservice.database.connection import get_session
+from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.data_types import geode_object_type
 
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
-from opengeodeweb_back.typed_route import parse_params, raw_route, typed_route
-from opengeodeweb_back.routes import schemas
 from opengeodeweb_back.geode_objects import geode_objects
-from opengeodeweb_back.geode_objects.geode_mesh import GeodeMesh
-from opengeodeweb_back.geode_objects.geode_model import GeodeModel
 from opengeodeweb_back.geode_objects.geode_graph import GeodeGraph
 from opengeodeweb_back.geode_objects.geode_grid2d import GeodeGrid2D
 from opengeodeweb_back.geode_objects.geode_grid3d import GeodeGrid3D
+from opengeodeweb_back.geode_objects.geode_mesh import GeodeMesh
+from opengeodeweb_back.geode_objects.geode_model import GeodeModel
+from opengeodeweb_back.geode_objects.geode_solid_mesh3d import GeodeSolidMesh3D
 from opengeodeweb_back.geode_objects.geode_surface_mesh2d import GeodeSurfaceMesh2D
 from opengeodeweb_back.geode_objects.geode_surface_mesh3d import GeodeSurfaceMesh3D
+from opengeodeweb_back.routes import schemas
+from opengeodeweb_back.typed_route import parse_params, raw_route, typed_route
 
 ComponentMesh = (
     og.Corner2D,
@@ -77,9 +77,9 @@ def _finalize_upload(filename: str) -> flask.Response:
 
 @raw_route(routes, schemas.upload_file_route)
 def upload_file() -> flask.Response:
-    UPLOAD_FOLDER_PATH = flask.current_app.config["UPLOAD_FOLDER_PATH"]
-    print(f"{UPLOAD_FOLDER_PATH=}", flush=True)
-    Path(UPLOAD_FOLDER_PATH).mkdir(parents=True, exist_ok=True)
+    upload_folder_path = flask.current_app.config["UPLOAD_FOLDER_PATH"]
+    print(f"{upload_folder_path=}", flush=True)
+    Path(upload_folder_path).mkdir(parents=True, exist_ok=True)
 
     # Multipart callers (e.g. Vease) still send the whole file as a "file" form
     # part. Everything else PUTs raw bytes with ?filename= as a query param:
@@ -92,7 +92,7 @@ def upload_file() -> flask.Response:
         if file.filename is None:
             flask.abort(400, "Filename is required")
         filename = werkzeug.utils.secure_filename(Path(file.filename).name)
-        file_path = Path(UPLOAD_FOLDER_PATH) / filename
+        file_path = Path(upload_folder_path) / filename
         file.save(file_path)
         return _finalize_upload(filename)
 
@@ -100,7 +100,7 @@ def upload_file() -> flask.Response:
     if not raw_filename:
         flask.abort(400, "Filename is required")
     filename = werkzeug.utils.secure_filename(Path(raw_filename).name)
-    file_path = Path(UPLOAD_FOLDER_PATH) / filename
+    file_path = Path(upload_folder_path) / filename
 
     total_chunks = flask.request.args.get("total_chunks", type=int)
     if total_chunks is None:
@@ -127,12 +127,12 @@ def allowed_objects(
     file_absolute_path = geode_functions.upload_file_path(params.filename)
     file_extension = utils_functions.extension_from_filename(Path(file_absolute_path).name)
     allowed_objects: dict[str, schemas.allowed_objects.AllowedObject] = {}
-    for geode_object_type, geode_object in geode_objects.items():
+    for object_type, geode_object in geode_objects.items():
         if file_extension not in geode_object.input_extensions():
             continue
         loadability_score = geode_object.is_loadable(file_absolute_path)
         priority_score = geode_object.object_priority(file_absolute_path)
-        allowed_objects[geode_object_type] = schemas.allowed_objects.AllowedObject(
+        allowed_objects[object_type] = schemas.allowed_objects.AllowedObject(
             is_loadable=loadability_score.value(),
             object_priority=priority_score,
         )
@@ -287,8 +287,8 @@ def attributes_metadata(
     attribute_managers = manager if isinstance(manager, list) else [manager]
     attributes: list[dict[str, str | int | float | bool | list[float]]] = []
     first_manager = attribute_managers[0]
-    for id in first_manager.attribute_ids():
-        attribute = first_manager.find_generic_attribute(id)
+    for attribute_id in first_manager.attribute_ids():
+        attribute = first_manager.find_generic_attribute(attribute_id)
         if attribute is None:
             continue
         attribute_name = attribute.name()
@@ -316,7 +316,7 @@ def attributes_metadata(
         attributes.append(
             {
                 "attribute_name": attribute_name,
-                "attribute_id": id.string(),
+                "attribute_id": attribute_id.string(),
                 "nb_items": nb_items,
                 "min_value": min(min_values),
                 "max_value": max(max_values),
@@ -507,7 +507,7 @@ def export_project() -> flask.Response:
         if database_root_path.is_file():
             zip_file.write(database_root_path, "project.db")
 
-        for data_id, native_file in rows:
+        for data_id, _native_file in rows:
             base_dir = Path(project_folder) / data_id
             if base_dir.is_dir():
                 for file_path in base_dir.rglob("*"):

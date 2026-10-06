@@ -1,15 +1,21 @@
 # Standard library imports
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+import geode_viewables as viewables
+
 # Third party imports
 import opengeode as og
-import opengeode_inspector as og_inspector
-import geode_viewables as viewables
-from opengeodeweb_microservice.database.data_types import GeodeMeshType
+
+from .geode_grid2d import GeodeGrid2D
 
 # Local application imports
 from .geode_surface_mesh2d import GeodeSurfaceMesh2D
-from .geode_grid2d import GeodeGrid2D
+
+if TYPE_CHECKING:
+    import opengeode_inspector as og_inspector
+    from opengeodeweb_microservice.database.data_types import GeodeMeshType
 
 
 class GeodeRegularGrid2D(GeodeSurfaceMesh2D, GeodeGrid2D):

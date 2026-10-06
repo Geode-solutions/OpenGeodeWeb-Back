@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 # Standard library imports
 import base64
 import hashlib
@@ -6,50 +8,52 @@ import time
 import uuid
 import xml.etree.ElementTree as ET
 import zipfile
-from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
+from importlib import metadata
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+import fastjsonschema  # type: ignore[import-untyped]
 
 # Third party imports
 import flask
-import fastjsonschema  # type: ignore
-import importlib.metadata as metadata
-import shutil
-from werkzeug.exceptions import HTTPException
-import werkzeug
 import opengeode as og
-from opengeodeweb_microservice.schemas import ErrorResponse, SchemaDict
-from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.connection import get_session
-from opengeodeweb_microservice.database.data_types import GeodeObjectType
+from opengeodeweb_microservice.database.data import Data
+from opengeodeweb_microservice.schemas import ErrorResponse, SchemaDict
 
 # Local application imports
 from . import geode_functions
 from .geode_objects import geode_objects
 from .geode_objects.geode_model import GeodeModel
-from .geode_objects.geode_object import GeodeObject
 from .geode_objects.geode_vertex_set import GeodeVertexSet
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from opengeodeweb_microservice.database.data_types import GeodeObjectType
+    from werkzeug.exceptions import HTTPException
+
+    from .geode_objects.geode_object import GeodeObject
 
 
 def increment_request_counter(current_app: flask.Flask) -> None:
     if "REQUEST_COUNTER" in current_app.config:
-        REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER", 0))
-        REQUEST_COUNTER += 1
-        current_app.config.update(REQUEST_COUNTER=REQUEST_COUNTER)
+        request_counter = int(current_app.config.get("REQUEST_COUNTER", 0))
+        request_counter += 1
+        current_app.config.update(REQUEST_COUNTER=request_counter)
 
 
 def decrement_request_counter(current_app: flask.Flask) -> None:
     if "REQUEST_COUNTER" in current_app.config:
-        REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER", 0))
-        REQUEST_COUNTER -= 1
-        current_app.config.update(REQUEST_COUNTER=REQUEST_COUNTER)
+        request_counter = int(current_app.config.get("REQUEST_COUNTER", 0))
+        request_counter -= 1
+        current_app.config.update(REQUEST_COUNTER=request_counter)
 
 
 def update_last_request_time(current_app: flask.Flask) -> None:
     if "LAST_REQUEST_TIME" in current_app.config:
-        LAST_REQUEST_TIME = time.time()
-        current_app.config.update(LAST_REQUEST_TIME=LAST_REQUEST_TIME)
+        current_app.config.update(LAST_REQUEST_TIME=time.time())
 
 
 def terminate_session(exception: BaseException | None) -> None:
@@ -82,39 +86,35 @@ def teardown_request(current_app: flask.Flask, exception: BaseException | None =
 
 
 def kill_task(current_app: flask.Flask) -> bool:
-    REQUEST_COUNTER = int(current_app.config.get("REQUEST_COUNTER", 0))
-    LAST_PING_TIME = float(current_app.config.get("LAST_PING_TIME", 0))
-    LAST_REQUEST_TIME = float(current_app.config.get("LAST_REQUEST_TIME", 0))
-    MINUTES_BEFORE_TIMEOUT = float(current_app.config.get("MINUTES_BEFORE_TIMEOUT", 0))
+    request_counter = int(current_app.config.get("REQUEST_COUNTER", 0))
+    last_ping_time = float(current_app.config.get("LAST_PING_TIME", 0))
+    last_request_time = float(current_app.config.get("LAST_REQUEST_TIME", 0))
+    minutes_before_timeout = float(current_app.config.get("MINUTES_BEFORE_TIMEOUT", 0))
     current_time = time.time()
-    minutes_since_last_request = (current_time - LAST_REQUEST_TIME) / 60
-    minutes_since_last_ping = (current_time - LAST_PING_TIME) / 60
+    minutes_since_last_request = (current_time - last_request_time) / 60
+    minutes_since_last_ping = (current_time - last_ping_time) / 60
     print(
         "kill_task",
-        REQUEST_COUNTER,
-        MINUTES_BEFORE_TIMEOUT,
+        request_counter,
+        minutes_before_timeout,
         minutes_since_last_ping,
         minutes_since_last_request,
         flush=True,
     )
-    if REQUEST_COUNTER > 1:
+    if request_counter > 1:
         return False
-    if MINUTES_BEFORE_TIMEOUT == 0:
+    if minutes_before_timeout == 0:
         return False
-    if minutes_since_last_ping > MINUTES_BEFORE_TIMEOUT:
+    if minutes_since_last_ping > minutes_before_timeout:
         return True
-    if minutes_since_last_request > MINUTES_BEFORE_TIMEOUT:
-        return True
-    return False
+    return minutes_since_last_request > minutes_before_timeout
 
 
 def versions(list_packages: list[str]) -> list[dict[str, str]]:
-    list_with_versions = []
-    for package in list_packages:
-        list_with_versions.append(
-            {"package": package, "version": metadata.distribution(package).version}
-        )
-    return list_with_versions
+    return [
+        {"package": package, "version": metadata.distribution(package).version}
+        for package in list_packages
+    ]
 
 
 def validate_request(request: flask.Request, schema: SchemaDict) -> dict[str, Any]:
@@ -155,9 +155,9 @@ def send_file(upload_folder: str, saved_files: list[str], new_file_name: str) ->
     else:
         mimetype = "application/zip"
         new_file_name = Path(new_file_name).stem + ".zip"
-        with zipfile.ZipFile(Path(upload_folder).resolve() / new_file_name, "w") as zipObj:
+        with zipfile.ZipFile(Path(upload_folder).resolve() / new_file_name, "w") as zip_file:
             for saved_file_path in saved_files:
-                zipObj.write(
+                zip_file.write(
                     saved_file_path,
                     Path(saved_file_path).name,
                 )
@@ -215,27 +215,25 @@ def model_components(data_id: str, model: GeodeModel, viewable_file: str | None)
         root = tree.find("vtkMultiBlockDataSet")
         if root is None:
             flask.abort(500, "Failed to read viewable file")
-        current_index = 0
         assert root is not None
-        for elem in root.iter():
+        for current_index, elem in enumerate(root.iter()):
             if "uuid" in elem.attrib and elem.tag == "DataSet":
                 uuid_to_flat_index[elem.attrib["uuid"]] = current_index
-            current_index += 1
 
     model_mesh_components = model.mesh_components()
     mesh_components = []
     for mesh_component, ids in model_mesh_components.items():
         component_type = mesh_component.get()
-        for id in ids:
-            component = model.component(id)
-            geode_id = id.string()
+        for component_id in ids:
+            component = model.component(component_id)
+            geode_id = component_id.string()
             component_name = component.name()
             if not component_name:
                 component_name = geode_id
             viewer_id = uuid_to_flat_index[geode_id]
-            boundaries = model.boundaries(id)
+            boundaries = model.boundaries(component_id)
             boundaries_uuid = [boundary.id.string() for boundary in boundaries]
-            internals = model.internals(id)
+            internals = model.internals(component_id)
             internals_uuid = [internal.id.string() for internal in internals]
             mesh_component_object = {
                 "viewer_id": viewer_id,
@@ -252,13 +250,13 @@ def model_components(data_id: str, model: GeodeModel, viewable_file: str | None)
     collection_components = []
     for collection_component, ids in model_collection_components.items():
         component_type = collection_component.get()
-        for id in ids:
-            component = model.component(id)
-            geode_id = id.string()
+        for component_id in ids:
+            component = model.component(component_id)
+            geode_id = component_id.string()
             component_name = component.name()
             if not component_name:
                 component_name = geode_id
-            items = model.items(id)
+            items = model.items(component_id)
             items_uuid = [item.id.string() for item in items]
             collection_component_object = {
                 "geode_id": geode_id,

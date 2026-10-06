@@ -1,58 +1,68 @@
+from __future__ import annotations
+
 # Standard library imports
 import base64
 import re
-
-# Third party imports
-import flask
-from flask.ctx import AppContext
-from flask.testing import FlaskClient
 import shutil
 import uuid
 import zipfile
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+# Third party imports
+import flask
+import pytest
+from opengeodeweb_microservice.database.data import Data
 
 # Local application imports
-from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_back import geode_functions, utils_functions
 from opengeodeweb_back.geode_objects.geode_brep import GeodeBRep
 from opengeodeweb_back.geode_objects.geode_polygonal_surface3d import (
     GeodePolygonalSurface3D,
 )
 
+if TYPE_CHECKING:
+    from flask.testing import FlaskClient
+
 base_dir = Path(__file__).resolve().parent
 data_dir = base_dir / "data"
 
 
-def test_increment_request_counter(app_context: AppContext) -> None:
+@pytest.mark.usefixtures("app_context")
+def test_increment_request_counter() -> None:
     assert flask.current_app.config.get("REQUEST_COUNTER") == 0
     utils_functions.increment_request_counter(flask.current_app)
     assert flask.current_app.config.get("REQUEST_COUNTER") == 1
 
 
-def test_decrement_request_counter(app_context: AppContext) -> None:
+@pytest.mark.usefixtures("app_context")
+def test_decrement_request_counter() -> None:
     assert flask.current_app.config.get("REQUEST_COUNTER") == 1
     utils_functions.decrement_request_counter(flask.current_app)
     assert flask.current_app.config.get("REQUEST_COUNTER") == 0
 
 
-def test_update_last_request_time(app_context: AppContext) -> None:
-    LAST_REQUEST_TIME = flask.current_app.config.get("LAST_REQUEST_TIME")
+@pytest.mark.usefixtures("app_context")
+def test_update_last_request_time() -> None:
+    last_request_time = flask.current_app.config.get("LAST_REQUEST_TIME")
     utils_functions.update_last_request_time(flask.current_app)
-    assert flask.current_app.config.get("LAST_REQUEST_TIME", 0) >= LAST_REQUEST_TIME
+    assert flask.current_app.config.get("LAST_REQUEST_TIME", 0) >= last_request_time
 
 
-def test_before_request(app_context: AppContext) -> None:
+@pytest.mark.usefixtures("app_context")
+def test_before_request() -> None:
     assert flask.current_app.config.get("REQUEST_COUNTER") == 0
     utils_functions.before_request(flask.current_app)
     assert flask.current_app.config.get("REQUEST_COUNTER") == 1
 
 
-def test_teardown_request(app_context: AppContext) -> None:
-    LAST_REQUEST_TIME = flask.current_app.config.get("LAST_REQUEST_TIME")
+@pytest.mark.usefixtures("app_context")
+def test_teardown_request() -> None:
+    last_request_time = flask.current_app.config.get("LAST_REQUEST_TIME")
     assert flask.current_app.config.get("REQUEST_COUNTER") == 1
     utils_functions.teardown_request(flask.current_app)
     assert flask.current_app.config.get("REQUEST_COUNTER") == 0
-    assert flask.current_app.config.get("LAST_REQUEST_TIME", 0) >= LAST_REQUEST_TIME
+    assert flask.current_app.config.get("LAST_REQUEST_TIME", 0) >= last_request_time
 
 
 def test_versions() -> None:

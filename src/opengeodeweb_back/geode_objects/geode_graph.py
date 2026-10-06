@@ -1,16 +1,20 @@
 # Standard library imports
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 # Third party imports
 import opengeode as og
 import opengeode_inspector as og_inspector
-from opengeodeweb_microservice.database.data_types import (
-    GeodeMeshType,
-    ViewerElementsType,
-)
 
 # Local application imports
 from .geode_vertex_set import GeodeVertexSet
+
+if TYPE_CHECKING:
+    from opengeodeweb_microservice.database.data_types import (
+        GeodeMeshType,
+        ViewerElementsType,
+    )
 
 
 class GeodeGraph(GeodeVertexSet):
@@ -82,8 +86,7 @@ class GeodeGraph(GeodeVertexSet):
         return None
 
     def validate(self) -> og_inspector.ObjectValidity:
-        result = og_inspector.ObjectValidity()
-        return result
+        return og_inspector.ObjectValidity()
 
     def edge_attribute_manager(self) -> og.AttributeManager:
         return self.graph.edge_attribute_manager()
