@@ -3,6 +3,7 @@ from __future__ import annotations
 # Standard library imports
 import base64
 import hashlib
+import logging
 import threading
 import time
 import uuid
@@ -27,6 +28,8 @@ from . import geode_functions
 from .geode_objects import geode_objects
 from .geode_objects.geode_model import GeodeModel
 from .geode_objects.geode_vertex_set import GeodeVertexSet
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -78,11 +81,11 @@ def teardown_request(current_app: flask.Flask, exception: BaseException | None =
     update_last_request_time(current_app)
     terminate_session(exception)
     if flask.has_request_context():
-        message = "Request to " + str(flask.request.endpoint) + " completed"
         if hasattr(flask.g, "start_time"):
             duration = time.perf_counter() - flask.g.start_time
-            message += " in " + str(duration) + "s"
-        print(message, flush=True)
+            logger.info("Request to %s completed in %.3fs", flask.request.endpoint, duration)
+        else:
+            logger.info("Request to %s completed", flask.request.endpoint)
 
 
 def kill_task(current_app: flask.Flask) -> bool:
@@ -93,13 +96,13 @@ def kill_task(current_app: flask.Flask) -> bool:
     current_time = time.time()
     minutes_since_last_request = (current_time - last_request_time) / 60
     minutes_since_last_ping = (current_time - last_ping_time) / 60
-    print(
-        "kill_task",
+    logger.debug(
+        "kill_task: request_counter=%s minutes_before_timeout=%s "
+        "minutes_since_last_ping=%s minutes_since_last_request=%s",
         request_counter,
         minutes_before_timeout,
         minutes_since_last_ping,
         minutes_since_last_request,
-        flush=True,
     )
     if request_counter > 1:
         return False
@@ -127,7 +130,7 @@ def validate_request(request: flask.Request, schema: SchemaDict) -> dict[str, An
         validate(json_data)
     except fastjsonschema.JsonSchemaException as e:
         error_msg = str(e)
-        print("Validation failed:", error_msg, flush=True)
+        logger.warning("Validation failed: %s", error_msg)
         flask.abort(400, error_msg)
     return json_data
 
@@ -175,7 +178,7 @@ def send_file(upload_folder: str, saved_files: list[str], new_file_name: str) ->
 
 
 def handle_exception(exception: HTTPException) -> flask.Response:
-    print("\033[91mError:\033[0m \033[91m" + str(exception) + "\033[0m", flush=True)
+    logger.error("Error: %s", exception)
     code = exception.code or 500
     error = ErrorResponse(
         code=code,
@@ -189,7 +192,7 @@ def handle_exception(exception: HTTPException) -> flask.Response:
 
 
 def handle_unexpected_exception(exception: Exception) -> flask.Response:
-    print("\033[91mError:\033[0m \033[91m" + str(exception) + "\033[0m", flush=True)
+    logger.error("Unexpected error: %s", exception, exc_info=exception)
     error = ErrorResponse(code=500, name="Internal Server Error", description=str(exception))
     return flask.make_response(error.to_dict(), 500)
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import queue
 import threading
 from pathlib import Path
@@ -22,6 +23,8 @@ from opengeodeweb_back.routes.create import blueprint_create
 
 if TYPE_CHECKING:
     from collections.abc import Generator
+
+logger = logging.getLogger(__name__)
 
 
 def create_app(name: str) -> flask.Flask:
@@ -127,7 +130,8 @@ def run_server(app: Flask) -> None:
     pre_args, _ = pre_parser.parse_known_args()
 
     if pre_args.project_folder_path is None:
-        raise ValueError("project_folder_path must be provided")
+        msg = "project_folder_path must be provided"
+        raise ValueError(msg)
     project_folder_path = str(Path(pre_args.project_folder_path).resolve())
 
     if pre_args.debug:
@@ -192,7 +196,11 @@ def run_server(app: Flask) -> None:
 
     args.project_folder_path = str(Path(args.project_folder_path).resolve())
 
-    print(f"{args=}", flush=True)
+    logging.basicConfig(
+        level=logging.DEBUG if args.debug else logging.INFO,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
+    logger.info("Arguments: %s", args)
 
     app.config.update(
         HOST=args.host,
@@ -207,14 +215,15 @@ def run_server(app: Flask) -> None:
 
     db_filename = app.config.get("DATABASE_FILENAME")
     if not isinstance(db_filename, str):
-        raise TypeError(f"DATABASE_FILENAME config must be a string, got {db_filename!r}")
+        msg = f"DATABASE_FILENAME config must be a string, got {db_filename!r}"
+        raise TypeError(msg)
     db_path = Path(str(app.config.get("DATA_FOLDER_PATH"))) / db_filename
     db_path.parent.mkdir(parents=True, exist_ok=True)
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     connection.init_database(str(db_path))
-    print(f"Database initialized at: {db_path}", flush=True)
+    logger.info("Database initialized at: %s", db_path)
 
     flask_cors.CORS(app, origins=args.allowed_origins)
     app.run(
@@ -229,7 +238,7 @@ def run_opengeodeweb_back() -> None:
     app = create_app(__name__)
     register_ogw_back_blueprints(app)
     run_server(app)
-    print("Server stopped", flush=True)
+    logger.info("Server stopped")
 
 
 # ''' Main '''

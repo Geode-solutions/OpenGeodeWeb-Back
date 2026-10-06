@@ -68,10 +68,11 @@ def typed_route(
         def view() -> flask.Response:
             result = handler(parse_params(route))
             if not isinstance(result, route.response):
-                raise TypeError(
+                msg = (
                     f"{handler.__name__} returned {type(result).__name__}, "
                     f"expected {route.response.__name__}"
                 )
+                raise TypeError(msg)
             payload = _drop_none(result.to_dict())
             if flask.current_app.debug or flask.current_app.testing:
                 validate_response(payload)

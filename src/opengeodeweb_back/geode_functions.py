@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 # Standard library imports
+import logging
 from pathlib import Path
 from typing import TYPE_CHECKING
-
 
 # Third party imports
 import flask
@@ -19,6 +19,9 @@ from .geode_objects import geode_objects
 
 if TYPE_CHECKING:
     from .geode_objects.geode_object import GeodeObject
+
+
+logger = logging.getLogger(__name__)
 
 
 def data_file_path(data_id: str, filename: str | None = None) -> str:
@@ -39,8 +42,9 @@ def load_geode_object(data_id: str) -> GeodeObject:
         flask.abort(404, f"Data with id {data_id} not found")
 
     file_absolute_path = data_file_path(data_id, data.native_file)
-    print("Loading file: ", file_absolute_path)
-    print("File exists: ", Path(file_absolute_path).exists())
+    logger.debug(
+        "Loading file: %s (exists: %s)", file_absolute_path, Path(file_absolute_path).exists()
+    )
     return geode_object_from_string(data.geode_object).load(file_absolute_path)
 
 

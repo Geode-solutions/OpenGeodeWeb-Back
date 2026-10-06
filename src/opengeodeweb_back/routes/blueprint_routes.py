@@ -1,4 +1,5 @@
 # Standard library imports
+import logging
 import math
 import os
 import shutil
@@ -47,6 +48,8 @@ ComponentLine = (og.Line2D, og.Line3D)
 ComponentSurface = (og.Surface2D, og.Surface3D)
 ComponentBlock = og.Block3D
 
+logger = logging.getLogger(__name__)
+
 routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
 
 
@@ -71,14 +74,14 @@ def _upload_response(message: str, status: int) -> flask.Response:
 
 
 def _finalize_upload(filename: str) -> flask.Response:
-    print(f"{filename=}", flush=True)
+    logger.info("File uploaded: %s", filename)
     return _upload_response("File uploaded", 201)
 
 
 @raw_route(routes, schemas.upload_file_route)
 def upload_file() -> flask.Response:
     upload_folder_path = flask.current_app.config["UPLOAD_FOLDER_PATH"]
-    print(f"{upload_folder_path=}", flush=True)
+    logger.debug("Upload folder: %s", upload_folder_path)
     Path(upload_folder_path).mkdir(parents=True, exist_ok=True)
 
     # Multipart callers (e.g. Vease) still send the whole file as a "file" form
@@ -481,7 +484,7 @@ def ping(params: schemas.Ping) -> schemas.PingResponse:
 
 @typed_route(routes, schemas.kill_route)
 def kill(params: schemas.Kill) -> schemas.KillResponse:
-    print("Manual server kill, shutting down...", flush=True)
+    logger.info("Manual server kill, shutting down...")
     utils_functions.teardown_request(flask.current_app)
     Timer(0.5, os._exit, [0]).start()
     return schemas.KillResponse(message="Flask server is dead")

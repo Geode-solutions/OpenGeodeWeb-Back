@@ -50,7 +50,8 @@ def test_unexpected_exception_error_response(
     client: FlaskClient, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     def fail(_filename: str) -> str:
-        raise RuntimeError("unexpected failure")
+        msg = "unexpected failure"
+        raise RuntimeError(msg)
 
     monkeypatch.setattr(geode_functions, "upload_file_path", fail)
     response = client.post("/opengeodeweb_back/allowed_objects", json={"filename": "corbi.og_brep"})

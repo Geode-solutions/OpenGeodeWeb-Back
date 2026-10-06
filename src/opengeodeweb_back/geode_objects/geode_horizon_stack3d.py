@@ -93,7 +93,8 @@ class GeodeHorizonStack3D(GeodeModel):
         return []
 
     def component(self, id: og.uuid) -> og.Component3D:
-        raise NotImplementedError("HorizonStack3D has no mesh components")
+        msg = "HorizonStack3D has no mesh components"
+        raise NotImplementedError(msg)
 
     def inspect(self) -> Any:
         return None
