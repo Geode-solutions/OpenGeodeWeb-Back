@@ -14,9 +14,7 @@ class GeodeHybridSolid3D(GeodeSolidMesh3D):
     hybrid_solid: og.HybridSolid3D
 
     def __init__(self, hybrid_solid: og.HybridSolid3D | None = None) -> None:
-        self.hybrid_solid = (
-            hybrid_solid if hybrid_solid is not None else og.HybridSolid3D.create()
-        )
+        self.hybrid_solid = hybrid_solid if hybrid_solid is not None else og.HybridSolid3D.create()
         super().__init__(self.hybrid_solid)
 
     @classmethod
@@ -60,9 +58,7 @@ class GeodeHybridSolid3D(GeodeSolidMesh3D):
         return og.save_hybrid_solid3D(self.hybrid_solid, filename)
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_viewable_hybrid_solid3D(
-            self.hybrid_solid, filename_without_extension
-        )
+        return viewables.save_viewable_hybrid_solid3D(self.hybrid_solid, filename_without_extension)
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_hybrid_solid3D(

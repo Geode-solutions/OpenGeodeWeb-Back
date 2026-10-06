@@ -124,9 +124,7 @@ def test_create_curve(client: FlaskClient, curve_data: test_utils.JsonData) -> N
     test_utils.test_route_wrong_params(client, route, lambda: copy.deepcopy(curve_data))
 
 
-def test_create_polygonal_surface(
-    client: FlaskClient, surface_data: test_utils.JsonData
-) -> None:
+def test_create_polygonal_surface(client: FlaskClient, surface_data: test_utils.JsonData) -> None:
     """Test the creation of a polygonal surface with valid data."""
     route: str = "/opengeodeweb_back/create/polygonal_surface"
 
@@ -148,6 +146,4 @@ def test_create_polygonal_surface(
     assert response_data["geode_object_type"] == "PolygonalSurface3D"
 
     # Test with missing parameters
-    test_utils.test_route_wrong_params(
-        client, route, lambda: copy.deepcopy(surface_data)
-    )
+    test_utils.test_route_wrong_params(client, route, lambda: copy.deepcopy(surface_data))

@@ -69,9 +69,7 @@ def before_request(current_app: flask.Flask) -> None:
     flask.g.start_time = time.perf_counter()
 
 
-def teardown_request(
-    current_app: flask.Flask, exception: BaseException | None = None
-) -> None:
+def teardown_request(current_app: flask.Flask, exception: BaseException | None = None) -> None:
     decrement_request_counter(current_app)
     update_last_request_time(current_app)
     terminate_session(exception)
@@ -151,9 +149,7 @@ def extension_from_filename(filename: str) -> str:
     return os.path.splitext(filename)[1][1:]
 
 
-def send_file(
-    upload_folder: str, saved_files: list[str], new_file_name: str
-) -> flask.Response:
+def send_file(upload_folder: str, saved_files: list[str], new_file_name: str) -> flask.Response:
     if len(saved_files) == 1:
         mimetype = "application/octet-binary"
     else:
@@ -196,9 +192,7 @@ def handle_exception(exception: HTTPException) -> flask.Response:
 
 def handle_unexpected_exception(exception: Exception) -> flask.Response:
     print("\033[91mError:\033[0m \033[91m" + str(exception) + "\033[0m", flush=True)
-    error = ErrorResponse(
-        code=500, name="Internal Server Error", description=str(exception)
-    )
+    error = ErrorResponse(code=500, name="Internal Server Error", description=str(exception))
     return flask.make_response(error.to_dict(), 500)
 
 
@@ -215,9 +209,7 @@ def content_based_uuid(file_path: str) -> og.uuid:
     return og.uuid(str(uuid.uuid5(uuid.NAMESPACE_OID, digest)))
 
 
-def model_components(
-    data_id: str, model: GeodeModel, viewable_file: str | None
-) -> dict[str, Any]:
+def model_components(data_id: str, model: GeodeModel, viewable_file: str | None) -> dict[str, Any]:
     uuid_to_flat_index: dict[str, int] = {}
     if viewable_file:
         vtm_file_path = geode_functions.data_file_path(data_id, viewable_file)
@@ -314,9 +306,7 @@ def save_all_viewables_and_return_info(
             light_path = results[2]
             with open(light_path, "rb") as f:
                 binary_light_viewable = f.read()
-            binary_light_viewable_str = base64.b64encode(binary_light_viewable).decode(
-                "ascii"
-            )
+            binary_light_viewable_str = base64.b64encode(binary_light_viewable).decode("ascii")
             data.viewable_file = os.path.basename(viewable_path)
             data.light_viewable_file = os.path.basename(light_path)
         else:
@@ -366,9 +356,7 @@ def generate_files_from_object(
     return save_all_viewables_and_return_info(geode_object, data, data_path)
 
 
-def generate_files_from_file(
-    geode_object_type: GeodeObjectType, input_file: str
-) -> dict[str, Any]:
+def generate_files_from_file(geode_object_type: GeodeObjectType, input_file: str) -> dict[str, Any]:
     generic_geode_object = geode_objects[geode_object_type]
     full_input_filename = geode_functions.upload_file_path(input_file)
     geode_object = generic_geode_object.load(full_input_filename)

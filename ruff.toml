@@ -1,0 +1,24 @@
+# https://docs.astral.sh/ruff/configuration/
+
+target-version = "py314"
+line-length = 100
+indent-width = 4
+extend-exclude = ["**/schemas/**"] # generated schemas
+
+[lint]
+select = ["ALL"]
+ignore = [
+    "D103", # ignore undocumented public function
+    "D203", # incorrect-blank-line-before-class
+    "D213", # multi-line-summary-second-line
+    "COM812", # missing-trailing-comma
+]
+
+[lint.per-file-ignores]
+"tests/**" = [
+    "S101",    # assert is how pytest works
+]
+
+[format]
+quote-style = "double"
+indent-style = "space"

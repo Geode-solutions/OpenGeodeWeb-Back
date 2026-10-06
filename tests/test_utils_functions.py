@@ -189,9 +189,7 @@ def test_generate_files_from_object(
         assert re.match(r"[0-9a-f]{32}", result["id"])
         assert isinstance(result["viewer_type"], str)
         assert isinstance(result["binary_light_viewable"], str)
-        light_viewable_bytes = base64.b64decode(
-            result["binary_light_viewable"], validate=True
-        )
+        light_viewable_bytes = base64.b64decode(result["binary_light_viewable"], validate=True)
         assert light_viewable_bytes.startswith(b'<?xml version="1.0"?>')
         assert b'<AppendedData encoding="raw">' in light_viewable_bytes
 
@@ -247,9 +245,7 @@ def test_generate_files_from_file_returns_geode_id(client: FlaskClient) -> None:
             GeodeBRep.geode_object_type(), "test.og_brep"
         )
         expected_geode_id = (
-            GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
-            .identifier.id()
-            .string()
+            GeodeBRep.load(os.path.join(data_dir, "test.og_brep")).identifier.id().string()
         )
         assert result["geode_id"] == expected_geode_id
         assert len(result["geode_id"]) == 36
@@ -323,9 +319,7 @@ def test_send_file_multiple_returns_zip(client: FlaskClient, tmp_path: Path) -> 
             response.close()
 
 
-def test_send_file_single_returns_octet_binary(
-    client: FlaskClient, tmp_path: Path
-) -> None:
+def test_send_file_single_returns_octet_binary(client: FlaskClient, tmp_path: Path) -> None:
     app = client.application
     with app.app_context():
         app.config["UPLOAD_FOLDER_PATH"] = str(tmp_path)

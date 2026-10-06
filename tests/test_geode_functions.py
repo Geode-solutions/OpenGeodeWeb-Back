@@ -26,9 +26,7 @@ def test_input_output() -> None:
             if generic_geode_object.is_loadable(file_absolute_path).value() == 0.0:
                 continue
             geode_object = generic_geode_object.load(file_absolute_path)
-            data_name = geode_object.identifier.name() or os.path.basename(
-                file_absolute_path
-            )
+            data_name = geode_object.identifier.name() or os.path.basename(file_absolute_path)
             if geode_object.is_viewable():
                 viewable_file_path = geode_object.save_viewable(
                     os.path.join(os.path.abspath(f"./output"), data_name)
@@ -39,8 +37,8 @@ def test_input_output() -> None:
                     os.path.join(os.path.abspath(f"./output"), data_name)
                 )
                 os.remove(light_viewable_file_path)
-            geode_objects_output_extensions = (
-                geode_functions.geode_object_output_extensions(geode_object)
+            geode_objects_output_extensions = geode_functions.geode_object_output_extensions(
+                geode_object
             )
             assert type(geode_objects_output_extensions) is dict
             for (

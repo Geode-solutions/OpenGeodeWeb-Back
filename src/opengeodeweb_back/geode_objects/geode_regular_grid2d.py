@@ -16,9 +16,7 @@ class GeodeRegularGrid2D(GeodeSurfaceMesh2D, GeodeGrid2D):
     regular_grid: og.RegularGrid2D
 
     def __init__(self, regular_grid: og.RegularGrid2D | None = None) -> None:
-        self.regular_grid = (
-            regular_grid if regular_grid is not None else og.RegularGrid2D.create()
-        )
+        self.regular_grid = regular_grid if regular_grid is not None else og.RegularGrid2D.create()
         super().__init__(self.regular_grid)
 
     @classmethod
@@ -65,9 +63,7 @@ class GeodeRegularGrid2D(GeodeSurfaceMesh2D, GeodeGrid2D):
         return og.save_regular_grid2D(self.regular_grid, filename)
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_viewable_regular_grid2D(
-            self.regular_grid, filename_without_extension
-        )
+        return viewables.save_viewable_regular_grid2D(self.regular_grid, filename_without_extension)
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_regular_grid2D(

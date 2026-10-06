@@ -27,9 +27,7 @@ def create_app(name: str) -> flask.Flask:
     def before_request() -> flask.Response | None:
         if flask.request.method == "OPTIONS":
             response = flask.make_response()
-            response.headers["Access-Control-Allow-Methods"] = (
-                "GET,POST,PUT,DELETE,OPTIONS"
-            )
+            response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
             return response
         utils_functions.before_request(flask.current_app)
         return None
@@ -51,9 +49,7 @@ def create_app(name: str) -> flask.Flask:
 
     @app.after_request
     def after_request(response: flask.Response) -> flask.Response:
-        endpoint = (
-            flask.request.endpoint.replace(".", "/") if flask.request.endpoint else None
-        )
+        endpoint = flask.request.endpoint.replace(".", "/") if flask.request.endpoint else None
         if endpoint == "events" or endpoint == None:
             return response
 
@@ -138,9 +134,7 @@ def run_server(app: Flask) -> None:
     parser = argparse.ArgumentParser(
         prog="OpenGeodeWeb-Back", description="Backend server for OpenGeodeWeb"
     )
-    parser.add_argument(
-        "--host", default=app.config.get("HOST"), type=str, help="Host to run on"
-    )
+    parser.add_argument("--host", default=app.config.get("HOST"), type=str, help="Host to run on")
     parser.add_argument(
         "-p",
         "--port",
@@ -209,9 +203,7 @@ def run_server(app: Flask) -> None:
 
     db_filename = app.config.get("DATABASE_FILENAME")
     if not isinstance(db_filename, str):
-        raise TypeError(
-            f"DATABASE_FILENAME config must be a string, got {db_filename!r}"
-        )
+        raise TypeError(f"DATABASE_FILENAME config must be a string, got {db_filename!r}")
     db_path = os.path.join(str(app.config.get("DATA_FOLDER_PATH")), db_filename)
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"

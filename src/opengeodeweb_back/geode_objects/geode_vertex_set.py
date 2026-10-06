@@ -17,9 +17,7 @@ class GeodeVertexSet(GeodeMesh):
     vertex_set: og.VertexSet
 
     def __init__(self, vertex_set: og.VertexSet | None = None) -> None:
-        self.vertex_set = (
-            vertex_set if vertex_set is not None else og.VertexSet.create()
-        )
+        self.vertex_set = vertex_set if vertex_set is not None else og.VertexSet.create()
         super().__init__(self.vertex_set)
 
     @classmethod

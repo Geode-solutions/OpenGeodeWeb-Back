@@ -36,9 +36,7 @@ class GeodeImplicitCrossSection(GeodeCrossSection):
 
     @classmethod
     def load(cls, filename: str) -> GeodeImplicitCrossSection:
-        return GeodeImplicitCrossSection(
-            og_geosciences.load_implicit_cross_section(filename)
-        )
+        return GeodeImplicitCrossSection(og_geosciences.load_implicit_cross_section(filename))
 
     @classmethod
     def additional_files(cls, filename: str) -> og.AdditionalFiles:
@@ -66,9 +64,7 @@ class GeodeImplicitCrossSection(GeodeCrossSection):
         )
 
     def save(self, filename: str) -> list[str]:
-        return og_geosciences.save_implicit_cross_section(
-            self.implicit_cross_section, filename
-        )
+        return og_geosciences.save_implicit_cross_section(self.implicit_cross_section, filename)
 
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_implicit_cross_section(

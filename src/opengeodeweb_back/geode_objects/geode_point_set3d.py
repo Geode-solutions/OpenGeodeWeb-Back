@@ -68,14 +68,10 @@ class GeodePointSet3D(GeodeVertexSet):
         return og.save_point_set3D(self.point_set, filename)
 
     def save_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_viewable_point_set3D(
-            self.point_set, filename_without_extension
-        )
+        return viewables.save_viewable_point_set3D(self.point_set, filename_without_extension)
 
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_light_viewable_point_set3D(
-            self.point_set, filename_without_extension
-        )
+        return viewables.save_light_viewable_point_set3D(self.point_set, filename_without_extension)
 
     def inspect(self) -> og_inspector.PointSetInspectionResult:
         return og_inspector.inspect_point_set3D(self.point_set)
@@ -103,6 +99,4 @@ class GeodePointSet3D(GeodeVertexSet):
         self, crs_name: str, input: og.CoordinateSystem2D, output: og.CoordinateSystem2D
     ) -> None:
         builder = self.builder()
-        og.create_point_set_coordinate_system3D(
-            self.point_set, builder, crs_name, input, output
-        )
+        og.create_point_set_coordinate_system3D(self.point_set, builder, crs_name, input, output)

@@ -33,15 +33,11 @@ class GeodeImplicitStructuralModel(GeodeStructuralModel):
         return self.implicit_structural_model.native_extension()
 
     def builder(self) -> og_geosciences.ImplicitStructuralModelBuilder:
-        return og_geosciences.ImplicitStructuralModelBuilder(
-            self.implicit_structural_model
-        )
+        return og_geosciences.ImplicitStructuralModelBuilder(self.implicit_structural_model)
 
     @classmethod
     def load(cls, filename: str) -> GeodeImplicitStructuralModel:
-        return GeodeImplicitStructuralModel(
-            og_geosciences.load_implicit_structural_model(filename)
-        )
+        return GeodeImplicitStructuralModel(og_geosciences.load_implicit_structural_model(filename))
 
     @classmethod
     def additional_files(cls, filename: str) -> og.AdditionalFiles:

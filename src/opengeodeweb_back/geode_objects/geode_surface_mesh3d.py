@@ -15,9 +15,7 @@ class GeodeSurfaceMesh3D(GeodeVertexSet):
     surface_mesh: og.SurfaceMesh3D
 
     def __init__(self, surface_mesh: og.SurfaceMesh3D | None = None) -> None:
-        self.surface_mesh = (
-            surface_mesh if surface_mesh is not None else og.SurfaceMesh3D.create()
-        )
+        self.surface_mesh = surface_mesh if surface_mesh is not None else og.SurfaceMesh3D.create()
         super().__init__(self.surface_mesh)
 
     @classmethod

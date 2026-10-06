@@ -14,13 +14,9 @@ from .geode_brep import GeodeBRep
 class GeodeStructuralModel(GeodeBRep):
     structural_model: og_geosciences.StructuralModel
 
-    def __init__(
-        self, structural_model: og_geosciences.StructuralModel | None = None
-    ) -> None:
+    def __init__(self, structural_model: og_geosciences.StructuralModel | None = None) -> None:
         self.structural_model = (
-            structural_model
-            if structural_model is not None
-            else og_geosciences.StructuralModel()
+            structural_model if structural_model is not None else og_geosciences.StructuralModel()
         )
         super().__init__(self.structural_model)
 
@@ -59,9 +55,7 @@ class GeodeStructuralModel(GeodeBRep):
         return og_geosciences.structural_model_object_priority(filename)
 
     def is_saveable(self, filename: str) -> bool:
-        return og_geosciences.is_structural_model_saveable(
-            self.structural_model, filename
-        )
+        return og_geosciences.is_structural_model_saveable(self.structural_model, filename)
 
     def save(self, filename: str) -> list[str]:
         return og_geosciences.save_structural_model(self.structural_model, filename)

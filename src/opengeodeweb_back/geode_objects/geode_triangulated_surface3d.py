@@ -13,9 +13,7 @@ from .geode_surface_mesh3d import GeodeSurfaceMesh3D
 class GeodeTriangulatedSurface3D(GeodeSurfaceMesh3D):
     triangulated_surface: og.TriangulatedSurface3D
 
-    def __init__(
-        self, triangulated_surface: og.TriangulatedSurface3D | None = None
-    ) -> None:
+    def __init__(self, triangulated_surface: og.TriangulatedSurface3D | None = None) -> None:
         self.triangulated_surface = (
             triangulated_surface
             if triangulated_surface is not None
@@ -58,9 +56,7 @@ class GeodeTriangulatedSurface3D(GeodeSurfaceMesh3D):
         return og.triangulated_surface_object_priority3D(filename)
 
     def is_saveable(self, filename: str) -> bool:
-        return og.is_triangulated_surface_saveable3D(
-            self.triangulated_surface, filename
-        )
+        return og.is_triangulated_surface_saveable3D(self.triangulated_surface, filename)
 
     def save(self, filename: str) -> list[str]:
         return og.save_triangulated_surface3D(self.triangulated_surface, filename)

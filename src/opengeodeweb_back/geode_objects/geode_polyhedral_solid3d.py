@@ -15,9 +15,7 @@ class GeodePolyhedralSolid3D(GeodeSolidMesh3D):
 
     def __init__(self, polyhedral_solid: og.PolyhedralSolid3D | None = None) -> None:
         self.polyhedral_solid = (
-            polyhedral_solid
-            if polyhedral_solid is not None
-            else og.PolyhedralSolid3D.create()
+            polyhedral_solid if polyhedral_solid is not None else og.PolyhedralSolid3D.create()
         )
         super().__init__(self.polyhedral_solid)
 

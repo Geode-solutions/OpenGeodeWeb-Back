@@ -112,9 +112,7 @@ def test_upload_file_raw_missing_filename(client: FlaskClient) -> None:
     assert response.status_code == 400
 
 
-def test_upload_file_chunked(
-    client: FlaskClient, filename: str = "test.og_brep"
-) -> None:
+def test_upload_file_chunked(client: FlaskClient, filename: str = "test.og_brep") -> None:
     file = os.path.join(data_dir, filename)
     with open(file, "rb") as opened_file:
         file_bytes = opened_file.read()
@@ -122,8 +120,7 @@ def test_upload_file_chunked(
     chunk_filename = "chunked_upload_test.og_brep"
     chunk_size = max(1, len(file_bytes) // 3)
     chunks = [
-        file_bytes[index : index + chunk_size]
-        for index in range(0, len(file_bytes), chunk_size)
+        file_bytes[index : index + chunk_size] for index in range(0, len(file_bytes), chunk_size)
     ]
     total_chunks = len(chunks)
 
@@ -221,9 +218,7 @@ def test_validate_object(client: FlaskClient) -> None:
 
 
 def test_validate_invalid_object(client: FlaskClient) -> None:
-    response_save = test_save_viewable_file(
-        client, "BRep", "wrong_boundary_surface_model.og_brep"
-    )
+    response_save = test_save_viewable_file(client, "BRep", "wrong_boundary_surface_model.og_brep")
     assert response_save.status_code == 200
     model_id = response_save.get_json()["id"]
     response = client.post("/opengeodeweb_back/validate", json={"id": model_id})
@@ -246,9 +241,7 @@ def test_geode_objects_and_output_extensions(client: FlaskClient) -> None:
     response = client.post(route, json=get_full_data())
 
     assert response.status_code == 200
-    geode_objects_and_output_extensions = response.get_json()[
-        "geode_objects_and_output_extensions"
-    ]
+    geode_objects_and_output_extensions = response.get_json()["geode_objects_and_output_extensions"]
     assert type(geode_objects_and_output_extensions) is dict
     for geode_object, values in geode_objects_and_output_extensions.items():
         assert type(values) is dict
@@ -310,9 +303,7 @@ def test_texture_coordinates(client: FlaskClient, test_id: str) -> None:
         data_path = geode_functions.data_file_path(data.id, data.native_file)
         os.makedirs(os.path.dirname(data_path), exist_ok=True)
         assert os.path.exists(data_path), f"File not found at {data_path}"
-    response = client.post(
-        "/opengeodeweb_back/texture_coordinates", json={"id": data.id}
-    )
+    response = client.post("/opengeodeweb_back/texture_coordinates", json={"id": data.id})
     assert response.status_code == 200
     texture_coordinates = response.get_json()["texture_coordinates"]
     assert type(texture_coordinates) is list
@@ -616,9 +607,7 @@ def test_model_components(client: FlaskClient) -> None:
 
 def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
     route = "/opengeodeweb_back/export_project"
-    snapshot = {
-        "styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}
-    }
+    snapshot = {"styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}}
     filename = "export_project_test.vease"
     project_folder = client.application.config["DATA_FOLDER_PATH"]
     os.makedirs(project_folder, exist_ok=True)
@@ -686,14 +675,10 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
 
 def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
     route = "/opengeodeweb_back/import_project"
-    snapshot = {
-        "styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}
-    }
+    snapshot = {"styles": {"1": {"visibility": True, "opacity": 1.0, "color": [0.2, 0.6, 0.9]}}}
 
     original_data_folder = client.application.config["DATA_FOLDER_PATH"]
-    client.application.config["DATA_FOLDER_PATH"] = os.path.join(
-        str(tmp_path), "project_data"
-    )
+    client.application.config["DATA_FOLDER_PATH"] = os.path.join(str(tmp_path), "project_data")
     db_path = os.path.join(client.application.config["DATA_FOLDER_PATH"], "project.db")
 
     import sqlite3, zipfile, json
@@ -861,9 +846,7 @@ def test_extract_valid_attribute_values_with_sentinel_no_value() -> None:
     attribute.set_value(vertex_0, -999.0)
     attribute.set_value(vertex_1, 42.0)
 
-    valid_values, has_nan = extract_valid_attribute_values(
-        attribute_manager, "variable_double", 0
-    )
+    valid_values, has_nan = extract_valid_attribute_values(attribute_manager, "variable_double", 0)
     assert has_nan is True
     assert valid_values == [42.0]
 

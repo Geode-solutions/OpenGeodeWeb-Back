@@ -66,9 +66,7 @@ def _write_stream(path: str, stream: typing.IO[bytes], mode: str = "wb") -> None
 
 
 def _upload_response(message: str, status: int) -> flask.Response:
-    return flask.make_response(
-        schemas.UploadFileResponse(message=message).to_dict(), status
-    )
+    return flask.make_response(schemas.UploadFileResponse(message=message).to_dict(), status)
 
 
 def _finalize_upload(filename: str) -> flask.Response:
@@ -127,9 +125,7 @@ def allowed_objects(
     params: schemas.AllowedObjects,
 ) -> schemas.AllowedObjectsResponse:
     file_absolute_path = geode_functions.upload_file_path(params.filename)
-    file_extension = utils_functions.extension_from_filename(
-        os.path.basename(file_absolute_path)
-    )
+    file_extension = utils_functions.extension_from_filename(os.path.basename(file_absolute_path))
     allowed_objects: dict[str, schemas.allowed_objects.AllowedObject] = {}
     for geode_object_type, geode_object in geode_objects.items():
         if file_extension not in geode_object.input_extensions():
@@ -207,11 +203,11 @@ def geode_objects_and_output_extensions(
     params: schemas.GeodeObjectsAndOutputExtensions,
 ) -> schemas.GeodeObjectsAndOutputExtensionsResponse:
     file_path = geode_functions.upload_file_path(params.filename)
-    geode_object = geode_functions.geode_object_from_string(
-        params.geode_object_type
-    ).load(file_path)
-    geode_objects_and_output_extensions = (
-        geode_functions.geode_object_output_extensions(geode_object)
+    geode_object = geode_functions.geode_object_from_string(params.geode_object_type).load(
+        file_path
+    )
+    geode_objects_and_output_extensions = geode_functions.geode_object_output_extensions(
+        geode_object
     )
     return schemas.GeodeObjectsAndOutputExtensionsResponse(
         geode_objects_and_output_extensions={
@@ -263,9 +259,7 @@ def extract_valid_attribute_values(
     nb_items = attribute.nb_items()
     default_values = getattr(attribute, "default_values", None)
     no_value = default_values().no_value if default_values else None
-    if no_value is None and (
-        "Point" in attribute.type() or "Vector" in attribute.type()
-    ):
+    if no_value is None and ("Point" in attribute.type() or "Vector" in attribute.type()):
         no_value = [0.0] * nb_items
 
     value_getter = getattr(
@@ -512,9 +506,7 @@ def export_project() -> flask.Response:
     with get_session() as session:
         rows = session.query(Data.id, Data.native_file).all()
 
-    with zipfile.ZipFile(
-        export_vease_path, "w", compression=zipfile.ZIP_DEFLATED
-    ) as zip_file:
+    with zipfile.ZipFile(export_vease_path, "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
         database_root_path = os.path.join(project_folder, "project.db")
         if os.path.isfile(database_root_path):
             zip_file.write(database_root_path, "project.db")
@@ -550,9 +542,7 @@ def import_project(params: schemas.ImportProject) -> schemas.ImportProjectRespon
         connection.scoped_session_registry.remove()
     if connection.engine:
         connection.engine.dispose()
-    connection.engine = connection.session_factory = (
-        connection.scoped_session_registry
-    ) = None
+    connection.engine = connection.session_factory = connection.scoped_session_registry = None
 
     try:
         if os.path.exists(data_folder_path):
@@ -570,12 +560,8 @@ def import_project(params: schemas.ImportProject) -> schemas.ImportProjectRespon
     with zipfile.ZipFile(zip_file.stream) as zip_archive:
         project_folder = os.path.abspath(data_folder_path)
         for member in zip_archive.namelist():
-            target = os.path.abspath(
-                os.path.normpath(os.path.join(project_folder, member))
-            )
-            if not (
-                target == project_folder or target.startswith(project_folder + os.sep)
-            ):
+            target = os.path.abspath(os.path.normpath(os.path.join(project_folder, member)))
+            if not (target == project_folder or target.startswith(project_folder + os.sep)):
                 flask.abort(400, "Vease file contains unsafe paths")
         zip_archive.extractall(project_folder)
 
@@ -600,12 +586,8 @@ def import_project(params: schemas.ImportProject) -> schemas.ImportProjectRespon
                 if viewable_name:
                     vpath = geode_functions.data_file_path(data.id, viewable_name)
                     viewable_dir = os.path.join(data_path, "viewable")
-                    has_components = os.path.isdir(viewable_dir) and bool(
-                        os.listdir(viewable_dir)
-                    )
-                    if os.path.isfile(vpath) and (
-                        data.viewer_object != "model" or has_components
-                    ):
+                    has_components = os.path.isdir(viewable_dir) and bool(os.listdir(viewable_dir))
+                    if os.path.isfile(vpath) and (data.viewer_object != "model" or has_components):
                         continue
 
                 native_file = str(data.native_file or "")
@@ -616,12 +598,10 @@ def import_project(params: schemas.ImportProject) -> schemas.ImportProjectRespon
                 if not os.path.isfile(native_full):
                     continue
 
-                geode_object = geode_functions.geode_object_from_string(
-                    data.geode_object
-                ).load(native_full)
-                utils_functions.save_all_viewables_and_return_info(
-                    geode_object, data, data_path
+                geode_object = geode_functions.geode_object_from_string(data.geode_object).load(
+                    native_full
                 )
+                utils_functions.save_all_viewables_and_return_info(geode_object, data, data_path)
             session.commit()
 
         snapshot = {}

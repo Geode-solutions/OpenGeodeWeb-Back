@@ -109,9 +109,7 @@ class GeodeBRep(GeodeModel):
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
     ) -> None:
         builder = self.builder()
-        og_geosciences.convert_brep_coordinate_reference_system(
-            self.brep, builder, crs_name, info
-        )
+        og_geosciences.convert_brep_coordinate_reference_system(self.brep, builder, crs_name, info)
 
     def create_crs(
         self, crs_name: str, input: og.CoordinateSystem2D, output: og.CoordinateSystem2D

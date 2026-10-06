@@ -59,9 +59,7 @@ class GeodeSolidMesh3D(GeodeVertexSet):
         self, crs_name: str, input: og.CoordinateSystem2D, output: og.CoordinateSystem2D
     ) -> None:
         builder = self.builder()
-        og.create_solid_mesh_coordinate_system3D(
-            self.solid_mesh, builder, crs_name, input, output
-        )
+        og.create_solid_mesh_coordinate_system3D(self.solid_mesh, builder, crs_name, input, output)
 
     def polyhedron_attribute_manager(self) -> og.AttributeManager:
         return self.solid_mesh.polyhedron_attribute_manager()
