@@ -324,8 +324,7 @@ def _common_time_steps(
     ]
     for attribute_manager in attribute_managers[1:]:
         other_times = [
-            time_step.time
-            for time_step in attribute_manager.time_steps(attribute_name)
+            time_step.time for time_step in attribute_manager.time_steps(attribute_name)
         ]
         if other_times != times:
             return None
