@@ -52,6 +52,12 @@
             },
             "no_data": {
               "type": "boolean"
+            },
+            "time_steps": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
             }
           },
           "required": [
@@ -62,7 +68,8 @@
             "max_value",
             "min_values",
             "max_values",
-            "no_data"
+            "no_data",
+            "time_steps"
           ],
           "additionalProperties": false
         }

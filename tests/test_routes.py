@@ -352,6 +352,8 @@ def test_vertex_attribute_names(client: FlaskClient, test_id: str) -> None:
         assert "max_values" in attribute
         assert "no_data" in attribute
         assert isinstance(attribute["no_data"], bool)
+        assert "time_steps" in attribute
+        assert isinstance(attribute["time_steps"], list)
     print(
         f"[ATTRIBUTES]: ",
         [attribute["nb_items"] for attribute in attributes],
@@ -778,6 +780,8 @@ def _assert_attributes_response(response: TestResponse) -> None:
         assert "max_values" in attribute
         assert "no_data" in attribute
         assert isinstance(attribute["no_data"], bool)
+        assert "time_steps" in attribute
+        assert isinstance(attribute["time_steps"], list)
 
 
 def test_model_component_vertex_attribute_names(client: FlaskClient) -> None:
@@ -900,3 +904,30 @@ def test_component_id_length_is_strict(client: FlaskClient) -> None:
     model_id, _ = _load_brep_components(client)
     response = client.post(route, json={"id": model_id, "component_ids": ["a" * 32]})
     assert response.status_code == 400
+
+
+def test_vertex_attribute_names_time_series(client: FlaskClient, test_id: str) -> None:
+    route = f"/opengeodeweb_back/vertex_attribute_names"
+
+    with client.application.app_context():
+        file = os.path.join(data_dir, "time_series.og_psf3d")
+        data = Data.create(
+            geode_id=DUMMY_GEODE_ID,
+            geode_object=GeodePolygonalSurface3D.geode_object_type(),
+            viewer_object=GeodePolygonalSurface3D.viewer_type(),
+            viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
+        )
+        data.native_file = file
+        session = get_session()
+        if session:
+            session.commit()
+
+        data_path = geode_functions.data_file_path(data.id, data.native_file)
+        os.makedirs(os.path.dirname(data_path), exist_ok=True)
+        assert os.path.exists(data_path), f"File not found at {data_path}"
+    response = client.post(route, json={"id": data.id})
+    assert response.status_code == 200
+    attributes = response.get_json()["attributes"]
+    temperature = [a for a in attributes if a["attribute_name"] == "temperature"]
+    assert len(temperature) == 1
+    assert temperature[0]["time_steps"] == [0.5, 1.0, 2.0]
