@@ -1,7 +1,7 @@
 # Standard library imports
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
 import geode_viewables as viewables
 
@@ -26,51 +26,64 @@ class GeodeTriangulatedSurface2D(GeodeSurfaceMesh2D):
         )
         super().__init__(self.triangulated_surface)
 
+    @override
     @classmethod
     def geode_object_type(cls) -> GeodeMeshType:
         return "TriangulatedSurface2D"
 
+    @override
     def native_extension(self) -> str:
         return self.triangulated_surface.native_extension()
 
+    @override
     def builder(self) -> og.TriangulatedSurfaceBuilder2D:
         return og.TriangulatedSurfaceBuilder2D.create(self.triangulated_surface)
 
+    @override
     @classmethod
     def load(cls, filename: str) -> GeodeTriangulatedSurface2D:
         return GeodeTriangulatedSurface2D(og.load_triangulated_surface2D(filename))
 
+    @override
     @classmethod
     def additional_files(cls, filename: str) -> og.AdditionalFiles:
         return og.triangulated_surface_additional_files2D(filename)
 
+    @override
     @classmethod
     def is_loadable(cls, filename: str) -> og.Percentage:
         return og.is_triangulated_surface_loadable2D(filename)
 
+    @override
     @classmethod
     def input_extensions(cls) -> list[str]:
         return og.TriangulatedSurfaceInputFactory2D.list_creators()
 
+    @override
     @classmethod
     def output_extensions(cls) -> list[str]:
         return og.TriangulatedSurfaceOutputFactory2D.list_creators()
 
+    @override
     @classmethod
     def object_priority(cls, filename: str) -> int:
         return og.triangulated_surface_object_priority2D(filename)
 
+    @override
     def is_saveable(self, filename: str) -> bool:
         return og.is_triangulated_surface_saveable2D(self.triangulated_surface, filename)
 
+    @override
     def save(self, filename: str) -> list[str]:
         return og.save_triangulated_surface2D(self.triangulated_surface, filename)
 
+    @override
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_triangulated_surface2D(
             self.triangulated_surface, filename_without_extension
         )
 
+    @override
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_triangulated_surface2D(
             self.triangulated_surface, filename_without_extension

@@ -1,16 +1,17 @@
 # Standard library imports
-import os
 import time
 from pathlib import Path
 
 # Third party imports
+from flask.helpers import get_debug_flag
+
 # Local application imports
 
 base_dir = Path(__file__).resolve().parent
 
 
 class Config:
-    FLASK_DEBUG = os.environ.get("FLASK_DEBUG", default=False)
+    FLASK_DEBUG = get_debug_flag()
     HOST = "localhost"
     PORT = "5000"
     CORS_HEADERS = "Content-Type"

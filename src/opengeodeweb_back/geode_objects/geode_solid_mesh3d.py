@@ -1,7 +1,7 @@
 # Standard library imports
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
 # Third party imports
 import opengeode as og
@@ -22,24 +22,30 @@ class GeodeSolidMesh3D(GeodeVertexSet):
         self.solid_mesh = solid_mesh if solid_mesh is not None else og.SolidMesh3D()
         super().__init__(self.solid_mesh)
 
+    @override
     @classmethod
-    def is_3D(cls) -> bool:
+    def is_3d(cls) -> bool:
         return True
 
+    @override
     @classmethod
     def is_viewable(cls) -> bool:
         return True
 
+    @override
     @classmethod
     def viewer_elements_type(cls) -> ViewerElementsType:
         return "polyhedra"
 
+    @override
     def builder(self) -> og.SolidMeshBuilder3D:
         return og.SolidMeshBuilder3D.create(self.solid_mesh)
 
+    @override
     def inspect(self) -> og_inspector.SolidInspectionResult:
         return og_inspector.inspect_solid3D(self.solid_mesh)
 
+    @override
     def validate(self) -> og_inspector.ObjectValidity:
         return og_inspector.is_solid_valid3D(self.solid_mesh)
 
@@ -60,10 +66,12 @@ class GeodeSolidMesh3D(GeodeVertexSet):
         )
 
     def create_crs(
-        self, crs_name: str, input: og.CoordinateSystem2D, output: og.CoordinateSystem2D
+        self, crs_name: str, input_crs: og.CoordinateSystem2D, output_crs: og.CoordinateSystem2D
     ) -> None:
         builder = self.builder()
-        og.create_solid_mesh_coordinate_system3D(self.solid_mesh, builder, crs_name, input, output)
+        og.create_solid_mesh_coordinate_system3D(
+            self.solid_mesh, builder, crs_name, input_crs, output_crs
+        )
 
     def polyhedron_attribute_manager(self) -> og.AttributeManager:
         return self.solid_mesh.polyhedron_attribute_manager()

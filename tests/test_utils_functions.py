@@ -20,6 +20,7 @@ from opengeodeweb_back.geode_objects.geode_brep import GeodeBRep
 from opengeodeweb_back.geode_objects.geode_polygonal_surface3d import (
     GeodePolygonalSurface3D,
 )
+from opengeodeweb_back.geode_objects.geode_raster_image2d import GeodeRasterImage2D
 
 if TYPE_CHECKING:
     from flask.testing import FlaskClient
@@ -242,6 +243,19 @@ def test_generate_files_from_file_with_multi_dots(
             GeodeBRep.geode_object_type(), "cube.test.og_brep"
         )
     assert result["name"] == "cube.test"
+
+
+def test_generate_files_from_raster_image(
+    client: FlaskClient,
+) -> None:
+    # Raster images have no dedicated builder: naming them must still work
+    app = client.application
+    with app.app_context():
+        result = utils_functions.generate_files_from_file(
+            GeodeRasterImage2D.geode_object_type(), "test.jpg"
+        )
+    assert result["name"] == "test"
+    assert result["native_file"] == "native.og_img2d"
 
 
 def test_generate_files_from_file_returns_geode_id(client: FlaskClient) -> None:

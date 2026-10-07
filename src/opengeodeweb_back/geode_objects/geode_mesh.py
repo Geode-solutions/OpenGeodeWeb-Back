@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
 # Third party imports
 # Local application imports
@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 
 class GeodeMesh(GeodeObject):
+    @override
     @classmethod
     def viewer_type(cls) -> ViewerType:
         return "mesh"

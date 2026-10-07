@@ -1,7 +1,7 @@
 # Standard library imports
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
 import geode_viewables as viewables
 
@@ -22,58 +22,73 @@ class GeodeLightRegularGrid2D(GeodeGrid2D):
         self.light_regular_grid = light_regular_grid
         super().__init__(self.light_regular_grid)
 
+    @override
     @classmethod
     def geode_object_type(cls) -> GeodeMeshType:
         return "LightRegularGrid2D"
 
+    @override
     def native_extension(self) -> str:
         return self.light_regular_grid.native_extension()
 
+    @override
     def builder(self) -> og.IdentifierBuilder:
         return og.IdentifierBuilder(self.light_regular_grid)
 
+    @override
     @classmethod
     def load(cls, filename: str) -> GeodeLightRegularGrid2D:
         return GeodeLightRegularGrid2D(og.load_light_regular_grid2D(filename))
 
+    @override
     @classmethod
     def additional_files(cls, filename: str) -> og.AdditionalFiles:
         return og.light_regular_grid_additional_files2D(filename)
 
+    @override
     @classmethod
     def is_loadable(cls, filename: str) -> og.Percentage:
         return og.is_light_regular_grid_loadable2D(filename)
 
+    @override
     @classmethod
     def input_extensions(cls) -> list[str]:
         return og.LightRegularGridInputFactory2D.list_creators()
 
+    @override
     @classmethod
     def output_extensions(cls) -> list[str]:
         return og.LightRegularGridOutputFactory2D.list_creators()
 
+    @override
     @classmethod
     def object_priority(cls, filename: str) -> int:
         return og.light_regular_grid_object_priority2D(filename)
 
+    @override
     def is_saveable(self, filename: str) -> bool:
         return og.is_light_regular_grid_saveable2D(self.light_regular_grid, filename)
 
+    @override
     def save(self, filename: str) -> list[str]:
         return og.save_light_regular_grid2D(self.light_regular_grid, filename)
 
+    @override
     def save_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_viewable_light_regular_grid2D(
             self.light_regular_grid, filename_without_extension
         )
 
+    @override
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_light_regular_grid2D(
             self.light_regular_grid, filename_without_extension
         )
 
+    @override
     def vertex_attribute_manager(self) -> og.AttributeManager:
         return self.light_regular_grid.grid_vertex_attribute_manager()
 
+    @override
     def cell_attribute_manager(self) -> og.AttributeManager:
         return self.light_regular_grid.cell_attribute_manager()

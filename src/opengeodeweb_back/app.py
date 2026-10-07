@@ -6,7 +6,6 @@ import argparse
 import json
 import logging
 import queue
-import threading
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -27,9 +26,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-def create_app(name: str) -> flask.Flask:
-    app = flask.Flask(name)
-
+def _register_request_hooks(app: flask.Flask) -> None:
     @app.before_request
     def before_request() -> flask.Response | None:
         if flask.request.method == "OPTIONS":
@@ -39,12 +36,17 @@ def create_app(name: str) -> flask.Flask:
         utils_functions.before_request(flask.current_app)
         return None
 
+    @app.teardown_request
+    def teardown_request(exception: BaseException | None) -> None:
+        utils_functions.teardown_request(flask.current_app, exception)
+
+
+def _register_event_stream(app: flask.Flask) -> None:
     def wants_event_stream() -> bool:
         accept = flask.request.headers.get("Accept", "")
         return "text/event-stream" in accept
 
     _event_queue: queue.Queue[tuple[str, dict[str, Any]]] = queue.Queue()
-    _lock = threading.Lock()
 
     def publish_event(event: str, data: dict[str, Any]) -> None:
         _event_queue.put((event, data))
@@ -64,15 +66,17 @@ def create_app(name: str) -> flask.Flask:
             payload: dict[str, Any]
             try:
                 payload = response.get_json()
-            except Exception:
+            except ValueError:
                 payload = {"status": response.status_code}
             publish_event(endpoint, payload)
         return response
 
-    @app.teardown_request
-    def teardown_request(exception: BaseException | None) -> None:
-        utils_functions.teardown_request(flask.current_app, exception)
+    @app.route("/events")
+    def events() -> flask.Response:
+        return flask.Response(stream_events(), mimetype="text/event-stream")
 
+
+def _register_error_handlers(app: flask.Flask) -> None:
     @app.errorhandler(HTTPException)
     def errorhandler(exception: HTTPException) -> tuple[dict[str, Any], int] | Response:
         return utils_functions.handle_exception(exception)
@@ -81,10 +85,8 @@ def create_app(name: str) -> flask.Flask:
     def handle_generic_exception(exception: Exception) -> Response:
         return utils_functions.handle_unexpected_exception(exception)
 
-    @app.route("/events")
-    def events() -> flask.Response:
-        return flask.Response(stream_events(), mimetype="text/event-stream")
 
+def _register_base_routes(app: flask.Flask) -> None:
     @app.route(
         "/error",
         methods=["POST"],
@@ -107,6 +109,13 @@ def create_app(name: str) -> flask.Flask:
     def root() -> Response:
         return flask.make_response({}, 200)
 
+
+def create_app(name: str) -> flask.Flask:
+    app = flask.Flask(name)
+    _register_request_hooks(app)
+    _register_event_stream(app)
+    _register_error_handlers(app)
+    _register_base_routes(app)
     return app
 
 

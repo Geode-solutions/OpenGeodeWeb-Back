@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
 # Third party imports
 import opengeode_inspector as og_inspector
@@ -16,24 +16,26 @@ if TYPE_CHECKING:
 
 
 class GeodeGrid3D(GeodeMesh):
+    @override
     @classmethod
-    def is_3D(cls) -> bool:
+    def is_3d(cls) -> bool:
         return True
 
+    @override
     @classmethod
     def is_viewable(cls) -> bool:
         return True
 
+    @override
     @classmethod
     def viewer_elements_type(cls) -> ViewerElementsType:
         return "polyhedra"
 
-    def builder(self) -> object:
-        return None
-
+    @override
     def inspect(self) -> object:
         return None
 
+    @override
     def validate(self) -> og_inspector.ObjectValidity:
         return og_inspector.ObjectValidity()
 

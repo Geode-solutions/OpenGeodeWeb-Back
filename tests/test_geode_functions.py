@@ -20,9 +20,7 @@ def test_geode_objects() -> None:
 
 def test_input_output() -> None:
     for generic_geode_object in geode_objects.values():
-        print(f"\n{generic_geode_object.geode_object_type()=}")
         for input_extension in generic_geode_object.input_extensions():
-            print(f"\t{input_extension=}")
             file_absolute_path = str(data_folder / f"test.{input_extension}")
             if generic_geode_object.is_loadable(file_absolute_path).value() == 0.0:
                 continue
@@ -44,12 +42,10 @@ def test_input_output() -> None:
                 output_geode_object_type,
                 output_geode_extensions,
             ) in geode_objects_output_extensions.items():
-                print(f"\t\t{output_geode_object_type=}")
                 for (
                     output_extension,
                     output_is_saveable,
                 ) in output_geode_extensions.items():
-                    print(f"\t\t\t{output_extension=}")
                     uu_id = str(uuid.uuid4()).replace("-", "")
                     filename = f"{uu_id}.{output_extension}"
                     if output_is_saveable:

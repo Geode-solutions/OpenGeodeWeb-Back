@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 # Third party imports
 import opengeode as og
@@ -38,14 +38,14 @@ class GeodeObject(ABC):
 
     @classmethod
     @abstractmethod
-    def is_3D(cls) -> bool: ...
+    def is_3d(cls) -> bool: ...
 
     @classmethod
     @abstractmethod
     def is_viewable(cls) -> bool: ...
 
     @abstractmethod
-    def builder(self) -> Any: ...
+    def builder(self) -> og.IdentifierBuilder: ...
 
     @classmethod
     @abstractmethod
@@ -87,7 +87,7 @@ class GeodeObject(ABC):
     def save_light_viewable(self, filename_without_extension: str) -> str: ...
 
     @abstractmethod
-    def inspect(self) -> Any: ...
+    def inspect(self) -> object: ...
 
     @abstractmethod
     def validate(self) -> og_inspector.ObjectValidity: ...

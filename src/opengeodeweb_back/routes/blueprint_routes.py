@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 # Standard library imports
 import logging
 import math
@@ -8,6 +10,7 @@ import typing
 import zipfile
 from pathlib import Path
 from threading import Timer
+from typing import TYPE_CHECKING
 
 # Third party imports
 import flask
@@ -20,6 +23,7 @@ from opengeodeweb_microservice.database import connection
 from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.data_types import geode_object_type
+from sqlalchemy.exc import OperationalError
 
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
@@ -34,6 +38,9 @@ from opengeodeweb_back.geode_objects.geode_surface_mesh2d import GeodeSurfaceMes
 from opengeodeweb_back.geode_objects.geode_surface_mesh3d import GeodeSurfaceMesh3D
 from opengeodeweb_back.routes import schemas
 from opengeodeweb_back.typed_route import parse_params, raw_route, typed_route
+
+if TYPE_CHECKING:
+    from werkzeug.datastructures import FileStorage
 
 ComponentMesh = (
     og.Corner2D,
@@ -54,7 +61,7 @@ routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
 
 
 @typed_route(routes, schemas.allowed_files_route)
-def allowed_files(params: schemas.AllowedFiles) -> schemas.AllowedFilesResponse:
+def allowed_files(_params: schemas.AllowedFiles) -> schemas.AllowedFilesResponse:
     extensions: set[str] = set()
     for geode_object in geode_objects.values():
         for extension in geode_object.input_extensions():
@@ -174,7 +181,7 @@ def crs_converter_geographic_coordinate_systems(
     geode_object = geode_functions.geode_object_from_string(params.geode_object_type)
     infos = (
         og_geosciences.GeographicCoordinateSystem3D.geographic_coordinate_systems()
-        if geode_object.is_3D()
+        if geode_object.is_3d()
         else og_geosciences.GeographicCoordinateSystem2D.geographic_coordinate_systems()
     )
     crs_list = [
@@ -477,13 +484,13 @@ def model_component_polyhedron_attribute_names(
 
 
 @typed_route(routes, schemas.ping_route)
-def ping(params: schemas.Ping) -> schemas.PingResponse:
+def ping(_params: schemas.Ping) -> schemas.PingResponse:
     flask.current_app.config.update(LAST_PING_TIME=time.time())
     return schemas.PingResponse(message="Flask server is running")
 
 
 @typed_route(routes, schemas.kill_route)
-def kill(params: schemas.Kill) -> schemas.KillResponse:
+def kill(_params: schemas.Kill) -> schemas.KillResponse:
     logger.info("Manual server kill, shutting down...")
     utils_functions.teardown_request(flask.current_app)
     Timer(0.5, os._exit, [0]).start()
@@ -523,18 +530,19 @@ def export_project() -> flask.Response:
     return utils_functions.send_file(project_folder, [str(export_vease_path)], filename)
 
 
-@typed_route(routes, schemas.import_project_route)
-def import_project(params: schemas.ImportProject) -> schemas.ImportProjectResponse:
+def _uploaded_vease_file() -> FileStorage:
     if "file" not in flask.request.files:
         flask.abort(400, "No .vease file provided under 'file'")
     zip_file = flask.request.files["file"]
-    assert zip_file.filename is not None
+    if zip_file.filename is None:
+        flask.abort(400, "Filename is required")
     filename = werkzeug.utils.secure_filename(Path(zip_file.filename).name)
     if not filename.lower().endswith(".vease"):
         flask.abort(400, "Uploaded file must be a .vease")
+    return zip_file
 
-    data_folder_path = Path(flask.current_app.config["DATA_FOLDER_PATH"])
 
+def _reset_data_folder(data_folder_path: Path) -> None:
     # 423 Locked bypass : remove stopped requests
     if connection.scoped_session_registry:
         connection.scoped_session_registry.remove()
@@ -554,61 +562,81 @@ def import_project(params: schemas.ImportProject) -> schemas.ImportProjectRespon
     except PermissionError:
         flask.abort(423, "Project files are locked; cannot overwrite")
 
+
+def _extract_vease(zip_archive: zipfile.ZipFile, project_folder: Path) -> None:
+    for member in zip_archive.namelist():
+        target = (project_folder / member).resolve()
+        if not target.is_relative_to(project_folder):
+            flask.abort(400, "Vease file contains unsafe paths")
+    zip_archive.extractall(project_folder)
+
+
+def _open_project_database(project_folder: Path) -> list[Data]:
+    database_root_path = project_folder / "project.db"
+    if not database_root_path.is_file():
+        flask.abort(400, "Missing project.db at project root")
+
+    connection.init_database(str(database_root_path), create_tables=False)
+
+    try:
+        with get_session() as session:
+            return session.query(Data).all()
+    except OperationalError:
+        connection.init_database(str(database_root_path), create_tables=True)
+        with get_session() as session:
+            return session.query(Data).all()
+
+
+def _regenerate_missing_viewables(rows: list[Data]) -> None:
+    with get_session() as session:
+        for data in rows:
+            data_path = geode_functions.data_file_path(data.id)
+            viewable_name = data.viewable_file
+            if viewable_name:
+                vpath = Path(geode_functions.data_file_path(data.id, viewable_name))
+                viewable_dir = Path(data_path) / "viewable"
+                has_components = viewable_dir.is_dir() and any(viewable_dir.iterdir())
+                if vpath.is_file() and (data.viewer_object != "model" or has_components):
+                    continue
+
+            native_file = str(data.native_file or "")
+            if not native_file:
+                continue
+
+            native_full = geode_functions.data_file_path(data.id, native_file)
+            if not Path(native_full).is_file():
+                continue
+
+            geode_object = geode_functions.geode_object_from_string(data.geode_object).load(
+                native_full
+            )
+            utils_functions.save_all_viewables_and_return_info(geode_object, data, data_path)
+        session.commit()
+
+
+def _read_snapshot(zip_archive: zipfile.ZipFile) -> dict[str, object]:
+    try:
+        raw = zip_archive.read("snapshot.json").decode("utf-8")
+    except KeyError:
+        return {}
+    snapshot: dict[str, object] = flask.json.loads(raw)
+    return snapshot
+
+
+@raw_route(routes, schemas.import_project_route)
+def import_project() -> flask.Response:
+    zip_file = _uploaded_vease_file()
+    data_folder_path = Path(flask.current_app.config["DATA_FOLDER_PATH"])
+    _reset_data_folder(data_folder_path)
+
     zip_file.stream.seek(0)
     with zipfile.ZipFile(zip_file.stream) as zip_archive:
         project_folder = data_folder_path.resolve()
-        for member in zip_archive.namelist():
-            target = (project_folder / member).resolve()
-            if not target.is_relative_to(project_folder):
-                flask.abort(400, "Vease file contains unsafe paths")
-        zip_archive.extractall(project_folder)
-
-        database_root_path = project_folder / "project.db"
-        if not database_root_path.is_file():
-            flask.abort(400, "Missing project.db at project root")
-
-        connection.init_database(str(database_root_path), create_tables=False)
-
-        try:
-            with get_session() as session:
-                rows = session.query(Data).all()
-        except Exception:
-            connection.init_database(str(database_root_path), create_tables=True)
-            with get_session() as session:
-                rows = session.query(Data).all()
-
-        with get_session() as session:
-            for data in rows:
-                data_path = geode_functions.data_file_path(data.id)
-                viewable_name = data.viewable_file
-                if viewable_name:
-                    vpath = Path(geode_functions.data_file_path(data.id, viewable_name))
-                    viewable_dir = Path(data_path) / "viewable"
-                    has_components = viewable_dir.is_dir() and any(viewable_dir.iterdir())
-                    if vpath.is_file() and (data.viewer_object != "model" or has_components):
-                        continue
-
-                native_file = str(data.native_file or "")
-                if not native_file:
-                    continue
-
-                native_full = geode_functions.data_file_path(data.id, native_file)
-                if not Path(native_full).is_file():
-                    continue
-
-                geode_object = geode_functions.geode_object_from_string(data.geode_object).load(
-                    native_full
-                )
-                utils_functions.save_all_viewables_and_return_info(geode_object, data, data_path)
-            session.commit()
-
-        snapshot = {}
-        try:
-            raw = zip_archive.read("snapshot.json").decode("utf-8")
-            snapshot = flask.json.loads(raw)
-        except KeyError:
-            snapshot = {}
-    return schemas.ImportProjectResponse(snapshot=snapshot)
+        _extract_vease(zip_archive, project_folder)
+        rows = _open_project_database(project_folder)
+        _regenerate_missing_viewables(rows)
+        snapshot = _read_snapshot(zip_archive)
+    return flask.make_response(schemas.ImportProjectResponse(snapshot=snapshot).to_dict(), 200)
 
 
 @typed_route(routes, schemas.geode_object_inheritance_route)

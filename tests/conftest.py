@@ -46,9 +46,6 @@ def configure_test_environment() -> Generator[None]:
     db_path = (Path(app.config["DATA_FOLDER_PATH"]) / "project.db").resolve()
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 
-    print("Current working directory:", Path.cwd())
-    print("Directory contents:", [path.name for path in Path().iterdir()])
-
     init_database(str(db_path))
     os.environ["TEST_DB_PATH"] = str(db_path)
     register_ogw_back_blueprints(app)
@@ -61,7 +58,6 @@ def configure_test_environment() -> Generator[None]:
     tmp_data_path = app.config.get("DATA_FOLDER_PATH")
     if tmp_data_path and Path(tmp_data_path).exists():
         shutil.rmtree(tmp_data_path, ignore_errors=True)
-        print(f"Cleaned up test data folder: {tmp_data_path}", flush=True)
 
 
 @pytest.fixture

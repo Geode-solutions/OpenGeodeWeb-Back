@@ -7,7 +7,6 @@ import logging
 import threading
 import time
 import uuid
-import xml.etree.ElementTree as ET
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from importlib import metadata
@@ -19,6 +18,7 @@ import fastjsonschema  # type: ignore[import-untyped]
 # Third party imports
 import flask
 import opengeode as og
+from defusedxml.ElementTree import parse
 from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.schemas import ErrorResponse, SchemaDict
@@ -210,19 +210,21 @@ def content_based_uuid(file_path: str) -> og.uuid:
     return og.uuid(str(uuid.uuid5(uuid.NAMESPACE_OID, digest)))
 
 
-def model_components(data_id: str, model: GeodeModel, viewable_file: str | None) -> dict[str, Any]:
+def _uuid_to_flat_index(data_id: str, viewable_file: str | None) -> dict[str, int]:
     uuid_to_flat_index: dict[str, int] = {}
     if viewable_file:
         vtm_file_path = geode_functions.data_file_path(data_id, viewable_file)
-        tree = ET.parse(vtm_file_path)
+        tree = parse(vtm_file_path)
         root = tree.find("vtkMultiBlockDataSet")
         if root is None:
             flask.abort(500, "Failed to read viewable file")
-        assert root is not None
         for current_index, elem in enumerate(root.iter()):
             if "uuid" in elem.attrib and elem.tag == "DataSet":
                 uuid_to_flat_index[elem.attrib["uuid"]] = current_index
+    return uuid_to_flat_index
 
+
+def _mesh_components(model: GeodeModel, uuid_to_flat_index: dict[str, int]) -> list[dict[str, Any]]:
     model_mesh_components = model.mesh_components()
     mesh_components = []
     for mesh_component, ids in model_mesh_components.items():
@@ -248,7 +250,10 @@ def model_components(data_id: str, model: GeodeModel, viewable_file: str | None)
                 "is_active": component.is_active(),
             }
             mesh_components.append(mesh_component_object)
+    return mesh_components
 
+
+def _collection_components(model: GeodeModel) -> list[dict[str, Any]]:
     model_collection_components = model.collection_components()
     collection_components = []
     for collection_component, ids in model_collection_components.items():
@@ -269,9 +274,14 @@ def model_components(data_id: str, model: GeodeModel, viewable_file: str | None)
                 "is_active": component.is_active(),
             }
             collection_components.append(collection_component_object)
+    return collection_components
+
+
+def model_components(data_id: str, model: GeodeModel, viewable_file: str | None) -> dict[str, Any]:
+    uuid_to_flat_index = _uuid_to_flat_index(data_id, viewable_file)
     return {
-        "mesh_components": mesh_components,
-        "collection_components": collection_components,
+        "mesh_components": _mesh_components(model, uuid_to_flat_index),
+        "collection_components": _collection_components(model),
     }
 
 
@@ -314,10 +324,6 @@ def save_all_viewables_and_return_info(
 
         data.native_file = Path(native_files[0]).name
 
-        assert data.native_file is not None
-        if geode_object.is_viewable():
-            assert data.viewable_file is not None
-            assert data.light_viewable_file is not None
         name = geode_object.identifier.name()
         if not name:
             flask.abort(400, "Geode object has no name defined.")

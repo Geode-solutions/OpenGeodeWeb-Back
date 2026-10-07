@@ -2,7 +2,7 @@ from __future__ import annotations
 
 # Standard library imports
 import functools
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, overload
 
 import fastjsonschema  # type: ignore[import-untyped]
 
@@ -20,7 +20,11 @@ if TYPE_CHECKING:
 TYPED_ROUTE_MARKER = "__typed_route__"
 
 
-def _drop_none(value: Any) -> Any:
+@overload
+def _drop_none(value: dict[str, object]) -> dict[str, object]: ...
+@overload
+def _drop_none(value: object) -> object: ...
+def _drop_none(value: object) -> object:
     # Optional response fields are generated as `field: X | None = None`:
     # omit them instead of sending null
     if isinstance(value, dict):

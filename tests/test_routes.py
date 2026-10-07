@@ -79,9 +79,12 @@ def test_allowed_objects(client: FlaskClient) -> None:
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_upload_file(client: FlaskClient, filename: str = "test.og_brep") -> None:
+def test_upload_file(client: FlaskClient) -> None:
+    check_upload_file(client, "test.og_brep")
+
+
+def check_upload_file(client: FlaskClient, filename: str) -> None:
     file = data_dir / filename
-    print(f"{file=}", flush=True)
     response = client.put(
         "/opengeodeweb_back/upload_file",
         data={"file": FileStorage(file.open("rb"))},
@@ -89,7 +92,8 @@ def test_upload_file(client: FlaskClient, filename: str = "test.og_brep") -> Non
     assert response.status_code == 201
 
 
-def test_upload_file_raw(client: FlaskClient, filename: str = "test.og_brep") -> None:
+def test_upload_file_raw(client: FlaskClient) -> None:
+    filename: str = "test.og_brep"
     file_bytes = (data_dir / filename).read_bytes()
 
     raw_filename = "raw_upload_test.og_brep"
@@ -116,7 +120,8 @@ def test_upload_file_raw_missing_filename(client: FlaskClient) -> None:
     assert response.status_code == 400
 
 
-def test_upload_file_chunked(client: FlaskClient, filename: str = "test.og_brep") -> None:
+def test_upload_file_chunked(client: FlaskClient) -> None:
+    filename: str = "test.og_brep"
     file_bytes = (data_dir / filename).read_bytes()
 
     chunk_filename = "chunked_upload_test.og_brep"
@@ -204,7 +209,7 @@ def test_geographic_coordinate_systems(client: FlaskClient) -> None:
 
 
 def test_validate_object(client: FlaskClient) -> None:
-    response_save = test_save_viewable_file(client, "BRep", "cube.og_brep")
+    response_save = check_save_viewable_file(client, "BRep", "cube.og_brep")
     assert response_save.status_code == 200
     model_id = response_save.get_json()["id"]
     response = client.post("/opengeodeweb_back/validate", json={"id": model_id})
@@ -216,7 +221,7 @@ def test_validate_object(client: FlaskClient) -> None:
 
 
 def test_validate_invalid_object(client: FlaskClient) -> None:
-    response_save = test_save_viewable_file(client, "BRep", "wrong_boundary_surface_model.og_brep")
+    response_save = check_save_viewable_file(client, "BRep", "wrong_boundary_surface_model.og_brep")
     assert response_save.status_code == 200
     model_id = response_save.get_json()["id"]
     response = client.post("/opengeodeweb_back/validate", json={"id": model_id})
@@ -250,12 +255,16 @@ def test_geode_objects_and_output_extensions(client: FlaskClient) -> None:
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_save_viewable_file(
+def test_save_viewable_file(client: FlaskClient) -> TestResponse:
+    check_save_viewable_file(client, "BRep", "corbi.og_brep")
+
+
+def check_save_viewable_file(
     client: FlaskClient,
-    geode_object_type: str = "BRep",
-    filename: str = "corbi.og_brep",
+    geode_object_type: str,
+    filename: str,
 ) -> TestResponse:
-    test_upload_file(client, filename)
+    check_upload_file(client, filename)
     route = "/opengeodeweb_back/save_viewable_file"
 
     def get_full_data() -> test_utils.JsonData:
@@ -341,11 +350,6 @@ def test_vertex_attribute_names(client: FlaskClient) -> None:
         assert "max_values" in attribute
         assert "no_data" in attribute
         assert isinstance(attribute["no_data"], bool)
-    print(
-        "[ATTRIBUTES]: ",
-        [attribute["nb_items"] for attribute in attributes],
-        flush=True,
-    )
 
 
 def test_cell_attribute_names(client: FlaskClient) -> None:
@@ -380,11 +384,6 @@ def test_cell_attribute_names(client: FlaskClient) -> None:
         assert "max_values" in attribute
         assert "no_data" in attribute
         assert isinstance(attribute["no_data"], bool)
-    print(
-        "[ATTRIBUTES]: ",
-        [attribute["nb_items"] for attribute in attributes],
-        flush=True,
-    )
 
 
 def test_polygon_attribute_names(client: FlaskClient) -> None:
@@ -419,11 +418,6 @@ def test_polygon_attribute_names(client: FlaskClient) -> None:
         assert "max_values" in attribute
         assert "no_data" in attribute
         assert isinstance(attribute["no_data"], bool)
-    print(
-        "[ATTRIBUTES]: ",
-        [attribute["nb_items"] for attribute in attributes],
-        flush=True,
-    )
 
 
 def test_polyhedron_attribute_names(client: FlaskClient) -> None:
@@ -446,7 +440,6 @@ def test_polyhedron_attribute_names(client: FlaskClient) -> None:
         data_path.parent.mkdir(parents=True, exist_ok=True)
         assert data_path.exists(), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
-    print(response.get_json())
     assert response.status_code == 200
     attributes = response.get_json()["attributes"]
     assert type(attributes) is list
@@ -462,11 +455,6 @@ def test_polyhedron_attribute_names(client: FlaskClient) -> None:
         if attribute["attribute_name"] == "Range":
             assert attribute["min_value"] == 0.0
             assert attribute["max_value"] == 579.0
-    print(
-        "[ATTRIBUTES]: ",
-        [attribute["nb_items"] for attribute in attributes],
-        flush=True,
-    )
 
 
 def test_edge_attribute_names(client: FlaskClient) -> None:
@@ -489,10 +477,8 @@ def test_edge_attribute_names(client: FlaskClient) -> None:
         data_path.parent.mkdir(parents=True, exist_ok=True)
         assert data_path.exists(), f"File not found at {data_path}"
     response = client.post(route, json={"id": data.id})
-    print(response.get_json())
     assert response.status_code == 200
     attributes = response.get_json()["attributes"]
-    print("[ATTRIBUTES]: ", attributes, flush=True)
     assert type(attributes) is list
     for attribute in attributes:
         assert "attribute_name" in attribute
@@ -503,11 +489,6 @@ def test_edge_attribute_names(client: FlaskClient) -> None:
         assert "max_values" in attribute
         assert "no_data" in attribute
         assert isinstance(attribute["no_data"], bool)
-    print(
-        "[ATTRIBUTES]: ",
-        [attribute["nb_items"] for attribute in attributes],
-        flush=True,
-    )
 
 
 def test_database_uri_path(client: FlaskClient) -> None:
@@ -569,7 +550,7 @@ def test_geode_object_inheritance(client: FlaskClient) -> None:
 def test_model_components(client: FlaskClient) -> None:
     geode_object_type = "BRep"
     filename = "cube.og_brep"
-    response = test_save_viewable_file(client, geode_object_type, filename)
+    response = check_save_viewable_file(client, geode_object_type, filename)
     assert response.status_code == 200
     assert "mesh_components" in response.get_json()
     mesh_components = response.get_json()["mesh_components"]
@@ -725,7 +706,7 @@ def test_save_viewable_workflow_from_object(client: FlaskClient) -> None:
 
 def _load_brep_components(client: FlaskClient) -> tuple[str, dict[str, list[str]]]:
     """Load cube.og_brep and return (model_id, {component_type: [geode_id, ...]})."""
-    response = test_save_viewable_file(client, "BRep", "cube.og_brep")
+    response = check_save_viewable_file(client, "BRep", "cube.og_brep")
     assert response.status_code == 200
     model_id: str = response.get_json()["id"]
     mesh_components: list[dict[str, object]] = response.get_json()["mesh_components"]
