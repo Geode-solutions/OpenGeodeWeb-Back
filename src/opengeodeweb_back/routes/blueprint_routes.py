@@ -77,7 +77,9 @@ def _write_stream(path: Path, stream: typing.IO[bytes], mode: str = "wb") -> Non
 
 
 def _upload_response(message: str, status: int) -> flask.Response:
-    return flask.make_response(schemas.UploadFileResponse(message=message).to_dict(), status)
+    return flask.make_response(
+        schemas.UploadFileResponse(message=message).to_dict(), status
+    )
 
 
 def _finalize_upload(filename: str) -> flask.Response:
@@ -135,7 +137,9 @@ def allowed_objects(
     params: schemas.AllowedObjects,
 ) -> schemas.AllowedObjectsResponse:
     file_absolute_path = geode_functions.upload_file_path(params.filename)
-    file_extension = utils_functions.extension_from_filename(Path(file_absolute_path).name)
+    file_extension = utils_functions.extension_from_filename(
+        Path(file_absolute_path).name
+    )
     allowed_objects: dict[str, schemas.allowed_objects.AllowedObject] = {}
     for object_type, geode_object in geode_objects.items():
         if file_extension not in geode_object.input_extensions():
@@ -161,10 +165,14 @@ def missing_files(params: schemas.MissingFiles) -> schemas.MissingFilesResponse:
         for file in additional_files.mandatory_files + additional_files.optional_files
     )
     mandatory_files = [
-        Path(file.filename).name for file in additional_files.mandatory_files if file.is_missing
+        Path(file.filename).name
+        for file in additional_files.mandatory_files
+        if file.is_missing
     ]
     additional_files_array = [
-        Path(file.filename).name for file in additional_files.optional_files if file.is_missing
+        Path(file.filename).name
+        for file in additional_files.optional_files
+        if file.is_missing
     ]
 
     return schemas.MissingFilesResponse(
@@ -209,11 +217,11 @@ def geode_objects_and_output_extensions(
     params: schemas.GeodeObjectsAndOutputExtensions,
 ) -> schemas.GeodeObjectsAndOutputExtensionsResponse:
     file_path = geode_functions.upload_file_path(params.filename)
-    geode_object = geode_functions.geode_object_from_string(params.geode_object_type).load(
-        file_path
-    )
-    geode_objects_and_output_extensions = geode_functions.geode_object_output_extensions(
-        geode_object
+    geode_object = geode_functions.geode_object_from_string(
+        params.geode_object_type
+    ).load(file_path)
+    geode_objects_and_output_extensions = (
+        geode_functions.geode_object_output_extensions(geode_object)
     )
     return schemas.GeodeObjectsAndOutputExtensionsResponse(
         geode_objects_and_output_extensions={
@@ -265,7 +273,9 @@ def extract_valid_attribute_values(
     nb_items = attribute.nb_items()
     default_values = getattr(attribute, "default_values", None)
     no_value = default_values().no_value if default_values else None
-    if no_value is None and ("Point" in attribute.type() or "Vector" in attribute.type()):
+    if no_value is None and (
+        "Point" in attribute.type() or "Vector" in attribute.type()
+    ):
         no_value = [0.0] * nb_items
 
     value_getter = getattr(
@@ -512,7 +522,9 @@ def export_project() -> flask.Response:
     with get_session() as session:
         rows = session.query(Data.id, Data.native_file).all()
 
-    with zipfile.ZipFile(export_vease_path, "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
+    with zipfile.ZipFile(
+        export_vease_path, "w", compression=zipfile.ZIP_DEFLATED
+    ) as zip_file:
         database_root_path = Path(project_folder) / "project.db"
         if database_root_path.is_file():
             zip_file.write(database_root_path, "project.db")
@@ -548,7 +560,9 @@ def _reset_data_folder(data_folder_path: Path) -> None:
         connection.scoped_session_registry.remove()
     if connection.engine:
         connection.engine.dispose()
-    connection.engine = connection.session_factory = connection.scoped_session_registry = None
+    connection.engine = connection.session_factory = (
+        connection.scoped_session_registry
+    ) = None
 
     try:
         if data_folder_path.exists():
@@ -596,7 +610,9 @@ def _regenerate_missing_viewables(rows: list[Data]) -> None:
                 vpath = Path(geode_functions.data_file_path(data.id, viewable_name))
                 viewable_dir = Path(data_path) / "viewable"
                 has_components = viewable_dir.is_dir() and any(viewable_dir.iterdir())
-                if vpath.is_file() and (data.viewer_object != "model" or has_components):
+                if vpath.is_file() and (
+                    data.viewer_object != "model" or has_components
+                ):
                     continue
 
             native_file = str(data.native_file or "")
@@ -607,10 +623,12 @@ def _regenerate_missing_viewables(rows: list[Data]) -> None:
             if not Path(native_full).is_file():
                 continue
 
-            geode_object = geode_functions.geode_object_from_string(data.geode_object).load(
-                native_full
+            geode_object = geode_functions.geode_object_from_string(
+                data.geode_object
+            ).load(native_full)
+            utils_functions.save_all_viewables_and_return_info(
+                geode_object, data, data_path
             )
-            utils_functions.save_all_viewables_and_return_info(geode_object, data, data_path)
         session.commit()
 
 
@@ -636,7 +654,9 @@ def import_project() -> flask.Response:
         rows = _open_project_database(project_folder)
         _regenerate_missing_viewables(rows)
         snapshot = _read_snapshot(zip_archive)
-    return flask.make_response(schemas.ImportProjectResponse(snapshot=snapshot).to_dict(), 200)
+    return flask.make_response(
+        schemas.ImportProjectResponse(snapshot=snapshot).to_dict(), 200
+    )
 
 
 @typed_route(routes, schemas.geode_object_inheritance_route)

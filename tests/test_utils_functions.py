@@ -103,7 +103,9 @@ def test_create_data_folder_from_id(client: FlaskClient) -> None:
         data_path = utils_functions.create_data_folder_from_id(test_id)
         assert isinstance(data_path, str)
         assert Path(data_path).exists()
-        assert Path(data_path).is_relative_to(flask.current_app.config["DATA_FOLDER_PATH"])
+        assert Path(data_path).is_relative_to(
+            flask.current_app.config["DATA_FOLDER_PATH"]
+        )
         assert test_id in data_path
         shutil.rmtree(data_path, ignore_errors=True)
         assert not Path(data_path).exists()
@@ -112,7 +114,9 @@ def test_create_data_folder_from_id(client: FlaskClient) -> None:
 def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
     app = client.application
     with app.app_context():
-        expected_db_path = (Path(app.config["DATA_FOLDER_PATH"]) / "project.db").resolve()
+        expected_db_path = (
+            Path(app.config["DATA_FOLDER_PATH"]) / "project.db"
+        ).resolve()
         expected_uri = f"sqlite:///{expected_db_path}"
 
         assert app.config["SQLALCHEMY_DATABASE_URI"] == expected_uri
@@ -197,7 +201,9 @@ def test_generate_files_from_object(
         assert re.match(r"[0-9a-f]{32}", result["id"])
         assert isinstance(result["viewer_type"], str)
         assert isinstance(result["binary_light_viewable"], str)
-        light_viewable_bytes = base64.b64decode(result["binary_light_viewable"], validate=True)
+        light_viewable_bytes = base64.b64decode(
+            result["binary_light_viewable"], validate=True
+        )
         assert light_viewable_bytes.startswith(b'<?xml version="1.0"?>')
         assert b'<AppendedData encoding="raw">' in light_viewable_bytes
 
@@ -210,7 +216,9 @@ def test_generate_files_from_object(
         assert (data_path / result["native_file"]).exists()
         assert (data_path / result["viewable_file"]).exists()
         assert (data_path / data.light_viewable_file).exists()
-        assert (data_path / data.light_viewable_file).read_bytes() == light_viewable_bytes
+        assert (
+            data_path / data.light_viewable_file
+        ).read_bytes() == light_viewable_bytes
 
 
 def test_generate_files_from_file(
@@ -264,7 +272,9 @@ def test_generate_files_from_file_returns_geode_id(client: FlaskClient) -> None:
         result = utils_functions.generate_files_from_file(
             GeodeBRep.geode_object_type(), "test.og_brep"
         )
-        expected_geode_id = GeodeBRep.load(str(data_dir / "test.og_brep")).identifier.id().string()
+        expected_geode_id = (
+            GeodeBRep.load(str(data_dir / "test.og_brep")).identifier.id().string()
+        )
         assert result["geode_id"] == expected_geode_id
         assert len(result["geode_id"]) == 36
         assert len(result["id"]) == 32
@@ -337,7 +347,9 @@ def test_send_file_multiple_returns_zip(client: FlaskClient, tmp_path: Path) -> 
             response.close()
 
 
-def test_send_file_single_returns_octet_binary(client: FlaskClient, tmp_path: Path) -> None:
+def test_send_file_single_returns_octet_binary(
+    client: FlaskClient, tmp_path: Path
+) -> None:
     app = client.application
     with app.app_context():
         app.config["UPLOAD_FOLDER_PATH"] = str(tmp_path)

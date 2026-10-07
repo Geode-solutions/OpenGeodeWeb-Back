@@ -11,7 +11,10 @@ import opengeode as og
 from .geode_object import GeodeObject
 
 if TYPE_CHECKING:
-    from opengeodeweb_microservice.database.data_types import ViewerElementsType, ViewerType
+    from opengeodeweb_microservice.database.data_types import (
+        ViewerElementsType,
+        ViewerType,
+    )
 
 ComponentRegistry = dict[og.ComponentType, list[og.uuid]]
 

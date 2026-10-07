@@ -29,9 +29,9 @@ def test_every_route_is_typed() -> None:
     for endpoint, view in app.view_functions.items():
         if endpoint.split(".")[0] not in BLUEPRINTS:
             continue
-        assert getattr(view, TYPED_ROUTE_MARKER, False), (
-            f"{endpoint} must be registered with @typed_route or @raw_route"
-        )
+        assert getattr(
+            view, TYPED_ROUTE_MARKER, False
+        ), f"{endpoint} must be registered with @typed_route or @raw_route"
 
 
 def test_bad_params_error_response(client: FlaskClient) -> None:
@@ -54,7 +54,9 @@ def test_unexpected_exception_error_response(
         raise RuntimeError(msg)
 
     monkeypatch.setattr(geode_functions, "upload_file_path", fail)
-    response = client.post("/opengeodeweb_back/allowed_objects", json={"filename": "corbi.og_brep"})
+    response = client.post(
+        "/opengeodeweb_back/allowed_objects", json={"filename": "corbi.og_brep"}
+    )
     assert response.status_code == 500
     error = response.get_json()
     validate_error(error)

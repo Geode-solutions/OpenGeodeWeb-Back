@@ -66,7 +66,10 @@ class GeodeSolidMesh3D(GeodeVertexSet):
         )
 
     def create_crs(
-        self, crs_name: str, input_crs: og.CoordinateSystem2D, output_crs: og.CoordinateSystem2D
+        self,
+        crs_name: str,
+        input_crs: og.CoordinateSystem2D,
+        output_crs: og.CoordinateSystem2D,
     ) -> None:
         builder = self.builder()
         og.create_solid_mesh_coordinate_system3D(

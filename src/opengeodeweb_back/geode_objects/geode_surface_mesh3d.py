@@ -19,7 +19,9 @@ class GeodeSurfaceMesh3D(GeodeVertexSet):
     surface_mesh: og.SurfaceMesh3D
 
     def __init__(self, surface_mesh: og.SurfaceMesh3D | None = None) -> None:
-        self.surface_mesh = surface_mesh if surface_mesh is not None else og.SurfaceMesh3D.create()
+        self.surface_mesh = (
+            surface_mesh if surface_mesh is not None else og.SurfaceMesh3D.create()
+        )
         super().__init__(self.surface_mesh)
 
     @override
@@ -66,7 +68,10 @@ class GeodeSurfaceMesh3D(GeodeVertexSet):
         )
 
     def create_crs(
-        self, crs_name: str, input_crs: og.CoordinateSystem2D, output_crs: og.CoordinateSystem2D
+        self,
+        crs_name: str,
+        input_crs: og.CoordinateSystem2D,
+        output_crs: og.CoordinateSystem2D,
     ) -> None:
         builder = self.builder()
         og.create_surface_mesh_coordinate_system3D(

@@ -21,7 +21,9 @@ class GeodeEdgedCurve3D(GeodeGraph):
     edged_curve: og.EdgedCurve3D
 
     def __init__(self, edged_curve: og.EdgedCurve3D | None = None) -> None:
-        self.edged_curve = edged_curve if edged_curve is not None else og.EdgedCurve3D.create()
+        self.edged_curve = (
+            edged_curve if edged_curve is not None else og.EdgedCurve3D.create()
+        )
         super().__init__(self.edged_curve)
 
     @override
@@ -87,7 +89,9 @@ class GeodeEdgedCurve3D(GeodeGraph):
 
     @override
     def save_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_viewable_edged_curve3D(self.edged_curve, filename_without_extension)
+        return viewables.save_viewable_edged_curve3D(
+            self.edged_curve, filename_without_extension
+        )
 
     @override
     def save_light_viewable(self, filename_without_extension: str) -> str:
@@ -120,7 +124,10 @@ class GeodeEdgedCurve3D(GeodeGraph):
         )
 
     def create_crs(
-        self, crs_name: str, input_crs: og.CoordinateSystem2D, output_crs: og.CoordinateSystem2D
+        self,
+        crs_name: str,
+        input_crs: og.CoordinateSystem2D,
+        output_crs: og.CoordinateSystem2D,
     ) -> None:
         builder = self.builder()
         og.create_edged_curve_coordinate_system3D(

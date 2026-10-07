@@ -53,7 +53,8 @@ def _check_wrong_params_at(
             if response.status_code == HTTPStatus.BAD_REQUEST:
                 error_description: str = response.get_json()["description"]
                 _check(
-                    "must contain" in error_description and f"'{key}'" in error_description,
+                    "must contain" in error_description
+                    and f"'{key}'" in error_description,
                     f"{route}: missing '{key}' gave unexpected error: {error_description}",
                 )
             if isinstance(value, (dict, list)):
@@ -68,7 +69,8 @@ def _check_wrong_params_at(
         )
         error_description = response.get_json()["description"]
         _check(
-            "must not contain" in error_description and "'dumb_key'" in error_description,
+            "must not contain" in error_description
+            and "'dumb_key'" in error_description,
             f"{route}: extra 'dumb_key' gave unexpected error: {error_description}",
         )
     elif isinstance(data, list) and data:

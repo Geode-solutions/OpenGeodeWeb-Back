@@ -18,7 +18,9 @@ if TYPE_CHECKING:
 class GeodeTriangulatedSurface3D(GeodeSurfaceMesh3D):
     triangulated_surface: og.TriangulatedSurface3D
 
-    def __init__(self, triangulated_surface: og.TriangulatedSurface3D | None = None) -> None:
+    def __init__(
+        self, triangulated_surface: og.TriangulatedSurface3D | None = None
+    ) -> None:
         self.triangulated_surface = (
             triangulated_surface
             if triangulated_surface is not None
@@ -71,7 +73,9 @@ class GeodeTriangulatedSurface3D(GeodeSurfaceMesh3D):
 
     @override
     def is_saveable(self, filename: str) -> bool:
-        return og.is_triangulated_surface_saveable3D(self.triangulated_surface, filename)
+        return og.is_triangulated_surface_saveable3D(
+            self.triangulated_surface, filename
+        )
 
     @override
     def save(self, filename: str) -> list[str]:

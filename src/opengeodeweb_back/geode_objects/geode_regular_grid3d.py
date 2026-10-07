@@ -22,7 +22,9 @@ class GeodeRegularGrid3D(GeodeSolidMesh3D, GeodeGrid3D):
     regular_grid: og.RegularGrid3D
 
     def __init__(self, regular_grid: og.RegularGrid3D | None = None) -> None:
-        self.regular_grid = regular_grid if regular_grid is not None else og.RegularGrid3D.create()
+        self.regular_grid = (
+            regular_grid if regular_grid is not None else og.RegularGrid3D.create()
+        )
         super().__init__(self.regular_grid)
 
     @override
@@ -78,7 +80,9 @@ class GeodeRegularGrid3D(GeodeSolidMesh3D, GeodeGrid3D):
 
     @override
     def save_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_viewable_regular_grid3D(self.regular_grid, filename_without_extension)
+        return viewables.save_viewable_regular_grid3D(
+            self.regular_grid, filename_without_extension
+        )
 
     @override
     def save_light_viewable(self, filename_without_extension: str) -> str:

@@ -26,7 +26,9 @@ def point_set(params: schemas.PointSet) -> schemas.PointSetResponse:
     for point in params.points:
         builder.create_point(opengeode.Point3D([point.x, point.y, point.z]))
 
-    return schemas.PointSetResponse.from_dict(utils_functions.generate_files_from_object(pointset))
+    return schemas.PointSetResponse.from_dict(
+        utils_functions.generate_files_from_object(pointset)
+    )
 
 
 @typed_route(routes, schemas.edged_curve_route)
