@@ -15,7 +15,8 @@ from opengeodeweb_back import utils_functions
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from opengeodeweb_microservice.schemas import ParamsT, ResponseT, Route
+    from dataclasses_json import DataClassJsonMixin
+    from opengeodeweb_microservice.schemas import Route
 
 TYPED_ROUTE_MARKER = "__typed_route__"
 
@@ -48,7 +49,7 @@ def _register(
     return view
 
 
-def parse_params(route: Route[ParamsT, Any]) -> ParamsT:
+def parse_params[ParamsT: DataClassJsonMixin](route: Route[ParamsT, Any]) -> ParamsT:
     """Validate the JSON body of the current request against its route schema.
 
     Return the typed params built from it.
@@ -57,7 +58,7 @@ def parse_params(route: Route[ParamsT, Any]) -> ParamsT:
     return route.params.from_dict(json_data)
 
 
-def typed_route(
+def typed_route[ParamsT: DataClassJsonMixin, ResponseT: DataClassJsonMixin](
     blueprint: flask.Blueprint, route: Route[ParamsT, ResponseT]
 ) -> Callable[[Callable[[ParamsT], ResponseT]], Callable[[], flask.Response]]:
     """Register a JSON route whose handler takes and returns typed objects.

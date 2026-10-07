@@ -237,7 +237,7 @@ def run_server(app: Flask) -> None:
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-    connection.init_database(str(db_path))
+    connection.init_database(db_path)
     logger.info("Database initialized at: %s", db_path)
 
     flask_cors.CORS(app, origins=args.allowed_origins)

@@ -695,7 +695,7 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
     client.application.config["DATA_FOLDER_PATH"] = original_data_folder
     test_db_path = os.environ.get("TEST_DB_PATH")
     if test_db_path:
-        connection.init_database(test_db_path, create_tables=True)
+        connection.init_database(Path(test_db_path), create_tables=True)
 
     client.application.config["DATA_FOLDER_PATH"] = original_data_folder
 

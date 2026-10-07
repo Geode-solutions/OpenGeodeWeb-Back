@@ -556,13 +556,7 @@ def _uploaded_vease_file() -> FileStorage:
 
 def _reset_data_folder(data_folder_path: Path) -> None:
     # 423 Locked bypass : remove stopped requests
-    if connection.scoped_session_registry:
-        connection.scoped_session_registry.remove()
-    if connection.engine:
-        connection.engine.dispose()
-    connection.engine = connection.session_factory = (
-        connection.scoped_session_registry
-    ) = None
+    connection.close_database()
 
     try:
         if data_folder_path.exists():
@@ -590,13 +584,13 @@ def _open_project_database(project_folder: Path) -> list[Data]:
     if not database_root_path.is_file():
         flask.abort(400, "Missing project.db at project root")
 
-    connection.init_database(str(database_root_path), create_tables=False)
+    connection.init_database(database_root_path, create_tables=False)
 
     try:
         with get_session() as session:
             return session.query(Data).all()
     except OperationalError:
-        connection.init_database(str(database_root_path), create_tables=True)
+        connection.init_database(database_root_path, create_tables=True)
         with get_session() as session:
             return session.query(Data).all()
 

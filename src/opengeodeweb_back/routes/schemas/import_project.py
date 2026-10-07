@@ -1,3 +1,4 @@
+from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from typing import Dict, Any
 from dataclasses_json import DataClassJsonMixin
@@ -22,7 +23,7 @@ class ImportProjectResponse(DataClassJsonMixin):
 
 
 import_project_route = Route(
-    schema=load_schema(__file__),
+    schema=load_schema(Path(__file__)),
     params=ImportProject,
     response=ImportProjectResponse,
 )

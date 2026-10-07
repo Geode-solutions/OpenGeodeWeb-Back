@@ -1,6 +1,6 @@
 # https://docs.astral.sh/ruff/configuration/
 
-target-version = "py311"
+target-version = "py312"
 line-length = 100
 indent-width = 4
 extend-exclude = ["**/schemas/**"] # generated schemas

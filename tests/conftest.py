@@ -46,15 +46,12 @@ def configure_test_environment() -> Generator[None]:
     db_path = (Path(app.config["DATA_FOLDER_PATH"]) / "project.db").resolve()
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 
-    init_database(str(db_path))
+    init_database(db_path)
     os.environ["TEST_DB_PATH"] = str(db_path)
     register_ogw_back_blueprints(app)
     yield
 
-    if connection.scoped_session_registry:
-        connection.scoped_session_registry.remove()
-    if connection.engine:
-        connection.engine.dispose()
+    connection.close_database()
     tmp_data_path = app.config.get("DATA_FOLDER_PATH")
     if tmp_data_path and Path(tmp_data_path).exists():
         shutil.rmtree(tmp_data_path, ignore_errors=True)

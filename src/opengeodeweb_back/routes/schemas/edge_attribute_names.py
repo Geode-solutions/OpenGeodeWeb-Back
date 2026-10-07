@@ -1,3 +1,4 @@
+from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from typing import List
 from dataclasses_json import DataClassJsonMixin
@@ -37,7 +38,7 @@ class EdgeAttributeNamesResponse(DataClassJsonMixin):
 
 
 edge_attribute_names_route = Route(
-    schema=load_schema(__file__),
+    schema=load_schema(Path(__file__)),
     params=EdgeAttributeNames,
     response=EdgeAttributeNamesResponse,
 )
