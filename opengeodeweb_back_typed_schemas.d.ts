@@ -152,6 +152,7 @@ export interface VertexAttributeNamesResponseAttribute {
     min_values:     number[];
     nb_items:       number;
     no_data:        boolean;
+    time_steps:     number[];
 }
 
 export interface ValidateParams {
@@ -235,6 +236,7 @@ export interface PolyhedronAttributeNamesResponseAttribute {
     min_values:     number[];
     nb_items:       number;
     no_data:        boolean;
+    time_steps:     number[];
 }
 
 export interface PolygonAttributeNamesParams {
@@ -254,6 +256,7 @@ export interface PolygonAttributeNamesResponseAttribute {
     min_values:     number[];
     nb_items:       number;
     no_data:        boolean;
+    time_steps:     number[];
 }
 
 export interface PingParams {
@@ -281,6 +284,7 @@ export interface ModelComponentVertexAttributeNamesResponseAttribute {
     min_values:     number[];
     nb_items:       number;
     no_data:        boolean;
+    time_steps:     number[];
 }
 
 export interface ModelComponentPolyhedronAttributeNamesParams {
@@ -301,6 +305,7 @@ export interface ModelComponentPolyhedronAttributeNamesResponseAttribute {
     min_values:     number[];
     nb_items:       number;
     no_data:        boolean;
+    time_steps:     number[];
 }
 
 export interface ModelComponentPolygonAttributeNamesParams {
@@ -321,6 +326,7 @@ export interface ModelComponentPolygonAttributeNamesResponseAttribute {
     min_values:     number[];
     nb_items:       number;
     no_data:        boolean;
+    time_steps:     number[];
 }
 
 export interface ModelComponentEdgeAttributeNamesParams {
@@ -341,6 +347,7 @@ export interface ModelComponentEdgeAttributeNamesResponseAttribute {
     min_values:     number[];
     nb_items:       number;
     no_data:        boolean;
+    time_steps:     number[];
 }
 
 export interface MissingFilesParams {
@@ -422,6 +429,7 @@ export interface EdgeAttributeNamesResponseAttribute {
     min_values:     number[];
     nb_items:       number;
     no_data:        boolean;
+    time_steps:     number[];
 }
 
 export interface CellAttributeNamesParams {
@@ -441,6 +449,7 @@ export interface CellAttributeNamesResponseAttribute {
     min_values:     number[];
     nb_items:       number;
     no_data:        boolean;
+    time_steps:     number[];
 }
 
 export interface AllowedObjectsParams {

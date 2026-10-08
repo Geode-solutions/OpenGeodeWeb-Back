@@ -27,6 +27,7 @@ class Attribute(DataClassJsonMixin):
     min_values: List[float]
     nb_items: int
     no_data: bool
+    time_steps: List[float]
 
 
 @dataclass

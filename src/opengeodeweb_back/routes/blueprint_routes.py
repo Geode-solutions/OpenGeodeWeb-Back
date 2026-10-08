@@ -246,15 +246,24 @@ def texture_coordinates(
     return schemas.TextureCoordinatesResponse(texture_coordinates=texture_coordinates)
 
 
-def extract_valid_attribute_values(
+def _attribute_ids_for_name(
+    attribute_manager: og.AttributeManager, attribute_name: str
+) -> list[og.uuid]:
+    time_steps = attribute_manager.time_steps(attribute_name)
+    if time_steps:
+        return [time_step.attribute_id for time_step in time_steps]
+    attribute_ids = attribute_manager.attribute_ids_matching_name(attribute_name)
+    if not isinstance(attribute_ids, list) or not attribute_ids:
+        return []
+    return attribute_ids[:1]
+
+
+def _extract_valid_values_from_attribute(
     attribute_manager: og.AttributeManager,
-    attribute_name: str,
+    attribute_id: og.uuid,
     item_index: int,
 ) -> tuple[list[float], bool]:
-    attribute_ids = attribute_manager.attribute_ids_matching_name(attribute_name)
-    if not isinstance(attribute_ids, list):
-        return [], False
-    attribute = attribute_manager.find_generic_attribute(attribute_ids[0])
+    attribute = attribute_manager.find_generic_attribute(attribute_id)
     if (
         attribute is None
         or not attribute.is_genericable()
@@ -287,48 +296,98 @@ def extract_valid_attribute_values(
     return valid_values, has_nan
 
 
+def extract_valid_attribute_values(
+    attribute_manager: og.AttributeManager,
+    attribute_name: str,
+    item_index: int,
+) -> tuple[list[float], bool]:
+    valid_values: list[float] = []
+    has_nan = False
+    for attribute_id in _attribute_ids_for_name(attribute_manager, attribute_name):
+        step_values, step_has_nan = _extract_valid_values_from_attribute(
+            attribute_manager, attribute_id, item_index
+        )
+        valid_values.extend(step_values)
+        has_nan = has_nan or step_has_nan
+    return valid_values, has_nan
+
+
+def _common_time_steps(
+    attribute_managers: list[og.AttributeManager], attribute_name: str
+) -> list[float] | None:
+    times = [time_step.time for time_step in attribute_managers[0].time_steps(attribute_name)]
+    for attribute_manager in attribute_managers[1:]:
+        other_times = [time_step.time for time_step in attribute_manager.time_steps(attribute_name)]
+        if other_times != times:
+            return None
+    return times
+
+
+def _attribute_ranges(
+    attribute_managers: list[og.AttributeManager],
+    attribute_name: str,
+    nb_items: int,
+) -> tuple[list[float], list[float], bool]:
+    min_values: list[float] = []
+    max_values: list[float] = []
+    attribute_has_nan = False
+    for item_index in range(nb_items):
+        valid_values: list[float] = []
+        for attribute_manager in attribute_managers:
+            extracted_values, has_nan = extract_valid_attribute_values(
+                attribute_manager, attribute_name, item_index
+            )
+            valid_values.extend(extracted_values)
+            attribute_has_nan = attribute_has_nan or has_nan
+        if valid_values:
+            min_values.append(min(valid_values))
+            max_values.append(max(valid_values))
+    return min_values, max_values, attribute_has_nan
+
+
 def attributes_metadata(
     manager: og.AttributeManager | list[og.AttributeManager],
 ) -> list[dict[str, str | int | float | bool | list[float]]]:
     attribute_managers = manager if isinstance(manager, list) else [manager]
     attributes: list[dict[str, str | int | float | bool | list[float]]] = []
     first_manager = attribute_managers[0]
+    listed_time_series: set[str] = set()
     for attribute_id in first_manager.attribute_ids():
         attribute = first_manager.find_generic_attribute(attribute_id)
         if attribute is None:
             continue
         attribute_name = attribute.name()
-        if attribute_name is None:
+        if attribute_name is None or attribute_name in listed_time_series:
             continue
         if not attribute.is_genericable() or not attribute.properties().transferable:
             continue
+        time_steps = _common_time_steps(attribute_managers, attribute_name)
+        if time_steps is None:
+            continue
+        if time_steps:
+            listed_time_series.add(attribute_name)
         nb_items = attribute.nb_items()
-        min_values, max_values = [], []
-        attribute_has_nan = False
-        for item_index in range(nb_items):
-            valid_values: list[float] = []
-            for attribute_manager in attribute_managers:
-                extracted_values, has_nan = extract_valid_attribute_values(
-                    attribute_manager, attribute_name, item_index
-                )
-                valid_values.extend(extracted_values)
-                if has_nan:
-                    attribute_has_nan = True
-            if valid_values:
-                min_values.append(min(valid_values))
-                max_values.append(max(valid_values))
+        min_values, max_values, attribute_has_nan = _attribute_ranges(
+            attribute_managers, attribute_name, nb_items
+        )
         if not min_values or not max_values:
             continue
+        series_id = (
+            first_manager.time_steps(attribute_name)[0].attribute_id.string()
+            if time_steps
+            else attribute_id.string()
+        )
         attributes.append(
             {
                 "attribute_name": attribute_name,
-                "attribute_id": attribute_id.string(),
+                "attribute_id": series_id,
                 "nb_items": nb_items,
                 "min_value": min(min_values),
                 "max_value": max(max_values),
                 "min_values": min_values,
                 "max_values": max_values,
                 "no_data": attribute_has_nan,
+                "time_steps": time_steps,
             }
         )
     return attributes
