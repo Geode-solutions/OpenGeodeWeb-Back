@@ -27,17 +27,15 @@ def test_input_output() -> None:
             geode_object = generic_geode_object.load(file_absolute_path)
             data_name = geode_object.identifier.name() or Path(file_absolute_path).name
             if geode_object.is_viewable():
-                viewable_file_path = geode_object.save_viewable(
-                    str(output_folder / data_name)
-                )
+                viewable_file_path = geode_object.save_viewable(str(output_folder / data_name))
                 Path(viewable_file_path).unlink()
             if geode_object.is_viewable():
                 light_viewable_file_path = geode_object.save_light_viewable(
                     str(output_folder / data_name)
                 )
                 Path(light_viewable_file_path).unlink()
-            geode_objects_output_extensions = (
-                geode_functions.geode_object_output_extensions(geode_object)
+            geode_objects_output_extensions = geode_functions.geode_object_output_extensions(
+                geode_object
             )
             assert type(geode_objects_output_extensions) is dict
             for (

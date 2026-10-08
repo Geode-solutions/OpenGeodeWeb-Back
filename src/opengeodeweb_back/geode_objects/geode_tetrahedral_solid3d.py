@@ -20,9 +20,7 @@ class GeodeTetrahedralSolid3D(GeodeSolidMesh3D):
 
     def __init__(self, tetrahedral_solid: og.TetrahedralSolid3D | None = None) -> None:
         self.tetrahedral_solid = (
-            tetrahedral_solid
-            if tetrahedral_solid is not None
-            else og.TetrahedralSolid3D.create()
+            tetrahedral_solid if tetrahedral_solid is not None else og.TetrahedralSolid3D.create()
         )
         super().__init__(self.tetrahedral_solid)
 

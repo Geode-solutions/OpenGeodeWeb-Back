@@ -19,13 +19,9 @@ if TYPE_CHECKING:
 class GeodeCrossSection(GeodeSection):
     cross_section: og_geosciences.CrossSection
 
-    def __init__(
-        self, cross_section: og_geosciences.CrossSection | None = None
-    ) -> None:
+    def __init__(self, cross_section: og_geosciences.CrossSection | None = None) -> None:
         self.cross_section = (
-            cross_section
-            if cross_section is not None
-            else og_geosciences.CrossSection()
+            cross_section if cross_section is not None else og_geosciences.CrossSection()
         )
         super().__init__(self.cross_section)
 
@@ -82,9 +78,7 @@ class GeodeCrossSection(GeodeSection):
 
     @override
     def save_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_viewable_cross_section(
-            self.cross_section, filename_without_extension
-        )
+        return viewables.save_viewable_cross_section(self.cross_section, filename_without_extension)
 
     @override
     def save_light_viewable(self, filename_without_extension: str) -> str:

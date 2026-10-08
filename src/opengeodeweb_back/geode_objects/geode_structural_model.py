@@ -19,13 +19,9 @@ if TYPE_CHECKING:
 class GeodeStructuralModel(GeodeBRep):
     structural_model: og_geosciences.StructuralModel
 
-    def __init__(
-        self, structural_model: og_geosciences.StructuralModel | None = None
-    ) -> None:
+    def __init__(self, structural_model: og_geosciences.StructuralModel | None = None) -> None:
         self.structural_model = (
-            structural_model
-            if structural_model is not None
-            else og_geosciences.StructuralModel()
+            structural_model if structural_model is not None else og_geosciences.StructuralModel()
         )
         super().__init__(self.structural_model)
 
@@ -74,9 +70,7 @@ class GeodeStructuralModel(GeodeBRep):
 
     @override
     def is_saveable(self, filename: str) -> bool:
-        return og_geosciences.is_structural_model_saveable(
-            self.structural_model, filename
-        )
+        return og_geosciences.is_structural_model_saveable(self.structural_model, filename)
 
     @override
     def save(self, filename: str) -> list[str]:

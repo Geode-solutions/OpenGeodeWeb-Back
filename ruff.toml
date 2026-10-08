@@ -8,15 +8,15 @@ extend-exclude = ["**/schemas/**"] # generated schemas
 [lint]
 select = ["ALL"]
 ignore = [
-    "CPY001", # ignore copyright notice
-    "D", # ignore undocumented
-    "COM812", # missing-trailing-comma
+  "CPY001", # ignore copyright notice
+  "D", # ignore undocumented
+  "COM812", # missing-trailing-comma
 ]
 
 [lint.per-file-ignores]
 "tests/**" = [
-    "S101",    # assert is how pytest works
-    "PLR2004", # expected values in asserts are not magic numbers
+  "S101", # assert is how pytest works
+  "PLR2004", # expected values in asserts are not magic numbers
 ]
 
 [format]

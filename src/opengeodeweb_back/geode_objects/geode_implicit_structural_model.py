@@ -41,16 +41,12 @@ class GeodeImplicitStructuralModel(GeodeStructuralModel):
 
     @override
     def builder(self) -> og_geosciences.ImplicitStructuralModelBuilder:
-        return og_geosciences.ImplicitStructuralModelBuilder(
-            self.implicit_structural_model
-        )
+        return og_geosciences.ImplicitStructuralModelBuilder(self.implicit_structural_model)
 
     @override
     @classmethod
     def load(cls, filename: str) -> GeodeImplicitStructuralModel:
-        return GeodeImplicitStructuralModel(
-            og_geosciences.load_implicit_structural_model(filename)
-        )
+        return GeodeImplicitStructuralModel(og_geosciences.load_implicit_structural_model(filename))
 
     @override
     @classmethod

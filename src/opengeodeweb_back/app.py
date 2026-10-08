@@ -31,9 +31,7 @@ def _register_request_hooks(app: flask.Flask) -> None:
     def before_request() -> flask.Response | None:
         if flask.request.method == "OPTIONS":
             response = flask.make_response()
-            response.headers["Access-Control-Allow-Methods"] = (
-                "GET,POST,PUT,DELETE,OPTIONS"
-            )
+            response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
             return response
         utils_functions.before_request(flask.current_app)
         return None
@@ -60,9 +58,7 @@ def _register_event_stream(app: flask.Flask) -> None:
 
     @app.after_request
     def after_request(response: flask.Response) -> flask.Response:
-        endpoint = (
-            flask.request.endpoint.replace(".", "/") if flask.request.endpoint else None
-        )
+        endpoint = flask.request.endpoint.replace(".", "/") if flask.request.endpoint else None
         if endpoint in {"events", None}:
             return response
 
@@ -155,9 +151,7 @@ def run_server(app: Flask) -> None:
     parser = argparse.ArgumentParser(
         prog="OpenGeodeWeb-Back", description="Backend server for OpenGeodeWeb"
     )
-    parser.add_argument(
-        "--host", default=app.config.get("HOST"), type=str, help="Host to run on"
-    )
+    parser.add_argument("--host", default=app.config.get("HOST"), type=str, help="Host to run on")
     parser.add_argument(
         "-p",
         "--port",

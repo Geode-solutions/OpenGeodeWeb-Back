@@ -91,9 +91,7 @@ class GeodeSection(GeodeModel):
 
     @override
     def save_light_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_light_viewable_section(
-            self.section, filename_without_extension
-        )
+        return viewables.save_light_viewable_section(self.section, filename_without_extension)
 
     @override
     def mesh_components(self) -> ComponentRegistry:
@@ -150,6 +148,4 @@ class GeodeSection(GeodeModel):
         output_crs: og.CoordinateSystem2D,
     ) -> None:
         builder = self.builder()
-        og.create_section_coordinate_system(
-            self.section, builder, crs_name, input_crs, output_crs
-        )
+        og.create_section_coordinate_system(self.section, builder, crs_name, input_crs, output_crs)

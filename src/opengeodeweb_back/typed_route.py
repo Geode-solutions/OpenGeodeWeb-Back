@@ -29,9 +29,7 @@ def _drop_none(value: object) -> object:
     # Optional response fields are generated as `field: X | None = None`:
     # omit them instead of sending null
     if isinstance(value, dict):
-        return {
-            key: _drop_none(item) for key, item in value.items() if item is not None
-        }
+        return {key: _drop_none(item) for key, item in value.items() if item is not None}
     if isinstance(value, list):
         return [_drop_none(item) for item in value]
     return value
