@@ -62,6 +62,8 @@ opengeode-io==7.10.0
     #   -r requirements.in
     #   geode-viewables
     #   opengeode-geosciencesio
+types-defusedxml==0.7.0.20260504
+    # via -r requirements.in
 werkzeug==3.1.8
     # via
     #   -r requirements.in
