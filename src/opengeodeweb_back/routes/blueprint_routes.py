@@ -1,37 +1,46 @@
+from __future__ import annotations
+
 # Standard library imports
-from opengeodeweb_back.geode_objects.geode_solid_mesh3d import GeodeSolidMesh3D
-import os
-import time
-import shutil
+import logging
 import math
+import os
+import shutil
+import time
 import typing
+import zipfile
+from pathlib import Path
 from threading import Timer
+from typing import TYPE_CHECKING
 
 # Third party imports
 import flask
-import werkzeug
-import zipfile
 import opengeode as og
-import opengeode_io as og_io
 import opengeode_geosciences as og_geosciences
-import opengeode_geosciencesio as og_geosciencesio
-from opengeodeweb_microservice.database.data import Data
-from opengeodeweb_microservice.database.connection import get_session
+import opengeode_geosciencesio as og_geosciencesio  # noqa: F401 (registers IO plugins)
+import opengeode_io as og_io  # noqa: F401 (registers IO plugins)
+import werkzeug
 from opengeodeweb_microservice.database import connection
+from opengeodeweb_microservice.database.connection import get_session
+from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.database.data_types import geode_object_type
+from sqlalchemy.exc import OperationalError
 
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
-from opengeodeweb_back.typed_route import parse_params, raw_route, typed_route
-from opengeodeweb_back.routes import schemas
 from opengeodeweb_back.geode_objects import geode_objects
-from opengeodeweb_back.geode_objects.geode_mesh import GeodeMesh
-from opengeodeweb_back.geode_objects.geode_model import GeodeModel
 from opengeodeweb_back.geode_objects.geode_graph import GeodeGraph
 from opengeodeweb_back.geode_objects.geode_grid2d import GeodeGrid2D
 from opengeodeweb_back.geode_objects.geode_grid3d import GeodeGrid3D
+from opengeodeweb_back.geode_objects.geode_mesh import GeodeMesh
+from opengeodeweb_back.geode_objects.geode_model import GeodeModel
+from opengeodeweb_back.geode_objects.geode_solid_mesh3d import GeodeSolidMesh3D
 from opengeodeweb_back.geode_objects.geode_surface_mesh2d import GeodeSurfaceMesh2D
 from opengeodeweb_back.geode_objects.geode_surface_mesh3d import GeodeSurfaceMesh3D
+from opengeodeweb_back.routes import schemas
+from opengeodeweb_back.typed_route import parse_params, raw_route, typed_route
+
+if TYPE_CHECKING:
+    from werkzeug.datastructures import FileStorage
 
 ComponentMesh = (
     og.Corner2D,
@@ -46,11 +55,13 @@ ComponentLine = (og.Line2D, og.Line3D)
 ComponentSurface = (og.Surface2D, og.Surface3D)
 ComponentBlock = og.Block3D
 
+logger = logging.getLogger(__name__)
+
 routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
 
 
 @typed_route(routes, schemas.allowed_files_route)
-def allowed_files(params: schemas.AllowedFiles) -> schemas.AllowedFilesResponse:
+def allowed_files(_params: schemas.AllowedFiles) -> schemas.AllowedFilesResponse:
     extensions: set[str] = set()
     for geode_object in geode_objects.values():
         for extension in geode_object.input_extensions():
@@ -58,30 +69,27 @@ def allowed_files(params: schemas.AllowedFiles) -> schemas.AllowedFilesResponse:
     return schemas.AllowedFilesResponse(extensions=list(extensions))
 
 
-def _write_stream(path: str, stream: typing.IO[bytes], mode: str = "wb") -> None:
+def _write_stream(path: Path, stream: typing.IO[bytes], mode: str = "wb") -> None:
     read_buffer_size = 1024 * 1024
-    with open(path, mode) as destination:
+    with path.open(mode) as destination:
         while chunk := stream.read(read_buffer_size):
             destination.write(chunk)
 
 
 def _upload_response(message: str, status: int) -> flask.Response:
-    return flask.make_response(
-        schemas.UploadFileResponse(message=message).to_dict(), status
-    )
+    return flask.make_response(schemas.UploadFileResponse(message=message).to_dict(), status)
 
 
 def _finalize_upload(filename: str) -> flask.Response:
-    print(f"{filename=}", flush=True)
+    logger.info("File uploaded: %s", filename)
     return _upload_response("File uploaded", 201)
 
 
 @raw_route(routes, schemas.upload_file_route)
 def upload_file() -> flask.Response:
-    UPLOAD_FOLDER_PATH = flask.current_app.config["UPLOAD_FOLDER_PATH"]
-    print(f"{UPLOAD_FOLDER_PATH=}", flush=True)
-    if not os.path.exists(UPLOAD_FOLDER_PATH):
-        os.makedirs(UPLOAD_FOLDER_PATH, exist_ok=True)
+    upload_folder_path = flask.current_app.config["UPLOAD_FOLDER_PATH"]
+    logger.debug("Upload folder: %s", upload_folder_path)
+    Path(upload_folder_path).mkdir(parents=True, exist_ok=True)
 
     # Multipart callers (e.g. Vease) still send the whole file as a "file" form
     # part. Everything else PUTs raw bytes with ?filename= as a query param:
@@ -93,16 +101,16 @@ def upload_file() -> flask.Response:
         file = flask.request.files["file"]
         if file.filename is None:
             flask.abort(400, "Filename is required")
-        filename = werkzeug.utils.secure_filename(os.path.basename(file.filename))
-        file_path = os.path.join(UPLOAD_FOLDER_PATH, filename)
+        filename = werkzeug.utils.secure_filename(Path(file.filename).name)
+        file_path = Path(upload_folder_path) / filename
         file.save(file_path)
         return _finalize_upload(filename)
 
     raw_filename = flask.request.args.get("filename")
     if not raw_filename:
         flask.abort(400, "Filename is required")
-    filename = werkzeug.utils.secure_filename(os.path.basename(raw_filename))
-    file_path = os.path.join(UPLOAD_FOLDER_PATH, filename)
+    filename = werkzeug.utils.secure_filename(Path(raw_filename).name)
+    file_path = Path(upload_folder_path) / filename
 
     total_chunks = flask.request.args.get("total_chunks", type=int)
     if total_chunks is None:
@@ -113,12 +121,12 @@ def upload_file() -> flask.Response:
     if chunk_index is None or not 0 <= chunk_index < total_chunks:
         flask.abort(400, "Invalid chunk_index")
 
-    part_path = f"{file_path}.part"
+    part_path = file_path.with_name(f"{file_path.name}.part")
     _write_stream(part_path, flask.request.stream, "wb" if chunk_index == 0 else "ab")
     if chunk_index < total_chunks - 1:
         return _upload_response("Chunk received", 200)
 
-    os.replace(part_path, file_path)
+    part_path.replace(file_path)
     return _finalize_upload(filename)
 
 
@@ -127,16 +135,14 @@ def allowed_objects(
     params: schemas.AllowedObjects,
 ) -> schemas.AllowedObjectsResponse:
     file_absolute_path = geode_functions.upload_file_path(params.filename)
-    file_extension = utils_functions.extension_from_filename(
-        os.path.basename(file_absolute_path)
-    )
+    file_extension = utils_functions.extension_from_filename(Path(file_absolute_path).name)
     allowed_objects: dict[str, schemas.allowed_objects.AllowedObject] = {}
-    for geode_object_type, geode_object in geode_objects.items():
+    for object_type, geode_object in geode_objects.items():
         if file_extension not in geode_object.input_extensions():
             continue
         loadability_score = geode_object.is_loadable(file_absolute_path)
         priority_score = geode_object.object_priority(file_absolute_path)
-        allowed_objects[geode_object_type] = schemas.allowed_objects.AllowedObject(
+        allowed_objects[object_type] = schemas.allowed_objects.AllowedObject(
             is_loadable=loadability_score.value(),
             object_priority=priority_score,
         )
@@ -155,14 +161,10 @@ def missing_files(params: schemas.MissingFiles) -> schemas.MissingFilesResponse:
         for file in additional_files.mandatory_files + additional_files.optional_files
     )
     mandatory_files = [
-        os.path.basename(file.filename)
-        for file in additional_files.mandatory_files
-        if file.is_missing
+        Path(file.filename).name for file in additional_files.mandatory_files if file.is_missing
     ]
     additional_files_array = [
-        os.path.basename(file.filename)
-        for file in additional_files.optional_files
-        if file.is_missing
+        Path(file.filename).name for file in additional_files.optional_files if file.is_missing
     ]
 
     return schemas.MissingFilesResponse(
@@ -179,7 +181,7 @@ def crs_converter_geographic_coordinate_systems(
     geode_object = geode_functions.geode_object_from_string(params.geode_object_type)
     infos = (
         og_geosciences.GeographicCoordinateSystem3D.geographic_coordinate_systems()
-        if geode_object.is_3D()
+        if geode_object.is_3d()
         else og_geosciences.GeographicCoordinateSystem2D.geographic_coordinate_systems()
     )
     crs_list = [
@@ -207,11 +209,11 @@ def geode_objects_and_output_extensions(
     params: schemas.GeodeObjectsAndOutputExtensions,
 ) -> schemas.GeodeObjectsAndOutputExtensionsResponse:
     file_path = geode_functions.upload_file_path(params.filename)
-    geode_object = geode_functions.geode_object_from_string(
-        params.geode_object_type
-    ).load(file_path)
-    geode_objects_and_output_extensions = (
-        geode_functions.geode_object_output_extensions(geode_object)
+    geode_object = geode_functions.geode_object_from_string(params.geode_object_type).load(
+        file_path
+    )
+    geode_objects_and_output_extensions = geode_functions.geode_object_output_extensions(
+        geode_object
     )
     return schemas.GeodeObjectsAndOutputExtensionsResponse(
         geode_objects_and_output_extensions={
@@ -263,9 +265,7 @@ def extract_valid_attribute_values(
     nb_items = attribute.nb_items()
     default_values = getattr(attribute, "default_values", None)
     no_value = default_values().no_value if default_values else None
-    if no_value is None and (
-        "Point" in attribute.type() or "Vector" in attribute.type()
-    ):
+    if no_value is None and ("Point" in attribute.type() or "Vector" in attribute.type()):
         no_value = [0.0] * nb_items
 
     value_getter = getattr(
@@ -280,11 +280,7 @@ def extract_valid_attribute_values(
     has_nan = False
     for element_index in range(attribute_manager.nb_elements()):
         value = attribute.generic_item_value(element_index, item_index)
-        if (
-            value is None
-            or math.isnan(value)
-            or (no_value is not None and value_getter(element_index) == no_value)
-        ):
+        if math.isnan(value) or (no_value is not None and value_getter(element_index) == no_value):
             has_nan = True
         else:
             valid_values.append(value)
@@ -297,8 +293,8 @@ def attributes_metadata(
     attribute_managers = manager if isinstance(manager, list) else [manager]
     attributes: list[dict[str, str | int | float | bool | list[float]]] = []
     first_manager = attribute_managers[0]
-    for id in first_manager.attribute_ids():
-        attribute = first_manager.find_generic_attribute(id)
+    for attribute_id in first_manager.attribute_ids():
+        attribute = first_manager.find_generic_attribute(attribute_id)
         if attribute is None:
             continue
         attribute_name = attribute.name()
@@ -326,7 +322,7 @@ def attributes_metadata(
         attributes.append(
             {
                 "attribute_name": attribute_name,
-                "attribute_id": id.string(),
+                "attribute_id": attribute_id.string(),
                 "nb_items": nb_items,
                 "min_value": min(min_values),
                 "max_value": max(max_values),
@@ -484,14 +480,14 @@ def model_component_polyhedron_attribute_names(
 
 
 @typed_route(routes, schemas.ping_route)
-def ping(params: schemas.Ping) -> schemas.PingResponse:
+def ping(_params: schemas.Ping) -> schemas.PingResponse:
     flask.current_app.config.update(LAST_PING_TIME=time.time())
     return schemas.PingResponse(message="Flask server is running")
 
 
 @typed_route(routes, schemas.kill_route)
-def kill(params: schemas.Kill) -> schemas.KillResponse:
-    print("Manual server kill, shutting down...", flush=True)
+def kill(_params: schemas.Kill) -> schemas.KillResponse:
+    logger.info("Manual server kill, shutting down...")
     utils_functions.teardown_request(flask.current_app)
     Timer(0.5, os._exit, [0]).start()
     return schemas.KillResponse(message="Flask server is dead")
@@ -502,135 +498,137 @@ def export_project() -> flask.Response:
     params = parse_params(schemas.export_project_route)
 
     project_folder: str = flask.current_app.config["DATA_FOLDER_PATH"]
-    os.makedirs(project_folder, exist_ok=True)
+    Path(project_folder).mkdir(parents=True, exist_ok=True)
 
-    filename: str = werkzeug.utils.secure_filename(os.path.basename(params.filename))
+    filename: str = werkzeug.utils.secure_filename(Path(params.filename).name)
     if not filename.lower().endswith(".vease"):
         flask.abort(400, "Requested filename must end with .vease")
-    export_vease_path = os.path.join(project_folder, filename)
+    export_vease_path = Path(project_folder) / filename
 
     with get_session() as session:
         rows = session.query(Data.id, Data.native_file).all()
 
-    with zipfile.ZipFile(
-        export_vease_path, "w", compression=zipfile.ZIP_DEFLATED
-    ) as zip_file:
-        database_root_path = os.path.join(project_folder, "project.db")
-        if os.path.isfile(database_root_path):
+    with zipfile.ZipFile(export_vease_path, "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
+        database_root_path = Path(project_folder) / "project.db"
+        if database_root_path.is_file():
             zip_file.write(database_root_path, "project.db")
 
-        for data_id, native_file in rows:
-            base_dir = os.path.join(project_folder, data_id)
-            if os.path.isdir(base_dir):
-                for root, directories, files in os.walk(base_dir):
-                    for file_name in files:
-                        file_path = os.path.join(root, file_name)
-                        relative_path = os.path.relpath(file_path, base_dir)
-                        zip_file.write(file_path, os.path.join(data_id, relative_path))
+        for data_id, _native_file in rows:
+            base_dir = Path(project_folder) / data_id
+            if base_dir.is_dir():
+                for file_path in base_dir.rglob("*"):
+                    if file_path.is_file():
+                        relative_path = file_path.relative_to(base_dir)
+                        zip_file.write(file_path, Path(data_id) / relative_path)
 
         zip_file.writestr("snapshot.json", flask.json.dumps(params.snapshot))
 
-    return utils_functions.send_file(project_folder, [export_vease_path], filename)
+    return utils_functions.send_file(project_folder, [str(export_vease_path)], filename)
 
 
-@typed_route(routes, schemas.import_project_route)
-def import_project(params: schemas.ImportProject) -> schemas.ImportProjectResponse:
+def _uploaded_vease_file() -> FileStorage:
     if "file" not in flask.request.files:
         flask.abort(400, "No .vease file provided under 'file'")
     zip_file = flask.request.files["file"]
-    assert zip_file.filename is not None
-    filename = werkzeug.utils.secure_filename(os.path.basename(zip_file.filename))
+    if zip_file.filename is None:
+        flask.abort(400, "Filename is required")
+    filename = werkzeug.utils.secure_filename(Path(zip_file.filename).name)
     if not filename.lower().endswith(".vease"):
         flask.abort(400, "Uploaded file must be a .vease")
+    return zip_file
 
-    data_folder_path: str = flask.current_app.config["DATA_FOLDER_PATH"]
 
+def _reset_data_folder(data_folder_path: Path) -> None:
     # 423 Locked bypass : remove stopped requests
-    if connection.scoped_session_registry:
-        connection.scoped_session_registry.remove()
-    if connection.engine:
-        connection.engine.dispose()
-    connection.engine = connection.session_factory = (
-        connection.scoped_session_registry
-    ) = None
+    connection.close_database()
 
     try:
-        if os.path.exists(data_folder_path):
-            for item in os.scandir(data_folder_path):
-                if item.is_dir(follow_symlinks=False):
-                    shutil.rmtree(item.path)
+        if data_folder_path.exists():
+            for item in data_folder_path.iterdir():
+                if item.is_dir() and not item.is_symlink():
+                    shutil.rmtree(item)
                 else:
-                    os.remove(item.path)
+                    item.unlink()
         else:
-            os.makedirs(data_folder_path, exist_ok=True)
+            data_folder_path.mkdir(parents=True, exist_ok=True)
     except PermissionError:
         flask.abort(423, "Project files are locked; cannot overwrite")
 
+
+def _extract_vease(zip_archive: zipfile.ZipFile, project_folder: Path) -> None:
+    for member in zip_archive.namelist():
+        target = (project_folder / member).resolve()
+        if not target.is_relative_to(project_folder):
+            flask.abort(400, "Vease file contains unsafe paths")
+    zip_archive.extractall(project_folder)
+
+
+def _open_project_database(project_folder: Path) -> list[Data]:
+    database_root_path = project_folder / "project.db"
+    if not database_root_path.is_file():
+        flask.abort(400, "Missing project.db at project root")
+
+    connection.init_database(database_root_path, create_tables=False)
+
+    try:
+        with get_session() as session:
+            return session.query(Data).all()
+    except OperationalError:
+        connection.init_database(database_root_path, create_tables=True)
+        with get_session() as session:
+            return session.query(Data).all()
+
+
+def _regenerate_missing_viewables(rows: list[Data]) -> None:
+    with get_session() as session:
+        for data in rows:
+            data_path = geode_functions.data_file_path(data.id)
+            viewable_name = data.viewable_file
+            if viewable_name:
+                vpath = Path(geode_functions.data_file_path(data.id, viewable_name))
+                viewable_dir = Path(data_path) / "viewable"
+                has_components = viewable_dir.is_dir() and any(viewable_dir.iterdir())
+                if vpath.is_file() and (data.viewer_object != "model" or has_components):
+                    continue
+
+            native_file = str(data.native_file or "")
+            if not native_file:
+                continue
+
+            native_full = geode_functions.data_file_path(data.id, native_file)
+            if not Path(native_full).is_file():
+                continue
+
+            geode_object = geode_functions.geode_object_from_string(data.geode_object).load(
+                native_full
+            )
+            utils_functions.save_all_viewables_and_return_info(geode_object, data, data_path)
+        session.commit()
+
+
+def _read_snapshot(zip_archive: zipfile.ZipFile) -> dict[str, object]:
+    try:
+        raw = zip_archive.read("snapshot.json").decode("utf-8")
+    except KeyError:
+        return {}
+    snapshot: dict[str, object] = flask.json.loads(raw)
+    return snapshot
+
+
+@raw_route(routes, schemas.import_project_route)
+def import_project() -> flask.Response:
+    zip_file = _uploaded_vease_file()
+    data_folder_path = Path(flask.current_app.config["DATA_FOLDER_PATH"])
+    _reset_data_folder(data_folder_path)
+
     zip_file.stream.seek(0)
     with zipfile.ZipFile(zip_file.stream) as zip_archive:
-        project_folder = os.path.abspath(data_folder_path)
-        for member in zip_archive.namelist():
-            target = os.path.abspath(
-                os.path.normpath(os.path.join(project_folder, member))
-            )
-            if not (
-                target == project_folder or target.startswith(project_folder + os.sep)
-            ):
-                flask.abort(400, "Vease file contains unsafe paths")
-        zip_archive.extractall(project_folder)
-
-        database_root_path = os.path.join(project_folder, "project.db")
-        if not os.path.isfile(database_root_path):
-            flask.abort(400, "Missing project.db at project root")
-
-        connection.init_database(database_root_path, create_tables=False)
-
-        try:
-            with get_session() as session:
-                rows = session.query(Data).all()
-        except Exception:
-            connection.init_database(database_root_path, create_tables=True)
-            with get_session() as session:
-                rows = session.query(Data).all()
-
-        with get_session() as session:
-            for data in rows:
-                data_path = geode_functions.data_file_path(data.id)
-                viewable_name = data.viewable_file
-                if viewable_name:
-                    vpath = geode_functions.data_file_path(data.id, viewable_name)
-                    viewable_dir = os.path.join(data_path, "viewable")
-                    has_components = os.path.isdir(viewable_dir) and bool(
-                        os.listdir(viewable_dir)
-                    )
-                    if os.path.isfile(vpath) and (
-                        data.viewer_object != "model" or has_components
-                    ):
-                        continue
-
-                native_file = str(data.native_file or "")
-                if not native_file:
-                    continue
-
-                native_full = geode_functions.data_file_path(data.id, native_file)
-                if not os.path.isfile(native_full):
-                    continue
-
-                geode_object = geode_functions.geode_object_from_string(
-                    data.geode_object
-                ).load(native_full)
-                utils_functions.save_all_viewables_and_return_info(
-                    geode_object, data, data_path
-                )
-            session.commit()
-
-        snapshot = {}
-        try:
-            raw = zip_archive.read("snapshot.json").decode("utf-8")
-            snapshot = flask.json.loads(raw)
-        except KeyError:
-            snapshot = {}
-    return schemas.ImportProjectResponse(snapshot=snapshot)
+        project_folder = data_folder_path.resolve()
+        _extract_vease(zip_archive, project_folder)
+        rows = _open_project_database(project_folder)
+        _regenerate_missing_viewables(rows)
+        snapshot = _read_snapshot(zip_archive)
+    return flask.make_response(schemas.ImportProjectResponse(snapshot=snapshot).to_dict(), 200)
 
 
 @typed_route(routes, schemas.geode_object_inheritance_route)

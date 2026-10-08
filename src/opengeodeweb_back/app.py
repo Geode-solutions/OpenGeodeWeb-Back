@@ -1,75 +1,82 @@
 """Packages"""
 
+from __future__ import annotations
+
 import argparse
-import os
-from threading import Timer
-from typing import Any
+import json
+import logging
+import queue
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
+
 import flask
-import flask_cors  # type: ignore
+import flask_cors  # type: ignore[import-untyped]
 from flask import Flask, Response
 from flask_cors import cross_origin
+from opengeodeweb_microservice.database import connection
 from werkzeug.exceptions import HTTPException
-from opengeodeweb_back import utils_functions, app_config
+
+from opengeodeweb_back import app_config, utils_functions
 from opengeodeweb_back.routes import blueprint_routes
 from opengeodeweb_back.routes.create import blueprint_create
-from opengeodeweb_microservice.database import connection
 
-import queue
-import threading
-import json
-from typing import Any, Dict, Generator, Tuple
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
+logger = logging.getLogger(__name__)
 
 
-def create_app(name: str) -> flask.Flask:
-    app = flask.Flask(name)
-
+def _register_request_hooks(app: flask.Flask) -> None:
     @app.before_request
     def before_request() -> flask.Response | None:
         if flask.request.method == "OPTIONS":
             response = flask.make_response()
-            response.headers["Access-Control-Allow-Methods"] = (
-                "GET,POST,PUT,DELETE,OPTIONS"
-            )
+            response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
             return response
         utils_functions.before_request(flask.current_app)
         return None
 
+    @app.teardown_request
+    def teardown_request(exception: BaseException | None) -> None:
+        utils_functions.teardown_request(flask.current_app, exception)
+
+
+def _register_event_stream(app: flask.Flask) -> None:
     def wants_event_stream() -> bool:
         accept = flask.request.headers.get("Accept", "")
         return "text/event-stream" in accept
 
     _event_queue: queue.Queue[tuple[str, dict[str, Any]]] = queue.Queue()
-    _lock = threading.Lock()
 
     def publish_event(event: str, data: dict[str, Any]) -> None:
         _event_queue.put((event, data))
 
-    def stream_events() -> Generator[str, None, None]:
+    def stream_events() -> Generator[str]:
         while True:
             event, data = _event_queue.get()
             yield f"event: {event}\ndata: {json.dumps(data)}\n\n"
 
     @app.after_request
     def after_request(response: flask.Response) -> flask.Response:
-        endpoint = (
-            flask.request.endpoint.replace(".", "/") if flask.request.endpoint else None
-        )
-        if endpoint == "events" or endpoint == None:
+        endpoint = flask.request.endpoint.replace(".", "/") if flask.request.endpoint else None
+        if endpoint in {"events", None}:
             return response
 
         if wants_event_stream():
             payload: dict[str, Any]
             try:
                 payload = response.get_json()
-            except Exception:
+            except ValueError:
                 payload = {"status": response.status_code}
             publish_event(endpoint, payload)
         return response
 
-    @app.teardown_request
-    def teardown_request(exception: BaseException | None) -> None:
-        utils_functions.teardown_request(flask.current_app, exception)
+    @app.route("/events")
+    def events() -> flask.Response:
+        return flask.Response(stream_events(), mimetype="text/event-stream")
 
+
+def _register_error_handlers(app: flask.Flask) -> None:
     @app.errorhandler(HTTPException)
     def errorhandler(exception: HTTPException) -> tuple[dict[str, Any], int] | Response:
         return utils_functions.handle_exception(exception)
@@ -78,16 +85,14 @@ def create_app(name: str) -> flask.Flask:
     def handle_generic_exception(exception: Exception) -> Response:
         return utils_functions.handle_unexpected_exception(exception)
 
-    @app.route("/events")
-    def events() -> flask.Response:
-        return flask.Response(stream_events(), mimetype="text/event-stream")
 
+def _register_base_routes(app: flask.Flask) -> None:
     @app.route(
         "/error",
         methods=["POST"],
     )
     def return_error() -> Response:
-        flask.abort(500, f"Test")
+        flask.abort(500, "Test")
         return flask.make_response({}, 500)
 
     @app.route(
@@ -104,6 +109,13 @@ def create_app(name: str) -> flask.Flask:
     def root() -> Response:
         return flask.make_response({}, 200)
 
+
+def create_app(name: str) -> flask.Flask:
+    app = flask.Flask(name)
+    _register_request_hooks(app)
+    _register_event_stream(app)
+    _register_error_handlers(app)
+    _register_base_routes(app)
     return app
 
 
@@ -127,8 +139,9 @@ def run_server(app: Flask) -> None:
     pre_args, _ = pre_parser.parse_known_args()
 
     if pre_args.project_folder_path is None:
-        raise ValueError("project_folder_path must be provided")
-    project_folder_path = os.path.abspath(pre_args.project_folder_path)
+        msg = "project_folder_path must be provided"
+        raise ValueError(msg)
+    project_folder_path = str(Path(pre_args.project_folder_path).resolve())
 
     if pre_args.debug:
         app.config.from_object(app_config.DevConfig(project_folder_path))
@@ -138,9 +151,7 @@ def run_server(app: Flask) -> None:
     parser = argparse.ArgumentParser(
         prog="OpenGeodeWeb-Back", description="Backend server for OpenGeodeWeb"
     )
-    parser.add_argument(
-        "--host", default=app.config.get("HOST"), type=str, help="Host to run on"
-    )
+    parser.add_argument("--host", default=app.config.get("HOST"), type=str, help="Host to run on")
     parser.add_argument(
         "-p",
         "--port",
@@ -192,9 +203,13 @@ def run_server(app: Flask) -> None:
     )
     args = parser.parse_args()
 
-    args.project_folder_path = os.path.abspath(args.project_folder_path)
+    args.project_folder_path = str(Path(args.project_folder_path).resolve())
 
-    print(f"{args=}", flush=True)
+    logging.basicConfig(
+        level=logging.DEBUG if args.debug else logging.INFO,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
+    logger.info("Arguments: %s", args)
 
     app.config.update(
         HOST=args.host,
@@ -209,16 +224,15 @@ def run_server(app: Flask) -> None:
 
     db_filename = app.config.get("DATABASE_FILENAME")
     if not isinstance(db_filename, str):
-        raise TypeError(
-            f"DATABASE_FILENAME config must be a string, got {db_filename!r}"
-        )
-    db_path = os.path.join(str(app.config.get("DATA_FOLDER_PATH")), db_filename)
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        msg = f"DATABASE_FILENAME config must be a string, got {db_filename!r}"
+        raise TypeError(msg)
+    db_path = Path(str(app.config.get("DATA_FOLDER_PATH"))) / db_filename
+    db_path.parent.mkdir(parents=True, exist_ok=True)
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     connection.init_database(db_path)
-    print(f"Database initialized at: {db_path}", flush=True)
+    logger.info("Database initialized at: %s", db_path)
 
     flask_cors.CORS(app, origins=args.allowed_origins)
     app.run(
@@ -233,7 +247,7 @@ def run_opengeodeweb_back() -> None:
     app = create_app(__name__)
     register_ogw_back_blueprints(app)
     run_server(app)
-    print("Server stopped", flush=True)
+    logger.info("Server stopped")
 
 
 # ''' Main '''

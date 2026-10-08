@@ -1,3 +1,4 @@
+from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from typing import Dict
 from dataclasses_json import DataClassJsonMixin
@@ -31,7 +32,7 @@ class AllowedObjectsResponse(DataClassJsonMixin):
 
 
 allowed_objects_route = Route(
-    schema=load_schema(__file__),
+    schema=load_schema(Path(__file__)),
     params=AllowedObjects,
     response=AllowedObjectsResponse,
 )

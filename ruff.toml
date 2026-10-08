@@ -1,0 +1,24 @@
+# https://docs.astral.sh/ruff/configuration/
+
+target-version = "py312"
+line-length = 100
+indent-width = 4
+extend-exclude = ["**/schemas/**"] # generated schemas
+
+[lint]
+select = ["ALL"]
+ignore = [
+  "CPY001", # ignore copyright notice
+  "D", # ignore undocumented
+  "COM812", # missing-trailing-comma
+]
+
+[lint.per-file-ignores]
+"tests/**" = [
+  "S101", # assert is how pytest works
+  "PLR2004", # expected values in asserts are not magic numbers
+]
+
+[format]
+quote-style = "double"
+indent-style = "space"

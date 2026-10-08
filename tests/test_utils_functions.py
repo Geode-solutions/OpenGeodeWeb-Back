@@ -1,59 +1,69 @@
+from __future__ import annotations
+
 # Standard library imports
 import base64
 import re
-import os
-
-# Third party imports
-import flask
-from flask.ctx import AppContext
-from flask.testing import FlaskClient
 import shutil
 import uuid
 import zipfile
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+# Third party imports
+import flask
+import pytest
+from opengeodeweb_microservice.database.data import Data
 
 # Local application imports
-from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_back import geode_functions, utils_functions
 from opengeodeweb_back.geode_objects.geode_brep import GeodeBRep
 from opengeodeweb_back.geode_objects.geode_polygonal_surface3d import (
     GeodePolygonalSurface3D,
 )
+from opengeodeweb_back.geode_objects.geode_raster_image2d import GeodeRasterImage2D
 
-base_dir = os.path.abspath(os.path.dirname(__file__))
-data_dir = os.path.join(base_dir, "data")
+if TYPE_CHECKING:
+    from flask.testing import FlaskClient
+
+base_dir = Path(__file__).resolve().parent
+data_dir = base_dir / "data"
 
 
-def test_increment_request_counter(app_context: AppContext) -> None:
+@pytest.mark.usefixtures("app_context")
+def test_increment_request_counter() -> None:
     assert flask.current_app.config.get("REQUEST_COUNTER") == 0
     utils_functions.increment_request_counter(flask.current_app)
     assert flask.current_app.config.get("REQUEST_COUNTER") == 1
 
 
-def test_decrement_request_counter(app_context: AppContext) -> None:
+@pytest.mark.usefixtures("app_context")
+def test_decrement_request_counter() -> None:
     assert flask.current_app.config.get("REQUEST_COUNTER") == 1
     utils_functions.decrement_request_counter(flask.current_app)
     assert flask.current_app.config.get("REQUEST_COUNTER") == 0
 
 
-def test_update_last_request_time(app_context: AppContext) -> None:
-    LAST_REQUEST_TIME = flask.current_app.config.get("LAST_REQUEST_TIME")
+@pytest.mark.usefixtures("app_context")
+def test_update_last_request_time() -> None:
+    last_request_time = flask.current_app.config.get("LAST_REQUEST_TIME")
     utils_functions.update_last_request_time(flask.current_app)
-    assert flask.current_app.config.get("LAST_REQUEST_TIME", 0) >= LAST_REQUEST_TIME
+    assert flask.current_app.config.get("LAST_REQUEST_TIME", 0) >= last_request_time
 
 
-def test_before_request(app_context: AppContext) -> None:
+@pytest.mark.usefixtures("app_context")
+def test_before_request() -> None:
     assert flask.current_app.config.get("REQUEST_COUNTER") == 0
     utils_functions.before_request(flask.current_app)
     assert flask.current_app.config.get("REQUEST_COUNTER") == 1
 
 
-def test_teardown_request(app_context: AppContext) -> None:
-    LAST_REQUEST_TIME = flask.current_app.config.get("LAST_REQUEST_TIME")
+@pytest.mark.usefixtures("app_context")
+def test_teardown_request() -> None:
+    last_request_time = flask.current_app.config.get("LAST_REQUEST_TIME")
     assert flask.current_app.config.get("REQUEST_COUNTER") == 1
     utils_functions.teardown_request(flask.current_app)
     assert flask.current_app.config.get("REQUEST_COUNTER") == 0
-    assert flask.current_app.config.get("LAST_REQUEST_TIME", 0) >= LAST_REQUEST_TIME
+    assert flask.current_app.config.get("LAST_REQUEST_TIME", 0) >= last_request_time
 
 
 def test_versions() -> None:
@@ -92,25 +102,23 @@ def test_create_data_folder_from_id(client: FlaskClient) -> None:
         test_id = str(uuid.uuid4()).replace("-", "")
         data_path = utils_functions.create_data_folder_from_id(test_id)
         assert isinstance(data_path, str)
-        assert os.path.exists(data_path)
-        assert data_path.startswith(flask.current_app.config["DATA_FOLDER_PATH"])
+        assert Path(data_path).exists()
+        assert Path(data_path).is_relative_to(flask.current_app.config["DATA_FOLDER_PATH"])
         assert test_id in data_path
         shutil.rmtree(data_path, ignore_errors=True)
-        assert not os.path.exists(data_path)
+        assert not Path(data_path).exists()
 
 
 def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
     app = client.application
     with app.app_context():
-        expected_db_path = os.path.abspath(
-            os.path.join(app.config["DATA_FOLDER_PATH"], "project.db")
-        )
+        expected_db_path = (Path(app.config["DATA_FOLDER_PATH"]) / "project.db").resolve()
         expected_uri = f"sqlite:///{expected_db_path}"
 
         assert app.config["SQLALCHEMY_DATABASE_URI"] == expected_uri
-        assert os.path.exists(expected_db_path)
+        assert expected_db_path.exists()
 
-        geode_object = GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
+        geode_object = GeodeBRep.load(str(data_dir / "test.og_brep"))
 
         data_entry = Data.create(
             geode_id=geode_object.identifier.id().string(),
@@ -145,14 +153,14 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
         assert db_entry.viewable_file == result["viewable_file"]
         assert db_entry.geode_object == geode_object.geode_object_type()
 
-        expected_data_path = os.path.join(app.config["DATA_FOLDER_PATH"], result["id"])
-        assert os.path.exists(expected_data_path)
+        expected_data_path = Path(app.config["DATA_FOLDER_PATH"]) / result["id"]
+        assert expected_data_path.exists()
 
 
 def test_save_all_viewables_commits_to_db(client: FlaskClient) -> None:
     app = client.application
     with app.app_context():
-        geode_object = GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
+        geode_object = GeodeBRep.load(str(data_dir / "test.og_brep"))
         data_entry = Data.create(
             geode_id=geode_object.identifier.id().string(),
             geode_object=geode_object.geode_object_type(),
@@ -176,7 +184,7 @@ def test_generate_files_from_object(
 ) -> None:
     app = client.application
     with app.app_context():
-        geode_object = GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
+        geode_object = GeodeBRep.load(str(data_dir / "test.og_brep"))
 
         result = utils_functions.generate_files_from_object(geode_object)
 
@@ -189,9 +197,7 @@ def test_generate_files_from_object(
         assert re.match(r"[0-9a-f]{32}", result["id"])
         assert isinstance(result["viewer_type"], str)
         assert isinstance(result["binary_light_viewable"], str)
-        light_viewable_bytes = base64.b64decode(
-            result["binary_light_viewable"], validate=True
-        )
+        light_viewable_bytes = base64.b64decode(result["binary_light_viewable"], validate=True)
         assert light_viewable_bytes.startswith(b'<?xml version="1.0"?>')
         assert b'<AppendedData encoding="raw">' in light_viewable_bytes
 
@@ -200,12 +206,11 @@ def test_generate_files_from_object(
         assert data.light_viewable_file is not None
         assert data.light_viewable_file.endswith(".vtp")
 
-        data_path = os.path.join(app.config["DATA_FOLDER_PATH"], result["id"])
-        assert os.path.exists(os.path.join(data_path, result["native_file"]))
-        assert os.path.exists(os.path.join(data_path, result["viewable_file"]))
-        assert os.path.exists(os.path.join(data_path, data.light_viewable_file))
-        with open(os.path.join(data_path, data.light_viewable_file), "rb") as f:
-            assert f.read() == light_viewable_bytes
+        data_path = Path(app.config["DATA_FOLDER_PATH"]) / result["id"]
+        assert (data_path / result["native_file"]).exists()
+        assert (data_path / result["viewable_file"]).exists()
+        assert (data_path / data.light_viewable_file).exists()
+        assert (data_path / data.light_viewable_file).read_bytes() == light_viewable_bytes
 
 
 def test_generate_files_from_file(
@@ -240,17 +245,26 @@ def test_generate_files_from_file_with_multi_dots(
     assert result["name"] == "cube.test"
 
 
+def test_generate_files_from_raster_image(
+    client: FlaskClient,
+) -> None:
+    # Raster images have no dedicated builder: naming them must still work
+    app = client.application
+    with app.app_context():
+        result = utils_functions.generate_files_from_file(
+            GeodeRasterImage2D.geode_object_type(), "test.jpg"
+        )
+    assert result["name"] == "test"
+    assert result["native_file"] == "native.og_img2d"
+
+
 def test_generate_files_from_file_returns_geode_id(client: FlaskClient) -> None:
     app = client.application
     with app.app_context():
         result = utils_functions.generate_files_from_file(
             GeodeBRep.geode_object_type(), "test.og_brep"
         )
-        expected_geode_id = (
-            GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
-            .identifier.id()
-            .string()
-        )
+        expected_geode_id = GeodeBRep.load(str(data_dir / "test.og_brep")).identifier.id().string()
         assert result["geode_id"] == expected_geode_id
         assert len(result["geode_id"]) == 36
         assert len(result["id"]) == 32
@@ -293,7 +307,7 @@ def test_generate_files_from_non_native_file_twice_shares_geode_id(
 def test_generate_files_from_object_returns_geode_id(client: FlaskClient) -> None:
     app = client.application
     with app.app_context():
-        geode_object = GeodeBRep.load(os.path.join(data_dir, "test.og_brep"))
+        geode_object = GeodeBRep.load(str(data_dir / "test.og_brep"))
         result = utils_functions.generate_files_from_object(geode_object)
     assert result["geode_id"] == geode_object.identifier.id().string()
 
@@ -315,7 +329,7 @@ def test_send_file_multiple_returns_zip(client: FlaskClient, tmp_path: Path) -> 
             assert response.mimetype == "application/zip"
             new_file_name = response.headers.get("new-file-name")
             assert new_file_name == "bundle.zip"
-            zip_path = os.path.join(app.config["UPLOAD_FOLDER_PATH"], new_file_name)
+            zip_path = Path(app.config["UPLOAD_FOLDER_PATH"]) / new_file_name
             with zipfile.ZipFile(zip_path, "r") as zip_file:
                 zip_entries = zip_file.namelist()
                 assert "tmp_send_file_1.txt" in zip_entries
@@ -323,9 +337,7 @@ def test_send_file_multiple_returns_zip(client: FlaskClient, tmp_path: Path) -> 
             response.close()
 
 
-def test_send_file_single_returns_octet_binary(
-    client: FlaskClient, tmp_path: Path
-) -> None:
+def test_send_file_single_returns_octet_binary(client: FlaskClient, tmp_path: Path) -> None:
     app = client.application
     with app.app_context():
         app.config["UPLOAD_FOLDER_PATH"] = str(tmp_path)
@@ -341,8 +353,6 @@ def test_send_file_single_returns_octet_binary(
             assert response.mimetype == "application/octet-binary"
             new_file_name = response.headers.get("new-file-name")
             assert new_file_name == "tmp_send_file_1.txt"
-            zip_path = os.path.join(app.config["UPLOAD_FOLDER_PATH"], new_file_name)
-            with open(zip_path, "rb") as f:
-                file_bytes = f.read()
-            assert file_bytes == b"hello 1"
+            sent_path = Path(app.config["UPLOAD_FOLDER_PATH"]) / new_file_name
+            assert sent_path.read_bytes() == b"hello 1"
             response.close()
