@@ -1,17 +1,22 @@
 # Standard library imports
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, override
+
+import geode_viewables as viewables
+
 # Third party imports
 import opengeode as og
 import opengeode_inspector as og_inspector
-import geode_viewables as viewables
-from opengeodeweb_microservice.database.data_types import (
-    GeodeMeshType,
-    ViewerElementsType,
-)
 
 # Local application imports
 from .geode_mesh import GeodeMesh
+
+if TYPE_CHECKING:
+    from opengeodeweb_microservice.database.data_types import (
+        GeodeMeshType,
+        ViewerElementsType,
+    )
 
 
 class GeodeRasterImage3D(GeodeMesh):
@@ -21,74 +26,90 @@ class GeodeRasterImage3D(GeodeMesh):
         self.raster_image = raster_image
         super().__init__(self.raster_image)
 
+    @override
     @classmethod
     def geode_object_type(cls) -> GeodeMeshType:
         return "RasterImage3D"
 
+    @override
     @classmethod
     def viewer_elements_type(cls) -> ViewerElementsType:
         return "polyhedra"
 
+    @override
     def native_extension(self) -> str:
         return self.raster_image.native_extension()
 
+    @override
     @classmethod
-    def is_3D(cls) -> bool:
+    def is_3d(cls) -> bool:
         return True
 
+    @override
     @classmethod
     def is_viewable(cls) -> bool:
         return True
 
-    def builder(self) -> None:
-        return None
+    @override
+    def builder(self) -> og.IdentifierBuilder:
+        return og.IdentifierBuilder(self.raster_image)
 
+    @override
     @classmethod
     def load(cls, filename: str) -> GeodeRasterImage3D:
         return GeodeRasterImage3D(og.load_raster_image3D(filename))
 
+    @override
     @classmethod
     def additional_files(cls, filename: str) -> og.AdditionalFiles:
         return og.raster_image_additional_files3D(filename)
 
+    @override
     @classmethod
     def is_loadable(cls, filename: str) -> og.Percentage:
         return og.is_raster_image_loadable3D(filename)
 
+    @override
     @classmethod
     def input_extensions(cls) -> list[str]:
         return og.RasterImageInputFactory3D.list_creators()
 
+    @override
     @classmethod
     def output_extensions(cls) -> list[str]:
         return og.RasterImageOutputFactory3D.list_creators()
 
+    @override
     @classmethod
     def object_priority(cls, filename: str) -> int:
         return og.raster_image_object_priority3D(filename)
 
+    @override
     def is_saveable(self, filename: str) -> bool:
         return og.is_raster_image_saveable3D(self.raster_image, filename)
 
+    @override
     def save(self, filename: str) -> list[str]:
         return og.save_raster_image3D(self.raster_image, filename)
 
+    @override
     def save_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_viewable_raster_image3D(
-            self.raster_image, filename_without_extension
-        )
+        return viewables.save_viewable_raster_image3D(self.raster_image, filename_without_extension)
 
+    @override
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_raster_image3D(
             self.raster_image, filename_without_extension
         )
 
+    @override
     def inspect(self) -> None:
         return None
 
+    @override
     def validate(self) -> og_inspector.ObjectValidity:
-        result = og_inspector.ObjectValidity()
-        return result
+        return og_inspector.ObjectValidity()
 
+    @override
     def vertex_attribute_manager(self) -> og.AttributeManager:
         return og.AttributeManager()

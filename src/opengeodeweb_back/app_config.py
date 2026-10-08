@@ -1,15 +1,17 @@
 # Standard library imports
-import os
 import time
+from pathlib import Path
 
 # Third party imports
+from flask.helpers import get_debug_flag
+
 # Local application imports
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
+base_dir = Path(__file__).resolve().parent
 
 
-class Config(object):
-    FLASK_DEBUG = os.environ.get("FLASK_DEBUG", default=False)
+class Config:
+    FLASK_DEBUG = get_debug_flag()
     HOST = "localhost"
     PORT = "5000"
     CORS_HEADERS = "Content-Type"
@@ -18,11 +20,11 @@ class Config(object):
     LAST_PING_TIME = time.time()
     DATABASE_FILENAME = "project.db"
 
-    def __init__(self, project_folder_path: str):
+    def __init__(self, project_folder_path: str) -> None:
         self.PROJECT_FOLDER_PATH = project_folder_path
-        self.DATA_FOLDER_PATH = os.path.join(project_folder_path, "data")
-        self.EXTENSIONS_FOLDER_PATH = os.path.join(project_folder_path, "extensions")
-        self.UPLOAD_FOLDER_PATH = os.path.join(project_folder_path, "uploads")
+        self.DATA_FOLDER_PATH = str(Path(project_folder_path) / "data")
+        self.EXTENSIONS_FOLDER_PATH = str(Path(project_folder_path) / "extensions")
+        self.UPLOAD_FOLDER_PATH = str(Path(project_folder_path) / "uploads")
 
 
 class ProdConfig(Config):

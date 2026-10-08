@@ -1,69 +1,83 @@
 # Standard library imports
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, override
+
+import geode_viewables as viewables
+
 # Third party imports
 import opengeode as og
-import geode_viewables as viewables
-from opengeodeweb_microservice.database.data_types import GeodeMeshType
 
 # Local application imports
 from .geode_solid_mesh3d import GeodeSolidMesh3D
+
+if TYPE_CHECKING:
+    from opengeodeweb_microservice.database.data_types import GeodeMeshType
 
 
 class GeodeHybridSolid3D(GeodeSolidMesh3D):
     hybrid_solid: og.HybridSolid3D
 
     def __init__(self, hybrid_solid: og.HybridSolid3D | None = None) -> None:
-        self.hybrid_solid = (
-            hybrid_solid if hybrid_solid is not None else og.HybridSolid3D.create()
-        )
+        self.hybrid_solid = hybrid_solid if hybrid_solid is not None else og.HybridSolid3D.create()
         super().__init__(self.hybrid_solid)
 
+    @override
     @classmethod
     def geode_object_type(cls) -> GeodeMeshType:
         return "HybridSolid3D"
 
+    @override
     def native_extension(self) -> str:
         return self.hybrid_solid.native_extension()
 
+    @override
     def builder(self) -> og.HybridSolidBuilder3D:
         return og.HybridSolidBuilder3D.create(self.hybrid_solid)
 
+    @override
     @classmethod
     def load(cls, filename: str) -> GeodeHybridSolid3D:
         return GeodeHybridSolid3D(og.load_hybrid_solid3D(filename))
 
+    @override
     @classmethod
     def additional_files(cls, filename: str) -> og.AdditionalFiles:
         return og.hybrid_solid_additional_files3D(filename)
 
+    @override
     @classmethod
     def is_loadable(cls, filename: str) -> og.Percentage:
         return og.is_hybrid_solid_loadable3D(filename)
 
+    @override
     @classmethod
     def input_extensions(cls) -> list[str]:
         return og.HybridSolidInputFactory3D.list_creators()
 
+    @override
     @classmethod
     def output_extensions(cls) -> list[str]:
         return og.HybridSolidOutputFactory3D.list_creators()
 
+    @override
     @classmethod
     def object_priority(cls, filename: str) -> int:
         return og.hybrid_solid_object_priority3D(filename)
 
+    @override
     def is_saveable(self, filename: str) -> bool:
         return og.is_hybrid_solid_saveable3D(self.hybrid_solid, filename)
 
+    @override
     def save(self, filename: str) -> list[str]:
         return og.save_hybrid_solid3D(self.hybrid_solid, filename)
 
+    @override
     def save_viewable(self, filename_without_extension: str) -> str:
-        return viewables.save_viewable_hybrid_solid3D(
-            self.hybrid_solid, filename_without_extension
-        )
+        return viewables.save_viewable_hybrid_solid3D(self.hybrid_solid, filename_without_extension)
 
+    @override
     def save_light_viewable(self, filename_without_extension: str) -> str:
         return viewables.save_light_viewable_hybrid_solid3D(
             self.hybrid_solid, filename_without_extension

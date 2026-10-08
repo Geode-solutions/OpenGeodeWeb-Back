@@ -1,20 +1,26 @@
+from __future__ import annotations
+
 # Standard library imports
-import time
-import shutil
 import os
+import shutil
+import time
 from pathlib import Path
-from typing import Generator
+from typing import TYPE_CHECKING
+
+import pytest
 
 # Third party imports
-from flask.ctx import AppContext
-from flask.testing import FlaskClient
-import pytest
+from opengeodeweb_microservice.database import connection
+from opengeodeweb_microservice.database.connection import init_database
 
 # Local application imports
 from opengeodeweb_back.app import create_app, register_ogw_back_blueprints
 
-from opengeodeweb_microservice.database import connection
-from opengeodeweb_microservice.database.connection import init_database
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
+    from flask.ctx import AppContext
+    from flask.testing import FlaskClient
 
 TEST_ID = "1"
 
@@ -22,7 +28,7 @@ app = create_app(__name__)
 
 
 @pytest.fixture(scope="session", autouse=True)
-def configure_test_environment() -> Generator[None, None, None]:
+def configure_test_environment() -> Generator[None]:
     base_path = Path(__file__).parent.absolute()
     test_data_path = base_path / "data"
 
@@ -35,41 +41,31 @@ def configure_test_environment() -> Generator[None, None, None]:
     app.config["DATA_FOLDER_PATH"] = "./data/"
     app.config["UPLOAD_FOLDER_PATH"] = "./tests/data/"
 
-    # The database lives in the data folder like in the app (DATA_FOLDER_PATH/project.db), so it is removed with it at session end.
-    db_path = os.path.abspath(
-        os.path.join(app.config["DATA_FOLDER_PATH"], "project.db")
-    )
+    # The database lives in the data folder like in the app (DATA_FOLDER_PATH/project.db),
+    # so it is removed with it at session end.
+    db_path = (Path(app.config["DATA_FOLDER_PATH"]) / "project.db").resolve()
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
-
-    print("Current working directory:", os.getcwd())
-    print("Directory contents:", os.listdir("."))
 
     init_database(db_path)
     os.environ["TEST_DB_PATH"] = str(db_path)
     register_ogw_back_blueprints(app)
     yield
 
-    if connection.scoped_session_registry:
-        connection.scoped_session_registry.remove()
-    if connection.engine:
-        connection.engine.dispose()
+    connection.close_database()
     tmp_data_path = app.config.get("DATA_FOLDER_PATH")
-    if tmp_data_path and os.path.exists(tmp_data_path):
+    if tmp_data_path and Path(tmp_data_path).exists():
         shutil.rmtree(tmp_data_path, ignore_errors=True)
-        print(f"Cleaned up test data folder: {tmp_data_path}", flush=True)
 
 
 @pytest.fixture
-def client() -> Generator[FlaskClient, None, None]:
+def client() -> FlaskClient:
     app.config["REQUEST_COUNTER"] = 0
     app.config["LAST_REQUEST_TIME"] = time.time()
-    client = app.test_client()
-    # client.headers = {"Content-type": "application/json", "Accept": "application/json"}
-    yield client
+    return app.test_client()
 
 
 @pytest.fixture
-def app_context() -> Generator[AppContext, None, None]:
+def app_context() -> Generator[AppContext]:
     with app.app_context() as ctx:
         yield ctx
 

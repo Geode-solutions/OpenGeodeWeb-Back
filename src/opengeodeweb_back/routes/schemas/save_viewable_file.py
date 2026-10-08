@@ -1,3 +1,4 @@
+from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from typing import List, Optional
 from dataclasses_json import DataClassJsonMixin
@@ -60,7 +61,7 @@ class SaveViewableFileResponse(DataClassJsonMixin):
 
 
 save_viewable_file_route = Route(
-    schema=load_schema(__file__),
+    schema=load_schema(Path(__file__)),
     params=SaveViewableFile,
     response=SaveViewableFileResponse,
 )
