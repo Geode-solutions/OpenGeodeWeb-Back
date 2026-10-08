@@ -20,9 +20,7 @@ class GeodePolygonalSurface3D(GeodeSurfaceMesh3D):
 
     def __init__(self, polygonal_surface: og.PolygonalSurface3D | None = None) -> None:
         self.polygonal_surface = (
-            polygonal_surface
-            if polygonal_surface is not None
-            else og.PolygonalSurface3D.create()
+            polygonal_surface if polygonal_surface is not None else og.PolygonalSurface3D.create()
         )
         super().__init__(self.polygonal_surface)
 

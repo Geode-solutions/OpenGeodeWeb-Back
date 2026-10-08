@@ -18,13 +18,9 @@ if TYPE_CHECKING:
 class GeodeHorizonStack3D(GeodeModel):
     horizon_stack: og_geosciences.HorizonsStack3D
 
-    def __init__(
-        self, horizon_stack: og_geosciences.HorizonsStack3D | None = None
-    ) -> None:
+    def __init__(self, horizon_stack: og_geosciences.HorizonsStack3D | None = None) -> None:
         self.horizon_stack = (
-            horizon_stack
-            if horizon_stack is not None
-            else og_geosciences.HorizonsStack3D()
+            horizon_stack if horizon_stack is not None else og_geosciences.HorizonsStack3D()
         )
         super().__init__(self.horizon_stack)
 

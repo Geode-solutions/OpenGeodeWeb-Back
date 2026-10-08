@@ -76,18 +76,14 @@ def before_request(current_app: flask.Flask) -> None:
     flask.g.start_time = time.perf_counter()
 
 
-def teardown_request(
-    current_app: flask.Flask, exception: BaseException | None = None
-) -> None:
+def teardown_request(current_app: flask.Flask, exception: BaseException | None = None) -> None:
     decrement_request_counter(current_app)
     update_last_request_time(current_app)
     terminate_session(exception)
     if flask.has_request_context():
         if hasattr(flask.g, "start_time"):
             duration = time.perf_counter() - flask.g.start_time
-            logger.info(
-                "Request to %s completed in %.3fs", flask.request.endpoint, duration
-            )
+            logger.info("Request to %s completed in %.3fs", flask.request.endpoint, duration)
         else:
             logger.info("Request to %s completed", flask.request.endpoint)
 
@@ -156,17 +152,13 @@ def extension_from_filename(filename: str) -> str:
     return Path(filename).suffix[1:]
 
 
-def send_file(
-    upload_folder: str, saved_files: list[str], new_file_name: str
-) -> flask.Response:
+def send_file(upload_folder: str, saved_files: list[str], new_file_name: str) -> flask.Response:
     if len(saved_files) == 1:
         mimetype = "application/octet-binary"
     else:
         mimetype = "application/zip"
         new_file_name = Path(new_file_name).stem + ".zip"
-        with zipfile.ZipFile(
-            Path(upload_folder).resolve() / new_file_name, "w"
-        ) as zip_file:
+        with zipfile.ZipFile(Path(upload_folder).resolve() / new_file_name, "w") as zip_file:
             for saved_file_path in saved_files:
                 zip_file.write(
                     saved_file_path,
@@ -201,9 +193,7 @@ def handle_exception(exception: HTTPException) -> flask.Response:
 
 def handle_unexpected_exception(exception: Exception) -> flask.Response:
     logger.error("Unexpected error: %s", exception, exc_info=exception)
-    error = ErrorResponse(
-        code=500, name="Internal Server Error", description=str(exception)
-    )
+    error = ErrorResponse(code=500, name="Internal Server Error", description=str(exception))
     return flask.make_response(error.to_dict(), 500)
 
 
@@ -234,9 +224,7 @@ def _uuid_to_flat_index(data_id: str, viewable_file: str | None) -> dict[str, in
     return uuid_to_flat_index
 
 
-def _mesh_components(
-    model: GeodeModel, uuid_to_flat_index: dict[str, int]
-) -> list[dict[str, Any]]:
+def _mesh_components(model: GeodeModel, uuid_to_flat_index: dict[str, int]) -> list[dict[str, Any]]:
     model_mesh_components = model.mesh_components()
     mesh_components = []
     for mesh_component, ids in model_mesh_components.items():
@@ -289,9 +277,7 @@ def _collection_components(model: GeodeModel) -> list[dict[str, Any]]:
     return collection_components
 
 
-def model_components(
-    data_id: str, model: GeodeModel, viewable_file: str | None
-) -> dict[str, Any]:
+def model_components(data_id: str, model: GeodeModel, viewable_file: str | None) -> dict[str, Any]:
     uuid_to_flat_index = _uuid_to_flat_index(data_id, viewable_file)
     return {
         "mesh_components": _mesh_components(model, uuid_to_flat_index),
@@ -328,9 +314,7 @@ def save_all_viewables_and_return_info(
             viewable_path = results[1]
             light_path = results[2]
             binary_light_viewable = Path(light_path).read_bytes()
-            binary_light_viewable_str = base64.b64encode(binary_light_viewable).decode(
-                "ascii"
-            )
+            binary_light_viewable_str = base64.b64encode(binary_light_viewable).decode("ascii")
             data.viewable_file = Path(viewable_path).name
             data.light_viewable_file = Path(light_path).name
         else:
@@ -376,9 +360,7 @@ def generate_files_from_object(
     return save_all_viewables_and_return_info(geode_object, data, data_path)
 
 
-def generate_files_from_file(
-    geode_object_type: GeodeObjectType, input_file: str
-) -> dict[str, Any]:
+def generate_files_from_file(geode_object_type: GeodeObjectType, input_file: str) -> dict[str, Any]:
     generic_geode_object = geode_objects[geode_object_type]
     full_input_filename = geode_functions.upload_file_path(input_file)
     geode_object = generic_geode_object.load(full_input_filename)
