@@ -59,14 +59,6 @@ class GeodeObject(ABC):
     @abstractmethod
     def additional_files(cls, filename: str) -> og.AdditionalFiles: ...
 
-    @classmethod
-    def time_series_input_extensions(cls) -> list[str]:
-        return []
-
-    @classmethod
-    def has_time_series_reader(cls, extension: str) -> bool:
-        return extension in cls.time_series_input_extensions()
-
     @abstractmethod
     def native_extension(self) -> str: ...
 

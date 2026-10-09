@@ -51,11 +51,11 @@ def test_allowed_files(client: FlaskClient) -> None:
     json = get_full_data()
     response = client.post(route, json=json)
     assert response.status_code == 200
-    extensions = response.get_json()["extensions"]
+    extensions = response.get_json()["data_extensions"]
     assert type(extensions) is list
     for extension in extensions:
         assert type(extension) is str
-    time_series_extensions = response.get_json()["time_series"]
+    time_series_extensions = response.get_json()["time_series_extensions"]
     assert "pvd" in time_series_extensions
     assert "pvd" not in extensions
 
@@ -170,8 +170,8 @@ def test_upload_file_chunked_invalid_chunk_index(client: FlaskClient) -> None:
     assert response.status_code == 400
 
 
-def test_missing_files(client: FlaskClient) -> None:
-    route = "/opengeodeweb_back/missing_files"
+def test_data_missing_files(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/data_missing_files"
 
     def get_full_data() -> test_utils.JsonData:
         return {
@@ -910,7 +910,7 @@ def test_upload_file_relative_path(client: FlaskClient) -> None:
         shutil.rmtree(upload_folder / "nested_upload", ignore_errors=True)
 
 
-def test_missing_files_time_series(client: FlaskClient) -> None:
+def test_time_series_missing_files(client: FlaskClient) -> None:
     upload_folder = Path(client.application.config["UPLOAD_FOLDER_PATH"]).resolve()
     try:
         response = client.put(
@@ -920,12 +920,8 @@ def test_missing_files_time_series(client: FlaskClient) -> None:
         )
         assert response.status_code == 201
         response = client.post(
-            "/opengeodeweb_back/missing_files",
-            json={
-                "geode_object_type": "BRep",
-                "filename": "lonely_time_series/time_series.pvd",
-                "time_series": True,
-            },
+            "/opengeodeweb_back/time_series_missing_files",
+            json={"filename": "lonely_time_series/time_series.pvd"},
         )
         assert response.status_code == 200
         assert response.get_json()["has_missing_files"] is True
@@ -934,7 +930,7 @@ def test_missing_files_time_series(client: FlaskClient) -> None:
         shutil.rmtree(upload_folder / "lonely_time_series", ignore_errors=True)
 
 
-def test_missing_files_time_series_outside_folder(client: FlaskClient) -> None:
+def test_time_series_missing_files_outside_folder(client: FlaskClient) -> None:
     upload_folder = Path(client.application.config["UPLOAD_FOLDER_PATH"]).resolve()
     pvd = (
         '<?xml version="1.0"?>\n<VTKFile type="Collection" version="0.1"><Collection>'
@@ -948,12 +944,8 @@ def test_missing_files_time_series_outside_folder(client: FlaskClient) -> None:
         )
         assert response.status_code == 201
         response = client.post(
-            "/opengeodeweb_back/missing_files",
-            json={
-                "geode_object_type": "BRep",
-                "filename": "outside_time_series/sub/time_series.pvd",
-                "time_series": True,
-            },
+            "/opengeodeweb_back/time_series_missing_files",
+            json={"filename": "outside_time_series/sub/time_series.pvd"},
         )
         assert response.status_code == 400
     finally:
@@ -986,7 +978,6 @@ def test_apply_time_series(client: FlaskClient) -> None:
 
     response = client.post(route, json=get_full_data())
     assert response.status_code == 200
-    assert response.get_json()["id"] == model_id
 
     response = client.post(
         "/opengeodeweb_back/model_component_polyhedron_attribute_names",

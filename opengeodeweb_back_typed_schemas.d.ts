@@ -173,6 +173,16 @@ export interface UploadFileResponse {
     message: string;
 }
 
+export interface TimeSeriesMissingFilesParams {
+    filename: string;
+}
+
+export interface TimeSeriesMissingFilesResponse {
+    additional_files:  string[];
+    has_missing_files: boolean;
+    mandatory_files:   string[];
+}
+
 export interface TimeSeriesAllowedObjectsParams {
     filename: string;
 }
@@ -358,18 +368,6 @@ export interface ModelComponentEdgeAttributeNamesResponseAttribute {
     time_steps:     number[];
 }
 
-export interface MissingFilesParams {
-    filename:          string;
-    geode_object_type: string;
-    time_series?:      boolean;
-}
-
-export interface MissingFilesResponse {
-    additional_files:  string[];
-    has_missing_files: boolean;
-    mandatory_files:   string[];
-}
-
 export interface KillParams {
 }
 
@@ -441,6 +439,17 @@ export interface EdgeAttributeNamesResponseAttribute {
     time_steps:     number[];
 }
 
+export interface DataMissingFilesParams {
+    filename:          string;
+    geode_object_type: string;
+}
+
+export interface DataMissingFilesResponse {
+    additional_files:  string[];
+    has_missing_files: boolean;
+    mandatory_files:   string[];
+}
+
 export interface CellAttributeNamesParams {
     id: string;
 }
@@ -467,36 +476,6 @@ export interface ApplyTimeSeriesParams {
 }
 
 export interface ApplyTimeSeriesResponse {
-    binary_light_viewable?: string;
-    collection_components?: ApplyTimeSeriesResponseCollectionComponent[];
-    geode_id:               string;
-    geode_object_type:      string;
-    id:                     string;
-    is_viewable:            boolean;
-    mesh_components?:       ApplyTimeSeriesResponseMeshComponent[];
-    name:                   string;
-    native_file:            string;
-    nb_vertices?:           number;
-    viewable_file?:         string;
-    viewer_type:            string;
-}
-
-export interface ApplyTimeSeriesResponseCollectionComponent {
-    geode_id:  string;
-    is_active: boolean;
-    items:     string[];
-    name:      string;
-    type:      string;
-}
-
-export interface ApplyTimeSeriesResponseMeshComponent {
-    boundaries: string[];
-    geode_id:   string;
-    internals:  string[];
-    is_active:  boolean;
-    name:       string;
-    type:       string;
-    viewer_id:  number;
 }
 
 export interface AllowedObjectsParams {
@@ -516,8 +495,8 @@ export interface AllowedFilesParams {
 }
 
 export interface AllowedFilesResponse {
-    extensions:  string[];
-    time_series: string[];
+    data_extensions:        string[];
+    time_series_extensions: string[];
 }
 
 export interface ErrorResponse {
@@ -543,6 +522,7 @@ export interface Schemas {
     readonly vertex_attribute_names: (typeof json)["opengeodeweb_back"]["vertex_attribute_names"] & TypedSchema<VertexAttributeNamesParams, VertexAttributeNamesResponse>;
     readonly validate: (typeof json)["opengeodeweb_back"]["validate"] & TypedSchema<ValidateParams, ValidateResponse>;
     readonly upload_file: (typeof json)["opengeodeweb_back"]["upload_file"] & TypedSchema<UploadFileParams, UploadFileResponse>;
+    readonly time_series_missing_files: (typeof json)["opengeodeweb_back"]["time_series_missing_files"] & TypedSchema<TimeSeriesMissingFilesParams, TimeSeriesMissingFilesResponse>;
     readonly time_series_allowed_objects: (typeof json)["opengeodeweb_back"]["time_series_allowed_objects"] & TypedSchema<TimeSeriesAllowedObjectsParams, TimeSeriesAllowedObjectsResponse>;
     readonly texture_coordinates: (typeof json)["opengeodeweb_back"]["texture_coordinates"] & TypedSchema<TextureCoordinatesParams, TextureCoordinatesResponse>;
     readonly save_viewable_file: (typeof json)["opengeodeweb_back"]["save_viewable_file"] & TypedSchema<SaveViewableFileParams, SaveViewableFileResponse>;
@@ -553,7 +533,6 @@ export interface Schemas {
     readonly model_component_polyhedron_attribute_names: (typeof json)["opengeodeweb_back"]["model_component_polyhedron_attribute_names"] & TypedSchema<ModelComponentPolyhedronAttributeNamesParams, ModelComponentPolyhedronAttributeNamesResponse>;
     readonly model_component_polygon_attribute_names: (typeof json)["opengeodeweb_back"]["model_component_polygon_attribute_names"] & TypedSchema<ModelComponentPolygonAttributeNamesParams, ModelComponentPolygonAttributeNamesResponse>;
     readonly model_component_edge_attribute_names: (typeof json)["opengeodeweb_back"]["model_component_edge_attribute_names"] & TypedSchema<ModelComponentEdgeAttributeNamesParams, ModelComponentEdgeAttributeNamesResponse>;
-    readonly missing_files: (typeof json)["opengeodeweb_back"]["missing_files"] & TypedSchema<MissingFilesParams, MissingFilesResponse>;
     readonly kill: (typeof json)["opengeodeweb_back"]["kill"] & TypedSchema<KillParams, KillResponse>;
     readonly import_project: (typeof json)["opengeodeweb_back"]["import_project"] & TypedSchema<ImportProjectParams, ImportProjectResponse>;
     readonly geographic_coordinate_systems: (typeof json)["opengeodeweb_back"]["geographic_coordinate_systems"] & TypedSchema<GeographicCoordinateSystemsParams, GeographicCoordinateSystemsResponse>;
@@ -561,6 +540,7 @@ export interface Schemas {
     readonly geode_object_inheritance: (typeof json)["opengeodeweb_back"]["geode_object_inheritance"] & TypedSchema<GeodeObjectInheritanceParams, GeodeObjectInheritanceResponse>;
     readonly export_project: (typeof json)["opengeodeweb_back"]["export_project"] & TypedSchema<ExportProjectParams, Blob>;
     readonly edge_attribute_names: (typeof json)["opengeodeweb_back"]["edge_attribute_names"] & TypedSchema<EdgeAttributeNamesParams, EdgeAttributeNamesResponse>;
+    readonly data_missing_files: (typeof json)["opengeodeweb_back"]["data_missing_files"] & TypedSchema<DataMissingFilesParams, DataMissingFilesResponse>;
     readonly cell_attribute_names: (typeof json)["opengeodeweb_back"]["cell_attribute_names"] & TypedSchema<CellAttributeNamesParams, CellAttributeNamesResponse>;
     readonly apply_time_series: (typeof json)["opengeodeweb_back"]["apply_time_series"] & TypedSchema<ApplyTimeSeriesParams, ApplyTimeSeriesResponse>;
     readonly allowed_objects: (typeof json)["opengeodeweb_back"]["allowed_objects"] & TypedSchema<AllowedObjectsParams, AllowedObjectsResponse>;

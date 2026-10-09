@@ -57,7 +57,6 @@ class GeodeBRep(GeodeModel):
     def additional_files(cls, filename: str) -> og.AdditionalFiles:
         return og.brep_additional_files(filename)
 
-    @override
     @classmethod
     def time_series_input_extensions(cls) -> list[str]:
         return og.BRepTimeSeriesInputFactory.list_creators()

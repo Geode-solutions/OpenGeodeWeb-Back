@@ -1,24 +1,16 @@
 {
-  "route": "/missing_files",
+  "route": "/time_series_missing_files",
   "methods": [
     "POST"
   ],
   "type": "object",
   "properties": {
-    "geode_object_type": {
-      "type": "string",
-      "minLength": 1
-    },
     "filename": {
       "type": "string",
       "minLength": 1
-    },
-    "time_series": {
-      "type": "boolean"
     }
   },
   "required": [
-    "geode_object_type",
     "filename"
   ],
   "additionalProperties": false,

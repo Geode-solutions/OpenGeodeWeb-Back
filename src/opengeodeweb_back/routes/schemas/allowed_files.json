@@ -10,13 +10,13 @@
   "response": {
     "type": "object",
     "properties": {
-      "extensions": {
+      "data_extensions": {
         "type": "array",
         "items": {
           "type": "string"
         }
       },
-      "time_series": {
+      "time_series_extensions": {
         "type": "array",
         "items": {
           "type": "string"
@@ -24,8 +24,8 @@
       }
     },
     "required": [
-      "extensions",
-      "time_series"
+      "data_extensions",
+      "time_series_extensions"
     ],
     "additionalProperties": false
   }
