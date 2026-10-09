@@ -1,37 +1,23 @@
 {
-  "route": "/missing_files",
+  "route": "/time_series_allowed_objects",
   "methods": [
     "POST"
   ],
   "type": "object",
   "properties": {
-    "geode_object_type": {
-      "type": "string",
-      "minLength": 1
-    },
     "filename": {
       "type": "string",
       "minLength": 1
     }
   },
   "required": [
-    "geode_object_type",
     "filename"
   ],
   "additionalProperties": false,
   "response": {
     "type": "object",
     "properties": {
-      "has_missing_files": {
-        "type": "boolean"
-      },
-      "mandatory_files": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        }
-      },
-      "additional_files": {
+      "allowed_objects": {
         "type": "array",
         "items": {
           "type": "string"
@@ -39,9 +25,7 @@
       }
     },
     "required": [
-      "has_missing_files",
-      "mandatory_files",
-      "additional_files"
+      "allowed_objects"
     ],
     "additionalProperties": false
   }

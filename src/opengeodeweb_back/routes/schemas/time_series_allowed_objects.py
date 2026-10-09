@@ -7,26 +7,25 @@ from dataclasses import dataclass
 
 
 @dataclass
-class AllowedFiles(DataClassJsonMixin):
+class TimeSeriesAllowedObjects(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    pass
+    filename: str
 
 
 @dataclass
-class AllowedFilesResponse(DataClassJsonMixin):
+class TimeSeriesAllowedObjectsResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    data_extensions: List[str]
-    time_series_extensions: List[str]
+    allowed_objects: List[str]
 
 
-allowed_files_route = Route(
+time_series_allowed_objects_route = Route(
     schema=load_schema(Path(__file__)),
-    params=AllowedFiles,
-    response=AllowedFilesResponse,
+    params=TimeSeriesAllowedObjects,
+    response=TimeSeriesAllowedObjectsResponse,
 )
 
-__all__ = ["AllowedFiles", "AllowedFilesResponse", "allowed_files_route"]
+__all__ = ["TimeSeriesAllowedObjects", "TimeSeriesAllowedObjectsResponse", "time_series_allowed_objects_route"]

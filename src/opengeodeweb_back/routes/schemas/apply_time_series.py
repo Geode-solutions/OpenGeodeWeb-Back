@@ -1,32 +1,31 @@
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
-from typing import List
 from dataclasses_json import DataClassJsonMixin
 from opengeodeweb_microservice.schemas import print_dataclass
 from dataclasses import dataclass
 
 
 @dataclass
-class AllowedFiles(DataClassJsonMixin):
+class ApplyTimeSeries(DataClassJsonMixin):
+    def __post_init__(self) -> None:
+        print_dataclass(self)
+
+    filename: str
+    id: str
+
+
+@dataclass
+class ApplyTimeSeriesResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
     pass
 
 
-@dataclass
-class AllowedFilesResponse(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    data_extensions: List[str]
-    time_series_extensions: List[str]
-
-
-allowed_files_route = Route(
+apply_time_series_route = Route(
     schema=load_schema(Path(__file__)),
-    params=AllowedFiles,
-    response=AllowedFilesResponse,
+    params=ApplyTimeSeries,
+    response=ApplyTimeSeriesResponse,
 )
 
-__all__ = ["AllowedFiles", "AllowedFilesResponse", "allowed_files_route"]
+__all__ = ["ApplyTimeSeries", "ApplyTimeSeriesResponse", "apply_time_series_route"]

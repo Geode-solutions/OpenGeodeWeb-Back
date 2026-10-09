@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class MissingFiles(DataClassJsonMixin):
+class DataMissingFiles(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
@@ -16,7 +16,7 @@ class MissingFiles(DataClassJsonMixin):
 
 
 @dataclass
-class MissingFilesResponse(DataClassJsonMixin):
+class DataMissingFilesResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
@@ -25,10 +25,10 @@ class MissingFilesResponse(DataClassJsonMixin):
     mandatory_files: List[str]
 
 
-missing_files_route = Route(
+data_missing_files_route = Route(
     schema=load_schema(Path(__file__)),
-    params=MissingFiles,
-    response=MissingFilesResponse,
+    params=DataMissingFiles,
+    response=DataMissingFilesResponse,
 )
 
-__all__ = ["MissingFiles", "MissingFilesResponse", "missing_files_route"]
+__all__ = ["DataMissingFiles", "DataMissingFilesResponse", "data_missing_files_route"]

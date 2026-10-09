@@ -57,6 +57,17 @@ class GeodeBRep(GeodeModel):
     def additional_files(cls, filename: str) -> og.AdditionalFiles:
         return og.brep_additional_files(filename)
 
+    @classmethod
+    def time_series_input_extensions(cls) -> list[str]:
+        return og.BRepTimeSeriesInputFactory.list_creators()
+
+    @classmethod
+    def time_series_additional_files(cls, filename: str) -> og.AdditionalFiles:
+        return og.brep_time_series_additional_files(filename)
+
+    def load_time_series(self, filename: str) -> None:
+        og.load_brep_time_series(self.brep, filename)
+
     @override
     @classmethod
     def is_loadable(cls, filename: str) -> og.Percentage:
