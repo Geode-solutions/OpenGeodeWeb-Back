@@ -20,6 +20,7 @@ class AllowedFilesResponse(DataClassJsonMixin):
         print_dataclass(self)
 
     extensions: List[str]
+    time_series: List[str]
 
 
 allowed_files_route = Route(

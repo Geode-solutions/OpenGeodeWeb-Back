@@ -4,33 +4,28 @@ from typing import List
 from dataclasses_json import DataClassJsonMixin
 from opengeodeweb_microservice.schemas import print_dataclass
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
-class MissingFiles(DataClassJsonMixin):
+class TimeSeriesAllowedObjects(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
     filename: str
-    geode_object_type: str
-    time_series: Optional[bool] = None
 
 
 @dataclass
-class MissingFilesResponse(DataClassJsonMixin):
+class TimeSeriesAllowedObjectsResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    additional_files: List[str]
-    has_missing_files: bool
-    mandatory_files: List[str]
+    allowed_objects: List[str]
 
 
-missing_files_route = Route(
+time_series_allowed_objects_route = Route(
     schema=load_schema(Path(__file__)),
-    params=MissingFiles,
-    response=MissingFilesResponse,
+    params=TimeSeriesAllowedObjects,
+    response=TimeSeriesAllowedObjectsResponse,
 )
 
-__all__ = ["MissingFiles", "MissingFilesResponse", "missing_files_route"]
+__all__ = ["TimeSeriesAllowedObjects", "TimeSeriesAllowedObjectsResponse", "time_series_allowed_objects_route"]

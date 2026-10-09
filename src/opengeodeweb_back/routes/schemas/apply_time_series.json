@@ -1,0 +1,161 @@
+{
+  "route": "/apply_time_series",
+  "methods": [
+    "POST"
+  ],
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 32
+    },
+    "filename": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "id",
+    "filename"
+  ],
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "native_file": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string",
+        "minLength": 32,
+        "maxLength": 32
+      },
+      "name": {
+        "type": "string"
+      },
+      "viewer_type": {
+        "type": "string"
+      },
+      "is_viewable": {
+        "type": "boolean"
+      },
+      "geode_object_type": {
+        "type": "string"
+      },
+      "viewable_file": {
+        "type": "string"
+      },
+      "binary_light_viewable": {
+        "type": "string"
+      },
+      "nb_vertices": {
+        "type": "integer"
+      },
+      "mesh_components": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "viewer_id": {
+              "type": "integer"
+            },
+            "geode_id": {
+              "type": "string",
+              "minLength": 36,
+              "maxLength": 36
+            },
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "boundaries": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 36,
+                "maxLength": 36
+              }
+            },
+            "internals": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 36,
+                "maxLength": 36
+              }
+            },
+            "is_active": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "viewer_id",
+            "geode_id",
+            "name",
+            "type",
+            "boundaries",
+            "internals",
+            "is_active"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "collection_components": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "geode_id": {
+              "type": "string",
+              "minLength": 36,
+              "maxLength": 36
+            },
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 36,
+                "maxLength": 36
+              }
+            },
+            "is_active": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "geode_id",
+            "name",
+            "type",
+            "items",
+            "is_active"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "geode_id": {
+        "type": "string",
+        "minLength": 36,
+        "maxLength": 36
+      }
+    },
+    "required": [
+      "native_file",
+      "id",
+      "name",
+      "viewer_type",
+      "is_viewable",
+      "geode_object_type",
+      "geode_id"
+    ],
+    "additionalProperties": false
+  }
+}

@@ -1,22 +1,23 @@
 {
-  "route": "/allowed_files",
+  "route": "/time_series_allowed_objects",
   "methods": [
     "POST"
   ],
   "type": "object",
-  "properties": {},
-  "required": [],
+  "properties": {
+    "filename": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "filename"
+  ],
   "additionalProperties": false,
   "response": {
     "type": "object",
     "properties": {
-      "extensions": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        }
-      },
-      "time_series": {
+      "allowed_objects": {
         "type": "array",
         "items": {
           "type": "string"
@@ -24,8 +25,7 @@
       }
     },
     "required": [
-      "extensions",
-      "time_series"
+      "allowed_objects"
     ],
     "additionalProperties": false
   }

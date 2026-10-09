@@ -3,6 +3,7 @@ from __future__ import annotations
 # Standard library imports
 import json
 import os
+import shutil
 import sqlite3
 import zipfile
 from pathlib import Path
@@ -54,6 +55,9 @@ def test_allowed_files(client: FlaskClient) -> None:
     assert type(extensions) is list
     for extension in extensions:
         assert type(extension) is str
+    time_series_extensions = response.get_json()["time_series"]
+    assert "pvd" in time_series_extensions
+    assert "pvd" in extensions
 
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
@@ -886,3 +890,97 @@ def test_vertex_attribute_names_time_series(client: FlaskClient) -> None:
     ]
     assert len(temperature) == 1
     assert temperature[0]["time_steps"] == [0.5, 1.0, 2.0]
+
+
+def test_upload_file_relative_path(client: FlaskClient) -> None:
+    upload_folder = Path(client.application.config["UPLOAD_FOLDER_PATH"]).resolve()
+    try:
+        for filename, expected in [
+            ("nested_upload/sub/file.txt", upload_folder / "nested_upload/sub/file.txt"),
+            ("../nested_upload/escape.txt", upload_folder / "nested_upload/escape.txt"),
+        ]:
+            response = client.put(
+                "/opengeodeweb_back/upload_file",
+                query_string={"filename": filename},
+                data=b"content",
+            )
+            assert response.status_code == 201
+            assert expected.is_file()
+    finally:
+        shutil.rmtree(upload_folder / "nested_upload", ignore_errors=True)
+
+
+def test_missing_files_time_series(client: FlaskClient) -> None:
+    upload_folder = Path(client.application.config["UPLOAD_FOLDER_PATH"]).resolve()
+    try:
+        response = client.put(
+            "/opengeodeweb_back/upload_file",
+            query_string={"filename": "lonely_time_series/time_series.pvd"},
+            data=(data_dir / "time_series" / "time_series.pvd").read_bytes(),
+        )
+        assert response.status_code == 201
+        response = client.post(
+            "/opengeodeweb_back/missing_files",
+            json={
+                "geode_object_type": "BRep",
+                "filename": "lonely_time_series/time_series.pvd",
+                "time_series": True,
+            },
+        )
+        assert response.status_code == 200
+        assert response.get_json()["has_missing_files"] is True
+        assert "vtkOutput/000000.vtm" in response.get_json()["mandatory_files"]
+    finally:
+        shutil.rmtree(upload_folder / "lonely_time_series", ignore_errors=True)
+
+
+def test_time_series_allowed_objects(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/time_series_allowed_objects"
+
+    def get_full_data() -> test_utils.JsonData:
+        return {"filename": "time_series/time_series.pvd"}
+
+    response = client.post(route, json=get_full_data())
+    assert response.status_code == 200
+    allowed_objects = response.get_json()["allowed_objects"]
+    assert "BRep" in allowed_objects
+    assert "PointSet3D" not in allowed_objects
+
+    test_utils.test_route_wrong_params(client, route, get_full_data)
+
+
+def test_apply_time_series(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/apply_time_series"
+    model_id, by_type = _load_brep_components(client)
+
+    def get_full_data() -> test_utils.JsonData:
+        return {"id": model_id, "filename": "time_series/time_series.pvd"}
+
+    response = client.post(route, json=get_full_data())
+    assert response.status_code == 200
+    assert response.get_json()["id"] == model_id
+
+    response = client.post(
+        "/opengeodeweb_back/model_component_polyhedron_attribute_names",
+        json={"id": model_id, "component_ids": by_type["Block"]},
+    )
+    pressure = [
+        attribute
+        for attribute in response.get_json()["attributes"]
+        if attribute["attribute_name"] == "pressure"
+    ]
+    assert len(pressure) == 1
+    assert pressure[0]["time_steps"] == [0.0, 1.0]
+
+    test_utils.test_route_wrong_params(client, route, get_full_data)
+
+
+def test_apply_time_series_errors(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/apply_time_series"
+    filename = "time_series/time_series.pvd"
+    response = client.post(route, json={"id": "0" * 32, "filename": filename})
+    assert response.status_code == 404
+
+    point_set_id = check_save_viewable_file(client, "PointSet3D", "test.og_pts3d").get_json()["id"]
+    response = client.post(route, json={"id": point_set_id, "filename": filename})
+    assert response.status_code == 400
