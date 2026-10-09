@@ -22,12 +22,7 @@ class Attribute(DataClassJsonMixin):
 
     attribute_id: str
     attribute_name: str
-    max_value: float
-    max_values: List[float]
-    min_value: float
-    min_values: List[float]
     nb_items: int
-    no_data: bool
     time_steps: List[float]
 
 

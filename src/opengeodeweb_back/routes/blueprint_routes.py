@@ -42,6 +42,8 @@ from opengeodeweb_back.typed_route import parse_params, raw_route, typed_route
 if TYPE_CHECKING:
     from werkzeug.datastructures import FileStorage
 
+    from opengeodeweb_back.geode_objects.geode_object import GeodeObject
+
 ComponentMesh = (
     og.Corner2D,
     og.Corner3D,
@@ -285,15 +287,20 @@ def _extract_valid_values_from_attribute(
         ],
     )
 
-    valid_values: list[float] = []
-    has_nan = False
-    for element_index in range(attribute_manager.nb_elements()):
-        value = attribute.generic_item_value(element_index, item_index)
-        if math.isnan(value) or (no_value is not None and value_getter(element_index) == no_value):
-            has_nan = True
-        else:
-            valid_values.append(value)
-    return valid_values, has_nan
+    item_value = attribute.generic_item_value
+    values = [
+        item_value(element_index, item_index)
+        for element_index in range(attribute_manager.nb_elements())
+    ]
+    if no_value is None:
+        valid_values = [value for value in values if not math.isnan(value)]
+        return valid_values, len(valid_values) != len(values)
+    valid_values = [
+        value
+        for element_index, value in enumerate(values)
+        if not math.isnan(value) and value_getter(element_index) != no_value
+    ]
+    return valid_values, len(valid_values) != len(values)
 
 
 def extract_valid_attribute_values(
@@ -347,9 +354,9 @@ def _attribute_ranges(
 
 def attributes_metadata(
     manager: og.AttributeManager | list[og.AttributeManager],
-) -> list[dict[str, str | int | float | bool | list[float]]]:
+) -> list[dict[str, str | int | list[float]]]:
     attribute_managers = manager if isinstance(manager, list) else [manager]
-    attributes: list[dict[str, str | int | float | bool | list[float]]] = []
+    attributes: list[dict[str, str | int | list[float]]] = []
     first_manager = attribute_managers[0]
     listed_time_series: set[str] = set()
     for attribute_id in first_manager.attribute_ids():
@@ -366,12 +373,6 @@ def attributes_metadata(
             continue
         if time_steps:
             listed_time_series.add(attribute_name)
-        nb_items = attribute.nb_items()
-        min_values, max_values, attribute_has_nan = _attribute_ranges(
-            attribute_managers, attribute_name, nb_items
-        )
-        if not min_values or not max_values:
-            continue
         series_id = (
             first_manager.time_steps(attribute_name)[0].attribute_id.string()
             if time_steps
@@ -381,16 +382,93 @@ def attributes_metadata(
             {
                 "attribute_name": attribute_name,
                 "attribute_id": series_id,
-                "nb_items": nb_items,
-                "min_value": min(min_values),
-                "max_value": max(max_values),
-                "min_values": min_values,
-                "max_values": max_values,
-                "no_data": attribute_has_nan,
+                "nb_items": attribute.nb_items(),
                 "time_steps": time_steps,
             }
         )
     return attributes
+
+
+def _attribute_nb_items(attribute_manager: og.AttributeManager, attribute_name: str) -> int:
+    attribute_ids = _attribute_ids_for_name(attribute_manager, attribute_name)
+    if not attribute_ids:
+        return 0
+    attribute = attribute_manager.find_generic_attribute(attribute_ids[0])
+    return attribute.nb_items() if attribute is not None else 0
+
+
+MESH_ATTRIBUTE_MANAGERS: dict[
+    str, tuple[type | tuple[type, ...], typing.Callable[[typing.Any], og.AttributeManager]]
+] = {
+    "vertex": (GeodeMesh, lambda mesh: mesh.vertex_attribute_manager()),
+    "edge": (GeodeGraph, lambda mesh: mesh.edge_attribute_manager()),
+    "cell": ((GeodeGrid2D, GeodeGrid3D), lambda mesh: mesh.cell_attribute_manager()),
+    "polygon": (
+        (GeodeSurfaceMesh2D, GeodeSurfaceMesh3D),
+        lambda mesh: mesh.polygon_attribute_manager(),
+    ),
+    "polyhedron": (GeodeSolidMesh3D, lambda mesh: mesh.polyhedron_attribute_manager()),
+}
+
+MODEL_COMPONENT_ATTRIBUTE_MANAGERS: dict[
+    str, tuple[type | tuple[type, ...], typing.Callable[[typing.Any], og.AttributeManager]]
+] = {
+    "vertex": (ComponentMesh, lambda component: component.mesh().vertex_attribute_manager()),
+    "edge": (ComponentLine, lambda component: component.mesh().edge_attribute_manager()),
+    "polygon": (
+        ComponentSurface,
+        lambda component: component.mesh().polygon_attribute_manager(),
+    ),
+    "polyhedron": (
+        ComponentBlock,
+        lambda component: component.mesh().polyhedron_attribute_manager(),
+    ),
+}
+
+
+def _range_attribute_managers(
+    geode_object: GeodeObject, params: schemas.AttributeRange
+) -> list[og.AttributeManager]:
+    element = params.element.value
+    if params.component_ids is None:
+        mesh_type, mesh_manager = MESH_ATTRIBUTE_MANAGERS[element]
+        if not isinstance(geode_object, mesh_type):
+            flask.abort(400, f"{params.id} does not have {element} attributes")
+        return [mesh_manager(geode_object)]
+    if (
+        not isinstance(geode_object, GeodeModel)
+        or element not in MODEL_COMPONENT_ATTRIBUTE_MANAGERS
+    ):
+        flask.abort(400, f"{params.id} components do not have {element} attributes")
+    component_type, component_manager = MODEL_COMPONENT_ATTRIBUTE_MANAGERS[element]
+    return [
+        component_manager(component)
+        for component_id in params.component_ids
+        if isinstance(
+            (component := geode_object.component(og.uuid(component_id))),
+            component_type,
+        )
+    ]
+
+
+@typed_route(routes, schemas.attribute_range_route)
+def attribute_range(params: schemas.AttributeRange) -> schemas.AttributeRangeResponse:
+    # The managers point into geode_object: it must outlive them
+    geode_object = geode_functions.load_geode_object(params.id)
+    attribute_managers = _range_attribute_managers(geode_object, params)
+    nb_items = min(
+        (
+            _attribute_nb_items(attribute_manager, params.attribute_name)
+            for attribute_manager in attribute_managers
+        ),
+        default=0,
+    )
+    min_values, max_values, no_data = _attribute_ranges(
+        attribute_managers, params.attribute_name, nb_items
+    )
+    return schemas.AttributeRangeResponse(
+        min_values=min_values, max_values=max_values, no_data=no_data
+    )
 
 
 @typed_route(routes, schemas.vertex_attribute_names_route)

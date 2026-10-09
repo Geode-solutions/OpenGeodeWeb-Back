@@ -343,13 +343,7 @@ def test_vertex_attribute_names(client: FlaskClient) -> None:
     assert type(attributes) is list
     for attribute in attributes:
         assert "attribute_name" in attribute
-        assert "min_value" in attribute
-        assert "max_value" in attribute
         assert "nb_items" in attribute
-        assert "min_values" in attribute
-        assert "max_values" in attribute
-        assert "no_data" in attribute
-        assert isinstance(attribute["no_data"], bool)
         assert "time_steps" in attribute
         assert isinstance(attribute["time_steps"], list)
 
@@ -379,13 +373,7 @@ def test_cell_attribute_names(client: FlaskClient) -> None:
     assert type(attributes) is list
     for attribute in attributes:
         assert "attribute_name" in attribute
-        assert "min_value" in attribute
-        assert "max_value" in attribute
         assert "nb_items" in attribute
-        assert "min_values" in attribute
-        assert "max_values" in attribute
-        assert "no_data" in attribute
-        assert isinstance(attribute["no_data"], bool)
 
 
 def test_polygon_attribute_names(client: FlaskClient) -> None:
@@ -413,13 +401,7 @@ def test_polygon_attribute_names(client: FlaskClient) -> None:
     assert type(attributes) is list
     for attribute in attributes:
         assert "attribute_name" in attribute
-        assert "min_value" in attribute
-        assert "max_value" in attribute
         assert "nb_items" in attribute
-        assert "min_values" in attribute
-        assert "max_values" in attribute
-        assert "no_data" in attribute
-        assert isinstance(attribute["no_data"], bool)
 
 
 def test_polyhedron_attribute_names(client: FlaskClient) -> None:
@@ -447,16 +429,7 @@ def test_polyhedron_attribute_names(client: FlaskClient) -> None:
     assert type(attributes) is list
     for attribute in attributes:
         assert "attribute_name" in attribute
-        assert "min_value" in attribute
-        assert "max_value" in attribute
         assert "nb_items" in attribute
-        assert "min_values" in attribute
-        assert "max_values" in attribute
-        assert "no_data" in attribute
-        assert isinstance(attribute["no_data"], bool)
-        if attribute["attribute_name"] == "Range":
-            assert attribute["min_value"] == 0.0
-            assert attribute["max_value"] == 579.0
 
 
 def test_edge_attribute_names(client: FlaskClient) -> None:
@@ -484,13 +457,7 @@ def test_edge_attribute_names(client: FlaskClient) -> None:
     assert type(attributes) is list
     for attribute in attributes:
         assert "attribute_name" in attribute
-        assert "min_value" in attribute
-        assert "max_value" in attribute
         assert "nb_items" in attribute
-        assert "min_values" in attribute
-        assert "max_values" in attribute
-        assert "no_data" in attribute
-        assert isinstance(attribute["no_data"], bool)
 
 
 def test_database_uri_path(client: FlaskClient) -> None:
@@ -728,13 +695,7 @@ def _assert_attributes_response(response: TestResponse) -> None:
     assert isinstance(attributes, list)
     for attribute in attributes:
         assert "attribute_name" in attribute
-        assert "min_value" in attribute
-        assert "max_value" in attribute
         assert "nb_items" in attribute
-        assert "min_values" in attribute
-        assert "max_values" in attribute
-        assert "no_data" in attribute
-        assert isinstance(attribute["no_data"], bool)
         assert "time_steps" in attribute
         assert isinstance(attribute["time_steps"], list)
 
@@ -886,3 +847,82 @@ def test_vertex_attribute_names_time_series(client: FlaskClient) -> None:
     ]
     assert len(temperature) == 1
     assert temperature[0]["time_steps"] == [0.5, 1.0, 2.0]
+
+
+def test_attribute_range(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/attribute_range"
+
+    with client.application.app_context():
+        file = str(data_dir / "polyhedron_attribute.vtu")
+        data = Data.create(
+            geode_id=DUMMY_GEODE_ID,
+            geode_object=GeodePolyhedralSolid3D.geode_object_type(),
+            viewer_object=GeodePolyhedralSolid3D.viewer_type(),
+            viewer_elements_type=GeodePolyhedralSolid3D.viewer_elements_type(),
+        )
+        data.native_file = file
+        session = get_session()
+        if session:
+            session.commit()
+
+        data_path = Path(geode_functions.data_file_path(data.id, data.native_file))
+        data_path.parent.mkdir(parents=True, exist_ok=True)
+        assert data_path.exists(), f"File not found at {data_path}"
+        data_id = data.id
+    response = client.post(
+        route, json={"id": data_id, "element": "polyhedron", "attribute_name": "toto_on_polyhedra"}
+    )
+    assert response.status_code == 200
+    assert response.get_json()["min_values"] == [3.0]
+    assert response.get_json()["max_values"] == [6.0]
+    assert isinstance(response.get_json()["no_data"], bool)
+
+    def get_full_data() -> test_utils.JsonData:
+        return {"id": data_id, "element": "polyhedron", "attribute_name": "toto_on_polyhedra"}
+
+    test_utils.test_route_wrong_params(client, route, get_full_data)
+
+
+def test_attribute_range_time_series(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/attribute_range"
+
+    with client.application.app_context():
+        file = str(data_dir / "time_series.og_psf3d")
+        data = Data.create(
+            geode_id=DUMMY_GEODE_ID,
+            geode_object=GeodePolygonalSurface3D.geode_object_type(),
+            viewer_object=GeodePolygonalSurface3D.viewer_type(),
+            viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
+        )
+        data.native_file = file
+        session = get_session()
+        if session:
+            session.commit()
+
+        data_path = Path(geode_functions.data_file_path(data.id, data.native_file))
+        data_path.parent.mkdir(parents=True, exist_ok=True)
+        assert data_path.exists(), f"File not found at {data_path}"
+    response = client.post(
+        route, json={"id": data.id, "element": "vertex", "attribute_name": "temperature"}
+    )
+    assert response.status_code == 200
+    assert response.get_json()["min_values"] == [5.0]
+    assert response.get_json()["max_values"] == [23.0]
+
+
+def test_model_component_attribute_range(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/attribute_range"
+    model_id, by_type = _load_brep_components(client)
+
+    response = client.post(
+        route,
+        json={
+            "id": model_id,
+            "element": "vertex",
+            "attribute_name": "unique vertices",
+            "component_ids": by_type["Corner"],
+        },
+    )
+    assert response.status_code == 200
+    assert len(response.get_json()["min_values"]) == 1
+    assert len(response.get_json()["max_values"]) == 1
