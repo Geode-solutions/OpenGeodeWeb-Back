@@ -69,7 +69,8 @@ def allowed_files(_params: schemas.AllowedFiles) -> schemas.AllowedFilesResponse
     for geode_object in geode_objects.values():
         extensions.update(geode_object.input_extensions())
         time_series.update(geode_object.time_series_input_extensions())
-    # Time series files are applied on an existing data, not imported: only apps handling them use the list
+    # Time series files are applied on an existing data, not imported:
+    # only apps handling them use this list
     return schemas.AllowedFilesResponse(extensions=list(extensions), time_series=list(time_series))
 
 
