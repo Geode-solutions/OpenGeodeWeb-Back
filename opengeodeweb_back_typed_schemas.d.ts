@@ -2,524 +2,528 @@
 import type json from "./opengeodeweb_back_schemas.json";
 
 export interface CreatePolygonalSurfaceParams {
-  name: string;
-  points: PolygonalSurfacePoint[];
-  polygons: Array<number[]>;
+    name:     string;
+    points:   PolygonalSurfacePoint[];
+    polygons: Array<number[]>;
 }
 
 export interface PolygonalSurfacePoint {
-  x: number;
-  y: number;
-  z: number;
+    x: number;
+    y: number;
+    z: number;
 }
 
 export interface CreatePolygonalSurfaceResponse {
-  binary_light_viewable?: string;
-  collection_components?: CreatePolygonalSurfaceResponseCollectionComponent[];
-  geode_id: string;
-  geode_object_type: string;
-  id: string;
-  is_viewable: boolean;
-  mesh_components?: CreatePolygonalSurfaceResponseMeshComponent[];
-  name: string;
-  native_file: string;
-  nb_vertices?: number;
-  viewable_file?: string;
-  viewer_type: string;
+    binary_light_viewable?: string;
+    collection_components?: CreatePolygonalSurfaceResponseCollectionComponent[];
+    geode_id:               string;
+    geode_object_type:      string;
+    id:                     string;
+    is_viewable:            boolean;
+    mesh_components?:       CreatePolygonalSurfaceResponseMeshComponent[];
+    name:                   string;
+    native_file:            string;
+    nb_vertices?:           number;
+    viewable_file?:         string;
+    viewer_type:            string;
 }
 
 export interface CreatePolygonalSurfaceResponseCollectionComponent {
-  geode_id: string;
-  is_active: boolean;
-  items: string[];
-  name: string;
-  type: string;
+    geode_id:  string;
+    is_active: boolean;
+    items:     string[];
+    name:      string;
+    type:      string;
 }
 
 export interface CreatePolygonalSurfaceResponseMeshComponent {
-  boundaries: string[];
-  geode_id: string;
-  internals: string[];
-  is_active: boolean;
-  name: string;
-  type: string;
-  viewer_id: number;
+    boundaries: string[];
+    geode_id:   string;
+    internals:  string[];
+    is_active:  boolean;
+    name:       string;
+    type:       string;
+    viewer_id:  number;
 }
 
 export interface CreatePointSetParams {
-  name: string;
-  points: Point[];
+    name:   string;
+    points: Point[];
 }
 
 export interface Point {
-  x: number;
-  y: number;
-  z: number;
+    x: number;
+    y: number;
+    z: number;
 }
 
 export interface CreatePointSetResponse {
-  binary_light_viewable?: string;
-  collection_components?: CreatePointSetResponseCollectionComponent[];
-  geode_id: string;
-  geode_object_type: string;
-  id: string;
-  is_viewable: boolean;
-  mesh_components?: CreatePointSetResponseMeshComponent[];
-  name: string;
-  native_file: string;
-  nb_vertices?: number;
-  viewable_file?: string;
-  viewer_type: string;
+    binary_light_viewable?: string;
+    collection_components?: CreatePointSetResponseCollectionComponent[];
+    geode_id:               string;
+    geode_object_type:      string;
+    id:                     string;
+    is_viewable:            boolean;
+    mesh_components?:       CreatePointSetResponseMeshComponent[];
+    name:                   string;
+    native_file:            string;
+    nb_vertices?:           number;
+    viewable_file?:         string;
+    viewer_type:            string;
 }
 
 export interface CreatePointSetResponseCollectionComponent {
-  geode_id: string;
-  is_active: boolean;
-  items: string[];
-  name: string;
-  type: string;
+    geode_id:  string;
+    is_active: boolean;
+    items:     string[];
+    name:      string;
+    type:      string;
 }
 
 export interface CreatePointSetResponseMeshComponent {
-  boundaries: string[];
-  geode_id: string;
-  internals: string[];
-  is_active: boolean;
-  name: string;
-  type: string;
-  viewer_id: number;
+    boundaries: string[];
+    geode_id:   string;
+    internals:  string[];
+    is_active:  boolean;
+    name:       string;
+    type:       string;
+    viewer_id:  number;
 }
 
 export interface CreateEdgedCurveParams {
-  edges: Array<number[]>;
-  name: string;
-  points: EdgedCurvePoint[];
+    edges:  Array<number[]>;
+    name:   string;
+    points: EdgedCurvePoint[];
 }
 
 export interface EdgedCurvePoint {
-  x: number;
-  y: number;
-  z: number;
+    x: number;
+    y: number;
+    z: number;
 }
 
 export interface CreateEdgedCurveResponse {
-  binary_light_viewable?: string;
-  collection_components?: CreateEdgedCurveResponseCollectionComponent[];
-  geode_id: string;
-  geode_object_type: string;
-  id: string;
-  is_viewable: boolean;
-  mesh_components?: CreateEdgedCurveResponseMeshComponent[];
-  name: string;
-  native_file: string;
-  nb_vertices?: number;
-  viewable_file?: string;
-  viewer_type: string;
+    binary_light_viewable?: string;
+    collection_components?: CreateEdgedCurveResponseCollectionComponent[];
+    geode_id:               string;
+    geode_object_type:      string;
+    id:                     string;
+    is_viewable:            boolean;
+    mesh_components?:       CreateEdgedCurveResponseMeshComponent[];
+    name:                   string;
+    native_file:            string;
+    nb_vertices?:           number;
+    viewable_file?:         string;
+    viewer_type:            string;
 }
 
 export interface CreateEdgedCurveResponseCollectionComponent {
-  geode_id: string;
-  is_active: boolean;
-  items: string[];
-  name: string;
-  type: string;
+    geode_id:  string;
+    is_active: boolean;
+    items:     string[];
+    name:      string;
+    type:      string;
 }
 
 export interface CreateEdgedCurveResponseMeshComponent {
-  boundaries: string[];
-  geode_id: string;
-  internals: string[];
-  is_active: boolean;
-  name: string;
-  type: string;
-  viewer_id: number;
+    boundaries: string[];
+    geode_id:   string;
+    internals:  string[];
+    is_active:  boolean;
+    name:       string;
+    type:       string;
+    viewer_id:  number;
 }
 
 export interface VertexAttributeNamesParams {
-  id: string;
+    id: string;
 }
 
 export interface VertexAttributeNamesResponse {
-  attributes: VertexAttributeNamesResponseAttribute[];
+    attributes: VertexAttributeNamesResponseAttribute[];
 }
 
 export interface VertexAttributeNamesResponseAttribute {
-  attribute_id: string;
-  attribute_name: string;
-  max_value: number;
-  max_values: number[];
-  min_value: number;
-  min_values: number[];
-  nb_items: number;
-  no_data: boolean;
-  time_steps: number[];
+    attribute_id:   string;
+    attribute_name: string;
+    max_value:      number;
+    max_values:     number[];
+    min_value:      number;
+    min_values:     number[];
+    nb_items:       number;
+    no_data:        boolean;
+    time_steps:     number[];
 }
 
 export interface ValidateParams {
-  id: string;
+    id: string;
 }
 
 export interface ValidateResponse {
-  is_valid: boolean;
-  issues: string[];
-  nb_issues: number;
+    is_valid:  boolean;
+    issues:    string[];
+    nb_issues: number;
 }
 
 export interface UploadFileParams {
-  filename?: string;
+    filename?: string;
 }
 
 export interface UploadFileResponse {
-  message: string;
+    message: string;
 }
 
 export interface TimeSeriesAllowedObjectsParams {
-  filename: string;
+    filename: string;
 }
 
 export interface TimeSeriesAllowedObjectsResponse {
-  allowed_objects: string[];
+    allowed_objects: string[];
 }
 
 export interface TextureCoordinatesParams {
-  id: string;
+    id: string;
 }
 
 export interface TextureCoordinatesResponse {
-  texture_coordinates: string[];
+    texture_coordinates: string[];
 }
 
 export interface SaveViewableFileParams {
-  filename: string;
-  geode_object_type: string;
+    filename:          string;
+    geode_object_type: string;
 }
 
 export interface SaveViewableFileResponse {
-  binary_light_viewable?: string;
-  collection_components?: SaveViewableFileResponseCollectionComponent[];
-  geode_id: string;
-  geode_object_type: string;
-  id: string;
-  is_viewable: boolean;
-  mesh_components?: SaveViewableFileResponseMeshComponent[];
-  name: string;
-  native_file: string;
-  nb_vertices?: number;
-  viewable_file?: string;
-  viewer_type: string;
+    binary_light_viewable?: string;
+    collection_components?: SaveViewableFileResponseCollectionComponent[];
+    geode_id:               string;
+    geode_object_type:      string;
+    id:                     string;
+    is_viewable:            boolean;
+    mesh_components?:       SaveViewableFileResponseMeshComponent[];
+    name:                   string;
+    native_file:            string;
+    nb_vertices?:           number;
+    viewable_file?:         string;
+    viewer_type:            string;
 }
 
 export interface SaveViewableFileResponseCollectionComponent {
-  geode_id: string;
-  is_active: boolean;
-  items: string[];
-  name: string;
-  type: string;
+    geode_id:  string;
+    is_active: boolean;
+    items:     string[];
+    name:      string;
+    type:      string;
 }
 
 export interface SaveViewableFileResponseMeshComponent {
-  boundaries: string[];
-  geode_id: string;
-  internals: string[];
-  is_active: boolean;
-  name: string;
-  type: string;
-  viewer_id: number;
+    boundaries: string[];
+    geode_id:   string;
+    internals:  string[];
+    is_active:  boolean;
+    name:       string;
+    type:       string;
+    viewer_id:  number;
 }
 
 export interface PolyhedronAttributeNamesParams {
-  id: string;
+    id: string;
 }
 
 export interface PolyhedronAttributeNamesResponse {
-  attributes: PolyhedronAttributeNamesResponseAttribute[];
+    attributes: PolyhedronAttributeNamesResponseAttribute[];
 }
 
 export interface PolyhedronAttributeNamesResponseAttribute {
-  attribute_id: string;
-  attribute_name: string;
-  max_value: number;
-  max_values: number[];
-  min_value: number;
-  min_values: number[];
-  nb_items: number;
-  no_data: boolean;
-  time_steps: number[];
+    attribute_id:   string;
+    attribute_name: string;
+    max_value:      number;
+    max_values:     number[];
+    min_value:      number;
+    min_values:     number[];
+    nb_items:       number;
+    no_data:        boolean;
+    time_steps:     number[];
 }
 
 export interface PolygonAttributeNamesParams {
-  id: string;
+    id: string;
 }
 
 export interface PolygonAttributeNamesResponse {
-  attributes: PolygonAttributeNamesResponseAttribute[];
+    attributes: PolygonAttributeNamesResponseAttribute[];
 }
 
 export interface PolygonAttributeNamesResponseAttribute {
-  attribute_id: string;
-  attribute_name: string;
-  max_value: number;
-  max_values: number[];
-  min_value: number;
-  min_values: number[];
-  nb_items: number;
-  no_data: boolean;
-  time_steps: number[];
+    attribute_id:   string;
+    attribute_name: string;
+    max_value:      number;
+    max_values:     number[];
+    min_value:      number;
+    min_values:     number[];
+    nb_items:       number;
+    no_data:        boolean;
+    time_steps:     number[];
 }
 
-export interface PingParams {}
+export interface PingParams {
+}
 
 export interface PingResponse {
-  message: string;
+    message: string;
 }
 
 export interface ModelComponentVertexAttributeNamesParams {
-  component_ids: string[];
-  id: string;
+    component_ids: string[];
+    id:            string;
 }
 
 export interface ModelComponentVertexAttributeNamesResponse {
-  attributes: ModelComponentVertexAttributeNamesResponseAttribute[];
+    attributes: ModelComponentVertexAttributeNamesResponseAttribute[];
 }
 
 export interface ModelComponentVertexAttributeNamesResponseAttribute {
-  attribute_id: string;
-  attribute_name: string;
-  max_value: number;
-  max_values: number[];
-  min_value: number;
-  min_values: number[];
-  nb_items: number;
-  no_data: boolean;
-  time_steps: number[];
+    attribute_id:   string;
+    attribute_name: string;
+    max_value:      number;
+    max_values:     number[];
+    min_value:      number;
+    min_values:     number[];
+    nb_items:       number;
+    no_data:        boolean;
+    time_steps:     number[];
 }
 
 export interface ModelComponentPolyhedronAttributeNamesParams {
-  component_ids: string[];
-  id: string;
+    component_ids: string[];
+    id:            string;
 }
 
 export interface ModelComponentPolyhedronAttributeNamesResponse {
-  attributes: ModelComponentPolyhedronAttributeNamesResponseAttribute[];
+    attributes: ModelComponentPolyhedronAttributeNamesResponseAttribute[];
 }
 
 export interface ModelComponentPolyhedronAttributeNamesResponseAttribute {
-  attribute_id: string;
-  attribute_name: string;
-  max_value: number;
-  max_values: number[];
-  min_value: number;
-  min_values: number[];
-  nb_items: number;
-  no_data: boolean;
-  time_steps: number[];
+    attribute_id:   string;
+    attribute_name: string;
+    max_value:      number;
+    max_values:     number[];
+    min_value:      number;
+    min_values:     number[];
+    nb_items:       number;
+    no_data:        boolean;
+    time_steps:     number[];
 }
 
 export interface ModelComponentPolygonAttributeNamesParams {
-  component_ids: string[];
-  id: string;
+    component_ids: string[];
+    id:            string;
 }
 
 export interface ModelComponentPolygonAttributeNamesResponse {
-  attributes: ModelComponentPolygonAttributeNamesResponseAttribute[];
+    attributes: ModelComponentPolygonAttributeNamesResponseAttribute[];
 }
 
 export interface ModelComponentPolygonAttributeNamesResponseAttribute {
-  attribute_id: string;
-  attribute_name: string;
-  max_value: number;
-  max_values: number[];
-  min_value: number;
-  min_values: number[];
-  nb_items: number;
-  no_data: boolean;
-  time_steps: number[];
+    attribute_id:   string;
+    attribute_name: string;
+    max_value:      number;
+    max_values:     number[];
+    min_value:      number;
+    min_values:     number[];
+    nb_items:       number;
+    no_data:        boolean;
+    time_steps:     number[];
 }
 
 export interface ModelComponentEdgeAttributeNamesParams {
-  component_ids: string[];
-  id: string;
+    component_ids: string[];
+    id:            string;
 }
 
 export interface ModelComponentEdgeAttributeNamesResponse {
-  attributes: ModelComponentEdgeAttributeNamesResponseAttribute[];
+    attributes: ModelComponentEdgeAttributeNamesResponseAttribute[];
 }
 
 export interface ModelComponentEdgeAttributeNamesResponseAttribute {
-  attribute_id: string;
-  attribute_name: string;
-  max_value: number;
-  max_values: number[];
-  min_value: number;
-  min_values: number[];
-  nb_items: number;
-  no_data: boolean;
-  time_steps: number[];
+    attribute_id:   string;
+    attribute_name: string;
+    max_value:      number;
+    max_values:     number[];
+    min_value:      number;
+    min_values:     number[];
+    nb_items:       number;
+    no_data:        boolean;
+    time_steps:     number[];
 }
 
 export interface MissingFilesParams {
-  filename: string;
-  geode_object_type: string;
-  time_series?: boolean;
+    filename:          string;
+    geode_object_type: string;
+    time_series?:      boolean;
 }
 
 export interface MissingFilesResponse {
-  additional_files: string[];
-  has_missing_files: boolean;
-  mandatory_files: string[];
+    additional_files:  string[];
+    has_missing_files: boolean;
+    mandatory_files:   string[];
 }
 
-export interface KillParams {}
+export interface KillParams {
+}
 
 export interface KillResponse {
-  message: string;
+    message: string;
 }
 
-export interface ImportProjectParams {}
+export interface ImportProjectParams {
+}
 
 export interface ImportProjectResponse {
-  snapshot: { [key: string]: any };
+    snapshot: { [key: string]: any };
 }
 
 export interface GeographicCoordinateSystemsParams {
-  geode_object_type: string;
+    geode_object_type: string;
 }
 
 export interface GeographicCoordinateSystemsResponse {
-  crs_list: CRSList[];
+    crs_list: CRSList[];
 }
 
 export interface CRSList {
-  authority: string;
-  code: string;
-  name: string;
+    authority: string;
+    code:      string;
+    name:      string;
 }
 
 export interface GeodeObjectsAndOutputExtensionsParams {
-  filename: string;
-  geode_object_type: string;
+    filename:          string;
+    geode_object_type: string;
 }
 
 export interface GeodeObjectsAndOutputExtensionsResponse {
-  geode_objects_and_output_extensions: { [key: string]: { [key: string]: boolean } };
+    geode_objects_and_output_extensions: { [key: string]: { [key: string]: boolean } };
 }
 
 export interface GeodeObjectInheritanceParams {
-  geode_object_type: string;
+    geode_object_type: string;
 }
 
 export interface GeodeObjectInheritanceResponse {
-  children: string[];
-  parents: string[];
+    children: string[];
+    parents:  string[];
 }
 
 export interface ExportProjectParams {
-  filename: string;
-  snapshot: { [key: string]: any };
+    filename: string;
+    snapshot: { [key: string]: any };
 }
 
 export interface EdgeAttributeNamesParams {
-  id: string;
+    id: string;
 }
 
 export interface EdgeAttributeNamesResponse {
-  attributes: EdgeAttributeNamesResponseAttribute[];
+    attributes: EdgeAttributeNamesResponseAttribute[];
 }
 
 export interface EdgeAttributeNamesResponseAttribute {
-  attribute_id: string;
-  attribute_name: string;
-  max_value: number;
-  max_values: number[];
-  min_value: number;
-  min_values: number[];
-  nb_items: number;
-  no_data: boolean;
-  time_steps: number[];
+    attribute_id:   string;
+    attribute_name: string;
+    max_value:      number;
+    max_values:     number[];
+    min_value:      number;
+    min_values:     number[];
+    nb_items:       number;
+    no_data:        boolean;
+    time_steps:     number[];
 }
 
 export interface CellAttributeNamesParams {
-  id: string;
+    id: string;
 }
 
 export interface CellAttributeNamesResponse {
-  attributes: CellAttributeNamesResponseAttribute[];
+    attributes: CellAttributeNamesResponseAttribute[];
 }
 
 export interface CellAttributeNamesResponseAttribute {
-  attribute_id: string;
-  attribute_name: string;
-  max_value: number;
-  max_values: number[];
-  min_value: number;
-  min_values: number[];
-  nb_items: number;
-  no_data: boolean;
-  time_steps: number[];
+    attribute_id:   string;
+    attribute_name: string;
+    max_value:      number;
+    max_values:     number[];
+    min_value:      number;
+    min_values:     number[];
+    nb_items:       number;
+    no_data:        boolean;
+    time_steps:     number[];
 }
 
 export interface ApplyTimeSeriesParams {
-  filename: string;
-  id: string;
+    filename: string;
+    id:       string;
 }
 
 export interface ApplyTimeSeriesResponse {
-  binary_light_viewable?: string;
-  collection_components?: ApplyTimeSeriesResponseCollectionComponent[];
-  geode_id: string;
-  geode_object_type: string;
-  id: string;
-  is_viewable: boolean;
-  mesh_components?: ApplyTimeSeriesResponseMeshComponent[];
-  name: string;
-  native_file: string;
-  nb_vertices?: number;
-  viewable_file?: string;
-  viewer_type: string;
+    binary_light_viewable?: string;
+    collection_components?: ApplyTimeSeriesResponseCollectionComponent[];
+    geode_id:               string;
+    geode_object_type:      string;
+    id:                     string;
+    is_viewable:            boolean;
+    mesh_components?:       ApplyTimeSeriesResponseMeshComponent[];
+    name:                   string;
+    native_file:            string;
+    nb_vertices?:           number;
+    viewable_file?:         string;
+    viewer_type:            string;
 }
 
 export interface ApplyTimeSeriesResponseCollectionComponent {
-  geode_id: string;
-  is_active: boolean;
-  items: string[];
-  name: string;
-  type: string;
+    geode_id:  string;
+    is_active: boolean;
+    items:     string[];
+    name:      string;
+    type:      string;
 }
 
 export interface ApplyTimeSeriesResponseMeshComponent {
-  boundaries: string[];
-  geode_id: string;
-  internals: string[];
-  is_active: boolean;
-  name: string;
-  type: string;
-  viewer_id: number;
+    boundaries: string[];
+    geode_id:   string;
+    internals:  string[];
+    is_active:  boolean;
+    name:       string;
+    type:       string;
+    viewer_id:  number;
 }
 
 export interface AllowedObjectsParams {
-  filename: string;
+    filename: string;
 }
 
 export interface AllowedObjectsResponse {
-  allowed_objects: { [key: string]: AllowedObject };
+    allowed_objects: { [key: string]: AllowedObject };
 }
 
 export interface AllowedObject {
-  is_loadable: number;
-  object_priority: number;
+    is_loadable:     number;
+    object_priority: number;
 }
 
-export interface AllowedFilesParams {}
+export interface AllowedFilesParams {
+}
 
 export interface AllowedFilesResponse {
-  extensions: string[];
-  time_series: string[];
+    extensions:  string[];
+    time_series: string[];
 }
 
 export interface ErrorResponse {
-  code: number;
-  description: string;
-  name: string;
+    code:        number;
+    description: string;
+    name:        string;
 }
 
 // `__params` and `__response` only exist at type level, to infer request/response types from a schema.
@@ -532,72 +536,35 @@ export type TypedSchema<Params, Response> = {
 export interface Schemas {
   readonly opengeodeweb_back: {
     readonly create: {
-      readonly polygonal_surface: (typeof json)["opengeodeweb_back"]["create"]["polygonal_surface"] &
-        TypedSchema<CreatePolygonalSurfaceParams, CreatePolygonalSurfaceResponse>;
-      readonly point_set: (typeof json)["opengeodeweb_back"]["create"]["point_set"] &
-        TypedSchema<CreatePointSetParams, CreatePointSetResponse>;
-      readonly edged_curve: (typeof json)["opengeodeweb_back"]["create"]["edged_curve"] &
-        TypedSchema<CreateEdgedCurveParams, CreateEdgedCurveResponse>;
+      readonly polygonal_surface: (typeof json)["opengeodeweb_back"]["create"]["polygonal_surface"] & TypedSchema<CreatePolygonalSurfaceParams, CreatePolygonalSurfaceResponse>;
+      readonly point_set: (typeof json)["opengeodeweb_back"]["create"]["point_set"] & TypedSchema<CreatePointSetParams, CreatePointSetResponse>;
+      readonly edged_curve: (typeof json)["opengeodeweb_back"]["create"]["edged_curve"] & TypedSchema<CreateEdgedCurveParams, CreateEdgedCurveResponse>;
     };
-    readonly vertex_attribute_names: (typeof json)["opengeodeweb_back"]["vertex_attribute_names"] &
-      TypedSchema<VertexAttributeNamesParams, VertexAttributeNamesResponse>;
-    readonly validate: (typeof json)["opengeodeweb_back"]["validate"] &
-      TypedSchema<ValidateParams, ValidateResponse>;
-    readonly upload_file: (typeof json)["opengeodeweb_back"]["upload_file"] &
-      TypedSchema<UploadFileParams, UploadFileResponse>;
-    readonly time_series_allowed_objects: (typeof json)["opengeodeweb_back"]["time_series_allowed_objects"] &
-      TypedSchema<TimeSeriesAllowedObjectsParams, TimeSeriesAllowedObjectsResponse>;
-    readonly texture_coordinates: (typeof json)["opengeodeweb_back"]["texture_coordinates"] &
-      TypedSchema<TextureCoordinatesParams, TextureCoordinatesResponse>;
-    readonly save_viewable_file: (typeof json)["opengeodeweb_back"]["save_viewable_file"] &
-      TypedSchema<SaveViewableFileParams, SaveViewableFileResponse>;
-    readonly polyhedron_attribute_names: (typeof json)["opengeodeweb_back"]["polyhedron_attribute_names"] &
-      TypedSchema<PolyhedronAttributeNamesParams, PolyhedronAttributeNamesResponse>;
-    readonly polygon_attribute_names: (typeof json)["opengeodeweb_back"]["polygon_attribute_names"] &
-      TypedSchema<PolygonAttributeNamesParams, PolygonAttributeNamesResponse>;
-    readonly ping: (typeof json)["opengeodeweb_back"]["ping"] &
-      TypedSchema<PingParams, PingResponse>;
-    readonly model_component_vertex_attribute_names: (typeof json)["opengeodeweb_back"]["model_component_vertex_attribute_names"] &
-      TypedSchema<
-        ModelComponentVertexAttributeNamesParams,
-        ModelComponentVertexAttributeNamesResponse
-      >;
-    readonly model_component_polyhedron_attribute_names: (typeof json)["opengeodeweb_back"]["model_component_polyhedron_attribute_names"] &
-      TypedSchema<
-        ModelComponentPolyhedronAttributeNamesParams,
-        ModelComponentPolyhedronAttributeNamesResponse
-      >;
-    readonly model_component_polygon_attribute_names: (typeof json)["opengeodeweb_back"]["model_component_polygon_attribute_names"] &
-      TypedSchema<
-        ModelComponentPolygonAttributeNamesParams,
-        ModelComponentPolygonAttributeNamesResponse
-      >;
-    readonly model_component_edge_attribute_names: (typeof json)["opengeodeweb_back"]["model_component_edge_attribute_names"] &
-      TypedSchema<ModelComponentEdgeAttributeNamesParams, ModelComponentEdgeAttributeNamesResponse>;
-    readonly missing_files: (typeof json)["opengeodeweb_back"]["missing_files"] &
-      TypedSchema<MissingFilesParams, MissingFilesResponse>;
-    readonly kill: (typeof json)["opengeodeweb_back"]["kill"] &
-      TypedSchema<KillParams, KillResponse>;
-    readonly import_project: (typeof json)["opengeodeweb_back"]["import_project"] &
-      TypedSchema<ImportProjectParams, ImportProjectResponse>;
-    readonly geographic_coordinate_systems: (typeof json)["opengeodeweb_back"]["geographic_coordinate_systems"] &
-      TypedSchema<GeographicCoordinateSystemsParams, GeographicCoordinateSystemsResponse>;
-    readonly geode_objects_and_output_extensions: (typeof json)["opengeodeweb_back"]["geode_objects_and_output_extensions"] &
-      TypedSchema<GeodeObjectsAndOutputExtensionsParams, GeodeObjectsAndOutputExtensionsResponse>;
-    readonly geode_object_inheritance: (typeof json)["opengeodeweb_back"]["geode_object_inheritance"] &
-      TypedSchema<GeodeObjectInheritanceParams, GeodeObjectInheritanceResponse>;
-    readonly export_project: (typeof json)["opengeodeweb_back"]["export_project"] &
-      TypedSchema<ExportProjectParams, Blob>;
-    readonly edge_attribute_names: (typeof json)["opengeodeweb_back"]["edge_attribute_names"] &
-      TypedSchema<EdgeAttributeNamesParams, EdgeAttributeNamesResponse>;
-    readonly cell_attribute_names: (typeof json)["opengeodeweb_back"]["cell_attribute_names"] &
-      TypedSchema<CellAttributeNamesParams, CellAttributeNamesResponse>;
-    readonly apply_time_series: (typeof json)["opengeodeweb_back"]["apply_time_series"] &
-      TypedSchema<ApplyTimeSeriesParams, ApplyTimeSeriesResponse>;
-    readonly allowed_objects: (typeof json)["opengeodeweb_back"]["allowed_objects"] &
-      TypedSchema<AllowedObjectsParams, AllowedObjectsResponse>;
-    readonly allowed_files: (typeof json)["opengeodeweb_back"]["allowed_files"] &
-      TypedSchema<AllowedFilesParams, AllowedFilesResponse>;
+    readonly vertex_attribute_names: (typeof json)["opengeodeweb_back"]["vertex_attribute_names"] & TypedSchema<VertexAttributeNamesParams, VertexAttributeNamesResponse>;
+    readonly validate: (typeof json)["opengeodeweb_back"]["validate"] & TypedSchema<ValidateParams, ValidateResponse>;
+    readonly upload_file: (typeof json)["opengeodeweb_back"]["upload_file"] & TypedSchema<UploadFileParams, UploadFileResponse>;
+    readonly time_series_allowed_objects: (typeof json)["opengeodeweb_back"]["time_series_allowed_objects"] & TypedSchema<TimeSeriesAllowedObjectsParams, TimeSeriesAllowedObjectsResponse>;
+    readonly texture_coordinates: (typeof json)["opengeodeweb_back"]["texture_coordinates"] & TypedSchema<TextureCoordinatesParams, TextureCoordinatesResponse>;
+    readonly save_viewable_file: (typeof json)["opengeodeweb_back"]["save_viewable_file"] & TypedSchema<SaveViewableFileParams, SaveViewableFileResponse>;
+    readonly polyhedron_attribute_names: (typeof json)["opengeodeweb_back"]["polyhedron_attribute_names"] & TypedSchema<PolyhedronAttributeNamesParams, PolyhedronAttributeNamesResponse>;
+    readonly polygon_attribute_names: (typeof json)["opengeodeweb_back"]["polygon_attribute_names"] & TypedSchema<PolygonAttributeNamesParams, PolygonAttributeNamesResponse>;
+    readonly ping: (typeof json)["opengeodeweb_back"]["ping"] & TypedSchema<PingParams, PingResponse>;
+    readonly model_component_vertex_attribute_names: (typeof json)["opengeodeweb_back"]["model_component_vertex_attribute_names"] & TypedSchema<ModelComponentVertexAttributeNamesParams, ModelComponentVertexAttributeNamesResponse>;
+    readonly model_component_polyhedron_attribute_names: (typeof json)["opengeodeweb_back"]["model_component_polyhedron_attribute_names"] & TypedSchema<ModelComponentPolyhedronAttributeNamesParams, ModelComponentPolyhedronAttributeNamesResponse>;
+    readonly model_component_polygon_attribute_names: (typeof json)["opengeodeweb_back"]["model_component_polygon_attribute_names"] & TypedSchema<ModelComponentPolygonAttributeNamesParams, ModelComponentPolygonAttributeNamesResponse>;
+    readonly model_component_edge_attribute_names: (typeof json)["opengeodeweb_back"]["model_component_edge_attribute_names"] & TypedSchema<ModelComponentEdgeAttributeNamesParams, ModelComponentEdgeAttributeNamesResponse>;
+    readonly missing_files: (typeof json)["opengeodeweb_back"]["missing_files"] & TypedSchema<MissingFilesParams, MissingFilesResponse>;
+    readonly kill: (typeof json)["opengeodeweb_back"]["kill"] & TypedSchema<KillParams, KillResponse>;
+    readonly import_project: (typeof json)["opengeodeweb_back"]["import_project"] & TypedSchema<ImportProjectParams, ImportProjectResponse>;
+    readonly geographic_coordinate_systems: (typeof json)["opengeodeweb_back"]["geographic_coordinate_systems"] & TypedSchema<GeographicCoordinateSystemsParams, GeographicCoordinateSystemsResponse>;
+    readonly geode_objects_and_output_extensions: (typeof json)["opengeodeweb_back"]["geode_objects_and_output_extensions"] & TypedSchema<GeodeObjectsAndOutputExtensionsParams, GeodeObjectsAndOutputExtensionsResponse>;
+    readonly geode_object_inheritance: (typeof json)["opengeodeweb_back"]["geode_object_inheritance"] & TypedSchema<GeodeObjectInheritanceParams, GeodeObjectInheritanceResponse>;
+    readonly export_project: (typeof json)["opengeodeweb_back"]["export_project"] & TypedSchema<ExportProjectParams, Blob>;
+    readonly edge_attribute_names: (typeof json)["opengeodeweb_back"]["edge_attribute_names"] & TypedSchema<EdgeAttributeNamesParams, EdgeAttributeNamesResponse>;
+    readonly cell_attribute_names: (typeof json)["opengeodeweb_back"]["cell_attribute_names"] & TypedSchema<CellAttributeNamesParams, CellAttributeNamesResponse>;
+    readonly apply_time_series: (typeof json)["opengeodeweb_back"]["apply_time_series"] & TypedSchema<ApplyTimeSeriesParams, ApplyTimeSeriesResponse>;
+    readonly allowed_objects: (typeof json)["opengeodeweb_back"]["allowed_objects"] & TypedSchema<AllowedObjectsParams, AllowedObjectsResponse>;
+    readonly allowed_files: (typeof json)["opengeodeweb_back"]["allowed_files"] & TypedSchema<AllowedFilesParams, AllowedFilesResponse>;
   };
 }
 
