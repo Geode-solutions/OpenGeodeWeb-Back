@@ -2,6 +2,8 @@ from __future__ import annotations
 
 # Standard library imports
 import logging
+import threading
+from collections import OrderedDict
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -48,6 +50,28 @@ def load_geode_object(data_id: str) -> GeodeObject:
         Path(file_absolute_path).exists(),
     )
     return geode_object_from_string(data.geode_object).load(file_absolute_path)
+
+
+# Big models take ~1s to load: read-only routes reuse the last loaded objects
+MAX_CACHED_GEODE_OBJECTS = 2
+_cached_geode_objects: OrderedDict[tuple[str, int], GeodeObject] = OrderedDict()
+_cache_lock = threading.Lock()
+
+
+def load_cached_geode_object(data_id: str) -> GeodeObject:
+    """Shared instance: callers must not modify it, use load_geode_object instead"""
+    data = get_data_info(data_id)
+    file_absolute_path = data_file_path(data_id, data.native_file)
+    key = (file_absolute_path, Path(file_absolute_path).stat().st_mtime_ns)
+    with _cache_lock:
+        if key in _cached_geode_objects:
+            _cached_geode_objects.move_to_end(key)
+            return _cached_geode_objects[key]
+        geode_object = geode_object_from_string(data.geode_object).load(file_absolute_path)
+        _cached_geode_objects[key] = geode_object
+        if len(_cached_geode_objects) > MAX_CACHED_GEODE_OBJECTS:
+            _cached_geode_objects.popitem(last=False)
+        return geode_object
 
 
 def get_data_info(data_id: str) -> Data:
