@@ -961,10 +961,7 @@ def test_time_series_allowed_objects(client: FlaskClient) -> None:
     response = client.post(route, json=get_full_data())
     assert response.status_code == 200
     allowed_objects = response.get_json()["allowed_objects"]
-    assert "BRep" in allowed_objects
-    # Structural models are BReps: time series apply to them too
-    assert "StructuralModel" in allowed_objects
-    assert "PointSet3D" not in allowed_objects
+    assert allowed_objects == ["BRep"]
 
     test_utils.test_route_wrong_params(client, route, get_full_data)
 

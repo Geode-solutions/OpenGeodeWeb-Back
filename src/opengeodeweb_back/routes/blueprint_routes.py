@@ -142,13 +142,9 @@ def time_series_allowed_objects(
     params: schemas.TimeSeriesAllowedObjects,
 ) -> schemas.TimeSeriesAllowedObjectsResponse:
     extension = utils_functions.extension_from_filename(params.filename)
+    is_readable = extension in GeodeBRep.time_series_input_extensions()
     return schemas.TimeSeriesAllowedObjectsResponse(
-        allowed_objects=[
-            object_type
-            for object_type, geode_object in geode_objects.items()
-            if issubclass(geode_object, GeodeBRep)
-            and extension in GeodeBRep.time_series_input_extensions()
-        ]
+        allowed_objects=[GeodeBRep.geode_object_type()] if is_readable else []
     )
 
 
@@ -304,9 +300,9 @@ def apply_time_series(
 ) -> schemas.ApplyTimeSeriesResponse:
     data = geode_functions.get_data_info(params.id)
     _check_time_series_extension(params.filename)
-    geode_object = geode_functions.load_geode_object(params.id)
-    if not isinstance(geode_object, GeodeBRep):
+    if data.geode_object != GeodeBRep.geode_object_type():
         flask.abort(400, f"{data.geode_object} is not a BRep: time series cannot be applied")
+    geode_object = GeodeBRep.load(geode_functions.data_file_path(params.id, data.native_file))
     # Applied in memory first: if OpenGeode fails, nothing is written.
     geode_object.load_time_series(geode_functions.upload_file_path(params.filename))
     utils_functions.save_all_viewables_and_return_info(
