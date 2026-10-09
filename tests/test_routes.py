@@ -57,7 +57,7 @@ def test_allowed_files(client: FlaskClient) -> None:
         assert type(extension) is str
     time_series_extensions = response.get_json()["time_series"]
     assert "pvd" in time_series_extensions
-    assert "pvd" in extensions
+    assert "pvd" not in extensions
 
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
@@ -934,6 +934,32 @@ def test_missing_files_time_series(client: FlaskClient) -> None:
         shutil.rmtree(upload_folder / "lonely_time_series", ignore_errors=True)
 
 
+def test_missing_files_time_series_outside_folder(client: FlaskClient) -> None:
+    upload_folder = Path(client.application.config["UPLOAD_FOLDER_PATH"]).resolve()
+    pvd = (
+        '<?xml version="1.0"?>\n<VTKFile type="Collection" version="0.1"><Collection>'
+        '<DataSet timestep="0" file="../000000.vtm" /></Collection></VTKFile>\n'
+    )
+    try:
+        response = client.put(
+            "/opengeodeweb_back/upload_file",
+            query_string={"filename": "outside_time_series/sub/time_series.pvd"},
+            data=pvd.encode(),
+        )
+        assert response.status_code == 201
+        response = client.post(
+            "/opengeodeweb_back/missing_files",
+            json={
+                "geode_object_type": "BRep",
+                "filename": "outside_time_series/sub/time_series.pvd",
+                "time_series": True,
+            },
+        )
+        assert response.status_code == 400
+    finally:
+        shutil.rmtree(upload_folder / "outside_time_series", ignore_errors=True)
+
+
 def test_time_series_allowed_objects(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/time_series_allowed_objects"
 
@@ -944,6 +970,8 @@ def test_time_series_allowed_objects(client: FlaskClient) -> None:
     assert response.status_code == 200
     allowed_objects = response.get_json()["allowed_objects"]
     assert "BRep" in allowed_objects
+    # Structural models are BReps: time series apply to them too
+    assert "StructuralModel" in allowed_objects
     assert "PointSet3D" not in allowed_objects
 
     test_utils.test_route_wrong_params(client, route, get_full_data)
