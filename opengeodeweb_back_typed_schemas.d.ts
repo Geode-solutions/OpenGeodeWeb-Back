@@ -146,12 +146,7 @@ export interface VertexAttributeNamesResponse {
 export interface VertexAttributeNamesResponseAttribute {
     attribute_id:   string;
     attribute_name: string;
-    max_value:      number;
-    max_values:     number[];
-    min_value:      number;
-    min_values:     number[];
     nb_items:       number;
-    no_data:        boolean;
     time_steps:     number[];
 }
 
@@ -230,12 +225,7 @@ export interface PolyhedronAttributeNamesResponse {
 export interface PolyhedronAttributeNamesResponseAttribute {
     attribute_id:   string;
     attribute_name: string;
-    max_value:      number;
-    max_values:     number[];
-    min_value:      number;
-    min_values:     number[];
     nb_items:       number;
-    no_data:        boolean;
     time_steps:     number[];
 }
 
@@ -250,12 +240,7 @@ export interface PolygonAttributeNamesResponse {
 export interface PolygonAttributeNamesResponseAttribute {
     attribute_id:   string;
     attribute_name: string;
-    max_value:      number;
-    max_values:     number[];
-    min_value:      number;
-    min_values:     number[];
     nb_items:       number;
-    no_data:        boolean;
     time_steps:     number[];
 }
 
@@ -278,12 +263,7 @@ export interface ModelComponentVertexAttributeNamesResponse {
 export interface ModelComponentVertexAttributeNamesResponseAttribute {
     attribute_id:   string;
     attribute_name: string;
-    max_value:      number;
-    max_values:     number[];
-    min_value:      number;
-    min_values:     number[];
     nb_items:       number;
-    no_data:        boolean;
     time_steps:     number[];
 }
 
@@ -299,12 +279,7 @@ export interface ModelComponentPolyhedronAttributeNamesResponse {
 export interface ModelComponentPolyhedronAttributeNamesResponseAttribute {
     attribute_id:   string;
     attribute_name: string;
-    max_value:      number;
-    max_values:     number[];
-    min_value:      number;
-    min_values:     number[];
     nb_items:       number;
-    no_data:        boolean;
     time_steps:     number[];
 }
 
@@ -320,12 +295,7 @@ export interface ModelComponentPolygonAttributeNamesResponse {
 export interface ModelComponentPolygonAttributeNamesResponseAttribute {
     attribute_id:   string;
     attribute_name: string;
-    max_value:      number;
-    max_values:     number[];
-    min_value:      number;
-    min_values:     number[];
     nb_items:       number;
-    no_data:        boolean;
     time_steps:     number[];
 }
 
@@ -341,12 +311,7 @@ export interface ModelComponentEdgeAttributeNamesResponse {
 export interface ModelComponentEdgeAttributeNamesResponseAttribute {
     attribute_id:   string;
     attribute_name: string;
-    max_value:      number;
-    max_values:     number[];
-    min_value:      number;
-    min_values:     number[];
     nb_items:       number;
-    no_data:        boolean;
     time_steps:     number[];
 }
 
@@ -423,12 +388,7 @@ export interface EdgeAttributeNamesResponse {
 export interface EdgeAttributeNamesResponseAttribute {
     attribute_id:   string;
     attribute_name: string;
-    max_value:      number;
-    max_values:     number[];
-    min_value:      number;
-    min_values:     number[];
     nb_items:       number;
-    no_data:        boolean;
     time_steps:     number[];
 }
 
@@ -443,13 +403,23 @@ export interface CellAttributeNamesResponse {
 export interface CellAttributeNamesResponseAttribute {
     attribute_id:   string;
     attribute_name: string;
-    max_value:      number;
-    max_values:     number[];
-    min_value:      number;
-    min_values:     number[];
     nb_items:       number;
-    no_data:        boolean;
     time_steps:     number[];
+}
+
+export interface AttributeRangeParams {
+    attribute_name: string;
+    component_ids?: string[];
+    element:        Element;
+    id:             string;
+}
+
+export type Element = "vertex" | "edge" | "cell" | "polygon" | "polyhedron";
+
+export interface AttributeRangeResponse {
+    max_values: number[];
+    min_values: number[];
+    no_data:    boolean;
 }
 
 export interface AllowedObjectsParams {
@@ -513,6 +483,7 @@ export interface Schemas {
     readonly export_project: (typeof json)["opengeodeweb_back"]["export_project"] & TypedSchema<ExportProjectParams, Blob>;
     readonly edge_attribute_names: (typeof json)["opengeodeweb_back"]["edge_attribute_names"] & TypedSchema<EdgeAttributeNamesParams, EdgeAttributeNamesResponse>;
     readonly cell_attribute_names: (typeof json)["opengeodeweb_back"]["cell_attribute_names"] & TypedSchema<CellAttributeNamesParams, CellAttributeNamesResponse>;
+    readonly attribute_range: (typeof json)["opengeodeweb_back"]["attribute_range"] & TypedSchema<AttributeRangeParams, AttributeRangeResponse>;
     readonly allowed_objects: (typeof json)["opengeodeweb_back"]["allowed_objects"] & TypedSchema<AllowedObjectsParams, AllowedObjectsResponse>;
     readonly allowed_files: (typeof json)["opengeodeweb_back"]["allowed_files"] & TypedSchema<AllowedFilesParams, AllowedFilesResponse>;
   };

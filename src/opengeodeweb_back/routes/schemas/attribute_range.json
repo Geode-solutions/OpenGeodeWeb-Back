@@ -1,0 +1,69 @@
+{
+  "route": "/attribute_range",
+  "methods": [
+    "POST"
+  ],
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 32
+    },
+    "element": {
+      "type": "string",
+      "enum": [
+        "vertex",
+        "edge",
+        "cell",
+        "polygon",
+        "polyhedron"
+      ]
+    },
+    "attribute_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "component_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "id",
+    "element",
+    "attribute_name"
+  ],
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "min_values": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "max_values": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "no_data": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "min_values",
+      "max_values",
+      "no_data"
+    ],
+    "additionalProperties": false
+  }
+}

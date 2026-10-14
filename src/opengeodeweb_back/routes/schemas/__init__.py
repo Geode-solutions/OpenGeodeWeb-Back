@@ -19,5 +19,6 @@ from .geode_object_inheritance import *
 from .export_project import *
 from .edge_attribute_names import *
 from .cell_attribute_names import *
+from .attribute_range import *
 from .allowed_objects import *
 from .allowed_files import *

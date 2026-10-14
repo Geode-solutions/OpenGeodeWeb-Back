@@ -607,27 +607,6 @@
                 "nb_items": {
                   "type": "integer"
                 },
-                "min_value": {
-                  "type": "number"
-                },
-                "max_value": {
-                  "type": "number"
-                },
-                "min_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "max_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "no_data": {
-                  "type": "boolean"
-                },
                 "time_steps": {
                   "type": "array",
                   "items": {
@@ -639,11 +618,6 @@
                 "attribute_name",
                 "attribute_id",
                 "nb_items",
-                "min_value",
-                "max_value",
-                "min_values",
-                "max_values",
-                "no_data",
                 "time_steps"
               ],
               "additionalProperties": false
@@ -956,27 +930,6 @@
                 "nb_items": {
                   "type": "integer"
                 },
-                "min_value": {
-                  "type": "number"
-                },
-                "max_value": {
-                  "type": "number"
-                },
-                "min_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "max_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "no_data": {
-                  "type": "boolean"
-                },
                 "time_steps": {
                   "type": "array",
                   "items": {
@@ -988,11 +941,6 @@
                 "attribute_name",
                 "attribute_id",
                 "nb_items",
-                "min_value",
-                "max_value",
-                "min_values",
-                "max_values",
-                "no_data",
                 "time_steps"
               ],
               "additionalProperties": false
@@ -1040,27 +988,6 @@
                 "nb_items": {
                   "type": "integer"
                 },
-                "min_value": {
-                  "type": "number"
-                },
-                "max_value": {
-                  "type": "number"
-                },
-                "min_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "max_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "no_data": {
-                  "type": "boolean"
-                },
                 "time_steps": {
                   "type": "array",
                   "items": {
@@ -1072,11 +999,6 @@
                 "attribute_name",
                 "attribute_id",
                 "nb_items",
-                "min_value",
-                "max_value",
-                "min_values",
-                "max_values",
-                "no_data",
                 "time_steps"
               ],
               "additionalProperties": false
@@ -1157,27 +1079,6 @@
                 "nb_items": {
                   "type": "integer"
                 },
-                "min_value": {
-                  "type": "number"
-                },
-                "max_value": {
-                  "type": "number"
-                },
-                "min_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "max_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "no_data": {
-                  "type": "boolean"
-                },
                 "time_steps": {
                   "type": "array",
                   "items": {
@@ -1189,11 +1090,6 @@
                 "attribute_name",
                 "attribute_id",
                 "nb_items",
-                "min_value",
-                "max_value",
-                "min_values",
-                "max_values",
-                "no_data",
                 "time_steps"
               ],
               "additionalProperties": false
@@ -1251,27 +1147,6 @@
                 "nb_items": {
                   "type": "integer"
                 },
-                "min_value": {
-                  "type": "number"
-                },
-                "max_value": {
-                  "type": "number"
-                },
-                "min_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "max_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "no_data": {
-                  "type": "boolean"
-                },
                 "time_steps": {
                   "type": "array",
                   "items": {
@@ -1283,11 +1158,6 @@
                 "attribute_name",
                 "attribute_id",
                 "nb_items",
-                "min_value",
-                "max_value",
-                "min_values",
-                "max_values",
-                "no_data",
                 "time_steps"
               ],
               "additionalProperties": false
@@ -1345,27 +1215,6 @@
                 "nb_items": {
                   "type": "integer"
                 },
-                "min_value": {
-                  "type": "number"
-                },
-                "max_value": {
-                  "type": "number"
-                },
-                "min_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "max_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "no_data": {
-                  "type": "boolean"
-                },
                 "time_steps": {
                   "type": "array",
                   "items": {
@@ -1377,11 +1226,6 @@
                 "attribute_name",
                 "attribute_id",
                 "nb_items",
-                "min_value",
-                "max_value",
-                "min_values",
-                "max_values",
-                "no_data",
                 "time_steps"
               ],
               "additionalProperties": false
@@ -1439,27 +1283,6 @@
                 "nb_items": {
                   "type": "integer"
                 },
-                "min_value": {
-                  "type": "number"
-                },
-                "max_value": {
-                  "type": "number"
-                },
-                "min_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "max_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "no_data": {
-                  "type": "boolean"
-                },
                 "time_steps": {
                   "type": "array",
                   "items": {
@@ -1471,11 +1294,6 @@
                 "attribute_name",
                 "attribute_id",
                 "nb_items",
-                "min_value",
-                "max_value",
-                "min_values",
-                "max_values",
-                "no_data",
                 "time_steps"
               ],
               "additionalProperties": false
@@ -1774,27 +1592,6 @@
                 "nb_items": {
                   "type": "integer"
                 },
-                "min_value": {
-                  "type": "number"
-                },
-                "max_value": {
-                  "type": "number"
-                },
-                "min_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "max_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "no_data": {
-                  "type": "boolean"
-                },
                 "time_steps": {
                   "type": "array",
                   "items": {
@@ -1806,11 +1603,6 @@
                 "attribute_name",
                 "attribute_id",
                 "nb_items",
-                "min_value",
-                "max_value",
-                "min_values",
-                "max_values",
-                "no_data",
                 "time_steps"
               ],
               "additionalProperties": false
@@ -1858,27 +1650,6 @@
                 "nb_items": {
                   "type": "integer"
                 },
-                "min_value": {
-                  "type": "number"
-                },
-                "max_value": {
-                  "type": "number"
-                },
-                "min_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "max_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "no_data": {
-                  "type": "boolean"
-                },
                 "time_steps": {
                   "type": "array",
                   "items": {
@@ -1890,11 +1661,6 @@
                 "attribute_name",
                 "attribute_id",
                 "nb_items",
-                "min_value",
-                "max_value",
-                "min_values",
-                "max_values",
-                "no_data",
                 "time_steps"
               ],
               "additionalProperties": false
@@ -1903,6 +1669,76 @@
         },
         "required": [
           "attributes"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "attribute_range": {
+      "$id": "opengeodeweb_back/attribute_range",
+      "route": "/attribute_range",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 32
+        },
+        "element": {
+          "type": "string",
+          "enum": [
+            "vertex",
+            "edge",
+            "cell",
+            "polygon",
+            "polyhedron"
+          ]
+        },
+        "attribute_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 36,
+            "maxLength": 36
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "element",
+        "attribute_name"
+      ],
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "min_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "max_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "no_data": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "min_values",
+          "max_values",
+          "no_data"
         ],
         "additionalProperties": false
       }
