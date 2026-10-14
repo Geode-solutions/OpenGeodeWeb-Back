@@ -19,7 +19,8 @@ class AllowedFilesResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    extensions: List[str]
+    data_extensions: List[str]
+    time_series_extensions: List[str]
 
 
 allowed_files_route = Route(

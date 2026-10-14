@@ -28,6 +28,7 @@ from sqlalchemy.exc import OperationalError
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
 from opengeodeweb_back.geode_objects import geode_objects
+from opengeodeweb_back.geode_objects.geode_brep import GeodeBRep
 from opengeodeweb_back.geode_objects.geode_graph import GeodeGraph
 from opengeodeweb_back.geode_objects.geode_grid2d import GeodeGrid2D
 from opengeodeweb_back.geode_objects.geode_grid3d import GeodeGrid3D
@@ -41,6 +42,7 @@ from opengeodeweb_back.typed_route import parse_params, raw_route, typed_route
 
 if TYPE_CHECKING:
     from werkzeug.datastructures import FileStorage
+
 
 ComponentMesh = (
     og.Corner2D,
@@ -62,11 +64,14 @@ routes = flask.Blueprint("routes", __name__, url_prefix="/opengeodeweb_back")
 
 @typed_route(routes, schemas.allowed_files_route)
 def allowed_files(_params: schemas.AllowedFiles) -> schemas.AllowedFilesResponse:
-    extensions: set[str] = set()
+    data_extensions: set[str] = set()
     for geode_object in geode_objects.values():
-        for extension in geode_object.input_extensions():
-            extensions.add(extension)
-    return schemas.AllowedFilesResponse(extensions=list(extensions))
+        data_extensions.update(geode_object.input_extensions())
+    # Time series files are applied on an existing BRep, not imported as data
+    return schemas.AllowedFilesResponse(
+        data_extensions=list(data_extensions),
+        time_series_extensions=GeodeBRep.time_series_input_extensions(),
+    )
 
 
 def _write_stream(path: Path, stream: typing.IO[bytes], mode: str = "wb") -> None:
@@ -101,21 +106,23 @@ def upload_file() -> flask.Response:
         file = flask.request.files["file"]
         if file.filename is None:
             flask.abort(400, "Filename is required")
-        filename = werkzeug.utils.secure_filename(Path(file.filename).name)
-        file_path = Path(upload_folder_path) / filename
+        # Only the name is kept: some multipart clients send their full local path.
+        # Relative paths (folder uploads) go through the raw upload below.
+        file_path = Path(geode_functions.upload_file_path(Path(file.filename).name))
+        file_path.parent.mkdir(parents=True, exist_ok=True)
         file.save(file_path)
-        return _finalize_upload(filename)
+        return _finalize_upload(file_path.name)
 
     raw_filename = flask.request.args.get("filename")
     if not raw_filename:
         flask.abort(400, "Filename is required")
-    filename = werkzeug.utils.secure_filename(Path(raw_filename).name)
-    file_path = Path(upload_folder_path) / filename
+    file_path = Path(geode_functions.upload_file_path(raw_filename))
+    file_path.parent.mkdir(parents=True, exist_ok=True)
 
     total_chunks = flask.request.args.get("total_chunks", type=int)
     if total_chunks is None:
         _write_stream(file_path, flask.request.stream)
-        return _finalize_upload(filename)
+        return _finalize_upload(file_path.name)
 
     chunk_index = flask.request.args.get("chunk_index", type=int)
     if chunk_index is None or not 0 <= chunk_index < total_chunks:
@@ -127,7 +134,18 @@ def upload_file() -> flask.Response:
         return _upload_response("Chunk received", 200)
 
     part_path.replace(file_path)
-    return _finalize_upload(filename)
+    return _finalize_upload(file_path.name)
+
+
+@typed_route(routes, schemas.time_series_allowed_objects_route)
+def time_series_allowed_objects(
+    params: schemas.TimeSeriesAllowedObjects,
+) -> schemas.TimeSeriesAllowedObjectsResponse:
+    extension = utils_functions.extension_from_filename(params.filename)
+    is_readable = extension in GeodeBRep.time_series_input_extensions()
+    return schemas.TimeSeriesAllowedObjectsResponse(
+        allowed_objects=[GeodeBRep.geode_object_type()] if is_readable else []
+    )
 
 
 @typed_route(routes, schemas.allowed_objects_route)
@@ -149,28 +167,69 @@ def allowed_objects(
     return schemas.AllowedObjectsResponse(allowed_objects=allowed_objects)
 
 
-@typed_route(routes, schemas.missing_files_route)
-def missing_files(params: schemas.MissingFiles) -> schemas.MissingFilesResponse:
-    file_path = geode_functions.upload_file_path(params.filename)
-    geode_object = geode_functions.geode_object_from_string(params.geode_object_type)
-    additional_files = geode_object.additional_files(
-        file_path,
-    )
-    has_missing_files = any(
-        file.is_missing
-        for file in additional_files.mandatory_files + additional_files.optional_files
-    )
-    mandatory_files = [
-        Path(file.filename).name for file in additional_files.mandatory_files if file.is_missing
-    ]
-    additional_files_array = [
-        Path(file.filename).name for file in additional_files.optional_files if file.is_missing
-    ]
+def _check_time_series_extension(filename: str) -> None:
+    extension = utils_functions.extension_from_filename(filename)
+    if extension not in GeodeBRep.time_series_input_extensions():
+        flask.abort(400, f"No time series reader for .{extension}")
 
-    return schemas.MissingFilesResponse(
-        has_missing_files=has_missing_files,
-        mandatory_files=mandatory_files,
-        additional_files=additional_files_array,
+
+def _resolved_path(file_path: str, main_file: Path) -> Path:
+    path = Path(file_path)
+    if not path.is_absolute():
+        path = main_file.parent / path
+    return path.resolve()
+
+
+def _path_relative_to_main_file(file_path: str, main_file: Path) -> str:
+    path = _resolved_path(file_path, main_file)
+    if path.is_relative_to(main_file.parent):
+        return path.relative_to(main_file.parent).as_posix()
+    return path.name
+
+
+def _missing_files(additional_files: og.AdditionalFiles, main_file: Path) -> dict[str, typing.Any]:
+    return {
+        "has_missing_files": any(
+            file.is_missing
+            for file in additional_files.mandatory_files + additional_files.optional_files
+        ),
+        "mandatory_files": [
+            _path_relative_to_main_file(file.filename, main_file)
+            for file in additional_files.mandatory_files
+            if file.is_missing
+        ],
+        "additional_files": [
+            _path_relative_to_main_file(file.filename, main_file)
+            for file in additional_files.optional_files
+            if file.is_missing
+        ],
+    }
+
+
+@typed_route(routes, schemas.data_missing_files_route)
+def data_missing_files(params: schemas.DataMissingFiles) -> schemas.DataMissingFilesResponse:
+    file_path = Path(geode_functions.upload_file_path(params.filename))
+    geode_object = geode_functions.geode_object_from_string(params.geode_object_type)
+    additional_files = geode_object.additional_files(str(file_path))
+    return schemas.DataMissingFilesResponse.from_dict(_missing_files(additional_files, file_path))
+
+
+@typed_route(routes, schemas.time_series_missing_files_route)
+def time_series_missing_files(
+    params: schemas.TimeSeriesMissingFiles,
+) -> schemas.TimeSeriesMissingFilesResponse:
+    file_path = Path(geode_functions.upload_file_path(params.filename))
+    _check_time_series_extension(file_path.name)
+    additional_files = GeodeBRep.time_series_additional_files(str(file_path))
+    # Uploads always land under the time series file's folder:
+    # files referenced outside of it could never be provided
+    if any(
+        not _resolved_path(file.filename, file_path).is_relative_to(file_path.parent)
+        for file in additional_files.mandatory_files + additional_files.optional_files
+    ):
+        flask.abort(400, f"{file_path.name} references files outside its folder")
+    return schemas.TimeSeriesMissingFilesResponse.from_dict(
+        _missing_files(additional_files, file_path)
     )
 
 
@@ -233,6 +292,23 @@ def save_viewable_file(
             input_file=params.filename,
         )
     )
+
+
+@typed_route(routes, schemas.apply_time_series_route)
+def apply_time_series(
+    params: schemas.ApplyTimeSeries,
+) -> schemas.ApplyTimeSeriesResponse:
+    data = geode_functions.get_data_info(params.id)
+    _check_time_series_extension(params.filename)
+    if data.geode_object != GeodeBRep.geode_object_type():
+        flask.abort(400, f"{data.geode_object} is not a BRep: time series cannot be applied")
+    geode_object = GeodeBRep.load(geode_functions.data_file_path(params.id, data.native_file))
+    # Applied in memory first: if OpenGeode fails, nothing is written.
+    geode_object.load_time_series(geode_functions.upload_file_path(params.filename))
+    utils_functions.save_all_viewables_and_return_info(
+        geode_object, data, geode_functions.data_file_path(params.id)
+    )
+    return schemas.ApplyTimeSeriesResponse()
 
 
 @typed_route(routes, schemas.texture_coordinates_route)

@@ -726,6 +726,83 @@
         "additionalProperties": false
       }
     },
+    "time_series_missing_files": {
+      "$id": "opengeodeweb_back/time_series_missing_files",
+      "route": "/time_series_missing_files",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "filename": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "filename"
+      ],
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "has_missing_files": {
+            "type": "boolean"
+          },
+          "mandatory_files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "additional_files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "has_missing_files",
+          "mandatory_files",
+          "additional_files"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "time_series_allowed_objects": {
+      "$id": "opengeodeweb_back/time_series_allowed_objects",
+      "route": "/time_series_allowed_objects",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "filename": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "filename"
+      ],
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "allowed_objects": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "allowed_objects"
+        ],
+        "additionalProperties": false
+      }
+    },
     "texture_coordinates": {
       "$id": "opengeodeweb_back/texture_coordinates",
       "route": "/texture_coordinates",
@@ -1488,55 +1565,6 @@
         "additionalProperties": false
       }
     },
-    "missing_files": {
-      "$id": "opengeodeweb_back/missing_files",
-      "route": "/missing_files",
-      "methods": [
-        "POST"
-      ],
-      "type": "object",
-      "properties": {
-        "geode_object_type": {
-          "type": "string",
-          "minLength": 1
-        },
-        "filename": {
-          "type": "string",
-          "minLength": 1
-        }
-      },
-      "required": [
-        "geode_object_type",
-        "filename"
-      ],
-      "additionalProperties": false,
-      "response": {
-        "type": "object",
-        "properties": {
-          "has_missing_files": {
-            "type": "boolean"
-          },
-          "mandatory_files": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "additional_files": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [
-          "has_missing_files",
-          "mandatory_files",
-          "additional_files"
-        ],
-        "additionalProperties": false
-      }
-    },
     "kill": {
       "$id": "opengeodeweb_back/kill",
       "route": "/kill",
@@ -1823,6 +1851,55 @@
         "additionalProperties": false
       }
     },
+    "data_missing_files": {
+      "$id": "opengeodeweb_back/data_missing_files",
+      "route": "/data_missing_files",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "geode_object_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "filename": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "geode_object_type",
+        "filename"
+      ],
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "has_missing_files": {
+            "type": "boolean"
+          },
+          "mandatory_files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "additional_files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "has_missing_files",
+          "mandatory_files",
+          "additional_files"
+        ],
+        "additionalProperties": false
+      }
+    },
     "cell_attribute_names": {
       "$id": "opengeodeweb_back/cell_attribute_names",
       "route": "/cell_attribute_names",
@@ -1907,6 +1984,36 @@
         "additionalProperties": false
       }
     },
+    "apply_time_series": {
+      "$id": "opengeodeweb_back/apply_time_series",
+      "route": "/apply_time_series",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 32
+        },
+        "filename": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "filename"
+      ],
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      }
+    },
     "allowed_objects": {
       "$id": "opengeodeweb_back/allowed_objects",
       "route": "/allowed_objects",
@@ -1966,7 +2073,13 @@
       "response": {
         "type": "object",
         "properties": {
-          "extensions": {
+          "data_extensions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "time_series_extensions": {
             "type": "array",
             "items": {
               "type": "string"
@@ -1974,7 +2087,8 @@
           }
         },
         "required": [
-          "extensions"
+          "data_extensions",
+          "time_series_extensions"
         ],
         "additionalProperties": false
       }
