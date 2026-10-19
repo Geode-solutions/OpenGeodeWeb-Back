@@ -260,6 +260,16 @@ def _attribute_ids_for_name(
     return attribute_ids[:1]
 
 
+def _is_nan_no_value(no_value: object) -> bool:
+    if isinstance(no_value, float):
+        return math.isnan(no_value)
+    if isinstance(no_value, list):
+        return bool(no_value) and all(
+            isinstance(value, float) and math.isnan(value) for value in no_value
+        )
+    return False
+
+
 def _extract_valid_values_from_attribute(
     attribute_manager: og.AttributeManager,
     attribute_id: og.uuid,
@@ -292,7 +302,8 @@ def _extract_valid_values_from_attribute(
         item_value(element_index, item_index)
         for element_index in range(attribute_manager.nb_elements())
     ]
-    if no_value is None:
+    # A NaN no value never compares equal: the isnan filter alone removes it
+    if no_value is None or _is_nan_no_value(no_value):
         valid_values = [value for value in values if not math.isnan(value)]
         return valid_values, len(valid_values) != len(values)
     valid_values = [
