@@ -1006,19 +1006,6 @@ def test_model_component_attribute_range(client: FlaskClient) -> None:
     assert len(response.get_json()["max_values"]) == 1
 
 
-def test_load_cached_geode_object(client: FlaskClient) -> None:
-    model_id, _ = _load_brep_components(client)
-    with client.application.app_context():
-        geode_object = geode_functions.load_cached_geode_object(model_id)
-        assert geode_functions.load_cached_geode_object(model_id) is geode_object
-
-        data = geode_functions.get_data_info(model_id)
-        native_file = Path(geode_functions.data_file_path(model_id, data.native_file))
-        mtime_ns = native_file.stat().st_mtime_ns + 1_000_000_000
-        os.utime(native_file, ns=(mtime_ns, mtime_ns))
-        assert geode_functions.load_cached_geode_object(model_id) is not geode_object
-
-
 def test_apply_time_series(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/apply_time_series"
     model_id, by_type = _load_brep_components(client)

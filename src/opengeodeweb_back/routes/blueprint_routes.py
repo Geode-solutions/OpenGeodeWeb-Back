@@ -540,7 +540,7 @@ def _range_attribute_managers(
 @typed_route(routes, schemas.attribute_range_route)
 def attribute_range(params: schemas.AttributeRange) -> schemas.AttributeRangeResponse:
     # The managers point into geode_object: it must outlive them
-    geode_object = geode_functions.load_cached_geode_object(params.id)
+    geode_object = geode_functions.load_geode_object(params.id)
     attribute_managers = _range_attribute_managers(geode_object, params)
     nb_items = min(
         (
@@ -561,7 +561,7 @@ def attribute_range(params: schemas.AttributeRange) -> schemas.AttributeRangeRes
 def vertex_attribute_names(
     params: schemas.VertexAttributeNames,
 ) -> schemas.VertexAttributeNamesResponse:
-    geode_object = geode_functions.load_cached_geode_object(params.id)
+    geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeMesh):
         flask.abort(400, f"{params.id} is not a GeodeMesh")
     attribute_manager = geode_object.vertex_attribute_manager()
@@ -574,7 +574,7 @@ def vertex_attribute_names(
 def cell_attribute_names(
     params: schemas.CellAttributeNames,
 ) -> schemas.CellAttributeNamesResponse:
-    geode_object = geode_functions.load_cached_geode_object(params.id)
+    geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeGrid2D | GeodeGrid3D):
         flask.abort(400, f"{params.id} is not a GeodeGrid")
     attribute_manager = geode_object.cell_attribute_manager()
@@ -587,7 +587,7 @@ def cell_attribute_names(
 def polygon_attribute_names(
     params: schemas.PolygonAttributeNames,
 ) -> schemas.PolygonAttributeNamesResponse:
-    geode_object = geode_functions.load_cached_geode_object(params.id)
+    geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeSurfaceMesh2D | GeodeSurfaceMesh3D):
         flask.abort(400, f"{params.id} is not a GeodeSurfaceMesh")
     attribute_manager = geode_object.polygon_attribute_manager()
@@ -600,7 +600,7 @@ def polygon_attribute_names(
 def polyhedron_attribute_names(
     params: schemas.PolyhedronAttributeNames,
 ) -> schemas.PolyhedronAttributeNamesResponse:
-    geode_object = geode_functions.load_cached_geode_object(params.id)
+    geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeSolidMesh3D):
         flask.abort(400, f"{params.id} is not a GeodeSolidMesh")
     attribute_manager = geode_object.polyhedron_attribute_manager()
@@ -613,7 +613,7 @@ def polyhedron_attribute_names(
 def edge_attribute_names(
     params: schemas.EdgeAttributeNames,
 ) -> schemas.EdgeAttributeNamesResponse:
-    geode_object = geode_functions.load_cached_geode_object(params.id)
+    geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeGraph):
         flask.abort(400, f"{params.id} does not have edges")
     attribute_manager = geode_object.edge_attribute_manager()
@@ -626,7 +626,7 @@ def edge_attribute_names(
 def model_component_vertex_attribute_names(
     params: schemas.ModelComponentVertexAttributeNames,
 ) -> schemas.ModelComponentVertexAttributeNamesResponse:
-    geode_object = geode_functions.load_cached_geode_object(params.id)
+    geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
     managers = [
@@ -646,7 +646,7 @@ def model_component_vertex_attribute_names(
 def model_component_edge_attribute_names(
     params: schemas.ModelComponentEdgeAttributeNames,
 ) -> schemas.ModelComponentEdgeAttributeNamesResponse:
-    geode_object = geode_functions.load_cached_geode_object(params.id)
+    geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
     managers = [
@@ -666,7 +666,7 @@ def model_component_edge_attribute_names(
 def model_component_polygon_attribute_names(
     params: schemas.ModelComponentPolygonAttributeNames,
 ) -> schemas.ModelComponentPolygonAttributeNamesResponse:
-    geode_object = geode_functions.load_cached_geode_object(params.id)
+    geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
     managers = [
@@ -686,7 +686,7 @@ def model_component_polygon_attribute_names(
 def model_component_polyhedron_attribute_names(
     params: schemas.ModelComponentPolyhedronAttributeNames,
 ) -> schemas.ModelComponentPolyhedronAttributeNamesResponse:
-    geode_object = geode_functions.load_cached_geode_object(params.id)
+    geode_object = geode_functions.load_geode_object(params.id)
     if not isinstance(geode_object, GeodeModel):
         flask.abort(400, f"{params.id} is not a GeodeModel")
     managers = [
