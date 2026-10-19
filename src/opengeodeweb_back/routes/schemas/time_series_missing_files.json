@@ -1,0 +1,43 @@
+{
+  "route": "/time_series_missing_files",
+  "methods": [
+    "POST"
+  ],
+  "type": "object",
+  "properties": {
+    "filename": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "filename"
+  ],
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "has_missing_files": {
+        "type": "boolean"
+      },
+      "mandatory_files": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "additional_files": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [
+      "has_missing_files",
+      "mandatory_files",
+      "additional_files"
+    ],
+    "additionalProperties": false
+  }
+}
