@@ -1,5 +1,5 @@
 {
-  "route": "/attribute_range",
+  "route": "/polygon_attribute_range",
   "methods": [
     "POST"
   ],
@@ -10,33 +10,13 @@
       "minLength": 32,
       "maxLength": 32
     },
-    "element": {
-      "type": "string",
-      "enum": [
-        "vertex",
-        "edge",
-        "cell",
-        "polygon",
-        "polyhedron"
-      ]
-    },
     "attribute_name": {
       "type": "string",
       "minLength": 1
-    },
-    "component_ids": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 36,
-        "maxLength": 36
-      },
-      "minItems": 1
     }
   },
   "required": [
     "id",
-    "element",
     "attribute_name"
   ],
   "additionalProperties": false,

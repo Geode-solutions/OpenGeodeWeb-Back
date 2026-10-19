@@ -853,8 +853,8 @@ def test_vertex_attribute_names_time_series(client: FlaskClient) -> None:
     assert temperature[0]["time_steps"] == [0.5, 1.0, 2.0]
 
 
-def test_attribute_range(client: FlaskClient) -> None:
-    route = "/opengeodeweb_back/attribute_range"
+def test_polyhedron_attribute_range(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/polyhedron_attribute_range"
 
     with client.application.app_context():
         file = str(data_dir / "polyhedron_attribute.vtu")
@@ -873,16 +873,14 @@ def test_attribute_range(client: FlaskClient) -> None:
         data_path.parent.mkdir(parents=True, exist_ok=True)
         assert data_path.exists(), f"File not found at {data_path}"
         data_id = data.id
-    response = client.post(
-        route, json={"id": data_id, "element": "polyhedron", "attribute_name": "toto_on_polyhedra"}
-    )
+    response = client.post(route, json={"id": data_id, "attribute_name": "toto_on_polyhedra"})
     assert response.status_code == 200
     assert response.get_json()["min_values"] == [3.0]
     assert response.get_json()["max_values"] == [6.0]
     assert isinstance(response.get_json()["no_data"], bool)
 
     def get_full_data() -> test_utils.JsonData:
-        return {"id": data_id, "element": "polyhedron", "attribute_name": "toto_on_polyhedra"}
+        return {"id": data_id, "attribute_name": "toto_on_polyhedra"}
 
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
@@ -961,8 +959,8 @@ def test_time_series_allowed_objects(client: FlaskClient) -> None:
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_attribute_range_time_series(client: FlaskClient) -> None:
-    route = "/opengeodeweb_back/attribute_range"
+def test_vertex_attribute_range_time_series(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/vertex_attribute_range"
 
     with client.application.app_context():
         file = str(data_dir / "time_series.og_psf3d")
@@ -980,23 +978,20 @@ def test_attribute_range_time_series(client: FlaskClient) -> None:
         data_path = Path(geode_functions.data_file_path(data.id, data.native_file))
         data_path.parent.mkdir(parents=True, exist_ok=True)
         assert data_path.exists(), f"File not found at {data_path}"
-    response = client.post(
-        route, json={"id": data.id, "element": "vertex", "attribute_name": "temperature"}
-    )
+    response = client.post(route, json={"id": data.id, "attribute_name": "temperature"})
     assert response.status_code == 200
     assert response.get_json()["min_values"] == [5.0]
     assert response.get_json()["max_values"] == [23.0]
 
 
-def test_model_component_attribute_range(client: FlaskClient) -> None:
-    route = "/opengeodeweb_back/attribute_range"
+def test_model_component_vertex_attribute_range(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/model_component_vertex_attribute_range"
     model_id, by_type = _load_brep_components(client)
 
     response = client.post(
         route,
         json={
             "id": model_id,
-            "element": "vertex",
             "attribute_name": "unique vertices",
             "component_ids": by_type["Corner"],
         },

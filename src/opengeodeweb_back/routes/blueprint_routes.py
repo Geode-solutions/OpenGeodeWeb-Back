@@ -43,7 +43,6 @@ from opengeodeweb_back.typed_route import parse_params, raw_route, typed_route
 if TYPE_CHECKING:
     from werkzeug.datastructures import FileStorage
 
-    from opengeodeweb_back.geode_objects.geode_object import GeodeObject
 
 ComponentMesh = (
     og.Corner2D,
@@ -483,78 +482,20 @@ def _attribute_nb_items(attribute_manager: og.AttributeManager, attribute_name: 
     return attribute.nb_items() if attribute is not None else 0
 
 
-MESH_ATTRIBUTE_MANAGERS: dict[
-    str, tuple[type | tuple[type, ...], typing.Callable[[typing.Any], og.AttributeManager]]
-] = {
-    "vertex": (GeodeMesh, lambda mesh: mesh.vertex_attribute_manager()),
-    "edge": (GeodeGraph, lambda mesh: mesh.edge_attribute_manager()),
-    "cell": ((GeodeGrid2D, GeodeGrid3D), lambda mesh: mesh.cell_attribute_manager()),
-    "polygon": (
-        (GeodeSurfaceMesh2D, GeodeSurfaceMesh3D),
-        lambda mesh: mesh.polygon_attribute_manager(),
-    ),
-    "polyhedron": (GeodeSolidMesh3D, lambda mesh: mesh.polyhedron_attribute_manager()),
-}
-
-MODEL_COMPONENT_ATTRIBUTE_MANAGERS: dict[
-    str, tuple[type | tuple[type, ...], typing.Callable[[typing.Any], og.AttributeManager]]
-] = {
-    "vertex": (ComponentMesh, lambda component: component.mesh().vertex_attribute_manager()),
-    "edge": (ComponentLine, lambda component: component.mesh().edge_attribute_manager()),
-    "polygon": (
-        ComponentSurface,
-        lambda component: component.mesh().polygon_attribute_manager(),
-    ),
-    "polyhedron": (
-        ComponentBlock,
-        lambda component: component.mesh().polyhedron_attribute_manager(),
-    ),
-}
-
-
-def _range_attribute_managers(
-    geode_object: GeodeObject, params: schemas.AttributeRange
-) -> list[og.AttributeManager]:
-    element = params.element.value
-    if params.component_ids is None:
-        mesh_type, mesh_manager = MESH_ATTRIBUTE_MANAGERS[element]
-        if not isinstance(geode_object, mesh_type):
-            flask.abort(400, f"{params.id} does not have {element} attributes")
-        return [mesh_manager(geode_object)]
-    if (
-        not isinstance(geode_object, GeodeModel)
-        or element not in MODEL_COMPONENT_ATTRIBUTE_MANAGERS
-    ):
-        flask.abort(400, f"{params.id} components do not have {element} attributes")
-    component_type, component_manager = MODEL_COMPONENT_ATTRIBUTE_MANAGERS[element]
-    return [
-        component_manager(component)
-        for component_id in params.component_ids
-        if isinstance(
-            (component := geode_object.component(og.uuid(component_id))),
-            component_type,
-        )
-    ]
-
-
-@typed_route(routes, schemas.attribute_range_route)
-def attribute_range(params: schemas.AttributeRange) -> schemas.AttributeRangeResponse:
-    # The managers point into geode_object: it must outlive them
-    geode_object = geode_functions.load_geode_object(params.id)
-    attribute_managers = _range_attribute_managers(geode_object, params)
+def attributes_range(
+    attribute_managers: list[og.AttributeManager], attribute_name: str
+) -> dict[str, list[float] | bool]:
     nb_items = min(
         (
-            _attribute_nb_items(attribute_manager, params.attribute_name)
+            _attribute_nb_items(attribute_manager, attribute_name)
             for attribute_manager in attribute_managers
         ),
         default=0,
     )
     min_values, max_values, no_data = _attribute_ranges(
-        attribute_managers, params.attribute_name, nb_items
+        attribute_managers, attribute_name, nb_items
     )
-    return schemas.AttributeRangeResponse(
-        min_values=min_values, max_values=max_values, no_data=no_data
-    )
+    return {"min_values": min_values, "max_values": max_values, "no_data": no_data}
 
 
 @typed_route(routes, schemas.vertex_attribute_names_route)
@@ -567,6 +508,19 @@ def vertex_attribute_names(
     attribute_manager = geode_object.vertex_attribute_manager()
     return schemas.VertexAttributeNamesResponse.from_dict(
         {"attributes": attributes_metadata(attribute_manager)}
+    )
+
+
+@typed_route(routes, schemas.vertex_attribute_range_route)
+def vertex_attribute_range(
+    params: schemas.VertexAttributeRange,
+) -> schemas.VertexAttributeRangeResponse:
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeMesh):
+        flask.abort(400, f"{params.id} is not a GeodeMesh")
+    attribute_manager = geode_object.vertex_attribute_manager()
+    return schemas.VertexAttributeRangeResponse.from_dict(
+        attributes_range([attribute_manager], params.attribute_name)
     )
 
 
@@ -583,6 +537,19 @@ def cell_attribute_names(
     )
 
 
+@typed_route(routes, schemas.cell_attribute_range_route)
+def cell_attribute_range(
+    params: schemas.CellAttributeRange,
+) -> schemas.CellAttributeRangeResponse:
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeGrid2D | GeodeGrid3D):
+        flask.abort(400, f"{params.id} is not a GeodeGrid")
+    attribute_manager = geode_object.cell_attribute_manager()
+    return schemas.CellAttributeRangeResponse.from_dict(
+        attributes_range([attribute_manager], params.attribute_name)
+    )
+
+
 @typed_route(routes, schemas.polygon_attribute_names_route)
 def polygon_attribute_names(
     params: schemas.PolygonAttributeNames,
@@ -593,6 +560,19 @@ def polygon_attribute_names(
     attribute_manager = geode_object.polygon_attribute_manager()
     return schemas.PolygonAttributeNamesResponse.from_dict(
         {"attributes": attributes_metadata(attribute_manager)}
+    )
+
+
+@typed_route(routes, schemas.polygon_attribute_range_route)
+def polygon_attribute_range(
+    params: schemas.PolygonAttributeRange,
+) -> schemas.PolygonAttributeRangeResponse:
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeSurfaceMesh2D | GeodeSurfaceMesh3D):
+        flask.abort(400, f"{params.id} is not a GeodeSurfaceMesh")
+    attribute_manager = geode_object.polygon_attribute_manager()
+    return schemas.PolygonAttributeRangeResponse.from_dict(
+        attributes_range([attribute_manager], params.attribute_name)
     )
 
 
@@ -609,6 +589,19 @@ def polyhedron_attribute_names(
     )
 
 
+@typed_route(routes, schemas.polyhedron_attribute_range_route)
+def polyhedron_attribute_range(
+    params: schemas.PolyhedronAttributeRange,
+) -> schemas.PolyhedronAttributeRangeResponse:
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeSolidMesh3D):
+        flask.abort(400, f"{params.id} is not a GeodeSolidMesh")
+    attribute_manager = geode_object.polyhedron_attribute_manager()
+    return schemas.PolyhedronAttributeRangeResponse.from_dict(
+        attributes_range([attribute_manager], params.attribute_name)
+    )
+
+
 @typed_route(routes, schemas.edge_attribute_names_route)
 def edge_attribute_names(
     params: schemas.EdgeAttributeNames,
@@ -619,6 +612,19 @@ def edge_attribute_names(
     attribute_manager = geode_object.edge_attribute_manager()
     return schemas.EdgeAttributeNamesResponse.from_dict(
         {"attributes": attributes_metadata(attribute_manager)}
+    )
+
+
+@typed_route(routes, schemas.edge_attribute_range_route)
+def edge_attribute_range(
+    params: schemas.EdgeAttributeRange,
+) -> schemas.EdgeAttributeRangeResponse:
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeGraph):
+        flask.abort(400, f"{params.id} does not have edges")
+    attribute_manager = geode_object.edge_attribute_manager()
+    return schemas.EdgeAttributeRangeResponse.from_dict(
+        attributes_range([attribute_manager], params.attribute_name)
     )
 
 
@@ -642,6 +648,26 @@ def model_component_vertex_attribute_names(
     )
 
 
+@typed_route(routes, schemas.model_component_vertex_attribute_range_route)
+def model_component_vertex_attribute_range(
+    params: schemas.ModelComponentVertexAttributeRange,
+) -> schemas.ModelComponentVertexAttributeRangeResponse:
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeModel):
+        flask.abort(400, f"{params.id} is not a GeodeModel")
+    managers = [
+        component.mesh().vertex_attribute_manager()
+        for component_id in params.component_ids
+        if isinstance(
+            (component := geode_object.component(og.uuid(component_id))),
+            ComponentMesh,
+        )
+    ]
+    return schemas.ModelComponentVertexAttributeRangeResponse.from_dict(
+        attributes_range(managers, params.attribute_name)
+    )
+
+
 @typed_route(routes, schemas.model_component_edge_attribute_names_route)
 def model_component_edge_attribute_names(
     params: schemas.ModelComponentEdgeAttributeNames,
@@ -659,6 +685,26 @@ def model_component_edge_attribute_names(
     ]
     return schemas.ModelComponentEdgeAttributeNamesResponse.from_dict(
         {"attributes": attributes_metadata(managers)}
+    )
+
+
+@typed_route(routes, schemas.model_component_edge_attribute_range_route)
+def model_component_edge_attribute_range(
+    params: schemas.ModelComponentEdgeAttributeRange,
+) -> schemas.ModelComponentEdgeAttributeRangeResponse:
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeModel):
+        flask.abort(400, f"{params.id} is not a GeodeModel")
+    managers = [
+        component.mesh().edge_attribute_manager()
+        for component_id in params.component_ids
+        if isinstance(
+            (component := geode_object.component(og.uuid(component_id))),
+            ComponentLine,
+        )
+    ]
+    return schemas.ModelComponentEdgeAttributeRangeResponse.from_dict(
+        attributes_range(managers, params.attribute_name)
     )
 
 
@@ -682,6 +728,26 @@ def model_component_polygon_attribute_names(
     )
 
 
+@typed_route(routes, schemas.model_component_polygon_attribute_range_route)
+def model_component_polygon_attribute_range(
+    params: schemas.ModelComponentPolygonAttributeRange,
+) -> schemas.ModelComponentPolygonAttributeRangeResponse:
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeModel):
+        flask.abort(400, f"{params.id} is not a GeodeModel")
+    managers = [
+        component.mesh().polygon_attribute_manager()
+        for component_id in params.component_ids
+        if isinstance(
+            (component := geode_object.component(og.uuid(component_id))),
+            ComponentSurface,
+        )
+    ]
+    return schemas.ModelComponentPolygonAttributeRangeResponse.from_dict(
+        attributes_range(managers, params.attribute_name)
+    )
+
+
 @typed_route(routes, schemas.model_component_polyhedron_attribute_names_route)
 def model_component_polyhedron_attribute_names(
     params: schemas.ModelComponentPolyhedronAttributeNames,
@@ -699,6 +765,26 @@ def model_component_polyhedron_attribute_names(
     ]
     return schemas.ModelComponentPolyhedronAttributeNamesResponse.from_dict(
         {"attributes": attributes_metadata(managers)}
+    )
+
+
+@typed_route(routes, schemas.model_component_polyhedron_attribute_range_route)
+def model_component_polyhedron_attribute_range(
+    params: schemas.ModelComponentPolyhedronAttributeRange,
+) -> schemas.ModelComponentPolyhedronAttributeRangeResponse:
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeModel):
+        flask.abort(400, f"{params.id} is not a GeodeModel")
+    managers = [
+        component.mesh().polyhedron_attribute_manager()
+        for component_id in params.component_ids
+        if isinstance(
+            (component := geode_object.component(og.uuid(component_id))),
+            ComponentBlock,
+        )
+    ]
+    return schemas.ModelComponentPolyhedronAttributeRangeResponse.from_dict(
+        attributes_range(managers, params.attribute_name)
     )
 
 
