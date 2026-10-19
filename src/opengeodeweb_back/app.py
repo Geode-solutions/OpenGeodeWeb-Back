@@ -6,6 +6,7 @@ import argparse
 import json
 import logging
 import queue
+import threading
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -25,6 +26,9 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+# Below nginx's default 60 s proxy_read_timeout, which closes idle streams
+EVENTS_KEEP_ALIVE_SECONDS = 15
+
 
 def _register_request_hooks(app: flask.Flask) -> None:
     @app.before_request
@@ -41,25 +45,60 @@ def _register_request_hooks(app: flask.Flask) -> None:
         utils_functions.teardown_request(flask.current_app, exception)
 
 
+type _Event = tuple[str, dict[str, Any]]
+
+
+# One queue per connected stream: with a single shared queue, a stream left over from a
+# Dropped connection would take events meant for the others.
+class _EventListeners:
+    def __init__(self) -> None:
+        self._queues: set[queue.Queue[_Event]] = set()
+        self._lock = threading.Lock()
+
+    def publish(self, event: str, data: dict[str, Any]) -> None:
+        with self._lock:
+            for listener in self._queues:
+                listener.put((event, data))
+
+    def stream(self, keep_alive_seconds: float) -> flask.Response:
+        listener: queue.Queue[_Event] = queue.Queue()
+        with self._lock:
+            self._queues.add(listener)
+
+        def unregister() -> None:
+            with self._lock:
+                self._queues.discard(listener)
+
+        response = flask.Response(
+            _stream_events(listener, keep_alive_seconds), mimetype="text/event-stream"
+        )
+        response.call_on_close(unregister)
+        return response
+
+
+def _stream_events(listener: queue.Queue[_Event], keep_alive_seconds: float) -> Generator[str]:
+    while True:
+        try:
+            event, data = listener.get(timeout=keep_alive_seconds)
+        except queue.Empty:
+            # Comment line, ignored by EventSource: keeps proxies from closing the idle
+            # Stream and lets a dropped connection be detected
+            yield ": keep-alive\n\n"
+            continue
+        yield f"event: {event}\ndata: {json.dumps(data)}\n\n"
+
+
 def _register_event_stream(app: flask.Flask) -> None:
     def wants_event_stream() -> bool:
         accept = flask.request.headers.get("Accept", "")
         return "text/event-stream" in accept
 
-    _event_queue: queue.Queue[tuple[str, dict[str, Any]]] = queue.Queue()
-
-    def publish_event(event: str, data: dict[str, Any]) -> None:
-        _event_queue.put((event, data))
-
-    def stream_events() -> Generator[str]:
-        while True:
-            event, data = _event_queue.get()
-            yield f"event: {event}\ndata: {json.dumps(data)}\n\n"
+    listeners = _EventListeners()
 
     @app.after_request
     def after_request(response: flask.Response) -> flask.Response:
         endpoint = flask.request.endpoint.replace(".", "/") if flask.request.endpoint else None
-        if endpoint in {"events", None}:
+        if endpoint is None or endpoint == "events":
             return response
 
         if wants_event_stream():
@@ -68,12 +107,14 @@ def _register_event_stream(app: flask.Flask) -> None:
                 payload = response.get_json()
             except ValueError:
                 payload = {"status": response.status_code}
-            publish_event(endpoint, payload)
+            listeners.publish(endpoint, payload)
         return response
 
     @app.route("/events")
     def events() -> flask.Response:
-        return flask.Response(stream_events(), mimetype="text/event-stream")
+        return listeners.stream(
+            flask.current_app.config.get("EVENTS_KEEP_ALIVE_SECONDS", EVENTS_KEEP_ALIVE_SECONDS)
+        )
 
 
 def _register_error_handlers(app: flask.Flask) -> None:
