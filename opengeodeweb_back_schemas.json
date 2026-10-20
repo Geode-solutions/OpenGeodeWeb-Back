@@ -572,6 +572,56 @@
         }
       }
     },
+    "vertex_attribute_range": {
+      "$id": "opengeodeweb_back/vertex_attribute_range",
+      "route": "/vertex_attribute_range",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 32
+        },
+        "attribute_name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "attribute_name"
+      ],
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "min_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "max_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "no_data": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "min_values",
+          "max_values",
+          "no_data"
+        ],
+        "additionalProperties": false
+      }
+    },
     "vertex_attribute_names": {
       "$id": "opengeodeweb_back/vertex_attribute_names",
       "route": "/vertex_attribute_names",
@@ -607,27 +657,6 @@
                 "nb_items": {
                   "type": "integer"
                 },
-                "min_value": {
-                  "type": "number"
-                },
-                "max_value": {
-                  "type": "number"
-                },
-                "min_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "max_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "no_data": {
-                  "type": "boolean"
-                },
                 "time_steps": {
                   "type": "array",
                   "items": {
@@ -639,11 +668,6 @@
                 "attribute_name",
                 "attribute_id",
                 "nb_items",
-                "min_value",
-                "max_value",
-                "min_values",
-                "max_values",
-                "no_data",
                 "time_steps"
               ],
               "additionalProperties": false
@@ -998,6 +1022,56 @@
         "additionalProperties": false
       }
     },
+    "polyhedron_attribute_range": {
+      "$id": "opengeodeweb_back/polyhedron_attribute_range",
+      "route": "/polyhedron_attribute_range",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 32
+        },
+        "attribute_name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "attribute_name"
+      ],
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "min_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "max_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "no_data": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "min_values",
+          "max_values",
+          "no_data"
+        ],
+        "additionalProperties": false
+      }
+    },
     "polyhedron_attribute_names": {
       "$id": "opengeodeweb_back/polyhedron_attribute_names",
       "route": "/polyhedron_attribute_names",
@@ -1033,27 +1107,6 @@
                 "nb_items": {
                   "type": "integer"
                 },
-                "min_value": {
-                  "type": "number"
-                },
-                "max_value": {
-                  "type": "number"
-                },
-                "min_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "max_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "no_data": {
-                  "type": "boolean"
-                },
                 "time_steps": {
                   "type": "array",
                   "items": {
@@ -1065,11 +1118,6 @@
                 "attribute_name",
                 "attribute_id",
                 "nb_items",
-                "min_value",
-                "max_value",
-                "min_values",
-                "max_values",
-                "no_data",
                 "time_steps"
               ],
               "additionalProperties": false
@@ -1078,6 +1126,56 @@
         },
         "required": [
           "attributes"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "polygon_attribute_range": {
+      "$id": "opengeodeweb_back/polygon_attribute_range",
+      "route": "/polygon_attribute_range",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 32
+        },
+        "attribute_name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "attribute_name"
+      ],
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "min_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "max_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "no_data": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "min_values",
+          "max_values",
+          "no_data"
         ],
         "additionalProperties": false
       }
@@ -1117,27 +1215,6 @@
                 "nb_items": {
                   "type": "integer"
                 },
-                "min_value": {
-                  "type": "number"
-                },
-                "max_value": {
-                  "type": "number"
-                },
-                "min_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "max_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "no_data": {
-                  "type": "boolean"
-                },
                 "time_steps": {
                   "type": "array",
                   "items": {
@@ -1149,11 +1226,6 @@
                 "attribute_name",
                 "attribute_id",
                 "nb_items",
-                "min_value",
-                "max_value",
-                "min_values",
-                "max_values",
-                "no_data",
                 "time_steps"
               ],
               "additionalProperties": false
@@ -1185,6 +1257,66 @@
         },
         "required": [
           "message"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "model_component_vertex_attribute_range": {
+      "$id": "opengeodeweb_back/model_component_vertex_attribute_range",
+      "route": "/model_component_vertex_attribute_range",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 32
+        },
+        "component_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 36,
+            "maxLength": 36
+          },
+          "minItems": 1
+        },
+        "attribute_name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "component_ids",
+        "attribute_name"
+      ],
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "min_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "max_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "no_data": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "min_values",
+          "max_values",
+          "no_data"
         ],
         "additionalProperties": false
       }
@@ -1234,27 +1366,6 @@
                 "nb_items": {
                   "type": "integer"
                 },
-                "min_value": {
-                  "type": "number"
-                },
-                "max_value": {
-                  "type": "number"
-                },
-                "min_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "max_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "no_data": {
-                  "type": "boolean"
-                },
                 "time_steps": {
                   "type": "array",
                   "items": {
@@ -1266,11 +1377,6 @@
                 "attribute_name",
                 "attribute_id",
                 "nb_items",
-                "min_value",
-                "max_value",
-                "min_values",
-                "max_values",
-                "no_data",
                 "time_steps"
               ],
               "additionalProperties": false
@@ -1279,6 +1385,66 @@
         },
         "required": [
           "attributes"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "model_component_polyhedron_attribute_range": {
+      "$id": "opengeodeweb_back/model_component_polyhedron_attribute_range",
+      "route": "/model_component_polyhedron_attribute_range",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 32
+        },
+        "component_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 36,
+            "maxLength": 36
+          },
+          "minItems": 1
+        },
+        "attribute_name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "component_ids",
+        "attribute_name"
+      ],
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "min_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "max_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "no_data": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "min_values",
+          "max_values",
+          "no_data"
         ],
         "additionalProperties": false
       }
@@ -1328,27 +1494,6 @@
                 "nb_items": {
                   "type": "integer"
                 },
-                "min_value": {
-                  "type": "number"
-                },
-                "max_value": {
-                  "type": "number"
-                },
-                "min_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "max_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "no_data": {
-                  "type": "boolean"
-                },
                 "time_steps": {
                   "type": "array",
                   "items": {
@@ -1360,11 +1505,6 @@
                 "attribute_name",
                 "attribute_id",
                 "nb_items",
-                "min_value",
-                "max_value",
-                "min_values",
-                "max_values",
-                "no_data",
                 "time_steps"
               ],
               "additionalProperties": false
@@ -1373,6 +1513,66 @@
         },
         "required": [
           "attributes"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "model_component_polygon_attribute_range": {
+      "$id": "opengeodeweb_back/model_component_polygon_attribute_range",
+      "route": "/model_component_polygon_attribute_range",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 32
+        },
+        "component_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 36,
+            "maxLength": 36
+          },
+          "minItems": 1
+        },
+        "attribute_name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "component_ids",
+        "attribute_name"
+      ],
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "min_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "max_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "no_data": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "min_values",
+          "max_values",
+          "no_data"
         ],
         "additionalProperties": false
       }
@@ -1422,27 +1622,6 @@
                 "nb_items": {
                   "type": "integer"
                 },
-                "min_value": {
-                  "type": "number"
-                },
-                "max_value": {
-                  "type": "number"
-                },
-                "min_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "max_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "no_data": {
-                  "type": "boolean"
-                },
                 "time_steps": {
                   "type": "array",
                   "items": {
@@ -1454,11 +1633,6 @@
                 "attribute_name",
                 "attribute_id",
                 "nb_items",
-                "min_value",
-                "max_value",
-                "min_values",
-                "max_values",
-                "no_data",
                 "time_steps"
               ],
               "additionalProperties": false
@@ -1467,6 +1641,66 @@
         },
         "required": [
           "attributes"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "model_component_edge_attribute_range": {
+      "$id": "opengeodeweb_back/model_component_edge_attribute_range",
+      "route": "/model_component_edge_attribute_range",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 32
+        },
+        "component_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 36,
+            "maxLength": 36
+          },
+          "minItems": 1
+        },
+        "attribute_name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "component_ids",
+        "attribute_name"
+      ],
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "min_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "max_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "no_data": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "min_values",
+          "max_values",
+          "no_data"
         ],
         "additionalProperties": false
       }
@@ -1516,27 +1750,6 @@
                 "nb_items": {
                   "type": "integer"
                 },
-                "min_value": {
-                  "type": "number"
-                },
-                "max_value": {
-                  "type": "number"
-                },
-                "min_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "max_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "no_data": {
-                  "type": "boolean"
-                },
                 "time_steps": {
                   "type": "array",
                   "items": {
@@ -1548,11 +1761,6 @@
                 "attribute_name",
                 "attribute_id",
                 "nb_items",
-                "min_value",
-                "max_value",
-                "min_values",
-                "max_values",
-                "no_data",
                 "time_steps"
               ],
               "additionalProperties": false
@@ -1767,6 +1975,56 @@
         "format": "binary"
       }
     },
+    "edge_attribute_range": {
+      "$id": "opengeodeweb_back/edge_attribute_range",
+      "route": "/edge_attribute_range",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 32
+        },
+        "attribute_name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "attribute_name"
+      ],
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "min_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "max_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "no_data": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "min_values",
+          "max_values",
+          "no_data"
+        ],
+        "additionalProperties": false
+      }
+    },
     "edge_attribute_names": {
       "$id": "opengeodeweb_back/edge_attribute_names",
       "route": "/edge_attribute_names",
@@ -1802,27 +2060,6 @@
                 "nb_items": {
                   "type": "integer"
                 },
-                "min_value": {
-                  "type": "number"
-                },
-                "max_value": {
-                  "type": "number"
-                },
-                "min_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "max_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "no_data": {
-                  "type": "boolean"
-                },
                 "time_steps": {
                   "type": "array",
                   "items": {
@@ -1834,11 +2071,6 @@
                 "attribute_name",
                 "attribute_id",
                 "nb_items",
-                "min_value",
-                "max_value",
-                "min_values",
-                "max_values",
-                "no_data",
                 "time_steps"
               ],
               "additionalProperties": false
@@ -1900,6 +2132,56 @@
         "additionalProperties": false
       }
     },
+    "cell_attribute_range": {
+      "$id": "opengeodeweb_back/cell_attribute_range",
+      "route": "/cell_attribute_range",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 32
+        },
+        "attribute_name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "attribute_name"
+      ],
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "min_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "max_values": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "no_data": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "min_values",
+          "max_values",
+          "no_data"
+        ],
+        "additionalProperties": false
+      }
+    },
     "cell_attribute_names": {
       "$id": "opengeodeweb_back/cell_attribute_names",
       "route": "/cell_attribute_names",
@@ -1935,27 +2217,6 @@
                 "nb_items": {
                   "type": "integer"
                 },
-                "min_value": {
-                  "type": "number"
-                },
-                "max_value": {
-                  "type": "number"
-                },
-                "min_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "max_values": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "no_data": {
-                  "type": "boolean"
-                },
                 "time_steps": {
                   "type": "array",
                   "items": {
@@ -1967,11 +2228,6 @@
                 "attribute_name",
                 "attribute_id",
                 "nb_items",
-                "min_value",
-                "max_value",
-                "min_values",
-                "max_values",
-                "no_data",
                 "time_steps"
               ],
               "additionalProperties": false

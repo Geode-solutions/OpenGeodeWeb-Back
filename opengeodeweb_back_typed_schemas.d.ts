@@ -135,6 +135,17 @@ export interface CreateEdgedCurveResponseMeshComponent {
     viewer_id:  number;
 }
 
+export interface VertexAttributeRangeParams {
+    attribute_name: string;
+    id:             string;
+}
+
+export interface VertexAttributeRangeResponse {
+    max_values: number[];
+    min_values: number[];
+    no_data:    boolean;
+}
+
 export interface VertexAttributeNamesParams {
     id: string;
 }
@@ -146,12 +157,7 @@ export interface VertexAttributeNamesResponse {
 export interface VertexAttributeNamesResponseAttribute {
     attribute_id:   string;
     attribute_name: string;
-    max_value:      number;
-    max_values:     number[];
-    min_value:      number;
-    min_values:     number[];
     nb_items:       number;
-    no_data:        boolean;
     time_steps:     number[];
 }
 
@@ -237,6 +243,17 @@ export interface SaveViewableFileResponseMeshComponent {
     viewer_id:  number;
 }
 
+export interface PolyhedronAttributeRangeParams {
+    attribute_name: string;
+    id:             string;
+}
+
+export interface PolyhedronAttributeRangeResponse {
+    max_values: number[];
+    min_values: number[];
+    no_data:    boolean;
+}
+
 export interface PolyhedronAttributeNamesParams {
     id: string;
 }
@@ -248,13 +265,19 @@ export interface PolyhedronAttributeNamesResponse {
 export interface PolyhedronAttributeNamesResponseAttribute {
     attribute_id:   string;
     attribute_name: string;
-    max_value:      number;
-    max_values:     number[];
-    min_value:      number;
-    min_values:     number[];
     nb_items:       number;
-    no_data:        boolean;
     time_steps:     number[];
+}
+
+export interface PolygonAttributeRangeParams {
+    attribute_name: string;
+    id:             string;
+}
+
+export interface PolygonAttributeRangeResponse {
+    max_values: number[];
+    min_values: number[];
+    no_data:    boolean;
 }
 
 export interface PolygonAttributeNamesParams {
@@ -268,12 +291,7 @@ export interface PolygonAttributeNamesResponse {
 export interface PolygonAttributeNamesResponseAttribute {
     attribute_id:   string;
     attribute_name: string;
-    max_value:      number;
-    max_values:     number[];
-    min_value:      number;
-    min_values:     number[];
     nb_items:       number;
-    no_data:        boolean;
     time_steps:     number[];
 }
 
@@ -282,6 +300,18 @@ export interface PingParams {
 
 export interface PingResponse {
     message: string;
+}
+
+export interface ModelComponentVertexAttributeRangeParams {
+    attribute_name: string;
+    component_ids:  string[];
+    id:             string;
+}
+
+export interface ModelComponentVertexAttributeRangeResponse {
+    max_values: number[];
+    min_values: number[];
+    no_data:    boolean;
 }
 
 export interface ModelComponentVertexAttributeNamesParams {
@@ -296,13 +326,20 @@ export interface ModelComponentVertexAttributeNamesResponse {
 export interface ModelComponentVertexAttributeNamesResponseAttribute {
     attribute_id:   string;
     attribute_name: string;
-    max_value:      number;
-    max_values:     number[];
-    min_value:      number;
-    min_values:     number[];
     nb_items:       number;
-    no_data:        boolean;
     time_steps:     number[];
+}
+
+export interface ModelComponentPolyhedronAttributeRangeParams {
+    attribute_name: string;
+    component_ids:  string[];
+    id:             string;
+}
+
+export interface ModelComponentPolyhedronAttributeRangeResponse {
+    max_values: number[];
+    min_values: number[];
+    no_data:    boolean;
 }
 
 export interface ModelComponentPolyhedronAttributeNamesParams {
@@ -317,13 +354,20 @@ export interface ModelComponentPolyhedronAttributeNamesResponse {
 export interface ModelComponentPolyhedronAttributeNamesResponseAttribute {
     attribute_id:   string;
     attribute_name: string;
-    max_value:      number;
-    max_values:     number[];
-    min_value:      number;
-    min_values:     number[];
     nb_items:       number;
-    no_data:        boolean;
     time_steps:     number[];
+}
+
+export interface ModelComponentPolygonAttributeRangeParams {
+    attribute_name: string;
+    component_ids:  string[];
+    id:             string;
+}
+
+export interface ModelComponentPolygonAttributeRangeResponse {
+    max_values: number[];
+    min_values: number[];
+    no_data:    boolean;
 }
 
 export interface ModelComponentPolygonAttributeNamesParams {
@@ -338,13 +382,20 @@ export interface ModelComponentPolygonAttributeNamesResponse {
 export interface ModelComponentPolygonAttributeNamesResponseAttribute {
     attribute_id:   string;
     attribute_name: string;
-    max_value:      number;
-    max_values:     number[];
-    min_value:      number;
-    min_values:     number[];
     nb_items:       number;
-    no_data:        boolean;
     time_steps:     number[];
+}
+
+export interface ModelComponentEdgeAttributeRangeParams {
+    attribute_name: string;
+    component_ids:  string[];
+    id:             string;
+}
+
+export interface ModelComponentEdgeAttributeRangeResponse {
+    max_values: number[];
+    min_values: number[];
+    no_data:    boolean;
 }
 
 export interface ModelComponentEdgeAttributeNamesParams {
@@ -359,12 +410,7 @@ export interface ModelComponentEdgeAttributeNamesResponse {
 export interface ModelComponentEdgeAttributeNamesResponseAttribute {
     attribute_id:   string;
     attribute_name: string;
-    max_value:      number;
-    max_values:     number[];
-    min_value:      number;
-    min_values:     number[];
     nb_items:       number;
-    no_data:        boolean;
     time_steps:     number[];
 }
 
@@ -419,6 +465,17 @@ export interface ExportProjectParams {
     snapshot: { [key: string]: any };
 }
 
+export interface EdgeAttributeRangeParams {
+    attribute_name: string;
+    id:             string;
+}
+
+export interface EdgeAttributeRangeResponse {
+    max_values: number[];
+    min_values: number[];
+    no_data:    boolean;
+}
+
 export interface EdgeAttributeNamesParams {
     id: string;
 }
@@ -430,12 +487,7 @@ export interface EdgeAttributeNamesResponse {
 export interface EdgeAttributeNamesResponseAttribute {
     attribute_id:   string;
     attribute_name: string;
-    max_value:      number;
-    max_values:     number[];
-    min_value:      number;
-    min_values:     number[];
     nb_items:       number;
-    no_data:        boolean;
     time_steps:     number[];
 }
 
@@ -450,6 +502,17 @@ export interface DataMissingFilesResponse {
     mandatory_files:   string[];
 }
 
+export interface CellAttributeRangeParams {
+    attribute_name: string;
+    id:             string;
+}
+
+export interface CellAttributeRangeResponse {
+    max_values: number[];
+    min_values: number[];
+    no_data:    boolean;
+}
+
 export interface CellAttributeNamesParams {
     id: string;
 }
@@ -461,12 +524,7 @@ export interface CellAttributeNamesResponse {
 export interface CellAttributeNamesResponseAttribute {
     attribute_id:   string;
     attribute_name: string;
-    max_value:      number;
-    max_values:     number[];
-    min_value:      number;
-    min_values:     number[];
     nb_items:       number;
-    no_data:        boolean;
     time_steps:     number[];
 }
 
@@ -519,6 +577,7 @@ export interface Schemas {
       readonly point_set: (typeof json)["opengeodeweb_back"]["create"]["point_set"] & TypedSchema<CreatePointSetParams, CreatePointSetResponse>;
       readonly edged_curve: (typeof json)["opengeodeweb_back"]["create"]["edged_curve"] & TypedSchema<CreateEdgedCurveParams, CreateEdgedCurveResponse>;
     };
+    readonly vertex_attribute_range: (typeof json)["opengeodeweb_back"]["vertex_attribute_range"] & TypedSchema<VertexAttributeRangeParams, VertexAttributeRangeResponse>;
     readonly vertex_attribute_names: (typeof json)["opengeodeweb_back"]["vertex_attribute_names"] & TypedSchema<VertexAttributeNamesParams, VertexAttributeNamesResponse>;
     readonly validate: (typeof json)["opengeodeweb_back"]["validate"] & TypedSchema<ValidateParams, ValidateResponse>;
     readonly upload_file: (typeof json)["opengeodeweb_back"]["upload_file"] & TypedSchema<UploadFileParams, UploadFileResponse>;
@@ -526,12 +585,18 @@ export interface Schemas {
     readonly time_series_allowed_objects: (typeof json)["opengeodeweb_back"]["time_series_allowed_objects"] & TypedSchema<TimeSeriesAllowedObjectsParams, TimeSeriesAllowedObjectsResponse>;
     readonly texture_coordinates: (typeof json)["opengeodeweb_back"]["texture_coordinates"] & TypedSchema<TextureCoordinatesParams, TextureCoordinatesResponse>;
     readonly save_viewable_file: (typeof json)["opengeodeweb_back"]["save_viewable_file"] & TypedSchema<SaveViewableFileParams, SaveViewableFileResponse>;
+    readonly polyhedron_attribute_range: (typeof json)["opengeodeweb_back"]["polyhedron_attribute_range"] & TypedSchema<PolyhedronAttributeRangeParams, PolyhedronAttributeRangeResponse>;
     readonly polyhedron_attribute_names: (typeof json)["opengeodeweb_back"]["polyhedron_attribute_names"] & TypedSchema<PolyhedronAttributeNamesParams, PolyhedronAttributeNamesResponse>;
+    readonly polygon_attribute_range: (typeof json)["opengeodeweb_back"]["polygon_attribute_range"] & TypedSchema<PolygonAttributeRangeParams, PolygonAttributeRangeResponse>;
     readonly polygon_attribute_names: (typeof json)["opengeodeweb_back"]["polygon_attribute_names"] & TypedSchema<PolygonAttributeNamesParams, PolygonAttributeNamesResponse>;
     readonly ping: (typeof json)["opengeodeweb_back"]["ping"] & TypedSchema<PingParams, PingResponse>;
+    readonly model_component_vertex_attribute_range: (typeof json)["opengeodeweb_back"]["model_component_vertex_attribute_range"] & TypedSchema<ModelComponentVertexAttributeRangeParams, ModelComponentVertexAttributeRangeResponse>;
     readonly model_component_vertex_attribute_names: (typeof json)["opengeodeweb_back"]["model_component_vertex_attribute_names"] & TypedSchema<ModelComponentVertexAttributeNamesParams, ModelComponentVertexAttributeNamesResponse>;
+    readonly model_component_polyhedron_attribute_range: (typeof json)["opengeodeweb_back"]["model_component_polyhedron_attribute_range"] & TypedSchema<ModelComponentPolyhedronAttributeRangeParams, ModelComponentPolyhedronAttributeRangeResponse>;
     readonly model_component_polyhedron_attribute_names: (typeof json)["opengeodeweb_back"]["model_component_polyhedron_attribute_names"] & TypedSchema<ModelComponentPolyhedronAttributeNamesParams, ModelComponentPolyhedronAttributeNamesResponse>;
+    readonly model_component_polygon_attribute_range: (typeof json)["opengeodeweb_back"]["model_component_polygon_attribute_range"] & TypedSchema<ModelComponentPolygonAttributeRangeParams, ModelComponentPolygonAttributeRangeResponse>;
     readonly model_component_polygon_attribute_names: (typeof json)["opengeodeweb_back"]["model_component_polygon_attribute_names"] & TypedSchema<ModelComponentPolygonAttributeNamesParams, ModelComponentPolygonAttributeNamesResponse>;
+    readonly model_component_edge_attribute_range: (typeof json)["opengeodeweb_back"]["model_component_edge_attribute_range"] & TypedSchema<ModelComponentEdgeAttributeRangeParams, ModelComponentEdgeAttributeRangeResponse>;
     readonly model_component_edge_attribute_names: (typeof json)["opengeodeweb_back"]["model_component_edge_attribute_names"] & TypedSchema<ModelComponentEdgeAttributeNamesParams, ModelComponentEdgeAttributeNamesResponse>;
     readonly kill: (typeof json)["opengeodeweb_back"]["kill"] & TypedSchema<KillParams, KillResponse>;
     readonly import_project: (typeof json)["opengeodeweb_back"]["import_project"] & TypedSchema<ImportProjectParams, ImportProjectResponse>;
@@ -539,8 +604,10 @@ export interface Schemas {
     readonly geode_objects_and_output_extensions: (typeof json)["opengeodeweb_back"]["geode_objects_and_output_extensions"] & TypedSchema<GeodeObjectsAndOutputExtensionsParams, GeodeObjectsAndOutputExtensionsResponse>;
     readonly geode_object_inheritance: (typeof json)["opengeodeweb_back"]["geode_object_inheritance"] & TypedSchema<GeodeObjectInheritanceParams, GeodeObjectInheritanceResponse>;
     readonly export_project: (typeof json)["opengeodeweb_back"]["export_project"] & TypedSchema<ExportProjectParams, Blob>;
+    readonly edge_attribute_range: (typeof json)["opengeodeweb_back"]["edge_attribute_range"] & TypedSchema<EdgeAttributeRangeParams, EdgeAttributeRangeResponse>;
     readonly edge_attribute_names: (typeof json)["opengeodeweb_back"]["edge_attribute_names"] & TypedSchema<EdgeAttributeNamesParams, EdgeAttributeNamesResponse>;
     readonly data_missing_files: (typeof json)["opengeodeweb_back"]["data_missing_files"] & TypedSchema<DataMissingFilesParams, DataMissingFilesResponse>;
+    readonly cell_attribute_range: (typeof json)["opengeodeweb_back"]["cell_attribute_range"] & TypedSchema<CellAttributeRangeParams, CellAttributeRangeResponse>;
     readonly cell_attribute_names: (typeof json)["opengeodeweb_back"]["cell_attribute_names"] & TypedSchema<CellAttributeNamesParams, CellAttributeNamesResponse>;
     readonly apply_time_series: (typeof json)["opengeodeweb_back"]["apply_time_series"] & TypedSchema<ApplyTimeSeriesParams, ApplyTimeSeriesResponse>;
     readonly allowed_objects: (typeof json)["opengeodeweb_back"]["allowed_objects"] & TypedSchema<AllowedObjectsParams, AllowedObjectsResponse>;

@@ -334,6 +334,16 @@ def _attribute_ids_for_name(
     return attribute_ids[:1]
 
 
+def _is_nan_no_value(no_value: object) -> bool:
+    if isinstance(no_value, float):
+        return math.isnan(no_value)
+    if isinstance(no_value, list):
+        return bool(no_value) and all(
+            isinstance(value, float) and math.isnan(value) for value in no_value
+        )
+    return False
+
+
 def _extract_valid_values_from_attribute(
     attribute_manager: og.AttributeManager,
     attribute_id: og.uuid,
@@ -361,15 +371,21 @@ def _extract_valid_values_from_attribute(
         ],
     )
 
-    valid_values: list[float] = []
-    has_nan = False
-    for element_index in range(attribute_manager.nb_elements()):
-        value = attribute.generic_item_value(element_index, item_index)
-        if math.isnan(value) or (no_value is not None and value_getter(element_index) == no_value):
-            has_nan = True
-        else:
-            valid_values.append(value)
-    return valid_values, has_nan
+    item_value = attribute.generic_item_value
+    values = [
+        item_value(element_index, item_index)
+        for element_index in range(attribute_manager.nb_elements())
+    ]
+    # A NaN no value never compares equal: the isnan filter alone removes it
+    if no_value is None or _is_nan_no_value(no_value):
+        valid_values = [value for value in values if not math.isnan(value)]
+        return valid_values, len(valid_values) != len(values)
+    valid_values = [
+        value
+        for element_index, value in enumerate(values)
+        if not math.isnan(value) and value_getter(element_index) != no_value
+    ]
+    return valid_values, len(valid_values) != len(values)
 
 
 def extract_valid_attribute_values(
@@ -423,9 +439,9 @@ def _attribute_ranges(
 
 def attributes_metadata(
     manager: og.AttributeManager | list[og.AttributeManager],
-) -> list[dict[str, str | int | float | bool | list[float]]]:
+) -> list[dict[str, str | int | list[float]]]:
     attribute_managers = manager if isinstance(manager, list) else [manager]
-    attributes: list[dict[str, str | int | float | bool | list[float]]] = []
+    attributes: list[dict[str, str | int | list[float]]] = []
     first_manager = attribute_managers[0]
     listed_time_series: set[str] = set()
     for attribute_id in first_manager.attribute_ids():
@@ -442,12 +458,6 @@ def attributes_metadata(
             continue
         if time_steps:
             listed_time_series.add(attribute_name)
-        nb_items = attribute.nb_items()
-        min_values, max_values, attribute_has_nan = _attribute_ranges(
-            attribute_managers, attribute_name, nb_items
-        )
-        if not min_values or not max_values:
-            continue
         series_id = (
             first_manager.time_steps(attribute_name)[0].attribute_id.string()
             if time_steps
@@ -457,16 +467,35 @@ def attributes_metadata(
             {
                 "attribute_name": attribute_name,
                 "attribute_id": series_id,
-                "nb_items": nb_items,
-                "min_value": min(min_values),
-                "max_value": max(max_values),
-                "min_values": min_values,
-                "max_values": max_values,
-                "no_data": attribute_has_nan,
+                "nb_items": attribute.nb_items(),
                 "time_steps": time_steps,
             }
         )
     return attributes
+
+
+def _attribute_nb_items(attribute_manager: og.AttributeManager, attribute_name: str) -> int:
+    attribute_ids = _attribute_ids_for_name(attribute_manager, attribute_name)
+    if not attribute_ids:
+        return 0
+    attribute = attribute_manager.find_generic_attribute(attribute_ids[0])
+    return attribute.nb_items() if attribute is not None else 0
+
+
+def attributes_range(
+    attribute_managers: list[og.AttributeManager], attribute_name: str
+) -> dict[str, list[float] | bool]:
+    nb_items = min(
+        (
+            _attribute_nb_items(attribute_manager, attribute_name)
+            for attribute_manager in attribute_managers
+        ),
+        default=0,
+    )
+    min_values, max_values, no_data = _attribute_ranges(
+        attribute_managers, attribute_name, nb_items
+    )
+    return {"min_values": min_values, "max_values": max_values, "no_data": no_data}
 
 
 @typed_route(routes, schemas.vertex_attribute_names_route)
@@ -479,6 +508,19 @@ def vertex_attribute_names(
     attribute_manager = geode_object.vertex_attribute_manager()
     return schemas.VertexAttributeNamesResponse.from_dict(
         {"attributes": attributes_metadata(attribute_manager)}
+    )
+
+
+@typed_route(routes, schemas.vertex_attribute_range_route)
+def vertex_attribute_range(
+    params: schemas.VertexAttributeRange,
+) -> schemas.VertexAttributeRangeResponse:
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeMesh):
+        flask.abort(400, f"{params.id} is not a GeodeMesh")
+    attribute_manager = geode_object.vertex_attribute_manager()
+    return schemas.VertexAttributeRangeResponse.from_dict(
+        attributes_range([attribute_manager], params.attribute_name)
     )
 
 
@@ -495,6 +537,19 @@ def cell_attribute_names(
     )
 
 
+@typed_route(routes, schemas.cell_attribute_range_route)
+def cell_attribute_range(
+    params: schemas.CellAttributeRange,
+) -> schemas.CellAttributeRangeResponse:
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeGrid2D | GeodeGrid3D):
+        flask.abort(400, f"{params.id} is not a GeodeGrid")
+    attribute_manager = geode_object.cell_attribute_manager()
+    return schemas.CellAttributeRangeResponse.from_dict(
+        attributes_range([attribute_manager], params.attribute_name)
+    )
+
+
 @typed_route(routes, schemas.polygon_attribute_names_route)
 def polygon_attribute_names(
     params: schemas.PolygonAttributeNames,
@@ -505,6 +560,19 @@ def polygon_attribute_names(
     attribute_manager = geode_object.polygon_attribute_manager()
     return schemas.PolygonAttributeNamesResponse.from_dict(
         {"attributes": attributes_metadata(attribute_manager)}
+    )
+
+
+@typed_route(routes, schemas.polygon_attribute_range_route)
+def polygon_attribute_range(
+    params: schemas.PolygonAttributeRange,
+) -> schemas.PolygonAttributeRangeResponse:
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeSurfaceMesh2D | GeodeSurfaceMesh3D):
+        flask.abort(400, f"{params.id} is not a GeodeSurfaceMesh")
+    attribute_manager = geode_object.polygon_attribute_manager()
+    return schemas.PolygonAttributeRangeResponse.from_dict(
+        attributes_range([attribute_manager], params.attribute_name)
     )
 
 
@@ -521,6 +589,19 @@ def polyhedron_attribute_names(
     )
 
 
+@typed_route(routes, schemas.polyhedron_attribute_range_route)
+def polyhedron_attribute_range(
+    params: schemas.PolyhedronAttributeRange,
+) -> schemas.PolyhedronAttributeRangeResponse:
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeSolidMesh3D):
+        flask.abort(400, f"{params.id} is not a GeodeSolidMesh")
+    attribute_manager = geode_object.polyhedron_attribute_manager()
+    return schemas.PolyhedronAttributeRangeResponse.from_dict(
+        attributes_range([attribute_manager], params.attribute_name)
+    )
+
+
 @typed_route(routes, schemas.edge_attribute_names_route)
 def edge_attribute_names(
     params: schemas.EdgeAttributeNames,
@@ -531,6 +612,19 @@ def edge_attribute_names(
     attribute_manager = geode_object.edge_attribute_manager()
     return schemas.EdgeAttributeNamesResponse.from_dict(
         {"attributes": attributes_metadata(attribute_manager)}
+    )
+
+
+@typed_route(routes, schemas.edge_attribute_range_route)
+def edge_attribute_range(
+    params: schemas.EdgeAttributeRange,
+) -> schemas.EdgeAttributeRangeResponse:
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeGraph):
+        flask.abort(400, f"{params.id} does not have edges")
+    attribute_manager = geode_object.edge_attribute_manager()
+    return schemas.EdgeAttributeRangeResponse.from_dict(
+        attributes_range([attribute_manager], params.attribute_name)
     )
 
 
@@ -554,6 +648,26 @@ def model_component_vertex_attribute_names(
     )
 
 
+@typed_route(routes, schemas.model_component_vertex_attribute_range_route)
+def model_component_vertex_attribute_range(
+    params: schemas.ModelComponentVertexAttributeRange,
+) -> schemas.ModelComponentVertexAttributeRangeResponse:
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeModel):
+        flask.abort(400, f"{params.id} is not a GeodeModel")
+    managers = [
+        component.mesh().vertex_attribute_manager()
+        for component_id in params.component_ids
+        if isinstance(
+            (component := geode_object.component(og.uuid(component_id))),
+            ComponentMesh,
+        )
+    ]
+    return schemas.ModelComponentVertexAttributeRangeResponse.from_dict(
+        attributes_range(managers, params.attribute_name)
+    )
+
+
 @typed_route(routes, schemas.model_component_edge_attribute_names_route)
 def model_component_edge_attribute_names(
     params: schemas.ModelComponentEdgeAttributeNames,
@@ -571,6 +685,26 @@ def model_component_edge_attribute_names(
     ]
     return schemas.ModelComponentEdgeAttributeNamesResponse.from_dict(
         {"attributes": attributes_metadata(managers)}
+    )
+
+
+@typed_route(routes, schemas.model_component_edge_attribute_range_route)
+def model_component_edge_attribute_range(
+    params: schemas.ModelComponentEdgeAttributeRange,
+) -> schemas.ModelComponentEdgeAttributeRangeResponse:
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeModel):
+        flask.abort(400, f"{params.id} is not a GeodeModel")
+    managers = [
+        component.mesh().edge_attribute_manager()
+        for component_id in params.component_ids
+        if isinstance(
+            (component := geode_object.component(og.uuid(component_id))),
+            ComponentLine,
+        )
+    ]
+    return schemas.ModelComponentEdgeAttributeRangeResponse.from_dict(
+        attributes_range(managers, params.attribute_name)
     )
 
 
@@ -594,6 +728,26 @@ def model_component_polygon_attribute_names(
     )
 
 
+@typed_route(routes, schemas.model_component_polygon_attribute_range_route)
+def model_component_polygon_attribute_range(
+    params: schemas.ModelComponentPolygonAttributeRange,
+) -> schemas.ModelComponentPolygonAttributeRangeResponse:
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeModel):
+        flask.abort(400, f"{params.id} is not a GeodeModel")
+    managers = [
+        component.mesh().polygon_attribute_manager()
+        for component_id in params.component_ids
+        if isinstance(
+            (component := geode_object.component(og.uuid(component_id))),
+            ComponentSurface,
+        )
+    ]
+    return schemas.ModelComponentPolygonAttributeRangeResponse.from_dict(
+        attributes_range(managers, params.attribute_name)
+    )
+
+
 @typed_route(routes, schemas.model_component_polyhedron_attribute_names_route)
 def model_component_polyhedron_attribute_names(
     params: schemas.ModelComponentPolyhedronAttributeNames,
@@ -611,6 +765,26 @@ def model_component_polyhedron_attribute_names(
     ]
     return schemas.ModelComponentPolyhedronAttributeNamesResponse.from_dict(
         {"attributes": attributes_metadata(managers)}
+    )
+
+
+@typed_route(routes, schemas.model_component_polyhedron_attribute_range_route)
+def model_component_polyhedron_attribute_range(
+    params: schemas.ModelComponentPolyhedronAttributeRange,
+) -> schemas.ModelComponentPolyhedronAttributeRangeResponse:
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeModel):
+        flask.abort(400, f"{params.id} is not a GeodeModel")
+    managers = [
+        component.mesh().polyhedron_attribute_manager()
+        for component_id in params.component_ids
+        if isinstance(
+            (component := geode_object.component(og.uuid(component_id))),
+            ComponentBlock,
+        )
+    ]
+    return schemas.ModelComponentPolyhedronAttributeRangeResponse.from_dict(
+        attributes_range(managers, params.attribute_name)
     )
 
 
