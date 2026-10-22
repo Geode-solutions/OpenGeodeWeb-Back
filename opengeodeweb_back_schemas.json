@@ -623,6 +623,50 @@
           "additionalProperties": false
         }
       },
+      "convert_geographic": {
+        "$id": "opengeodeweb_back/crs/convert_geographic",
+        "route": "/convert_geographic",
+        "methods": [
+          "POST"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 32
+          },
+          "authority": {
+            "type": "string",
+            "minLength": 1
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "authority",
+          "code",
+          "name"
+        ],
+        "additionalProperties": false,
+        "response": {
+          "type": "object",
+          "properties": {
+            "binary_light_viewable": {
+              "type": "string"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
       "assign_geographic": {
         "$id": "opengeodeweb_back/crs/assign_geographic",
         "route": "/assign_geographic",
@@ -659,6 +703,94 @@
         "response": {
           "type": "object",
           "properties": {},
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "align": {
+        "$id": "opengeodeweb_back/crs/align",
+        "route": "/align",
+        "methods": [
+          "POST"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 32
+          },
+          "source_points": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "x",
+                "y"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "target_points": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "x",
+                "y"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "authority": {
+            "type": "string",
+            "minLength": 1
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "source_points",
+          "target_points",
+          "authority",
+          "code",
+          "name"
+        ],
+        "additionalProperties": false,
+        "response": {
+          "type": "object",
+          "properties": {
+            "binary_light_viewable": {
+              "type": "string"
+            }
+          },
           "required": [],
           "additionalProperties": false
         }

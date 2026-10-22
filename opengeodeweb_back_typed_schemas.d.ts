@@ -149,6 +149,17 @@ export interface CRSList {
   name: string;
 }
 
+export interface CRSConvertGeographicParams {
+  authority: string;
+  code: string;
+  id: string;
+  name: string;
+}
+
+export interface CRSConvertGeographicResponse {
+  binary_light_viewable?: string;
+}
+
 export interface CRSAssignGeographicParams {
   authority: string;
   code: string;
@@ -157,6 +168,29 @@ export interface CRSAssignGeographicParams {
 }
 
 export interface CRSAssignGeographicResponse {}
+
+export interface CRSAlignParams {
+  authority: string;
+  code: string;
+  id: string;
+  name: string;
+  source_points: SourcePoint[];
+  target_points: TargetPoint[];
+}
+
+export interface SourcePoint {
+  x: number;
+  y: number;
+}
+
+export interface TargetPoint {
+  x: number;
+  y: number;
+}
+
+export interface CRSAlignResponse {
+  binary_light_viewable?: string;
+}
 
 export interface CRSActiveParams {
   id: string;
@@ -602,8 +636,12 @@ export interface Schemas {
     readonly crs: {
       readonly geographic_list: (typeof json)["opengeodeweb_back"]["crs"]["geographic_list"] &
         TypedSchema<CRSGeographicListParams, CRSGeographicListResponse>;
+      readonly convert_geographic: (typeof json)["opengeodeweb_back"]["crs"]["convert_geographic"] &
+        TypedSchema<CRSConvertGeographicParams, CRSConvertGeographicResponse>;
       readonly assign_geographic: (typeof json)["opengeodeweb_back"]["crs"]["assign_geographic"] &
         TypedSchema<CRSAssignGeographicParams, CRSAssignGeographicResponse>;
+      readonly align: (typeof json)["opengeodeweb_back"]["crs"]["align"] &
+        TypedSchema<CRSAlignParams, CRSAlignResponse>;
       readonly active: (typeof json)["opengeodeweb_back"]["crs"]["active"] &
         TypedSchema<CRSActiveParams, CRSActiveResponse>;
     };
