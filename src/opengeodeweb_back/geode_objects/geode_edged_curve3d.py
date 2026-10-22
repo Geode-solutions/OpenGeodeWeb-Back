@@ -106,6 +106,10 @@ class GeodeEdgedCurve3D(GeodeGraph):
     def crs_manager(self) -> og.CoordinateReferenceSystemManager3D:
         return self.edged_curve.main_coordinate_reference_system_manager()
 
+    def delete_crs(self, crs_name: str) -> None:
+        crs_builder = self.builder().main_coordinate_reference_system_manager_builder()
+        crs_builder.delete_coordinate_reference_system(crs_name)
+
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
     ) -> None:

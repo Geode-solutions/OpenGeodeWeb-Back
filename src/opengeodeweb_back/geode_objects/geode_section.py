@@ -137,6 +137,25 @@ class GeodeSection(GeodeModel):
         msg = "Section has no mesh component"
         raise ValueError(msg)
 
+    def delete_crs(self, crs_name: str) -> None:
+        # Models have no CRS manager of their own: the CRS lives on every component mesh
+        builder = self.builder()
+        for corner in self.section.corners():
+            crs_builder = builder.corner_mesh_builder(
+                corner
+            ).main_coordinate_reference_system_manager_builder()
+            crs_builder.delete_coordinate_reference_system(crs_name)
+        for line in self.section.lines():
+            crs_builder = builder.line_mesh_builder(
+                line
+            ).main_coordinate_reference_system_manager_builder()
+            crs_builder.delete_coordinate_reference_system(crs_name)
+        for surface in self.section.surfaces():
+            crs_builder = builder.surface_mesh_builder(
+                surface
+            ).main_coordinate_reference_system_manager_builder()
+            crs_builder.delete_coordinate_reference_system(crs_name)
+
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
     ) -> None:
