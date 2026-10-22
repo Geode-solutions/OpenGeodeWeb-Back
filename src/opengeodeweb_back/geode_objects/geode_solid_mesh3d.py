@@ -49,6 +49,9 @@ class GeodeSolidMesh3D(GeodeVertexSet):
     def validate(self) -> og_inspector.ObjectValidity:
         return og_inspector.is_solid_valid3D(self.solid_mesh)
 
+    def crs_manager(self) -> og.CoordinateReferenceSystemManager3D:
+        return self.solid_mesh.main_coordinate_reference_system_manager()
+
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
     ) -> None:

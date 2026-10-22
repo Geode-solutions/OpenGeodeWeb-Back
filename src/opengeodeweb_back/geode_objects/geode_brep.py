@@ -136,6 +136,19 @@ class GeodeBRep(GeodeModel):
     def validate(self) -> og_inspector.ObjectValidity:
         return og_inspector.is_brep_valid(self.brep)
 
+    def crs_manager(self) -> og.CoordinateReferenceSystemManager3D:
+        # Models have no CRS manager of their own: CRS are assigned to every component mesh
+        for components in (
+            self.brep.corners(),
+            self.brep.lines(),
+            self.brep.surfaces(),
+            self.brep.blocks(),
+        ):
+            for component in components:
+                return component.mesh().main_coordinate_reference_system_manager()
+        msg = "BRep has no mesh component"
+        raise ValueError(msg)
+
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
     ) -> None:

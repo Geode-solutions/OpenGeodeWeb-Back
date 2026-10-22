@@ -101,6 +101,9 @@ class GeodePointSet2D(GeodeVertexSet):
     def validate(self) -> og_inspector.ObjectValidity:
         return og_inspector.is_pointset_valid2D(self.point_set)
 
+    def crs_manager(self) -> og.CoordinateReferenceSystemManager2D:
+        return self.point_set.main_coordinate_reference_system_manager()
+
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
     ) -> None:

@@ -49,6 +49,9 @@ class GeodeSurfaceMesh2D(GeodeVertexSet):
     def validate(self) -> og_inspector.ObjectValidity:
         return og_inspector.is_surface_valid2D(self.surface_mesh)
 
+    def crs_manager(self) -> og.CoordinateReferenceSystemManager2D:
+        return self.surface_mesh.main_coordinate_reference_system_manager()
+
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
     ) -> None:

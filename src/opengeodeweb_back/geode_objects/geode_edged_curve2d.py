@@ -103,6 +103,9 @@ class GeodeEdgedCurve2D(GeodeGraph):
     def validate(self) -> og_inspector.ObjectValidity:
         return og_inspector.is_edged_curve_valid2D(self.edged_curve)
 
+    def crs_manager(self) -> og.CoordinateReferenceSystemManager2D:
+        return self.edged_curve.main_coordinate_reference_system_manager()
+
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
     ) -> None:
