@@ -1,0 +1,50 @@
+{
+  "route": "/active",
+  "methods": [
+    "POST"
+  ],
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 32
+    }
+  },
+  "required": [
+    "id"
+  ],
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "crs_name": {
+        "type": "string"
+      },
+      "crs_info": {
+        "type": "object",
+        "properties": {
+          "authority": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "authority",
+          "code",
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "required": [
+      "crs_name"
+    ],
+    "additionalProperties": false
+  }
+}

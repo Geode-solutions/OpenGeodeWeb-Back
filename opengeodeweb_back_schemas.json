@@ -572,6 +572,149 @@
         }
       }
     },
+    "crs": {
+      "geographic_list": {
+        "$id": "opengeodeweb_back/crs/geographic_list",
+        "route": "/geographic_list",
+        "methods": [
+          "POST"
+        ],
+        "type": "object",
+        "properties": {
+          "geode_object_type": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "geode_object_type"
+        ],
+        "additionalProperties": false,
+        "response": {
+          "type": "object",
+          "properties": {
+            "crs_list": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "authority": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "code",
+                  "authority"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "crs_list"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "assign_geographic": {
+        "$id": "opengeodeweb_back/crs/assign_geographic",
+        "route": "/assign_geographic",
+        "methods": [
+          "POST"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 32
+          },
+          "authority": {
+            "type": "string",
+            "minLength": 1
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "authority",
+          "code",
+          "name"
+        ],
+        "additionalProperties": false,
+        "response": {
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "active": {
+        "$id": "opengeodeweb_back/crs/active",
+        "route": "/active",
+        "methods": [
+          "POST"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 32
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false,
+        "response": {
+          "type": "object",
+          "properties": {
+            "crs_name": {
+              "type": "string"
+            },
+            "crs_info": {
+              "type": "object",
+              "properties": {
+                "authority": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "authority",
+                "code",
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "crs_name"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
     "vertex_attribute_range": {
       "$id": "opengeodeweb_back/vertex_attribute_range",
       "route": "/vertex_attribute_range",
@@ -1815,56 +1958,6 @@
         },
         "required": [
           "snapshot"
-        ],
-        "additionalProperties": false
-      }
-    },
-    "geographic_coordinate_systems": {
-      "$id": "opengeodeweb_back/geographic_coordinate_systems",
-      "route": "/geographic_coordinate_systems",
-      "methods": [
-        "POST"
-      ],
-      "type": "object",
-      "properties": {
-        "geode_object_type": {
-          "type": "string",
-          "minLength": 1
-        }
-      },
-      "required": [
-        "geode_object_type"
-      ],
-      "additionalProperties": false,
-      "response": {
-        "type": "object",
-        "properties": {
-          "crs_list": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "code": {
-                  "type": "string"
-                },
-                "authority": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "name",
-                "code",
-                "authority"
-              ],
-              "additionalProperties": false
-            }
-          }
-        },
-        "required": [
-          "crs_list"
         ],
         "additionalProperties": false
       }

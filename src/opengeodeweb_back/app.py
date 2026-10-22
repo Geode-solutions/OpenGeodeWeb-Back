@@ -20,6 +20,7 @@ from werkzeug.exceptions import HTTPException
 from opengeodeweb_back import app_config, utils_functions
 from opengeodeweb_back.routes import blueprint_routes
 from opengeodeweb_back.routes.create import blueprint_create
+from opengeodeweb_back.routes.crs import blueprint_crs
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -170,6 +171,11 @@ def register_ogw_back_blueprints(app: flask.Flask) -> None:
         blueprint_create.routes,
         url_prefix="/opengeodeweb_back/create",
         name="opengeodeweb_create",
+    )
+    app.register_blueprint(
+        blueprint_crs.routes,
+        url_prefix="/opengeodeweb_back/crs",
+        name="opengeodeweb_crs",
     )
 
 

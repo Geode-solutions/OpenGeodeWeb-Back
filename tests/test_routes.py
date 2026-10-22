@@ -183,25 +183,6 @@ def test_data_missing_files(client: FlaskClient) -> None:
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_geographic_coordinate_systems(client: FlaskClient) -> None:
-    route = "/opengeodeweb_back/geographic_coordinate_systems"
-
-    def get_full_data() -> test_utils.JsonData:
-        return {
-            "geode_object_type": "BRep",
-        }
-
-    response = client.post(route, json=get_full_data())
-    assert response.status_code == 200
-    crs_list = response.get_json()["crs_list"]
-    assert type(crs_list) is list
-    for crs in crs_list:
-        assert type(crs) is dict
-
-    # Test all params
-    test_utils.test_route_wrong_params(client, route, get_full_data)
-
-
 def test_validate_object(client: FlaskClient) -> None:
     response_save = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep")
     assert response_save.status_code == 200
