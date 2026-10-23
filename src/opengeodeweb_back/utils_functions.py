@@ -25,6 +25,7 @@ from opengeodeweb_microservice.schemas import ErrorResponse, SchemaDict
 
 # Local application imports
 from . import geode_functions
+from .crs_functions import active_crs
 from .geode_objects import geode_objects
 from .geode_objects.geode_model import GeodeModel
 from .geode_objects.geode_vertex_set import GeodeVertexSet
@@ -344,6 +345,9 @@ def save_all_viewables_and_return_info(
             response["nb_vertices"] = geode_object.vertex_set.nb_vertices()
         if isinstance(geode_object, GeodeModel):
             response |= model_components(data.id, geode_object, data.viewable_file)
+        crs = active_crs(geode_object)
+        if crs is not None:
+            response["crs"] = crs
         return response
 
 

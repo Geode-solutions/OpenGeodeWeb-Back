@@ -1,21 +1,24 @@
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
-from typing import List
+from typing import Optional
 from dataclasses_json import DataClassJsonMixin
 from opengeodeweb_microservice.schemas import print_dataclass
 from dataclasses import dataclass
 
 
 @dataclass
-class GeographicCoordinateSystems(DataClassJsonMixin):
+class ConvertGeographic(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    geode_object_type: str
+    authority: str
+    code: str
+    id: str
+    name: str
 
 
 @dataclass
-class CRSList(DataClassJsonMixin):
+class CRS(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
@@ -25,17 +28,18 @@ class CRSList(DataClassJsonMixin):
 
 
 @dataclass
-class GeographicCoordinateSystemsResponse(DataClassJsonMixin):
+class ConvertGeographicResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    crs_list: List[CRSList]
+    binary_light_viewable: Optional[str] = None
+    crs: Optional[CRS] = None
 
 
-geographic_coordinate_systems_route = Route(
+convert_geographic_route = Route(
     schema=load_schema(Path(__file__)),
-    params=GeographicCoordinateSystems,
-    response=GeographicCoordinateSystemsResponse,
+    params=ConvertGeographic,
+    response=ConvertGeographicResponse,
 )
 
-__all__ = ["GeographicCoordinateSystems", "GeographicCoordinateSystemsResponse", "geographic_coordinate_systems_route"]
+__all__ = ["ConvertGeographic", "ConvertGeographicResponse", "convert_geographic_route"]

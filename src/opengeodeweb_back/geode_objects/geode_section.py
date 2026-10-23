@@ -11,6 +11,7 @@ import opengeode_geosciences as og_geosciences
 import opengeode_inspector as og_inspector
 
 # Local application imports
+from .crs_coordinates import delete_crs_with_coordinates
 from .geode_model import ComponentRegistry, GeodeModel
 
 if TYPE_CHECKING:
@@ -124,6 +125,37 @@ class GeodeSection(GeodeModel):
     @override
     def validate(self) -> og_inspector.ObjectValidity:
         return og_inspector.is_section_valid(self.section)
+
+    def crs_manager(self) -> og.CoordinateReferenceSystemManager2D:
+        # Models have no CRS manager of their own: CRS are assigned to every component mesh
+        for components in (
+            self.section.corners(),
+            self.section.lines(),
+            self.section.surfaces(),
+        ):
+            for component in components:
+                return component.mesh().main_coordinate_reference_system_manager()
+        msg = "Section has no mesh component"
+        raise ValueError(msg)
+
+    def delete_crs(self, crs_name: str) -> None:
+        # Models have no CRS manager of their own: the CRS lives on every component mesh
+        builder = self.builder()
+        for corner in self.section.corners():
+            crs_builder = builder.corner_mesh_builder(
+                corner
+            ).main_coordinate_reference_system_manager_builder()
+            delete_crs_with_coordinates(corner.mesh(), crs_builder, crs_name)
+        for line in self.section.lines():
+            crs_builder = builder.line_mesh_builder(
+                line
+            ).main_coordinate_reference_system_manager_builder()
+            delete_crs_with_coordinates(line.mesh(), crs_builder, crs_name)
+        for surface in self.section.surfaces():
+            crs_builder = builder.surface_mesh_builder(
+                surface
+            ).main_coordinate_reference_system_manager_builder()
+            delete_crs_with_coordinates(surface.mesh(), crs_builder, crs_name)
 
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
