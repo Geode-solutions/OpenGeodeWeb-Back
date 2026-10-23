@@ -16,6 +16,7 @@ export interface PolygonalSurfacePoint {
 export interface CreatePolygonalSurfaceResponse {
   binary_light_viewable?: string;
   collection_components?: CreatePolygonalSurfaceResponseCollectionComponent[];
+  crs?: CreatePolygonalSurfaceResponseCRS;
   geode_id: string;
   geode_object_type: string;
   id: string;
@@ -34,6 +35,12 @@ export interface CreatePolygonalSurfaceResponseCollectionComponent {
   items: string[];
   name: string;
   type: string;
+}
+
+export interface CreatePolygonalSurfaceResponseCRS {
+  authority: string;
+  code: string;
+  name: string;
 }
 
 export interface CreatePolygonalSurfaceResponseMeshComponent {
@@ -60,6 +67,7 @@ export interface Point {
 export interface CreatePointSetResponse {
   binary_light_viewable?: string;
   collection_components?: CreatePointSetResponseCollectionComponent[];
+  crs?: CreatePointSetResponseCRS;
   geode_id: string;
   geode_object_type: string;
   id: string;
@@ -78,6 +86,12 @@ export interface CreatePointSetResponseCollectionComponent {
   items: string[];
   name: string;
   type: string;
+}
+
+export interface CreatePointSetResponseCRS {
+  authority: string;
+  code: string;
+  name: string;
 }
 
 export interface CreatePointSetResponseMeshComponent {
@@ -105,6 +119,7 @@ export interface EdgedCurvePoint {
 export interface CreateEdgedCurveResponse {
   binary_light_viewable?: string;
   collection_components?: CreateEdgedCurveResponseCollectionComponent[];
+  crs?: CreateEdgedCurveResponseCRS;
   geode_id: string;
   geode_object_type: string;
   id: string;
@@ -123,6 +138,12 @@ export interface CreateEdgedCurveResponseCollectionComponent {
   items: string[];
   name: string;
   type: string;
+}
+
+export interface CreateEdgedCurveResponseCRS {
+  authority: string;
+  code: string;
+  name: string;
 }
 
 export interface CreateEdgedCurveResponseMeshComponent {
@@ -158,6 +179,13 @@ export interface CRSConvertGeographicParams {
 
 export interface CRSConvertGeographicResponse {
   binary_light_viewable?: string;
+  crs?: CRSConvertGeographicResponseCRS;
+}
+
+export interface CRSConvertGeographicResponseCRS {
+  authority: string;
+  code: string;
+  name: string;
 }
 
 export interface CRSAssignGeographicParams {
@@ -167,7 +195,15 @@ export interface CRSAssignGeographicParams {
   name: string;
 }
 
-export interface CRSAssignGeographicResponse {}
+export interface CRSAssignGeographicResponse {
+  crs?: CRSAssignGeographicResponseCRS;
+}
+
+export interface CRSAssignGeographicResponseCRS {
+  authority: string;
+  code: string;
+  name: string;
+}
 
 export interface CRSAlignParams {
   authority: string;
@@ -190,6 +226,13 @@ export interface TargetPoint {
 
 export interface CRSAlignResponse {
   binary_light_viewable?: string;
+  crs?: CRSAlignResponseCRS;
+}
+
+export interface CRSAlignResponseCRS {
+  authority: string;
+  code: string;
+  name: string;
 }
 
 export interface CRSActiveParams {
@@ -285,6 +328,7 @@ export interface SaveViewableFileParams {
 export interface SaveViewableFileResponse {
   binary_light_viewable?: string;
   collection_components?: SaveViewableFileResponseCollectionComponent[];
+  crs?: SaveViewableFileResponseCRS;
   geode_id: string;
   geode_object_type: string;
   id: string;
@@ -303,6 +347,12 @@ export interface SaveViewableFileResponseCollectionComponent {
   items: string[];
   name: string;
   type: string;
+}
+
+export interface SaveViewableFileResponseCRS {
+  authority: string;
+  code: string;
+  name: string;
 }
 
 export interface SaveViewableFileResponseMeshComponent {

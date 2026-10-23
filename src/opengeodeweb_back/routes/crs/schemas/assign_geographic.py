@@ -1,5 +1,6 @@
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
+from typing import Optional
 from dataclasses_json import DataClassJsonMixin
 from opengeodeweb_microservice.schemas import print_dataclass
 from dataclasses import dataclass
@@ -17,11 +18,21 @@ class AssignGeographic(DataClassJsonMixin):
 
 
 @dataclass
+class CRS(DataClassJsonMixin):
+    def __post_init__(self) -> None:
+        print_dataclass(self)
+
+    authority: str
+    code: str
+    name: str
+
+
+@dataclass
 class AssignGeographicResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    pass
+    crs: Optional[CRS] = None
 
 
 assign_geographic_route = Route(

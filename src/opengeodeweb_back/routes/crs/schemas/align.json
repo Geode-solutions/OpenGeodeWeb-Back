@@ -79,6 +79,26 @@
     "properties": {
       "binary_light_viewable": {
         "type": "string"
+      },
+      "crs": {
+        "type": "object",
+        "properties": {
+          "authority": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "authority",
+          "code",
+          "name"
+        ],
+        "additionalProperties": false
       }
     },
     "required": [],

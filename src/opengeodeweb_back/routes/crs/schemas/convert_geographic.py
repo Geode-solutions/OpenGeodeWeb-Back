@@ -18,11 +18,22 @@ class ConvertGeographic(DataClassJsonMixin):
 
 
 @dataclass
+class CRS(DataClassJsonMixin):
+    def __post_init__(self) -> None:
+        print_dataclass(self)
+
+    authority: str
+    code: str
+    name: str
+
+
+@dataclass
 class ConvertGeographicResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
     binary_light_viewable: Optional[str] = None
+    crs: Optional[CRS] = None
 
 
 convert_geographic_route = Route(

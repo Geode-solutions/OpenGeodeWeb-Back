@@ -1,4 +1,5 @@
 # Standard library imports
+from typing import Any
 
 # Third party imports
 import flask
@@ -7,47 +8,23 @@ import opengeode_geosciences as og_geosciences
 
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
-from opengeodeweb_back.geode_objects.geode_brep import GeodeBRep
-from opengeodeweb_back.geode_objects.geode_edged_curve2d import GeodeEdgedCurve2D
-from opengeodeweb_back.geode_objects.geode_edged_curve3d import GeodeEdgedCurve3D
-from opengeodeweb_back.geode_objects.geode_point_set2d import GeodePointSet2D
-from opengeodeweb_back.geode_objects.geode_point_set3d import GeodePointSet3D
-from opengeodeweb_back.geode_objects.geode_section import GeodeSection
-from opengeodeweb_back.geode_objects.geode_solid_mesh3d import GeodeSolidMesh3D
-from opengeodeweb_back.geode_objects.geode_surface_mesh2d import GeodeSurfaceMesh2D
-from opengeodeweb_back.geode_objects.geode_surface_mesh3d import GeodeSurfaceMesh3D
+from opengeodeweb_back.crs_functions import (
+    CRS_GEODE_OBJECTS,
+    CrsGeodeObject,
+    geographic_info,
+)
 from opengeodeweb_back.routes.crs import schemas
 from opengeodeweb_back.typed_route import typed_route
 
 routes = flask.Blueprint("crs", __name__, url_prefix="/crs")
 
-CRS_GEODE_OBJECTS = (
-    GeodeBRep,
-    GeodeSection,
-    GeodePointSet2D,
-    GeodePointSet3D,
-    GeodeEdgedCurve2D,
-    GeodeEdgedCurve3D,
-    GeodeSurfaceMesh2D,
-    GeodeSurfaceMesh3D,
-    GeodeSolidMesh3D,
-)
-
 
 def _prepare_crs_name(
-    geode_object: GeodeBRep
-    | GeodeSection
-    | GeodePointSet2D
-    | GeodePointSet3D
-    | GeodeEdgedCurve2D
-    | GeodeEdgedCurve3D
-    | GeodeSurfaceMesh2D
-    | GeodeSurfaceMesh3D
-    | GeodeSolidMesh3D,
+    geode_object: CrsGeodeObject,
     crs_name: str,
 ) -> None:
     crs_manager = geode_object.crs_manager()
-    info = _geographic_info(crs_manager)
+    info = geographic_info(crs_manager)
     if info is not None and info.authority_code() == crs_name:
         flask.abort(400, f"{crs_name} is already the active CRS")
     # A registered inactive CRS may hold coordinates derived from an outdated label: recompute it
@@ -55,16 +32,9 @@ def _prepare_crs_name(
         geode_object.delete_crs(crs_name)
 
 
-def _geographic_info(
-    crs_manager: og.CoordinateReferenceSystemManager2D | og.CoordinateReferenceSystemManager3D,
-) -> og_geosciences.GeographicCoordinateSystemInfo | None:
-    crs = crs_manager.active_coordinate_reference_system()
-    if isinstance(
-        crs,
-        og_geosciences.GeographicCoordinateSystem2D | og_geosciences.GeographicCoordinateSystem3D,
-    ):
-        return crs.info()
-    return None
+def _crs_response(saved: dict[str, Any]) -> dict[str, Any]:
+    # Only the fields the front refreshes after a CRS change
+    return {key: saved[key] for key in ("crs", "binary_light_viewable") if key in saved}
 
 
 @typed_route(routes, schemas.geographic_list_route)
@@ -88,7 +58,7 @@ def active(params: schemas.Active) -> schemas.ActiveResponse:
     if not isinstance(geode_object, CRS_GEODE_OBJECTS):
         flask.abort(400, f"{params.id} does not support coordinate reference systems")
     crs_manager = geode_object.crs_manager()
-    info = _geographic_info(crs_manager)
+    info = geographic_info(crs_manager)
     crs_info = (
         None
         if info is None
@@ -111,10 +81,10 @@ def assign_geographic(params: schemas.AssignGeographic) -> schemas.AssignGeograp
     info = og_geosciences.GeographicCoordinateSystemInfo(params.authority, params.code, params.name)
     _prepare_crs_name(geode_object, info.authority_code())
     geode_object.assign_crs(info.authority_code(), info)
-    utils_functions.save_all_viewables_and_return_info(
+    saved = utils_functions.save_all_viewables_and_return_info(
         geode_object, data, geode_functions.data_file_path(params.id)
     )
-    return schemas.AssignGeographicResponse()
+    return schemas.AssignGeographicResponse.from_dict(_crs_response(saved))
 
 
 @typed_route(routes, schemas.convert_geographic_route)
@@ -126,7 +96,7 @@ def convert_geographic(params: schemas.ConvertGeographic) -> schemas.ConvertGeog
     if not isinstance(geode_object, CRS_GEODE_OBJECTS):
         flask.abort(400, f"{params.id} does not support coordinate reference systems")
     crs_manager = geode_object.crs_manager()
-    if _geographic_info(crs_manager) is None:
+    if geographic_info(crs_manager) is None:
         flask.abort(400, "Assign a geographic CRS before converting")
     info = og_geosciences.GeographicCoordinateSystemInfo(params.authority, params.code, params.name)
     _prepare_crs_name(geode_object, info.authority_code())
@@ -138,9 +108,7 @@ def convert_geographic(params: schemas.ConvertGeographic) -> schemas.ConvertGeog
         geode_object, data, geode_functions.data_file_path(params.id)
     )
     # The front rebuilds its local actor from the new light viewable
-    return schemas.ConvertGeographicResponse(
-        binary_light_viewable=saved.get("binary_light_viewable")
-    )
+    return schemas.ConvertGeographicResponse.from_dict(_crs_response(saved))
 
 
 def _coordinate_system(
@@ -158,7 +126,7 @@ def align(params: schemas.Align) -> schemas.AlignResponse:
     )
     if not isinstance(geode_object, CRS_GEODE_OBJECTS):
         flask.abort(400, f"{params.id} does not support coordinate reference systems")
-    if _geographic_info(geode_object.crs_manager()) is not None:
+    if geographic_info(geode_object.crs_manager()) is not None:
         flask.abort(400, "Data already has a geographic CRS, use convert")
     try:
         source = _coordinate_system(params.source_points)
@@ -172,4 +140,4 @@ def align(params: schemas.Align) -> schemas.AlignResponse:
         geode_object, data, geode_functions.data_file_path(params.id)
     )
     # The front rebuilds its local actor from the new light viewable
-    return schemas.AlignResponse(binary_light_viewable=saved.get("binary_light_viewable"))
+    return schemas.AlignResponse.from_dict(_crs_response(saved))

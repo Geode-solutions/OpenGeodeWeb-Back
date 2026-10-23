@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 # Standard library imports
+import shutil
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 # Third party imports
 import pytest
 
 # Local application imports
+from opengeodeweb_microservice.database.data import Data
+
 from opengeodeweb_back import geode_functions, test_utils
 from opengeodeweb_back.geode_objects.geode_point_set3d import GeodePointSet3D
 
@@ -65,6 +69,7 @@ def test_assign_geographic(client: FlaskClient) -> None:
 
     response = client.post(route, json=get_full_data())
     assert response.status_code == 200
+    assert response.get_json()["crs"] == LAMBERT
     response = client.post(route, json={"id": point_set_id, **UTM})
     assert response.status_code == 200
     response = client.post(active_route, json={"id": point_set_id})
@@ -122,6 +127,7 @@ def test_convert_geographic(client: FlaskClient) -> None:
     assert response.status_code == 200
     # The front rebuilds its local actor from the new light viewable
     assert type(response.get_json()["binary_light_viewable"]) is str
+    assert response.get_json()["crs"] == UTM
     response = client.post(active_route, json={"id": point_set_id})
     assert response.get_json() == {"crs_name": "EPSG:32631", "crs_info": UTM}
     assert _first_point(client, point_set_id) != lambert_point
@@ -193,6 +199,7 @@ def test_align(client: FlaskClient) -> None:
     response = client.post(route, json=get_full_data())
     assert response.status_code == 200
     assert type(response.get_json()["binary_light_viewable"]) is str
+    assert response.get_json()["crs"] == LAMBERT
     response = client.post("/opengeodeweb_back/crs/active", json={"id": point_set_id})
     assert response.get_json() == {"crs_name": "EPSG:2154", "crs_info": LAMBERT}
     assert _first_point(client, point_set_id) == [1000, 2000, 5]
@@ -261,3 +268,28 @@ def test_convert_out_of_domain(client: FlaskClient) -> None:
     client.post("/opengeodeweb_back/crs/assign_geographic", json={"id": point_set_id, **WGS84})
     response = client.post(convert_route, json={"id": point_set_id, **LAMBERT})
     assert response.status_code == 400
+
+
+def test_saved_native_file_keeps_its_crs(client: FlaskClient) -> None:
+    point_set_id = test_utils.check_save_viewable_file(
+        client, "PointSet3D", "test.og_pts3d"
+    ).get_json()["id"]
+    client.post("/opengeodeweb_back/crs/assign_geographic", json={"id": point_set_id, **LAMBERT})
+    with client.application.app_context():
+        data = Data.get(point_set_id)
+        assert data is not None
+        native_path = Path(geode_functions.data_file_path(point_set_id, data.native_file))
+        upload_path = Path(geode_functions.upload_file_path("georeferenced.og_pts3d"))
+    upload_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(native_path, upload_path)
+    try:
+        response = client.post(
+            "/opengeodeweb_back/save_viewable_file",
+            json={"geode_object_type": "PointSet3D", "filename": "georeferenced.og_pts3d"},
+        )
+    finally:
+        upload_path.unlink()
+    assert response.status_code == 200
+    assert response.get_json()["crs"] == LAMBERT
+    # The copy lives in the shared test data folder: it must not outlive the test
+    assert not upload_path.exists()

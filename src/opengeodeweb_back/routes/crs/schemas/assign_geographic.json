@@ -32,7 +32,28 @@
   "additionalProperties": false,
   "response": {
     "type": "object",
-    "properties": {},
+    "properties": {
+      "crs": {
+        "type": "object",
+        "properties": {
+          "authority": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "authority",
+          "code",
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    },
     "required": [],
     "additionalProperties": false
   }

@@ -181,6 +181,26 @@
               "type": "string",
               "minLength": 36,
               "maxLength": 36
+            },
+            "crs": {
+              "type": "object",
+              "properties": {
+                "authority": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "authority",
+                "code",
+                "name"
+              ],
+              "additionalProperties": false
             }
           },
           "required": [
@@ -362,6 +382,26 @@
               "type": "string",
               "minLength": 36,
               "maxLength": 36
+            },
+            "crs": {
+              "type": "object",
+              "properties": {
+                "authority": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "authority",
+                "code",
+                "name"
+              ],
+              "additionalProperties": false
             }
           },
           "required": [
@@ -557,6 +597,26 @@
               "type": "string",
               "minLength": 36,
               "maxLength": 36
+            },
+            "crs": {
+              "type": "object",
+              "properties": {
+                "authority": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "authority",
+                "code",
+                "name"
+              ],
+              "additionalProperties": false
             }
           },
           "required": [
@@ -661,6 +721,26 @@
           "properties": {
             "binary_light_viewable": {
               "type": "string"
+            },
+            "crs": {
+              "type": "object",
+              "properties": {
+                "authority": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "authority",
+                "code",
+                "name"
+              ],
+              "additionalProperties": false
             }
           },
           "required": [],
@@ -702,7 +782,28 @@
         "additionalProperties": false,
         "response": {
           "type": "object",
-          "properties": {},
+          "properties": {
+            "crs": {
+              "type": "object",
+              "properties": {
+                "authority": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "authority",
+                "code",
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          },
           "required": [],
           "additionalProperties": false
         }
@@ -789,6 +890,26 @@
           "properties": {
             "binary_light_viewable": {
               "type": "string"
+            },
+            "crs": {
+              "type": "object",
+              "properties": {
+                "authority": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "authority",
+                "code",
+                "name"
+              ],
+              "additionalProperties": false
             }
           },
           "required": [],
@@ -1283,6 +1404,26 @@
             "type": "string",
             "minLength": 36,
             "maxLength": 36
+          },
+          "crs": {
+            "type": "object",
+            "properties": {
+              "authority": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "authority",
+              "code",
+              "name"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [

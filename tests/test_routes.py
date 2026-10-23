@@ -232,8 +232,9 @@ def test_geode_objects_and_output_extensions(client: FlaskClient) -> None:
     test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
-def test_save_viewable_file(client: FlaskClient) -> TestResponse:
-    test_utils.check_save_viewable_file(client, "BRep", "corbi.og_brep")
+def test_save_viewable_file(client: FlaskClient) -> None:
+    response = test_utils.check_save_viewable_file(client, "BRep", "corbi.og_brep")
+    assert "crs" not in response.get_json()
 
 
 def test_texture_coordinates(client: FlaskClient) -> None:
