@@ -11,7 +11,7 @@ import pytest
 # Local application imports
 from opengeodeweb_microservice.database.data import Data
 
-from opengeodeweb_back import geode_functions, test_utils
+from opengeodeweb_back import crs_functions, geode_functions, test_utils
 from opengeodeweb_back.geode_objects.geode_point_set3d import GeodePointSet3D
 
 if TYPE_CHECKING:
@@ -293,3 +293,86 @@ def test_saved_native_file_keeps_its_crs(client: FlaskClient) -> None:
     assert response.get_json()["crs"] == LAMBERT
     # The copy lives in the shared test data folder: it must not outlive the test
     assert not upload_path.exists()
+
+
+def _attribute_count(client: FlaskClient, data_id: str) -> int:
+    with client.application.app_context():
+        geode_object = geode_functions.load_geode_object(data_id)
+    assert isinstance(geode_object, GeodePointSet3D)
+    return len(geode_object.point_set.vertex_attribute_manager().attribute_ids())
+
+
+def test_round_trips_do_not_grow_the_native_file(client: FlaskClient) -> None:
+    convert_route = "/opengeodeweb_back/crs/convert_geographic"
+    point_set_id = test_utils.check_save_viewable_file(
+        client, "PointSet3D", "test.og_pts3d"
+    ).get_json()["id"]
+    client.post("/opengeodeweb_back/crs/assign_geographic", json={"id": point_set_id, **LAMBERT})
+    client.post(convert_route, json={"id": point_set_id, **UTM})
+    client.post(convert_route, json={"id": point_set_id, **LAMBERT})
+    attribute_count = _attribute_count(client, point_set_id)
+
+    for _ in range(2):
+        client.post(convert_route, json={"id": point_set_id, **UTM})
+        client.post(convert_route, json={"id": point_set_id, **LAMBERT})
+    assert _attribute_count(client, point_set_id) == attribute_count
+
+
+def test_unknown_crs(client: FlaskClient) -> None:
+    unknown = {"authority": "FOO", "code": "1", "name": "Unknown"}
+    point_set_id = test_utils.check_save_viewable_file(
+        client, "PointSet3D", "test.og_pts3d"
+    ).get_json()["id"]
+
+    response = client.post(
+        "/opengeodeweb_back/crs/assign_geographic", json={"id": point_set_id, **unknown}
+    )
+    assert response.status_code == 400
+    response = client.post(
+        "/opengeodeweb_back/crs/align",
+        json={
+            "id": _create_point_set(client),
+            "source_points": SOURCE,
+            "target_points": TARGET,
+            **unknown,
+        },
+    )
+    assert response.status_code == 400
+
+    # The name comes from the CRS list, not from the request
+    response = client.post(
+        "/opengeodeweb_back/crs/assign_geographic",
+        json={"id": point_set_id, **LAMBERT, "name": "Wrong name"},
+    )
+    assert response.get_json()["crs"] == LAMBERT
+    response = client.post(
+        "/opengeodeweb_back/crs/convert_geographic", json={"id": point_set_id, **unknown}
+    )
+    assert response.status_code == 400
+
+
+def test_assign_only_rewrites_the_native_file(client: FlaskClient) -> None:
+    point_set_id = test_utils.check_save_viewable_file(
+        client, "PointSet3D", "test.og_pts3d"
+    ).get_json()["id"]
+    with client.application.app_context():
+        data = Data.get(point_set_id)
+        assert data is not None
+        assert data.viewable_file is not None
+        viewable_path = Path(geode_functions.data_file_path(point_set_id, data.viewable_file))
+    viewable_mtime = viewable_path.stat().st_mtime_ns
+
+    response = client.post(
+        "/opengeodeweb_back/crs/assign_geographic", json={"id": point_set_id, **LAMBERT}
+    )
+    assert response.status_code == 200
+    assert viewable_path.stat().st_mtime_ns == viewable_mtime
+
+
+def test_unreadable_crs_does_not_fail_the_data_response(monkeypatch: pytest.MonkeyPatch) -> None:
+    def unreadable(*_args: object) -> None:
+        msg = "unreadable CRS"
+        raise RuntimeError(msg)
+
+    monkeypatch.setattr(crs_functions, "geographic_info", unreadable)
+    assert crs_functions.active_crs(GeodePointSet3D()) is None

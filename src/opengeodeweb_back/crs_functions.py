@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 # Standard library imports
+import functools
+import logging
 from typing import TYPE_CHECKING
 
 # Third party imports
@@ -21,6 +23,8 @@ if TYPE_CHECKING:
     import opengeode as og
 
     from opengeodeweb_back.geode_objects.geode_object import GeodeObject
+
+logger = logging.getLogger(__name__)
 
 CRS_GEODE_OBJECTS = (
     GeodeBRep,
@@ -47,6 +51,26 @@ CrsGeodeObject = (
 )
 
 
+@functools.cache
+def geographic_coordinate_systems(
+    is_3d: bool,  # noqa: FBT001 positional so the cache key stays simple
+) -> dict[str, og_geosciences.GeographicCoordinateSystemInfo]:
+    """Known geographic CRS by "AUTHORITY:CODE", built once: the list has thousands of entries."""
+    infos = (
+        og_geosciences.GeographicCoordinateSystem3D.geographic_coordinate_systems()
+        if is_3d
+        else og_geosciences.GeographicCoordinateSystem2D.geographic_coordinate_systems()
+    )
+    return {info.authority_code(): info for info in infos}
+
+
+def known_geographic_info(
+    geode_object: CrsGeodeObject, authority: str, code: str
+) -> og_geosciences.GeographicCoordinateSystemInfo | None:
+    """The listed CRS for authority:code, None when PROJ does not know it."""
+    return geographic_coordinate_systems(geode_object.is_3d()).get(f"{authority}:{code}")
+
+
 def geographic_info(
     crs_manager: og.CoordinateReferenceSystemManager2D | og.CoordinateReferenceSystemManager3D,
 ) -> og_geosciences.GeographicCoordinateSystemInfo | None:
@@ -65,7 +89,10 @@ def active_crs(geode_object: GeodeObject) -> dict[str, str] | None:
         return None
     try:
         info = geographic_info(geode_object.crs_manager())
-    except ValueError:  # A model without any component mesh has no CRS
+    except (ValueError, RuntimeError) as error:
+        # The CRS is extra information: a model without component mesh, or a CRS the
+        # geosciences library cannot read, must not fail the whole data response
+        logger.warning("Cannot read the active CRS: %s", error)
         return None
     if info is None:
         return None

@@ -11,6 +11,7 @@ import opengeode_geosciences as og_geosciences
 import opengeode_inspector as og_inspector
 
 # Local application imports
+from .crs_coordinates import delete_crs_with_coordinates
 from .geode_model import ComponentRegistry, GeodeModel
 
 if TYPE_CHECKING:
@@ -156,22 +157,22 @@ class GeodeBRep(GeodeModel):
             crs_builder = builder.corner_mesh_builder(
                 corner
             ).main_coordinate_reference_system_manager_builder()
-            crs_builder.delete_coordinate_reference_system(crs_name)
+            delete_crs_with_coordinates(corner.mesh(), crs_builder, crs_name)
         for line in self.brep.lines():
             crs_builder = builder.line_mesh_builder(
                 line
             ).main_coordinate_reference_system_manager_builder()
-            crs_builder.delete_coordinate_reference_system(crs_name)
+            delete_crs_with_coordinates(line.mesh(), crs_builder, crs_name)
         for surface in self.brep.surfaces():
             crs_builder = builder.surface_mesh_builder(
                 surface
             ).main_coordinate_reference_system_manager_builder()
-            crs_builder.delete_coordinate_reference_system(crs_name)
+            delete_crs_with_coordinates(surface.mesh(), crs_builder, crs_name)
         for block in self.brep.blocks():
             crs_builder = builder.block_mesh_builder(
                 block
             ).main_coordinate_reference_system_manager_builder()
-            crs_builder.delete_coordinate_reference_system(crs_name)
+            delete_crs_with_coordinates(block.mesh(), crs_builder, crs_name)
 
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo

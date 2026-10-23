@@ -11,6 +11,7 @@ import opengeode_geosciences as og_geosciences
 import opengeode_inspector as og_inspector
 
 # Local application imports
+from .crs_coordinates import delete_crs_with_coordinates
 from .geode_graph import GeodeGraph
 
 if TYPE_CHECKING:
@@ -108,7 +109,7 @@ class GeodeEdgedCurve3D(GeodeGraph):
 
     def delete_crs(self, crs_name: str) -> None:
         crs_builder = self.builder().main_coordinate_reference_system_manager_builder()
-        crs_builder.delete_coordinate_reference_system(crs_name)
+        delete_crs_with_coordinates(self.edged_curve, crs_builder, crs_name)
 
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
