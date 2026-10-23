@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 # Standard library imports
+import os
 import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -376,3 +377,8 @@ def test_unreadable_crs_does_not_fail_the_data_response(monkeypatch: pytest.Monk
 
     monkeypatch.setattr(crs_functions, "geographic_info", unreadable)
     assert crs_functions.active_crs(GeodePointSet3D()) is None
+
+
+def test_proj_finds_its_database() -> None:
+    # Packaged apps move libproj away from the opengeode share folder
+    assert (Path(os.environ["PROJ_DATA"]) / "proj.db").is_file()

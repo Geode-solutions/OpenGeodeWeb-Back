@@ -3,9 +3,12 @@ from __future__ import annotations
 # Standard library imports
 import functools
 import logging
+import os
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 # Third party imports
+import opengeode as og
 import opengeode_geosciences as og_geosciences
 
 # Local application imports
@@ -20,11 +23,14 @@ from opengeodeweb_back.geode_objects.geode_surface_mesh2d import GeodeSurfaceMes
 from opengeodeweb_back.geode_objects.geode_surface_mesh3d import GeodeSurfaceMesh3D
 
 if TYPE_CHECKING:
-    import opengeode as og
-
     from opengeodeweb_back.geode_objects.geode_object import GeodeObject
 
 logger = logging.getLogger(__name__)
+
+# TEMPORARY workaround, to remove once OpenGeode sets it itself (and ships a PyInstaller hook):
+# PROJ looks for its database next to the loaded libproj, which packaged apps (PyInstaller)
+# Load from elsewhere, so point it to the one opengeode ships
+os.environ.setdefault("PROJ_DATA", str(Path(og.__file__).parent / "share" / "proj"))
 
 CRS_GEODE_OBJECTS = (
     GeodeBRep,
