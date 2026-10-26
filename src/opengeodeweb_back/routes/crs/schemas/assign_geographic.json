@@ -52,6 +52,9 @@
           "name"
         ],
         "additionalProperties": false
+      },
+      "implausible": {
+        "type": "boolean"
       }
     },
     "required": [],

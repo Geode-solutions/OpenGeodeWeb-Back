@@ -11,11 +11,14 @@ import opengeode as og
 from opengeodeweb_back import geode_functions, utils_functions
 from opengeodeweb_back.crs_functions import (
     CRS_GEODE_OBJECTS,
+    ORIGINAL_CRS,
     CrsGeodeObject,
     active_crs,
+    coordinates_implausible,
     geographic_coordinate_systems,
     geographic_info,
     known_geographic_info,
+    original_coordinates,
 )
 from opengeodeweb_back.routes.crs import schemas
 from opengeodeweb_back.typed_route import typed_route
@@ -82,6 +85,18 @@ def active(params: schemas.Active) -> schemas.ActiveResponse:
     )
 
 
+def _keep_original_coordinates(geode_object: CrsGeodeObject) -> None:
+    """Assigning renames the active CRS: assign a copy so "points" survives for re-align."""
+    if not all(
+        mesh.main_coordinate_reference_system_manager().active_coordinate_reference_system_name()
+        == ORIGINAL_CRS
+        for mesh in geode_object.crs_meshes()
+    ):
+        return
+    identity = _coordinate_system([og.Point2D([0, 0]), og.Point2D([1, 0]), og.Point2D([0, 1])])
+    geode_object.create_crs("assigned", identity, identity)
+
+
 @typed_route(routes, schemas.assign_geographic_route)
 def assign_geographic(params: schemas.AssignGeographic) -> schemas.AssignGeographicResponse:
     data = geode_functions.get_data_info(params.id)
@@ -92,10 +107,17 @@ def assign_geographic(params: schemas.AssignGeographic) -> schemas.AssignGeograp
         flask.abort(400, f"{params.id} does not support coordinate reference systems")
     info = _known_info(geode_object, params.authority, params.code)
     _prepare_crs_name(geode_object, info.authority_code())
+    _keep_original_coordinates(geode_object)
     geode_object.assign_crs(info.authority_code(), info)
     # Assigning only relabels the coordinates: the viewables are unchanged
     geode_object.save(geode_functions.data_file_path(params.id, data.native_file))
-    return schemas.AssignGeographicResponse.from_dict({"crs": active_crs(geode_object)})
+    # A warning only: the label is kept, the front offers to align instead
+    return schemas.AssignGeographicResponse.from_dict(
+        {
+            "crs": active_crs(geode_object),
+            "implausible": coordinates_implausible(geode_object, info),
+        }
+    )
 
 
 @typed_route(routes, schemas.convert_geographic_route)
@@ -122,10 +144,60 @@ def convert_geographic(params: schemas.ConvertGeographic) -> schemas.ConvertGeog
     return schemas.ConvertGeographicResponse.from_dict(_crs_response(saved))
 
 
-def _coordinate_system(
+def _points(
     points: list[schemas.SourcePoint] | list[schemas.TargetPoint],
-) -> og.CoordinateSystem2D:
-    origin, first, second = (og.Point2D([point.x, point.y]) for point in points)
+) -> list[og.Point2D]:
+    return [og.Point2D([point.x, point.y]) for point in points]
+
+
+def _restore_original_coordinates(
+    geode_object: CrsGeodeObject, source_points: list[schemas.SourcePoint]
+) -> list[og.Point2D]:
+    """Restart from the loaded coordinates: alignments must not stack.
+
+    Picked points lie on the displayed data: they are mapped back as well.
+    Typed points are already original coordinates.
+    """
+    points = _points(source_points)
+    original_points = original_coordinates(geode_object, points)
+    if original_points is None and any(point.picked for point in source_points):
+        flask.abort(400, "Data has no three non-colinear vertices to re-align")
+    geode_object.set_active_crs(ORIGINAL_CRS)
+    _delete_other_crs(geode_object, ORIGINAL_CRS)
+    if original_points is None:
+        return points
+    return [
+        original if source.picked else typed
+        for source, original, typed in zip(source_points, original_points, points, strict=True)
+    ]
+
+
+def _crs_names(geode_object: CrsGeodeObject) -> set[str]:
+    # Model components may hold different CRS: gather them all
+    managers = [
+        mesh.main_coordinate_reference_system_manager() for mesh in geode_object.crs_meshes()
+    ]
+    return {name for manager in managers for name in manager.coordinate_reference_system_names()}
+
+
+def _has_original_coordinates(geode_object: CrsGeodeObject) -> bool:
+    # Assigning a geographic CRS renames the "points" CRS: the assigned coordinates are the base
+    return all(
+        mesh.main_coordinate_reference_system_manager().coordinate_reference_system_exists(
+            ORIGINAL_CRS
+        )
+        for mesh in geode_object.crs_meshes()
+    )
+
+
+def _delete_other_crs(geode_object: CrsGeodeObject, *kept: str) -> None:
+    for crs_name in _crs_names(geode_object):
+        if crs_name not in kept:
+            geode_object.delete_crs(crs_name)
+
+
+def _coordinate_system(points: list[og.Point2D]) -> og.CoordinateSystem2D:
+    origin, first, second = points
     return og.CoordinateSystem2D(origin, [first, second])
 
 
@@ -137,15 +209,24 @@ def align(params: schemas.Align) -> schemas.AlignResponse:
     )
     if not isinstance(geode_object, CRS_GEODE_OBJECTS):
         flask.abort(400, f"{params.id} does not support coordinate reference systems")
-    if geographic_info(geode_object.crs_manager()) is not None:
-        flask.abort(400, "Data already has a geographic CRS, use convert")
     info = _known_info(geode_object, params.authority, params.code)
+    source_points = _points(params.source_points)
+    # Without original coordinates, align the active ones: the points were picked on them
+    from_active = False
+    if geographic_info(geode_object.crs_manager()) is not None:
+        if _has_original_coordinates(geode_object):
+            source_points = _restore_original_coordinates(geode_object, params.source_points)
+        else:
+            from_active = True
     try:
-        source = _coordinate_system(params.source_points)
-        target = _coordinate_system(params.target_points)
+        source = _coordinate_system(source_points)
+        target = _coordinate_system(_points(params.target_points))
     except RuntimeError:  # OpenGeode cannot build a coordinate system from colinear points
         flask.abort(400, "Points must not be colinear")
     geode_object.create_crs("aligned", source, target)
+    if from_active:
+        # The previous geographic CRS and its coordinates would clash with the new assignment
+        _delete_other_crs(geode_object, "aligned", ORIGINAL_CRS)
     geode_object.assign_crs(info.authority_code(), info)
     saved = utils_functions.save_all_viewables_and_return_info(
         geode_object, data, geode_functions.data_file_path(params.id)

@@ -4,7 +4,7 @@ from __future__ import annotations
 import os
 import shutil
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 # Third party imports
 import pytest
@@ -13,6 +13,7 @@ import pytest
 from opengeodeweb_microservice.database.data import Data
 
 from opengeodeweb_back import crs_functions, geode_functions, test_utils
+from opengeodeweb_back.geode_objects.geode_brep import GeodeBRep
 from opengeodeweb_back.geode_objects.geode_point_set3d import GeodePointSet3D
 
 if TYPE_CHECKING:
@@ -170,12 +171,13 @@ SOURCE = [{"x": 0, "y": 0}, {"x": 10, "y": 0}, {"x": 0, "y": 10}]
 TARGET = [{"x": 1000, "y": 2000}, {"x": 1000, "y": 2020}, {"x": 980, "y": 2000}]
 
 
-def _create_point_set(client: FlaskClient) -> str:
-    points = [
-        {"x": 0, "y": 0, "z": 5},
-        {"x": 10, "y": 0, "z": 5},
-        {"x": 0, "y": 10, "z": 5},
-    ]
+def _create_point_set(client: FlaskClient, points: list[dict[str, float]] | None = None) -> str:
+    if points is None:
+        points = [
+            {"x": 0, "y": 0, "z": 5},
+            {"x": 10, "y": 0, "z": 5},
+            {"x": 0, "y": 10, "z": 5},
+        ]
     response = client.post(
         "/opengeodeweb_back/create/point_set", json={"name": "align", "points": points}
     )
@@ -223,12 +225,103 @@ def test_align_errors(client: FlaskClient) -> None:
     )
     assert response.status_code == 400
 
-    client.post("/opengeodeweb_back/crs/assign_geographic", json={"id": point_set_id, **LAMBERT})
-    response = client.post(
-        route,
-        json={"id": point_set_id, "source_points": SOURCE, "target_points": TARGET, **LAMBERT},
-    )
-    assert response.status_code == 400
+
+def _crs_names(client: FlaskClient, data_id: str) -> list[str]:
+    with client.application.app_context():
+        geode_object = geode_functions.load_geode_object(data_id)
+    assert isinstance(geode_object, GeodePointSet3D)
+    return sorted(geode_object.crs_manager().coordinate_reference_system_names())
+
+
+def test_realign(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/crs/align"
+    shifted_target = [{"x": 500, "y": 2000}, {"x": 500, "y": 2020}, {"x": 480, "y": 2000}]
+
+    def align(data_id: str, source: list[dict[str, Any]], target: list[dict[str, int]]) -> int:
+        response = client.post(
+            route,
+            json={"id": data_id, "source_points": source, "target_points": target, **LAMBERT},
+        )
+        return response.status_code
+
+    point_set_id = _create_point_set(client)
+    assert align(point_set_id, SOURCE, TARGET) == 200
+    # The points are picked again on the aligned data, where SOURCE now lies at TARGET
+    picked = [{**point, "picked": True} for point in TARGET]
+    assert align(point_set_id, picked, shifted_target) == 200
+    fresh_id = _create_point_set(client)
+    assert align(fresh_id, SOURCE, shifted_target) == 200
+    # Re-aligning restarts from the original coordinates, not from the first alignment
+    assert _first_point(client, point_set_id) == pytest.approx(_first_point(client, fresh_id))
+    assert _crs_names(client, point_set_id) == ["EPSG:2154", "points"]
+    assert _attribute_count(client, point_set_id) == _attribute_count(client, fresh_id)
+
+    brep_id = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep").get_json()["id"]
+    assert align(brep_id, SOURCE, TARGET) == 200
+    assert align(brep_id, picked, shifted_target) == 200
+
+
+def _brep_points(client: FlaskClient, data_id: str) -> list[float]:
+    with client.application.app_context():
+        brep = geode_functions.load_geode_object(data_id)
+    assert isinstance(brep, GeodeBRep)
+    return [
+        mesh.point(vertex).value(axis)
+        for mesh in brep.crs_meshes()
+        for vertex in range(mesh.nb_vertices())
+        for axis in range(3)
+    ]
+
+
+def test_align_after_assign(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/crs/align"
+    assign_route = "/opengeodeweb_back/crs/assign_geographic"
+
+    def align(
+        data_id: str, source: list[dict[str, Any]], target: list[dict[str, int]] = TARGET
+    ) -> int:
+        response = client.post(
+            route,
+            json={"id": data_id, "source_points": source, "target_points": target, **LAMBERT},
+        )
+        return response.status_code
+
+    # Assigning keeps the original coordinates: re-aligning always restarts from them
+    point_set_id = _create_point_set(client)
+    client.post(assign_route, json={"id": point_set_id, **LAMBERT})
+    assert _crs_names(client, point_set_id) == ["EPSG:2154", "points"]
+    assert align(point_set_id, SOURCE) == 200
+    fresh_id = _create_point_set(client)
+    assert align(fresh_id, SOURCE) == 200
+    assert _first_point(client, point_set_id) == pytest.approx(_first_point(client, fresh_id))
+    attribute_count = _attribute_count(client, point_set_id)
+    # The points are picked again on the aligned data, where SOURCE now lies at TARGET
+    assert align(point_set_id, [{**point, "picked": True} for point in TARGET]) == 200
+    assert _first_point(client, point_set_id) == pytest.approx(_first_point(client, fresh_id))
+    assert _crs_names(client, point_set_id) == ["EPSG:2154", "points"]
+    assert _attribute_count(client, point_set_id) == attribute_count
+    # Typed points are original coordinates: they are not mapped back
+    other_target = [{"x": 500, "y": 700}, {"x": 500, "y": 720}, {"x": 480, "y": 700}]
+    assert align(point_set_id, SOURCE, other_target) == 200
+    other_fresh_id = _create_point_set(client)
+    assert align(other_fresh_id, SOURCE, other_target) == 200
+    assert _first_point(client, point_set_id) == pytest.approx(_first_point(client, other_fresh_id))
+
+    brep_id = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep").get_json()["id"]
+    client.post(assign_route, json={"id": brep_id, **LAMBERT})
+    assert align(brep_id, SOURCE) == 200
+    fresh_brep_id = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep").get_json()[
+        "id"
+    ]
+    assert align(fresh_brep_id, SOURCE) == 200
+    assert _brep_points(client, brep_id) == pytest.approx(_brep_points(client, fresh_brep_id))
+    with client.application.app_context():
+        brep = geode_functions.load_geode_object(brep_id)
+    assert isinstance(brep, GeodeBRep)
+    for mesh in brep.crs_meshes():
+        crs_manager = mesh.main_coordinate_reference_system_manager()
+        assert crs_manager.active_coordinate_reference_system_name() == "EPSG:2154"
+        assert sorted(crs_manager.coordinate_reference_system_names()) == ["EPSG:2154", "points"]
 
 
 WGS84 = {"authority": "EPSG", "code": "4326", "name": "WGS 84"}
@@ -382,3 +475,21 @@ def test_unreadable_crs_does_not_fail_the_data_response(monkeypatch: pytest.Monk
 def test_proj_finds_its_database() -> None:
     # Packaged apps move libproj away from the opengeode share folder
     assert (Path(os.environ["PROJ_DATA"]) / "proj.db").is_file()
+
+
+def test_assign_geographic_plausibility(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/crs/assign_geographic"
+    for point, implausible in (
+        ({"x": 650000, "y": 6860000, "z": 0}, False),
+        # Local coordinates read as Lambert-93 land far outside the Earth
+        ({"x": 6710278, "y": 48021667, "z": 0}, True),
+        ({"x": 1e9, "y": 1e9, "z": 0}, True),
+        # Lands on the Earth, but far from France where Lambert-93 is used
+        ({"x": 1000, "y": 1000, "z": 0}, True),
+    ):
+        point_set_id = _create_point_set(client, [point])
+        response = client.post(route, json={"id": point_set_id, **LAMBERT})
+        # A warning only: the CRS is assigned anyway
+        assert response.status_code == 200
+        assert response.get_json()["crs"] == LAMBERT
+        assert response.get_json()["implausible"] is implausible

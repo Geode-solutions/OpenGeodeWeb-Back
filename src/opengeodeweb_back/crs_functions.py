@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 # Standard library imports
+import contextlib
 import functools
 import logging
+import math
 import os
+import sqlite3
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -23,9 +26,16 @@ from opengeodeweb_back.geode_objects.geode_surface_mesh2d import GeodeSurfaceMes
 from opengeodeweb_back.geode_objects.geode_surface_mesh3d import GeodeSurfaceMesh3D
 
 if TYPE_CHECKING:
+    from opengeodeweb_back.geode_objects.crs_coordinates import Mesh
     from opengeodeweb_back.geode_objects.geode_object import GeodeObject
 
 logger = logging.getLogger(__name__)
+
+ORIGINAL_CRS = "points"
+# OpenGeode orders EPSG:4326 coordinates as (latitude, longitude)
+WGS84 = og_geosciences.GeographicCoordinateSystemInfo("EPSG", "4326", "WGS 84")
+MAX_LATITUDE = 90.0
+MAX_LONGITUDE = 180.0
 
 # TEMPORARY workaround, to remove once OpenGeode sets it itself (and ships a PyInstaller hook):
 # PROJ looks for its database next to the loaded libproj, which packaged apps (PyInstaller)
@@ -103,3 +113,169 @@ def active_crs(geode_object: GeodeObject) -> dict[str, str] | None:
     if info is None:
         return None
     return {"authority": info.authority, "code": info.code, "name": info.name}
+
+
+def convert_xy_corners(
+    bounds: tuple[float, float, float, float],
+    source: og_geosciences.GeographicCoordinateSystemInfo,
+    target: og_geosciences.GeographicCoordinateSystemInfo,
+) -> list[tuple[float, float]]:
+    """The four corners of bounds, given in source, converted to target.
+
+    Raises RuntimeError when PROJ rejects coordinates outside either CRS domain.
+    """
+    x_min, y_min, x_max, y_max = bounds
+    corners = GeodePointSet3D()
+    builder = corners.builder()
+    for x, y in ((x_min, y_min), (x_max, y_min), (x_min, y_max), (x_max, y_max)):
+        builder.create_point(og.Point3D([x, y, 0.0]))
+    corners.assign_crs(source.authority_code(), source)
+    # Assigning then converting to the same CRS name is rejected by OpenGeode
+    if source.authority_code() != target.authority_code():
+        corners.convert_crs(target.authority_code(), target)
+    points = (corners.point_set.point(index) for index in range(4))
+    return [(point.value(0), point.value(1)) for point in points]
+
+
+# Extents (south, north, west, east) PROJ declares for a CRS
+AREA_OF_USE_QUERY = """
+SELECT extent.south_lat, extent.north_lat, extent.west_lon, extent.east_lon
+FROM usage JOIN extent
+ON extent.auth_name = usage.extent_auth_name AND extent.code = usage.extent_code
+WHERE usage.object_auth_name = ? AND usage.object_code = ?
+AND usage.object_table_name IN ('projected_crs', 'geodetic_crs', 'compound_crs')
+"""
+
+
+@functools.cache
+def area_of_use(authority: str, code: str) -> list[tuple[float, float, float, float]]:
+    """Extents where PROJ declares the CRS usable, empty when unknown.
+
+    The bindings do not expose them: read the PROJ database opengeode ships.
+    """
+    database = (Path(os.environ["PROJ_DATA"]) / "proj.db").resolve()
+    try:
+        with contextlib.closing(
+            sqlite3.connect(f"{database.as_uri()}?mode=ro", uri=True)
+        ) as connection:
+            rows = connection.execute(AREA_OF_USE_QUERY, (authority, code)).fetchall()
+    except sqlite3.Error as error:
+        logger.warning("Cannot read the CRS area of use: %s", error)
+        return []
+    return [(float(s), float(n), float(w), float(e)) for s, n, w, e in rows]
+
+
+def _overlaps(
+    latitudes: tuple[float, float],
+    longitudes: tuple[float, float],
+    area: tuple[float, float, float, float],
+) -> bool:
+    south, north, west, east = area
+    if latitudes[1] < south or latitudes[0] > north:
+        return False
+    if west <= east:
+        return longitudes[1] >= west and longitudes[0] <= east
+    # The area crosses the antimeridian
+    return longitudes[1] >= west or longitudes[0] <= east
+
+
+def coordinates_implausible(
+    geode_object: CrsGeodeObject, info: og_geosciences.GeographicCoordinateSystemInfo
+) -> bool:
+    """Whether the data XY extent, read in info, misses the area where info is used."""
+    boxes = [mesh.bounding_box() for mesh in geode_object.crs_meshes()]
+    # Without mesh, the infinite bounds below mark the data as implausible
+    bounds = (
+        min((box.min().value(0) for box in boxes), default=math.inf),
+        min((box.min().value(1) for box in boxes), default=math.inf),
+        max((box.max().value(0) for box in boxes), default=math.inf),
+        max((box.max().value(1) for box in boxes), default=math.inf),
+    )
+    if not all(math.isfinite(value) for value in bounds):
+        return True
+    try:
+        corners = convert_xy_corners(bounds, info, WGS84)
+    except RuntimeError:
+        return True
+    latitudes = [latitude for latitude, _ in corners]
+    longitudes = [longitude for _, longitude in corners]
+    # Written as "not within" so NaN counts as outside
+    if not all(abs(value) <= MAX_LATITUDE for value in latitudes) or not all(
+        abs(value) <= MAX_LONGITUDE for value in longitudes
+    ):
+        return True
+    areas = area_of_use(info.authority, info.code)
+    if not areas:
+        return False
+    latitude_range = (min(latitudes), max(latitudes))
+    longitude_range = (min(longitudes), max(longitudes))
+    # Partial overlap is enough: models often go a little beyond the declared area
+    return not any(_overlaps(latitude_range, longitude_range, area) for area in areas)
+
+
+# Frames are fitted on a sample of the vertices: large meshes would be slow to scan in Python
+MAX_FRAME_VERTICES = 10_000
+MIN_FRAME_POINTS = 3
+
+
+def _xy(
+    crs: og.CoordinateReferenceSystem2D | og.CoordinateReferenceSystem3D, vertex: int
+) -> list[float]:
+    point = crs.point(vertex)
+    return [point.value(0), point.value(1)]
+
+
+def _cross(origin: list[float], first: list[float], second: list[float]) -> float:
+    return (first[0] - origin[0]) * (second[1] - origin[1]) - (first[1] - origin[1]) * (
+        second[0] - origin[0]
+    )
+
+
+def _frames(mesh: Mesh) -> tuple[og.CoordinateSystem2D, og.CoordinateSystem2D] | None:
+    """The same three vertices as frames in the active and in the original CRS."""
+    nb_vertices = mesh.nb_vertices()
+    if nb_vertices < MIN_FRAME_POINTS:
+        return None
+    crs_manager = mesh.main_coordinate_reference_system_manager()
+    active = crs_manager.active_coordinate_reference_system()
+    original = crs_manager.find_coordinate_reference_system(ORIGINAL_CRS)
+    vertices = range(0, nb_vertices, max(1, nb_vertices // MAX_FRAME_VERTICES))
+    points = {vertex: _xy(active, vertex) for vertex in vertices}
+    origin = points[0]
+    # The farthest vertex, then the one spanning the largest triangle: the best conditioned frame
+    first = max(
+        vertices,
+        key=lambda vertex: math.dist(origin, points[vertex]),
+    )
+    second = max(
+        vertices,
+        key=lambda vertex: abs(_cross(origin, points[first], points[vertex])),
+    )
+    span = math.dist(origin, points[first]) ** 2
+    if span == 0 or abs(_cross(origin, points[first], points[second])) <= span * 1e-9:
+        return None
+
+    def frame(
+        crs: og.CoordinateReferenceSystem2D | og.CoordinateReferenceSystem3D,
+    ) -> og.CoordinateSystem2D:
+        return og.CoordinateSystem2D(
+            og.Point2D(_xy(crs, 0)), [og.Point2D(_xy(crs, first)), og.Point2D(_xy(crs, second))]
+        )
+
+    return frame(active), frame(original)
+
+
+def original_coordinates(
+    geode_object: CrsGeodeObject, points: list[og.Point2D]
+) -> list[og.Point2D] | None:
+    """Points given in the active CRS, expressed in the original coordinates.
+
+    An alignment is affine: three vertices known in both CRS invert it (approximately when the
+    data was converted since). None when no mesh has three non-colinear vertices.
+    """
+    for mesh in geode_object.crs_meshes():
+        frames = _frames(mesh)
+        if frames is not None:
+            active, original = frames
+            return [original.global_coordinates(active.coordinates(point)) for point in points]
+    return None

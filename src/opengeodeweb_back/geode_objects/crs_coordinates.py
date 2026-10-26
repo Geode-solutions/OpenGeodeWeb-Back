@@ -34,6 +34,9 @@ def _coordinates_name(
 def delete_crs_with_coordinates(mesh: Mesh, crs_builder: CrsBuilder, crs_name: str) -> None:
     """Delete an inactive CRS and its coordinates: each conversion stores new ones."""
     crs_manager = mesh.main_coordinate_reference_system_manager()
+    # Model components may not all hold the same CRS
+    if not crs_manager.coordinate_reference_system_exists(crs_name):
+        return
     coordinates_name = _coordinates_name(crs_manager.find_coordinate_reference_system(crs_name))
     active_name = _coordinates_name(crs_manager.active_coordinate_reference_system())
     crs_builder.delete_coordinate_reference_system(crs_name)

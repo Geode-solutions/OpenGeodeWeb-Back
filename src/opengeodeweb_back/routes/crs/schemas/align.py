@@ -4,7 +4,7 @@ from typing import Optional
 from dataclasses_json import DataClassJsonMixin
 from opengeodeweb_microservice.schemas import print_dataclass
 from dataclasses import dataclass
-from typing import List
+from typing import Optional, List
 
 
 @dataclass
@@ -14,6 +14,7 @@ class SourcePoint(DataClassJsonMixin):
 
     x: float
     y: float
+    picked: Optional[bool] = None
 
 
 @dataclass

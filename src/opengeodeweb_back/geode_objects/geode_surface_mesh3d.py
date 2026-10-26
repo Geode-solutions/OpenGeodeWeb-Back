@@ -15,6 +15,8 @@ from .geode_vertex_set import GeodeVertexSet
 if TYPE_CHECKING:
     from opengeodeweb_microservice.database.data_types import ViewerElementsType
 
+    from .crs_coordinates import Mesh
+
 
 class GeodeSurfaceMesh3D(GeodeVertexSet):
     surface_mesh: og.SurfaceMesh3D
@@ -56,6 +58,13 @@ class GeodeSurfaceMesh3D(GeodeVertexSet):
     def delete_crs(self, crs_name: str) -> None:
         crs_builder = self.builder().main_coordinate_reference_system_manager_builder()
         delete_crs_with_coordinates(self.surface_mesh, crs_builder, crs_name)
+
+    def set_active_crs(self, crs_name: str) -> None:
+        crs_builder = self.builder().main_coordinate_reference_system_manager_builder()
+        crs_builder.set_active_coordinate_reference_system(crs_name)
+
+    def crs_meshes(self) -> list[Mesh]:
+        return [self.surface_mesh]
 
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo

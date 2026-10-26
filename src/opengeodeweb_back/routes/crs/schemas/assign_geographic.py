@@ -33,6 +33,7 @@ class AssignGeographicResponse(DataClassJsonMixin):
         print_dataclass(self)
 
     crs: Optional[CRS] = None
+    implausible: Optional[bool] = None
 
 
 assign_geographic_route = Route(

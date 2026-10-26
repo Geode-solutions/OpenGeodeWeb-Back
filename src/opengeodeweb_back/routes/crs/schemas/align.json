@@ -22,6 +22,10 @@
           },
           "y": {
             "type": "number"
+          },
+          "picked": {
+            "type": "boolean",
+            "default": false
           }
         },
         "required": [
