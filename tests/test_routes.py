@@ -523,8 +523,17 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
             viewer_elements_type="default",
             native_file="native.txt",
         )
+        basemap = Data(
+            id="test_basemap",
+            geode_id=DUMMY_GEODE_ID,
+            geode_object="TriangulatedSurface3D",
+            viewer_object="mesh",
+            viewer_elements_type="polygons",
+            native_file="native.og_tsf3d",
+        )
         session.add(data1)
         session.add(data2)
+        session.add(basemap)
         session.commit()
 
         data1_dir = project_folder / "test_data_1"
@@ -534,6 +543,11 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
         data2_dir = project_folder / "test_data_2"
         data2_dir.mkdir(parents=True, exist_ok=True)
         (data2_dir / "native.txt").write_text("native file content")
+
+        # Basemaps are rebuilt on import: their tiles stay out of the export
+        basemap_tiles = project_folder / "test_basemap" / "tiles"
+        basemap_tiles.mkdir(parents=True, exist_ok=True)
+        (basemap_tiles / "0_0.png").write_bytes(b"\x89PNG")
 
     response = client.post(route, json={"snapshot": snapshot, "filename": filename})
     assert response.status_code == 200
@@ -552,6 +566,7 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
         assert "project.db" in names
         assert "test_data_1/native.txt" in names
         assert "test_data_2/native.txt" in names
+        assert not any(name.startswith("test_basemap/") for name in names)
 
     response.close()
 

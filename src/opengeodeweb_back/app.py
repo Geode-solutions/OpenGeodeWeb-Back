@@ -19,6 +19,7 @@ from werkzeug.exceptions import HTTPException
 
 from opengeodeweb_back import app_config, utils_functions
 from opengeodeweb_back.routes import blueprint_routes
+from opengeodeweb_back.routes.basemap import blueprint_basemap
 from opengeodeweb_back.routes.create import blueprint_create
 from opengeodeweb_back.routes.crs import blueprint_crs
 
@@ -176,6 +177,11 @@ def register_ogw_back_blueprints(app: flask.Flask) -> None:
         blueprint_crs.routes,
         url_prefix="/opengeodeweb_back/crs",
         name="opengeodeweb_crs",
+    )
+    app.register_blueprint(
+        blueprint_basemap.routes,
+        url_prefix="/opengeodeweb_back/basemap",
+        name="opengeodeweb_basemap",
     )
 
 
