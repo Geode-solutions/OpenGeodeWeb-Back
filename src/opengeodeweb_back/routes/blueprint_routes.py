@@ -804,6 +804,9 @@ def export_project() -> flask.Response:
 
         for data_id, _native_file in rows:
             base_dir = Path(project_folder) / data_id
+            # Basemaps are rebuilt from the project style: their tiles are not exported
+            if (base_dir / "tiles").is_dir():
+                continue
             if base_dir.is_dir():
                 for file_path in base_dir.rglob("*"):
                     if file_path.is_file():
