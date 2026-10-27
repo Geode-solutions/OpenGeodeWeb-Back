@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 # Standard library imports
+import contextlib
 import logging
 import math
 import os
 import shutil
+import sqlite3
+import tempfile
 import time
 import typing
 import zipfile
@@ -782,6 +785,19 @@ def kill(_params: schemas.Kill) -> schemas.KillResponse:
     return schemas.KillResponse(message="Flask server is dead")
 
 
+def _copy_database_without(source: Path, destination: Path, data_ids: list[str]) -> None:
+    """Consistent copy of the project database, even while it is in use, without some rows."""
+    with (
+        contextlib.closing(sqlite3.connect(source)) as source_connection,
+        contextlib.closing(sqlite3.connect(destination)) as destination_connection,
+    ):
+        source_connection.backup(destination_connection)
+        destination_connection.executemany(
+            "DELETE FROM datas WHERE id = ?", [(data_id,) for data_id in data_ids]
+        )
+        destination_connection.commit()
+
+
 @raw_route(routes, schemas.export_project_route)
 def export_project() -> flask.Response:
     params = parse_params(schemas.export_project_route)
@@ -796,14 +812,23 @@ def export_project() -> flask.Response:
 
     with get_session() as session:
         rows = session.query(Data.id, Data.native_file).all()
+    # Basemaps are rebuilt from the project style: neither their rows nor their tiles are exported
+    basemap_ids = [
+        data_id for data_id, _ in rows if (Path(project_folder) / data_id / "tiles").is_dir()
+    ]
 
     with zipfile.ZipFile(export_vease_path, "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
         database_root_path = Path(project_folder) / "project.db"
         if database_root_path.is_file():
-            zip_file.write(database_root_path, "project.db")
+            with tempfile.TemporaryDirectory() as folder:
+                exported_database = Path(folder) / "project.db"
+                _copy_database_without(database_root_path, exported_database, basemap_ids)
+                zip_file.write(exported_database, "project.db")
 
         for data_id, _native_file in rows:
             base_dir = Path(project_folder) / data_id
+            if data_id in basemap_ids:
+                continue
             if base_dir.is_dir():
                 for file_path in base_dir.rglob("*"):
                     if file_path.is_file():
