@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 # Standard library imports
+import contextlib
 import json
 import os
 import shutil
@@ -567,6 +568,12 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
         assert "test_data_1/native.txt" in names
         assert "test_data_2/native.txt" in names
         assert not any(name.startswith("test_basemap/") for name in names)
+        # Nor their rows: they would stay as orphans after each import
+        exported_db = tmp_path / "exported_project.db"
+        exported_db.write_bytes(zip_file.read("project.db"))
+        with contextlib.closing(sqlite3.connect(exported_db)) as connection:
+            ids = {row[0] for row in connection.execute("SELECT id FROM datas")}
+        assert ids == {"test_data_1", "test_data_2"}
 
     response.close()
 
