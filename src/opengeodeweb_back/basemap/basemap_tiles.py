@@ -32,7 +32,7 @@ class TileRange:
     y_max: int
 
     def tile_span(self) -> float:
-        return 2 * HALF_WORLD / 2**self.z
+        return 2 * HALF_WORLD / (1 << self.z)
 
     def bounds_3857(self) -> tuple[float, float, float, float]:
         span = self.tile_span()
@@ -53,8 +53,8 @@ class TileRange:
 
 
 def _range_at(bounds_3857: tuple[float, float, float, float], z: int) -> TileRange:
-    span = 2 * HALF_WORLD / 2**z
-    last = 2**z - 1
+    span = 2 * HALF_WORLD / (1 << z)
+    last = (1 << z) - 1
     x_min, y_min, x_max, y_max = bounds_3857
 
     def column(x: float) -> int:
