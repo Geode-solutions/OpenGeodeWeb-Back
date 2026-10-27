@@ -824,6 +824,15 @@
             "minLength": 32,
             "maxLength": 32
           },
+          "linked_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 32,
+              "maxLength": 32
+            },
+            "uniqueItems": true
+          },
           "mode": {
             "type": "string",
             "enum": [
@@ -930,6 +939,44 @@
             },
             "rotation": {
               "type": "number"
+            },
+            "linked": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "binary_light_viewable": {
+                    "type": "string"
+                  },
+                  "crs": {
+                    "type": "object",
+                    "properties": {
+                      "authority": {
+                        "type": "string"
+                      },
+                      "code": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "authority",
+                      "code",
+                      "name"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "additionalProperties": false
+              }
             }
           },
           "required": [],

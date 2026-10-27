@@ -210,6 +210,7 @@ export interface CRSAlignParams {
     authority:     string;
     code:          string;
     id:            string;
+    linked_ids?:   string[];
     mode?:         Mode;
     name:          string;
     source_points: SourcePoint[];
@@ -232,11 +233,24 @@ export interface TargetPoint {
 export interface CRSAlignResponse {
     binary_light_viewable?: string;
     crs?:                   CRSAlignResponseCRS;
+    linked?:                Linked[];
     rotation?:              number;
     scale?:                 number;
 }
 
 export interface CRSAlignResponseCRS {
+    authority: string;
+    code:      string;
+    name:      string;
+}
+
+export interface Linked {
+    binary_light_viewable?: string;
+    crs?:                   LinkedCRS;
+    id:                     string;
+}
+
+export interface LinkedCRS {
     authority: string;
     code:      string;
     name:      string;

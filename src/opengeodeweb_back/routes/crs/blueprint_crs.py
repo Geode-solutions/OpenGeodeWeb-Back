@@ -2,6 +2,7 @@ from __future__ import annotations
 
 # Standard library imports
 import math
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 # Third party imports
@@ -28,6 +29,7 @@ from opengeodeweb_back.typed_route import typed_route
 
 if TYPE_CHECKING:
     import opengeode_geosciences as og_geosciences
+    from opengeodeweb_microservice.database.data import Data
 
 routes = flask.Blueprint("crs", __name__, url_prefix="/crs")
 
@@ -158,26 +160,35 @@ def _points(
     return [og.Point2D([point.x, point.y]) for point in points]
 
 
-def _restore_original_coordinates(
+def _original_source_points(
     geode_object: CrsGeodeObject, source_points: list[schemas.SourcePoint]
 ) -> list[og.Point2D]:
-    """Restart from the loaded coordinates: alignments must not stack.
+    """Source points in the loaded coordinates: alignments must not stack.
 
-    Picked points lie on the displayed data: they are mapped back as well.
+    Picked points lie on the displayed data: they are mapped back.
     Typed points are already original coordinates.
     """
     points = _points(source_points)
     original_points = original_coordinates(geode_object, points)
-    if original_points is None and any(point.picked for point in source_points):
-        flask.abort(400, "Data has no three non-colinear vertices to re-align")
-    geode_object.set_active_crs(ORIGINAL_CRS)
-    _delete_other_crs(geode_object, ORIGINAL_CRS)
     if original_points is None:
+        if any(point.picked for point in source_points):
+            flask.abort(400, "Data has no three non-colinear vertices to re-align")
         return points
     return [
         original if source.picked else typed
         for source, original, typed in zip(source_points, original_points, points, strict=True)
     ]
+
+
+def _restart_alignment(geode_object: CrsGeodeObject) -> bool:
+    """Go back to the loaded coordinates. True when only the active ones can be aligned."""
+    if geographic_info(geode_object.crs_manager()) is None:
+        return False
+    if not _has_original_coordinates(geode_object):
+        return True
+    geode_object.set_active_crs(ORIGINAL_CRS)
+    _delete_other_crs(geode_object, ORIGINAL_CRS)
+    return False
 
 
 def _crs_names(geode_object: CrsGeodeObject) -> set[str]:
@@ -251,54 +262,95 @@ def _check_pair_count(mode: str, params: schemas.Align) -> None:
         flask.abort(400, "Alignment without distortion needs 1 or 2 pairs of points")
 
 
-@typed_route(routes, schemas.align_route)
-def align(params: schemas.Align) -> schemas.AlignResponse:
-    data = geode_functions.get_data_info(params.id)
+def _load_crs_object(data_id: str) -> tuple[Data, CrsGeodeObject]:
+    data = geode_functions.get_data_info(data_id)
     geode_object = geode_functions.geode_object_from_string(data.geode_object).load(
-        geode_functions.data_file_path(params.id, data.native_file)
+        geode_functions.data_file_path(data_id, data.native_file)
     )
     if not isinstance(geode_object, CRS_GEODE_OBJECTS):
-        flask.abort(400, f"{params.id} does not support coordinate reference systems")
+        flask.abort(400, f"{data_id} does not support coordinate reference systems")
+    return data, geode_object
+
+
+def _coordinate_systems(
+    mode: str, source_points: list[og.Point2D], target_points: list[og.Point2D]
+) -> tuple[og.CoordinateSystem2D, og.CoordinateSystem2D, float | None, float | None]:
+    """Frames moving source onto target, with the scale and rotation without distortion."""
+    if mode == SIMILARITY:
+        return _similarity_coordinate_systems(source_points, target_points)
+    try:
+        source = _coordinate_system(source_points)
+        target = _coordinate_system(target_points)
+    except RuntimeError:  # OpenGeode cannot build a coordinate system from colinear points
+        flask.abort(400, "Points must not be colinear")
+    return source, target, None, None
+
+
+@dataclass(frozen=True)
+class _Alignment:
+    source: og.CoordinateSystem2D
+    target: og.CoordinateSystem2D
+    scale: float | None
+    info: og_geosciences.GeographicCoordinateSystemInfo
+
+
+def _apply_alignment(geode_object: CrsGeodeObject, alignment: _Alignment) -> None:
+    from_active = _restart_alignment(geode_object)
+    geode_object.create_crs("aligned", alignment.source, alignment.target)
+    # The aligned CRS is active: scale its Z so the data keeps its proportions
+    scale = alignment.scale
+    if scale is not None and scale != 1 and isinstance(geode_object, CRS_GEODE_OBJECTS_3D):
+        geode_object.scale_z(scale)
+    if from_active:
+        # The previous geographic CRS and its coordinates would clash with the new assignment
+        _delete_other_crs(geode_object, "aligned", ORIGINAL_CRS)
+    geode_object.assign_crs(alignment.info.authority_code(), alignment.info)
+
+
+@typed_route(routes, schemas.align_route)
+def align(params: schemas.Align) -> schemas.AlignResponse:
+    data, geode_object = _load_crs_object(params.id)
     info = _known_info(geode_object, params.authority, params.code)
     mode = params.mode.value if params.mode is not None else SIMILARITY
     _check_pair_count(mode, params)
     # In degrees, a uniform scale would flatten Z and (lat, lon) axes would mirror the data
     if mode == SIMILARITY and not is_projected(params.authority, params.code):
         flask.abort(400, "Alignment without distortion needs a projected CRS: use the affine mode")
+    linked_ids = params.linked_ids or []
+    if params.id in linked_ids:
+        flask.abort(400, "The aligned data cannot also be linked to itself")
+    # Linked data share the local frame of the aligned one: all are loaded and checked
+    # before any file is written
+    linked = [(data_id, *_load_crs_object(data_id)) for data_id in linked_ids]
     source_points = _points(params.source_points)
-    # Without original coordinates, align the active ones: the points were picked on them
-    from_active = False
-    if geographic_info(geode_object.crs_manager()) is not None:
-        if _has_original_coordinates(geode_object):
-            source_points = _restore_original_coordinates(geode_object, params.source_points)
-        else:
-            from_active = True
-    target_points = _points(params.target_points)
-    scale: float | None = None
-    rotation: float | None = None
-    if mode == SIMILARITY:
-        source, target, scale, rotation = _similarity_coordinate_systems(
-            source_points, target_points
-        )
-    else:
-        try:
-            source = _coordinate_system(source_points)
-            target = _coordinate_system(target_points)
-        except RuntimeError:  # OpenGeode cannot build a coordinate system from colinear points
-            flask.abort(400, "Points must not be colinear")
-    geode_object.create_crs("aligned", source, target)
-    # The aligned CRS is active: scale its Z so the data keeps its proportions
-    if scale is not None and scale != 1 and isinstance(geode_object, CRS_GEODE_OBJECTS_3D):
-        geode_object.scale_z(scale)
-    if from_active:
-        # The previous geographic CRS and its coordinates would clash with the new assignment
-        _delete_other_crs(geode_object, "aligned", ORIGINAL_CRS)
-    geode_object.assign_crs(info.authority_code(), info)
+    if geographic_info(geode_object.crs_manager()) is not None and _has_original_coordinates(
+        geode_object
+    ):
+        source_points = _original_source_points(geode_object, params.source_points)
+    source, target, scale, rotation = _coordinate_systems(
+        mode, source_points, _points(params.target_points)
+    )
+    alignment = _Alignment(source, target, scale, info)
+    _apply_alignment(geode_object, alignment)
+    for _, _, linked_object in linked:
+        _apply_alignment(linked_object, alignment)
     saved = utils_functions.save_all_viewables_and_return_info(
         geode_object, data, geode_functions.data_file_path(params.id)
     )
-    # The front rebuilds its local actor from the new light viewable
+    # The front rebuilds the local actors from the new light viewables
     response = _crs_response(saved)
     if scale is not None:
         response.update(scale=scale, rotation=rotation)
+    if linked:
+        response["linked"] = [
+            {
+                "id": data_id,
+                **_crs_response(
+                    utils_functions.save_all_viewables_and_return_info(
+                        linked_object, linked_data, geode_functions.data_file_path(data_id)
+                    )
+                ),
+            }
+            for data_id, linked_data, linked_object in linked
+        ]
     return schemas.AlignResponse.from_dict(response)
