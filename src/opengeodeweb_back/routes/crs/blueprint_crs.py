@@ -107,51 +107,93 @@ def _keep_original_coordinates(geode_object: CrsGeodeObject) -> None:
     geode_object.create_crs("assigned", identity, identity)
 
 
-@typed_route(routes, schemas.assign_geographic_route)
-def assign_geographic(params: schemas.AssignGeographic) -> schemas.AssignGeographicResponse:
-    data = geode_functions.get_data_info(params.id)
-    geode_object = geode_functions.geode_object_from_string(data.geode_object).load(
-        geode_functions.data_file_path(params.id, data.native_file)
-    )
-    if not isinstance(geode_object, CRS_GEODE_OBJECTS):
-        flask.abort(400, f"{params.id} does not support coordinate reference systems")
-    info = _known_info(geode_object, params.authority, params.code)
+def _linked_objects(
+    data_id: str, linked_ids: list[str] | None
+) -> list[tuple[str, Data, CrsGeodeObject]]:
+    """Data sharing the change of the main one, all loaded before any file is written."""
+    linked_ids = linked_ids or []
+    if data_id in linked_ids:
+        flask.abort(400, "The data cannot also be linked to itself")
+    return [(linked_id, *_load_crs_object(linked_id)) for linked_id in linked_ids]
+
+
+def _assign(
+    geode_object: CrsGeodeObject, authority: str, code: str
+) -> og_geosciences.GeographicCoordinateSystemInfo:
+    info = _known_info(geode_object, authority, code)
     _prepare_crs_name(geode_object, info.authority_code())
     _keep_original_coordinates(geode_object)
     geode_object.assign_crs(info.authority_code(), info)
+    return info
+
+
+@typed_route(routes, schemas.assign_geographic_route)
+def assign_geographic(params: schemas.AssignGeographic) -> schemas.AssignGeographicResponse:
+    data, geode_object = _load_crs_object(params.id)
+    linked = _linked_objects(params.id, params.linked_ids)
+    # Every data is assigned in memory before any file is written
+    info = _assign(geode_object, params.authority, params.code)
+    linked_infos = [
+        _assign(linked_object, params.authority, params.code) for _, _, linked_object in linked
+    ]
     # Assigning only relabels the coordinates: the viewables are unchanged
     geode_object.save(geode_functions.data_file_path(params.id, data.native_file))
+    for linked_id, linked_data, linked_object in linked:
+        linked_object.save(geode_functions.data_file_path(linked_id, linked_data.native_file))
     # A warning only: the label is kept, the front offers to align instead
-    return schemas.AssignGeographicResponse.from_dict(
-        {
-            "crs": active_crs(geode_object),
-            "implausible": coordinates_implausible(geode_object, info),
-        }
-    )
+    response: dict[str, Any] = {
+        "crs": active_crs(geode_object),
+        "implausible": coordinates_implausible(geode_object, info),
+    }
+    if linked:
+        response["linked"] = [
+            {
+                "id": linked_id,
+                "crs": active_crs(linked_object),
+                "implausible": coordinates_implausible(linked_object, linked_info),
+            }
+            for (linked_id, _, linked_object), linked_info in zip(linked, linked_infos, strict=True)
+        ]
+    return schemas.AssignGeographicResponse.from_dict(response)
 
 
-@typed_route(routes, schemas.convert_geographic_route)
-def convert_geographic(params: schemas.ConvertGeographic) -> schemas.ConvertGeographicResponse:
-    data = geode_functions.get_data_info(params.id)
-    geode_object = geode_functions.geode_object_from_string(data.geode_object).load(
-        geode_functions.data_file_path(params.id, data.native_file)
-    )
-    if not isinstance(geode_object, CRS_GEODE_OBJECTS):
-        flask.abort(400, f"{params.id} does not support coordinate reference systems")
-    crs_manager = geode_object.crs_manager()
-    if geographic_info(crs_manager) is None:
+def _convert(geode_object: CrsGeodeObject, authority: str, code: str) -> None:
+    if geographic_info(geode_object.crs_manager()) is None:
         flask.abort(400, "Assign a geographic CRS before converting")
-    info = _known_info(geode_object, params.authority, params.code)
+    info = _known_info(geode_object, authority, code)
     _prepare_crs_name(geode_object, info.authority_code())
     try:
         geode_object.convert_crs(info.authority_code(), info)
     except RuntimeError:  # PROJ rejects coordinates outside the source or target CRS domain
         flask.abort(400, f"Coordinates cannot be converted to {info.authority_code()}")
+
+
+@typed_route(routes, schemas.convert_geographic_route)
+def convert_geographic(params: schemas.ConvertGeographic) -> schemas.ConvertGeographicResponse:
+    data, geode_object = _load_crs_object(params.id)
+    linked = _linked_objects(params.id, params.linked_ids)
+    # Every data is converted in memory before any file is written
+    _convert(geode_object, params.authority, params.code)
+    for _, _, linked_object in linked:
+        _convert(linked_object, params.authority, params.code)
     saved = utils_functions.save_all_viewables_and_return_info(
         geode_object, data, geode_functions.data_file_path(params.id)
     )
-    # The front rebuilds its local actor from the new light viewable
-    return schemas.ConvertGeographicResponse.from_dict(_crs_response(saved))
+    # The front rebuilds the local actors from the new light viewables
+    response = _crs_response(saved)
+    if linked:
+        response["linked"] = [
+            {
+                "id": linked_id,
+                **_crs_response(
+                    utils_functions.save_all_viewables_and_return_info(
+                        linked_object, linked_data, geode_functions.data_file_path(linked_id)
+                    )
+                ),
+            }
+            for linked_id, linked_data, linked_object in linked
+        ]
+    return schemas.ConvertGeographicResponse.from_dict(response)
 
 
 def _points(
@@ -316,12 +358,8 @@ def align(params: schemas.Align) -> schemas.AlignResponse:
     # In degrees, a uniform scale would flatten Z and (lat, lon) axes would mirror the data
     if mode == SIMILARITY and not is_projected(params.authority, params.code):
         flask.abort(400, "Alignment without distortion needs a projected CRS: use the affine mode")
-    linked_ids = params.linked_ids or []
-    if params.id in linked_ids:
-        flask.abort(400, "The aligned data cannot also be linked to itself")
-    # Linked data share the local frame of the aligned one: all are loaded and checked
-    # before any file is written
-    linked = [(data_id, *_load_crs_object(data_id)) for data_id in linked_ids]
+    # Linked data share the local frame of the aligned one
+    linked = _linked_objects(params.id, params.linked_ids)
     source_points = _points(params.source_points)
     if geographic_info(geode_object.crs_manager()) is not None and _has_original_coordinates(
         geode_object

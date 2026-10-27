@@ -171,15 +171,17 @@ export interface CRSList {
 }
 
 export interface CRSConvertGeographicParams {
-    authority: string;
-    code:      string;
-    id:        string;
-    name:      string;
+    authority:   string;
+    code:        string;
+    id:          string;
+    linked_ids?: string[];
+    name:        string;
 }
 
 export interface CRSConvertGeographicResponse {
     binary_light_viewable?: string;
     crs?:                   CRSConvertGeographicResponseCRS;
+    linked?:                CRSConvertGeographicResponseLinked[];
 }
 
 export interface CRSConvertGeographicResponseCRS {
@@ -188,19 +190,45 @@ export interface CRSConvertGeographicResponseCRS {
     name:      string;
 }
 
-export interface CRSAssignGeographicParams {
+export interface CRSConvertGeographicResponseLinked {
+    binary_light_viewable?: string;
+    crs?:                   PurpleCRS;
+    id:                     string;
+}
+
+export interface PurpleCRS {
     authority: string;
     code:      string;
-    id:        string;
     name:      string;
+}
+
+export interface CRSAssignGeographicParams {
+    authority:   string;
+    code:        string;
+    id:          string;
+    linked_ids?: string[];
+    name:        string;
 }
 
 export interface CRSAssignGeographicResponse {
     crs?:         CRSAssignGeographicResponseCRS;
     implausible?: boolean;
+    linked?:      CRSAssignGeographicResponseLinked[];
 }
 
 export interface CRSAssignGeographicResponseCRS {
+    authority: string;
+    code:      string;
+    name:      string;
+}
+
+export interface CRSAssignGeographicResponseLinked {
+    crs?:         FluffyCRS;
+    id:           string;
+    implausible?: boolean;
+}
+
+export interface FluffyCRS {
     authority: string;
     code:      string;
     name:      string;
@@ -233,7 +261,7 @@ export interface TargetPoint {
 export interface CRSAlignResponse {
     binary_light_viewable?: string;
     crs?:                   CRSAlignResponseCRS;
-    linked?:                Linked[];
+    linked?:                CRSAlignResponseLinked[];
     rotation?:              number;
     scale?:                 number;
 }
@@ -244,13 +272,13 @@ export interface CRSAlignResponseCRS {
     name:      string;
 }
 
-export interface Linked {
+export interface CRSAlignResponseLinked {
     binary_light_viewable?: string;
-    crs?:                   LinkedCRS;
+    crs?:                   TentacledCRS;
     id:                     string;
 }
 
-export interface LinkedCRS {
+export interface TentacledCRS {
     authority: string;
     code:      string;
     name:      string;

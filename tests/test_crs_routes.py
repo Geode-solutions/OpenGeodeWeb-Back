@@ -678,3 +678,68 @@ def test_assign_geographic_plausibility(client: FlaskClient) -> None:
         assert response.status_code == 200
         assert response.get_json()["crs"] == LAMBERT
         assert response.get_json()["implausible"] is implausible
+
+
+def _active_crs(client: FlaskClient, data_id: str) -> dict[str, str] | None:
+    return (
+        client.post("/opengeodeweb_back/crs/active", json={"id": data_id})
+        .get_json()
+        .get("crs_info")
+    )
+
+
+def test_assign_linked(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/crs/assign_geographic"
+    point_set_id = _create_point_set(client)
+    brep_id = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep").get_json()["id"]
+    response = client.post(route, json={"id": point_set_id, "linked_ids": [brep_id], **LAMBERT})
+    assert response.status_code == 200
+    [linked] = response.get_json()["linked"]
+    assert linked["id"] == brep_id
+    assert linked["crs"] == LAMBERT
+    assert isinstance(linked["implausible"], bool)
+    assert _active_crs(client, brep_id) == LAMBERT
+    assert _active_crs(client, point_set_id) == LAMBERT
+
+
+def test_convert_linked(client: FlaskClient) -> None:
+    assign_route = "/opengeodeweb_back/crs/assign_geographic"
+    route = "/opengeodeweb_back/crs/convert_geographic"
+    first_id = test_utils.check_save_viewable_file(
+        client, "PointSet3D", "test.og_pts3d"
+    ).get_json()["id"]
+    second_id = test_utils.check_save_viewable_file(
+        client, "PointSet3D", "test.og_pts3d"
+    ).get_json()["id"]
+    client.post(assign_route, json={"id": first_id, "linked_ids": [second_id], **LAMBERT})
+    response = client.post(route, json={"id": first_id, "linked_ids": [second_id], **UTM})
+    assert response.status_code == 200
+    [linked] = response.get_json()["linked"]
+    assert linked["id"] == second_id
+    assert linked["crs"] == UTM
+    assert type(linked["binary_light_viewable"]) is str
+    assert _first_point(client, second_id) == pytest.approx(_first_point(client, first_id))
+
+
+def test_assign_and_convert_linked_errors(client: FlaskClient) -> None:
+    assign_route = "/opengeodeweb_back/crs/assign_geographic"
+    convert_route = "/opengeodeweb_back/crs/convert_geographic"
+    point_set_id = _create_point_set(client)
+    # Every data is checked before any is written: the main one stays untouched
+    response = client.post(
+        assign_route, json={"id": point_set_id, "linked_ids": ["0" * 32], **LAMBERT}
+    )
+    assert response.status_code == 404
+    assert _active_crs(client, point_set_id) is None
+    response = client.post(
+        assign_route, json={"id": point_set_id, "linked_ids": [point_set_id], **LAMBERT}
+    )
+    assert response.status_code == 400
+    # A linked data without CRS cannot be converted: nothing is converted
+    other_id = _create_point_set(client)
+    client.post(assign_route, json={"id": point_set_id, **LAMBERT})
+    response = client.post(
+        convert_route, json={"id": point_set_id, "linked_ids": [other_id], **UTM}
+    )
+    assert response.status_code == 400
+    assert _active_crs(client, point_set_id) == LAMBERT
