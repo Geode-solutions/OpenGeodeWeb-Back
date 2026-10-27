@@ -39,6 +39,16 @@ class CollectionComponent(DataClassJsonMixin):
 
 
 @dataclass
+class CRS(DataClassJsonMixin):
+    def __post_init__(self) -> None:
+        print_dataclass(self)
+
+    authority: str
+    code: str
+    name: str
+
+
+@dataclass
 class MeshComponent(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
@@ -66,6 +76,7 @@ class PointSetResponse(DataClassJsonMixin):
     viewer_type: str
     binary_light_viewable: Optional[str] = None
     collection_components: Optional[List[CollectionComponent]] = None
+    crs: Optional[CRS] = None
     mesh_components: Optional[List[MeshComponent]] = None
     nb_vertices: Optional[int] = None
     viewable_file: Optional[str] = None

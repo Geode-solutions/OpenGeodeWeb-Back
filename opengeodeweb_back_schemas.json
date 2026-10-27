@@ -181,6 +181,26 @@
               "type": "string",
               "minLength": 36,
               "maxLength": 36
+            },
+            "crs": {
+              "type": "object",
+              "properties": {
+                "authority": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "authority",
+                "code",
+                "name"
+              ],
+              "additionalProperties": false
             }
           },
           "required": [
@@ -362,6 +382,26 @@
               "type": "string",
               "minLength": 36,
               "maxLength": 36
+            },
+            "crs": {
+              "type": "object",
+              "properties": {
+                "authority": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "authority",
+                "code",
+                "name"
+              ],
+              "additionalProperties": false
             }
           },
           "required": [
@@ -557,6 +597,26 @@
               "type": "string",
               "minLength": 36,
               "maxLength": 36
+            },
+            "crs": {
+              "type": "object",
+              "properties": {
+                "authority": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "authority",
+                "code",
+                "name"
+              ],
+              "additionalProperties": false
             }
           },
           "required": [
@@ -567,6 +627,503 @@
             "is_viewable",
             "geode_object_type",
             "geode_id"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "crs": {
+      "geographic_list": {
+        "$id": "opengeodeweb_back/crs/geographic_list",
+        "route": "/geographic_list",
+        "methods": [
+          "POST"
+        ],
+        "type": "object",
+        "properties": {
+          "geode_object_type": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "geode_object_type"
+        ],
+        "additionalProperties": false,
+        "response": {
+          "type": "object",
+          "properties": {
+            "crs_list": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "authority": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "code",
+                  "authority"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "crs_list"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "convert_geographic": {
+        "$id": "opengeodeweb_back/crs/convert_geographic",
+        "route": "/convert_geographic",
+        "methods": [
+          "POST"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 32
+          },
+          "linked_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 32,
+              "maxLength": 32
+            },
+            "uniqueItems": true
+          },
+          "authority": {
+            "type": "string",
+            "minLength": 1
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "authority",
+          "code",
+          "name"
+        ],
+        "additionalProperties": false,
+        "response": {
+          "type": "object",
+          "properties": {
+            "binary_light_viewable": {
+              "type": "string"
+            },
+            "crs": {
+              "type": "object",
+              "properties": {
+                "authority": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "authority",
+                "code",
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            "linked": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "crs": {
+                    "type": "object",
+                    "properties": {
+                      "authority": {
+                        "type": "string"
+                      },
+                      "code": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "authority",
+                      "code",
+                      "name"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "binary_light_viewable": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "assign_geographic": {
+        "$id": "opengeodeweb_back/crs/assign_geographic",
+        "route": "/assign_geographic",
+        "methods": [
+          "POST"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 32
+          },
+          "linked_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 32,
+              "maxLength": 32
+            },
+            "uniqueItems": true
+          },
+          "authority": {
+            "type": "string",
+            "minLength": 1
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "authority",
+          "code",
+          "name"
+        ],
+        "additionalProperties": false,
+        "response": {
+          "type": "object",
+          "properties": {
+            "crs": {
+              "type": "object",
+              "properties": {
+                "authority": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "authority",
+                "code",
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            "implausible": {
+              "type": "boolean"
+            },
+            "linked": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "crs": {
+                    "type": "object",
+                    "properties": {
+                      "authority": {
+                        "type": "string"
+                      },
+                      "code": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "authority",
+                      "code",
+                      "name"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "implausible": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "align": {
+        "$id": "opengeodeweb_back/crs/align",
+        "route": "/align",
+        "methods": [
+          "POST"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 32
+          },
+          "linked_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 32,
+              "maxLength": 32
+            },
+            "uniqueItems": true
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "similarity",
+              "affine"
+            ]
+          },
+          "source_points": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                },
+                "picked": {
+                  "type": "boolean",
+                  "default": false
+                }
+              },
+              "required": [
+                "x",
+                "y"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "target_points": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "x",
+                "y"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "authority": {
+            "type": "string",
+            "minLength": 1
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "source_points",
+          "target_points",
+          "authority",
+          "code",
+          "name"
+        ],
+        "additionalProperties": false,
+        "response": {
+          "type": "object",
+          "properties": {
+            "binary_light_viewable": {
+              "type": "string"
+            },
+            "crs": {
+              "type": "object",
+              "properties": {
+                "authority": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "authority",
+                "code",
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            "scale": {
+              "type": "number"
+            },
+            "rotation": {
+              "type": "number"
+            },
+            "linked": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "binary_light_viewable": {
+                    "type": "string"
+                  },
+                  "crs": {
+                    "type": "object",
+                    "properties": {
+                      "authority": {
+                        "type": "string"
+                      },
+                      "code": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "authority",
+                      "code",
+                      "name"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "active": {
+        "$id": "opengeodeweb_back/crs/active",
+        "route": "/active",
+        "methods": [
+          "POST"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 32
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false,
+        "response": {
+          "type": "object",
+          "properties": {
+            "crs_name": {
+              "type": "string"
+            },
+            "crs_info": {
+              "type": "object",
+              "properties": {
+                "authority": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "authority",
+                "code",
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "crs_name"
           ],
           "additionalProperties": false
         }
@@ -1008,6 +1565,26 @@
             "type": "string",
             "minLength": 36,
             "maxLength": 36
+          },
+          "crs": {
+            "type": "object",
+            "properties": {
+              "authority": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "authority",
+              "code",
+              "name"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -1815,56 +2392,6 @@
         },
         "required": [
           "snapshot"
-        ],
-        "additionalProperties": false
-      }
-    },
-    "geographic_coordinate_systems": {
-      "$id": "opengeodeweb_back/geographic_coordinate_systems",
-      "route": "/geographic_coordinate_systems",
-      "methods": [
-        "POST"
-      ],
-      "type": "object",
-      "properties": {
-        "geode_object_type": {
-          "type": "string",
-          "minLength": 1
-        }
-      },
-      "required": [
-        "geode_object_type"
-      ],
-      "additionalProperties": false,
-      "response": {
-        "type": "object",
-        "properties": {
-          "crs_list": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "code": {
-                  "type": "string"
-                },
-                "authority": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "name",
-                "code",
-                "authority"
-              ],
-              "additionalProperties": false
-            }
-          }
-        },
-        "required": [
-          "crs_list"
         ],
         "additionalProperties": false
       }

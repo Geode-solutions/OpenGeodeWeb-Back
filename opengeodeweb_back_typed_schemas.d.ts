@@ -16,6 +16,7 @@ export interface PolygonalSurfacePoint {
 export interface CreatePolygonalSurfaceResponse {
     binary_light_viewable?: string;
     collection_components?: CreatePolygonalSurfaceResponseCollectionComponent[];
+    crs?:                   CreatePolygonalSurfaceResponseCRS;
     geode_id:               string;
     geode_object_type:      string;
     id:                     string;
@@ -34,6 +35,12 @@ export interface CreatePolygonalSurfaceResponseCollectionComponent {
     items:     string[];
     name:      string;
     type:      string;
+}
+
+export interface CreatePolygonalSurfaceResponseCRS {
+    authority: string;
+    code:      string;
+    name:      string;
 }
 
 export interface CreatePolygonalSurfaceResponseMeshComponent {
@@ -60,6 +67,7 @@ export interface Point {
 export interface CreatePointSetResponse {
     binary_light_viewable?: string;
     collection_components?: CreatePointSetResponseCollectionComponent[];
+    crs?:                   CreatePointSetResponseCRS;
     geode_id:               string;
     geode_object_type:      string;
     id:                     string;
@@ -78,6 +86,12 @@ export interface CreatePointSetResponseCollectionComponent {
     items:     string[];
     name:      string;
     type:      string;
+}
+
+export interface CreatePointSetResponseCRS {
+    authority: string;
+    code:      string;
+    name:      string;
 }
 
 export interface CreatePointSetResponseMeshComponent {
@@ -105,6 +119,7 @@ export interface EdgedCurvePoint {
 export interface CreateEdgedCurveResponse {
     binary_light_viewable?: string;
     collection_components?: CreateEdgedCurveResponseCollectionComponent[];
+    crs?:                   CreateEdgedCurveResponseCRS;
     geode_id:               string;
     geode_object_type:      string;
     id:                     string;
@@ -125,6 +140,12 @@ export interface CreateEdgedCurveResponseCollectionComponent {
     type:      string;
 }
 
+export interface CreateEdgedCurveResponseCRS {
+    authority: string;
+    code:      string;
+    name:      string;
+}
+
 export interface CreateEdgedCurveResponseMeshComponent {
     boundaries: string[];
     geode_id:   string;
@@ -133,6 +154,149 @@ export interface CreateEdgedCurveResponseMeshComponent {
     name:       string;
     type:       string;
     viewer_id:  number;
+}
+
+export interface CRSGeographicListParams {
+    geode_object_type: string;
+}
+
+export interface CRSGeographicListResponse {
+    crs_list: CRSList[];
+}
+
+export interface CRSList {
+    authority: string;
+    code:      string;
+    name:      string;
+}
+
+export interface CRSConvertGeographicParams {
+    authority:   string;
+    code:        string;
+    id:          string;
+    linked_ids?: string[];
+    name:        string;
+}
+
+export interface CRSConvertGeographicResponse {
+    binary_light_viewable?: string;
+    crs?:                   CRSConvertGeographicResponseCRS;
+    linked?:                CRSConvertGeographicResponseLinked[];
+}
+
+export interface CRSConvertGeographicResponseCRS {
+    authority: string;
+    code:      string;
+    name:      string;
+}
+
+export interface CRSConvertGeographicResponseLinked {
+    binary_light_viewable?: string;
+    crs?:                   PurpleCRS;
+    id:                     string;
+}
+
+export interface PurpleCRS {
+    authority: string;
+    code:      string;
+    name:      string;
+}
+
+export interface CRSAssignGeographicParams {
+    authority:   string;
+    code:        string;
+    id:          string;
+    linked_ids?: string[];
+    name:        string;
+}
+
+export interface CRSAssignGeographicResponse {
+    crs?:         CRSAssignGeographicResponseCRS;
+    implausible?: boolean;
+    linked?:      CRSAssignGeographicResponseLinked[];
+}
+
+export interface CRSAssignGeographicResponseCRS {
+    authority: string;
+    code:      string;
+    name:      string;
+}
+
+export interface CRSAssignGeographicResponseLinked {
+    crs?:         FluffyCRS;
+    id:           string;
+    implausible?: boolean;
+}
+
+export interface FluffyCRS {
+    authority: string;
+    code:      string;
+    name:      string;
+}
+
+export interface CRSAlignParams {
+    authority:     string;
+    code:          string;
+    id:            string;
+    linked_ids?:   string[];
+    mode?:         Mode;
+    name:          string;
+    source_points: SourcePoint[];
+    target_points: TargetPoint[];
+}
+
+export type Mode = "similarity" | "affine";
+
+export interface SourcePoint {
+    picked?: boolean;
+    x:       number;
+    y:       number;
+}
+
+export interface TargetPoint {
+    x: number;
+    y: number;
+}
+
+export interface CRSAlignResponse {
+    binary_light_viewable?: string;
+    crs?:                   CRSAlignResponseCRS;
+    linked?:                CRSAlignResponseLinked[];
+    rotation?:              number;
+    scale?:                 number;
+}
+
+export interface CRSAlignResponseCRS {
+    authority: string;
+    code:      string;
+    name:      string;
+}
+
+export interface CRSAlignResponseLinked {
+    binary_light_viewable?: string;
+    crs?:                   TentacledCRS;
+    id:                     string;
+}
+
+export interface TentacledCRS {
+    authority: string;
+    code:      string;
+    name:      string;
+}
+
+export interface CRSActiveParams {
+    id: string;
+}
+
+export interface CRSActiveResponse {
+    crs_info?: CRSInfo;
+    crs_name:  string;
+}
+
+export interface CRSInfo {
+    authority: string;
+    code:      string;
+    name:      string;
 }
 
 export interface VertexAttributeRangeParams {
@@ -213,6 +377,7 @@ export interface SaveViewableFileParams {
 export interface SaveViewableFileResponse {
     binary_light_viewable?: string;
     collection_components?: SaveViewableFileResponseCollectionComponent[];
+    crs?:                   SaveViewableFileResponseCRS;
     geode_id:               string;
     geode_object_type:      string;
     id:                     string;
@@ -231,6 +396,12 @@ export interface SaveViewableFileResponseCollectionComponent {
     items:     string[];
     name:      string;
     type:      string;
+}
+
+export interface SaveViewableFileResponseCRS {
+    authority: string;
+    code:      string;
+    name:      string;
 }
 
 export interface SaveViewableFileResponseMeshComponent {
@@ -428,20 +599,6 @@ export interface ImportProjectResponse {
     snapshot: { [key: string]: any };
 }
 
-export interface GeographicCoordinateSystemsParams {
-    geode_object_type: string;
-}
-
-export interface GeographicCoordinateSystemsResponse {
-    crs_list: CRSList[];
-}
-
-export interface CRSList {
-    authority: string;
-    code:      string;
-    name:      string;
-}
-
 export interface GeodeObjectsAndOutputExtensionsParams {
     filename:          string;
     geode_object_type: string;
@@ -577,6 +734,13 @@ export interface Schemas {
       readonly point_set: (typeof json)["opengeodeweb_back"]["create"]["point_set"] & TypedSchema<CreatePointSetParams, CreatePointSetResponse>;
       readonly edged_curve: (typeof json)["opengeodeweb_back"]["create"]["edged_curve"] & TypedSchema<CreateEdgedCurveParams, CreateEdgedCurveResponse>;
     };
+    readonly crs: {
+      readonly geographic_list: (typeof json)["opengeodeweb_back"]["crs"]["geographic_list"] & TypedSchema<CRSGeographicListParams, CRSGeographicListResponse>;
+      readonly convert_geographic: (typeof json)["opengeodeweb_back"]["crs"]["convert_geographic"] & TypedSchema<CRSConvertGeographicParams, CRSConvertGeographicResponse>;
+      readonly assign_geographic: (typeof json)["opengeodeweb_back"]["crs"]["assign_geographic"] & TypedSchema<CRSAssignGeographicParams, CRSAssignGeographicResponse>;
+      readonly align: (typeof json)["opengeodeweb_back"]["crs"]["align"] & TypedSchema<CRSAlignParams, CRSAlignResponse>;
+      readonly active: (typeof json)["opengeodeweb_back"]["crs"]["active"] & TypedSchema<CRSActiveParams, CRSActiveResponse>;
+    };
     readonly vertex_attribute_range: (typeof json)["opengeodeweb_back"]["vertex_attribute_range"] & TypedSchema<VertexAttributeRangeParams, VertexAttributeRangeResponse>;
     readonly vertex_attribute_names: (typeof json)["opengeodeweb_back"]["vertex_attribute_names"] & TypedSchema<VertexAttributeNamesParams, VertexAttributeNamesResponse>;
     readonly validate: (typeof json)["opengeodeweb_back"]["validate"] & TypedSchema<ValidateParams, ValidateResponse>;
@@ -600,7 +764,6 @@ export interface Schemas {
     readonly model_component_edge_attribute_names: (typeof json)["opengeodeweb_back"]["model_component_edge_attribute_names"] & TypedSchema<ModelComponentEdgeAttributeNamesParams, ModelComponentEdgeAttributeNamesResponse>;
     readonly kill: (typeof json)["opengeodeweb_back"]["kill"] & TypedSchema<KillParams, KillResponse>;
     readonly import_project: (typeof json)["opengeodeweb_back"]["import_project"] & TypedSchema<ImportProjectParams, ImportProjectResponse>;
-    readonly geographic_coordinate_systems: (typeof json)["opengeodeweb_back"]["geographic_coordinate_systems"] & TypedSchema<GeographicCoordinateSystemsParams, GeographicCoordinateSystemsResponse>;
     readonly geode_objects_and_output_extensions: (typeof json)["opengeodeweb_back"]["geode_objects_and_output_extensions"] & TypedSchema<GeodeObjectsAndOutputExtensionsParams, GeodeObjectsAndOutputExtensionsResponse>;
     readonly geode_object_inheritance: (typeof json)["opengeodeweb_back"]["geode_object_inheritance"] & TypedSchema<GeodeObjectInheritanceParams, GeodeObjectInheritanceResponse>;
     readonly export_project: (typeof json)["opengeodeweb_back"]["export_project"] & TypedSchema<ExportProjectParams, Blob>;

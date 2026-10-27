@@ -11,10 +11,13 @@ import opengeode_geosciences as og_geosciences
 import opengeode_inspector as og_inspector
 
 # Local application imports
+from .crs_coordinates import delete_crs_with_coordinates, scale_z
 from .geode_graph import GeodeGraph
 
 if TYPE_CHECKING:
     from opengeodeweb_microservice.database.data_types import GeodeMeshType
+
+    from .crs_coordinates import Mesh
 
 
 class GeodeEdgedCurve3D(GeodeGraph):
@@ -103,6 +106,20 @@ class GeodeEdgedCurve3D(GeodeGraph):
     def validate(self) -> og_inspector.ObjectValidity:
         return og_inspector.is_edged_curve_valid3D(self.edged_curve)
 
+    def crs_manager(self) -> og.CoordinateReferenceSystemManager3D:
+        return self.edged_curve.main_coordinate_reference_system_manager()
+
+    def delete_crs(self, crs_name: str) -> None:
+        crs_builder = self.builder().main_coordinate_reference_system_manager_builder()
+        delete_crs_with_coordinates(self.edged_curve, crs_builder, crs_name)
+
+    def set_active_crs(self, crs_name: str) -> None:
+        crs_builder = self.builder().main_coordinate_reference_system_manager_builder()
+        crs_builder.set_active_coordinate_reference_system(crs_name)
+
+    def crs_meshes(self) -> list[Mesh]:
+        return [self.edged_curve]
+
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
     ) -> None:
@@ -129,3 +146,6 @@ class GeodeEdgedCurve3D(GeodeGraph):
         og.create_edged_curve_coordinate_system3D(
             self.edged_curve, builder, crs_name, input_crs, output_crs
         )
+
+    def scale_z(self, factor: float) -> None:
+        scale_z(self.edged_curve, self.builder(), factor)

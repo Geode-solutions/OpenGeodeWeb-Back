@@ -11,10 +11,13 @@ import opengeode_geosciences as og_geosciences
 import opengeode_inspector as og_inspector
 
 # Local application imports
+from .crs_coordinates import delete_crs_with_coordinates, scale_z
 from .geode_model import ComponentRegistry, GeodeModel
 
 if TYPE_CHECKING:
     from opengeodeweb_microservice.database.data_types import GeodeModelType
+
+    from .crs_coordinates import Mesh
 
 
 class GeodeBRep(GeodeModel):
@@ -136,6 +139,76 @@ class GeodeBRep(GeodeModel):
     def validate(self) -> og_inspector.ObjectValidity:
         return og_inspector.is_brep_valid(self.brep)
 
+    def crs_manager(self) -> og.CoordinateReferenceSystemManager3D:
+        # Models have no CRS manager of their own: CRS are assigned to every component mesh
+        for components in (
+            self.brep.corners(),
+            self.brep.lines(),
+            self.brep.surfaces(),
+            self.brep.blocks(),
+        ):
+            for component in components:
+                return component.mesh().main_coordinate_reference_system_manager()
+        msg = "BRep has no mesh component"
+        raise ValueError(msg)
+
+    def delete_crs(self, crs_name: str) -> None:
+        # Models have no CRS manager of their own: the CRS lives on every component mesh
+        builder = self.builder()
+        for corner in self.brep.corners():
+            crs_builder = builder.corner_mesh_builder(
+                corner
+            ).main_coordinate_reference_system_manager_builder()
+            delete_crs_with_coordinates(corner.mesh(), crs_builder, crs_name)
+        for line in self.brep.lines():
+            crs_builder = builder.line_mesh_builder(
+                line
+            ).main_coordinate_reference_system_manager_builder()
+            delete_crs_with_coordinates(line.mesh(), crs_builder, crs_name)
+        for surface in self.brep.surfaces():
+            crs_builder = builder.surface_mesh_builder(
+                surface
+            ).main_coordinate_reference_system_manager_builder()
+            delete_crs_with_coordinates(surface.mesh(), crs_builder, crs_name)
+        for block in self.brep.blocks():
+            crs_builder = builder.block_mesh_builder(
+                block
+            ).main_coordinate_reference_system_manager_builder()
+            delete_crs_with_coordinates(block.mesh(), crs_builder, crs_name)
+
+    def set_active_crs(self, crs_name: str) -> None:
+        # Models have no CRS manager of their own: activate the CRS on every component mesh
+        builder = self.builder()
+        for corner in self.brep.corners():
+            crs_builder = builder.corner_mesh_builder(
+                corner
+            ).main_coordinate_reference_system_manager_builder()
+            crs_builder.set_active_coordinate_reference_system(crs_name)
+        for line in self.brep.lines():
+            crs_builder = builder.line_mesh_builder(
+                line
+            ).main_coordinate_reference_system_manager_builder()
+            crs_builder.set_active_coordinate_reference_system(crs_name)
+        for surface in self.brep.surfaces():
+            crs_builder = builder.surface_mesh_builder(
+                surface
+            ).main_coordinate_reference_system_manager_builder()
+            crs_builder.set_active_coordinate_reference_system(crs_name)
+        for block in self.brep.blocks():
+            crs_builder = builder.block_mesh_builder(
+                block
+            ).main_coordinate_reference_system_manager_builder()
+            crs_builder.set_active_coordinate_reference_system(crs_name)
+
+    def crs_meshes(self) -> list[Mesh]:
+        # Models have no CRS manager of their own: CRS live on every component mesh
+        meshes: list[Mesh] = []
+        meshes.extend(corner.mesh() for corner in self.brep.corners())
+        meshes.extend(line.mesh() for line in self.brep.lines())
+        meshes.extend(surface.mesh() for surface in self.brep.surfaces())
+        meshes.extend(block.mesh() for block in self.brep.blocks())
+        return meshes
+
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
     ) -> None:
@@ -158,3 +231,15 @@ class GeodeBRep(GeodeModel):
     ) -> None:
         builder = self.builder()
         og.create_brep_coordinate_system(self.brep, builder, crs_name, input_crs, output_crs)
+
+    def scale_z(self, factor: float) -> None:
+        # Models have no CRS manager of their own: every component mesh is scaled
+        builder = self.builder()
+        for corner in self.brep.corners():
+            scale_z(corner.mesh(), builder.corner_mesh_builder(corner), factor)
+        for line in self.brep.lines():
+            scale_z(line.mesh(), builder.line_mesh_builder(line), factor)
+        for surface in self.brep.surfaces():
+            scale_z(surface.mesh(), builder.surface_mesh_builder(surface), factor)
+        for block in self.brep.blocks():
+            scale_z(block.mesh(), builder.block_mesh_builder(block), factor)
