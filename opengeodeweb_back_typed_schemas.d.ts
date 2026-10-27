@@ -196,7 +196,8 @@ export interface CRSAssignGeographicParams {
 }
 
 export interface CRSAssignGeographicResponse {
-    crs?: CRSAssignGeographicResponseCRS;
+    crs?:         CRSAssignGeographicResponseCRS;
+    implausible?: boolean;
 }
 
 export interface CRSAssignGeographicResponseCRS {
@@ -215,8 +216,9 @@ export interface CRSAlignParams {
 }
 
 export interface SourcePoint {
-    x: number;
-    y: number;
+    picked?: boolean;
+    x:       number;
+    y:       number;
 }
 
 export interface TargetPoint {

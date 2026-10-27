@@ -802,6 +802,9 @@
                 "name"
               ],
               "additionalProperties": false
+            },
+            "implausible": {
+              "type": "boolean"
             }
           },
           "required": [],
@@ -833,6 +836,10 @@
                 },
                 "y": {
                   "type": "number"
+                },
+                "picked": {
+                  "type": "boolean",
+                  "default": false
                 }
               },
               "required": [
