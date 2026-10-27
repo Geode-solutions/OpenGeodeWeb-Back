@@ -8,7 +8,7 @@ import math
 import os
 import sqlite3
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 # Third party imports
 import opengeode as og
@@ -50,6 +50,15 @@ CRS_GEODE_OBJECTS = (
     GeodeEdgedCurve2D,
     GeodeEdgedCurve3D,
     GeodeSurfaceMesh2D,
+    GeodeSurfaceMesh3D,
+    GeodeSolidMesh3D,
+)
+
+# Objects with a Z axis: alignment without distortion scales it too
+CRS_GEODE_OBJECTS_3D = (
+    GeodeBRep,
+    GeodePointSet3D,
+    GeodeEdgedCurve3D,
     GeodeSurfaceMesh3D,
     GeodeSolidMesh3D,
 )
@@ -147,22 +156,46 @@ AND usage.object_table_name IN ('projected_crs', 'geodetic_crs', 'compound_crs')
 """
 
 
-@functools.cache
-def area_of_use(authority: str, code: str) -> list[tuple[float, float, float, float]]:
-    """Extents where PROJ declares the CRS usable, empty when unknown.
+# Projected CRS, alone or as the horizontal part of a compound CRS
+PROJECTED_QUERY = """
+SELECT 1 FROM projected_crs WHERE auth_name = ? AND code = ?
+UNION
+SELECT 1 FROM compound_crs JOIN projected_crs
+ON projected_crs.auth_name = compound_crs.horiz_crs_auth_name
+AND projected_crs.code = compound_crs.horiz_crs_code
+WHERE compound_crs.auth_name = ? AND compound_crs.code = ?
+"""
 
-    The bindings do not expose them: read the PROJ database opengeode ships.
+
+def _query_proj_database(query: str, parameters: tuple[str, ...]) -> list[tuple[Any, ...]] | None:
+    """Rows from the PROJ database opengeode ships, None when it cannot be read.
+
+    The bindings do not expose this information.
     """
     database = (Path(os.environ["PROJ_DATA"]) / "proj.db").resolve()
     try:
         with contextlib.closing(
             sqlite3.connect(f"{database.as_uri()}?mode=ro", uri=True)
         ) as connection:
-            rows = connection.execute(AREA_OF_USE_QUERY, (authority, code)).fetchall()
+            rows: list[tuple[Any, ...]] = connection.execute(query, parameters).fetchall()
     except sqlite3.Error as error:
-        logger.warning("Cannot read the CRS area of use: %s", error)
-        return []
+        logger.warning("Cannot read the PROJ database: %s", error)
+        return None
+    return rows
+
+
+@functools.cache
+def area_of_use(authority: str, code: str) -> list[tuple[float, float, float, float]]:
+    """Extents where PROJ declares the CRS usable, empty when unknown."""
+    rows = _query_proj_database(AREA_OF_USE_QUERY, (authority, code)) or []
     return [(float(s), float(n), float(w), float(e)) for s, n, w, e in rows]
+
+
+@functools.cache
+def is_projected(authority: str, code: str) -> bool:
+    """Whether the CRS measures X and Y as lengths, not angles. True when unknown."""
+    rows = _query_proj_database(PROJECTED_QUERY, (authority, code, authority, code))
+    return rows is None or len(rows) > 0
 
 
 def _overlaps(

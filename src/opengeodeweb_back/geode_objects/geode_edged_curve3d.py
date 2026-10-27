@@ -11,7 +11,7 @@ import opengeode_geosciences as og_geosciences
 import opengeode_inspector as og_inspector
 
 # Local application imports
-from .crs_coordinates import delete_crs_with_coordinates
+from .crs_coordinates import delete_crs_with_coordinates, scale_z
 from .geode_graph import GeodeGraph
 
 if TYPE_CHECKING:
@@ -146,3 +146,6 @@ class GeodeEdgedCurve3D(GeodeGraph):
         og.create_edged_curve_coordinate_system3D(
             self.edged_curve, builder, crs_name, input_crs, output_crs
         )
+
+    def scale_z(self, factor: float) -> None:
+        scale_z(self.edged_curve, self.builder(), factor)

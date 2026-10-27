@@ -9,7 +9,7 @@ import opengeode_geosciences as og_geosciences
 import opengeode_inspector as og_inspector
 
 # Local application imports
-from .crs_coordinates import delete_crs_with_coordinates
+from .crs_coordinates import delete_crs_with_coordinates, scale_z
 from .geode_vertex_set import GeodeVertexSet
 
 if TYPE_CHECKING:
@@ -92,6 +92,9 @@ class GeodeSolidMesh3D(GeodeVertexSet):
         og.create_solid_mesh_coordinate_system3D(
             self.solid_mesh, builder, crs_name, input_crs, output_crs
         )
+
+    def scale_z(self, factor: float) -> None:
+        scale_z(self.solid_mesh, self.builder(), factor)
 
     def polyhedron_attribute_manager(self) -> og.AttributeManager:
         return self.solid_mesh.polyhedron_attribute_manager()

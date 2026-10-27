@@ -17,6 +17,10 @@ Mesh = (
 CrsBuilder = (
     og.CoordinateReferenceSystemManagerBuilder2D | og.CoordinateReferenceSystemManagerBuilder3D
 )
+Mesh3D = og.PointSet3D | og.EdgedCurve3D | og.SurfaceMesh3D | og.SolidMesh3D
+MeshBuilder3D = (
+    og.PointSetBuilder3D | og.EdgedCurveBuilder3D | og.SurfaceMeshBuilder3D | og.SolidMeshBuilder3D
+)
 
 
 def _coordinates_name(
@@ -46,3 +50,12 @@ def delete_crs_with_coordinates(mesh: Mesh, crs_builder: CrsBuilder, crs_name: s
     attribute_manager = mesh.vertex_attribute_manager()
     for attribute_id in attribute_manager.attribute_ids_matching_name(coordinates_name) or []:
         attribute_manager.delete_attribute(attribute_id)
+
+
+def scale_z(mesh: Mesh3D, builder: MeshBuilder3D, factor: float) -> None:
+    """Scale the active coordinates along Z around Z = 0."""
+    for vertex in range(mesh.nb_vertices()):
+        point = mesh.point(vertex)
+        builder.set_point(
+            vertex, og.Point3D([point.value(0), point.value(1), point.value(2) * factor])
+        )

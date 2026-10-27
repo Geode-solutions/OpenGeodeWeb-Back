@@ -210,10 +210,13 @@ export interface CRSAlignParams {
     authority:     string;
     code:          string;
     id:            string;
+    mode?:         Mode;
     name:          string;
     source_points: SourcePoint[];
     target_points: TargetPoint[];
 }
+
+export type Mode = "similarity" | "affine";
 
 export interface SourcePoint {
     picked?: boolean;
@@ -229,6 +232,8 @@ export interface TargetPoint {
 export interface CRSAlignResponse {
     binary_light_viewable?: string;
     crs?:                   CRSAlignResponseCRS;
+    rotation?:              number;
+    scale?:                 number;
 }
 
 export interface CRSAlignResponseCRS {

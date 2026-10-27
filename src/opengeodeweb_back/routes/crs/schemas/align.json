@@ -10,9 +10,16 @@
       "minLength": 32,
       "maxLength": 32
     },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "similarity",
+        "affine"
+      ]
+    },
     "source_points": {
       "type": "array",
-      "minItems": 3,
+      "minItems": 1,
       "maxItems": 3,
       "items": {
         "type": "object",
@@ -37,7 +44,7 @@
     },
     "target_points": {
       "type": "array",
-      "minItems": 3,
+      "minItems": 1,
       "maxItems": 3,
       "items": {
         "type": "object",
@@ -103,6 +110,12 @@
           "name"
         ],
         "additionalProperties": false
+      },
+      "scale": {
+        "type": "number"
+      },
+      "rotation": {
+        "type": "number"
       }
     },
     "required": [],

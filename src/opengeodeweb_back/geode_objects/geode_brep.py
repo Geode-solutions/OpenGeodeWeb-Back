@@ -11,7 +11,7 @@ import opengeode_geosciences as og_geosciences
 import opengeode_inspector as og_inspector
 
 # Local application imports
-from .crs_coordinates import delete_crs_with_coordinates
+from .crs_coordinates import delete_crs_with_coordinates, scale_z
 from .geode_model import ComponentRegistry, GeodeModel
 
 if TYPE_CHECKING:
@@ -231,3 +231,15 @@ class GeodeBRep(GeodeModel):
     ) -> None:
         builder = self.builder()
         og.create_brep_coordinate_system(self.brep, builder, crs_name, input_crs, output_crs)
+
+    def scale_z(self, factor: float) -> None:
+        # Models have no CRS manager of their own: every component mesh is scaled
+        builder = self.builder()
+        for corner in self.brep.corners():
+            scale_z(corner.mesh(), builder.corner_mesh_builder(corner), factor)
+        for line in self.brep.lines():
+            scale_z(line.mesh(), builder.line_mesh_builder(line), factor)
+        for surface in self.brep.surfaces():
+            scale_z(surface.mesh(), builder.surface_mesh_builder(surface), factor)
+        for block in self.brep.blocks():
+            scale_z(block.mesh(), builder.block_mesh_builder(block), factor)

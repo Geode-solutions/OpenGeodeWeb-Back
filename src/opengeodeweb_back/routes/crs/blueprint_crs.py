@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 # Standard library imports
+import math
 from typing import TYPE_CHECKING, Any
 
 # Third party imports
@@ -11,12 +12,14 @@ import opengeode as og
 from opengeodeweb_back import geode_functions, utils_functions
 from opengeodeweb_back.crs_functions import (
     CRS_GEODE_OBJECTS,
+    CRS_GEODE_OBJECTS_3D,
     ORIGINAL_CRS,
     CrsGeodeObject,
     active_crs,
     coordinates_implausible,
     geographic_coordinate_systems,
     geographic_info,
+    is_projected,
     known_geographic_info,
     original_coordinates,
 )
@@ -27,6 +30,11 @@ if TYPE_CHECKING:
     import opengeode_geosciences as og_geosciences
 
 routes = flask.Blueprint("crs", __name__, url_prefix="/crs")
+
+SIMILARITY = "similarity"
+AFFINE = "affine"
+SIMILARITY_PAIRS = (1, 2)
+AFFINE_PAIRS = 3
 
 
 def _prepare_crs_name(
@@ -201,6 +209,48 @@ def _coordinate_system(points: list[og.Point2D]) -> og.CoordinateSystem2D:
     return og.CoordinateSystem2D(origin, [first, second])
 
 
+def _frame(origin: og.Point2D, x: float, y: float) -> og.CoordinateSystem2D:
+    # Perpendicular axes of equal length: going from one frame to another is a similarity
+    return og.CoordinateSystem2D([og.Vector2D([x, y]), og.Vector2D([-y, x])], origin)
+
+
+def _similarity_coordinate_systems(
+    source: list[og.Point2D], target: list[og.Point2D]
+) -> tuple[og.CoordinateSystem2D, og.CoordinateSystem2D, float, float]:
+    """Frames moving source onto target without distortion, with the scale and rotation."""
+    if len(source) == 1:
+        return _frame(source[0], 1, 0), _frame(target[0], 1, 0), 1.0, 0.0
+    source_x = source[1].value(0) - source[0].value(0)
+    source_y = source[1].value(1) - source[0].value(1)
+    target_x = target[1].value(0) - target[0].value(0)
+    target_y = target[1].value(1) - target[0].value(1)
+    source_length = math.hypot(source_x, source_y)
+    target_length = math.hypot(target_x, target_y)
+    if source_length == 0 or target_length == 0:
+        flask.abort(400, "The two points of the source or of the target must differ")
+    rotation = math.degrees(
+        math.atan2(
+            source_x * target_y - source_y * target_x, source_x * target_x + source_y * target_y
+        )
+    )
+    return (
+        _frame(source[0], source_x, source_y),
+        _frame(target[0], target_x, target_y),
+        target_length / source_length,
+        rotation,
+    )
+
+
+def _check_pair_count(mode: str, params: schemas.Align) -> None:
+    count = len(params.source_points)
+    if count != len(params.target_points):
+        flask.abort(400, "Source and target points must come in pairs")
+    if mode == AFFINE and count != AFFINE_PAIRS:
+        flask.abort(400, "Affine alignment needs 3 pairs of points")
+    if mode == SIMILARITY and count not in SIMILARITY_PAIRS:
+        flask.abort(400, "Alignment without distortion needs 1 or 2 pairs of points")
+
+
 @typed_route(routes, schemas.align_route)
 def align(params: schemas.Align) -> schemas.AlignResponse:
     data = geode_functions.get_data_info(params.id)
@@ -210,6 +260,11 @@ def align(params: schemas.Align) -> schemas.AlignResponse:
     if not isinstance(geode_object, CRS_GEODE_OBJECTS):
         flask.abort(400, f"{params.id} does not support coordinate reference systems")
     info = _known_info(geode_object, params.authority, params.code)
+    mode = params.mode.value if params.mode is not None else SIMILARITY
+    _check_pair_count(mode, params)
+    # In degrees, a uniform scale would flatten Z and (lat, lon) axes would mirror the data
+    if mode == SIMILARITY and not is_projected(params.authority, params.code):
+        flask.abort(400, "Alignment without distortion needs a projected CRS: use the affine mode")
     source_points = _points(params.source_points)
     # Without original coordinates, align the active ones: the points were picked on them
     from_active = False
@@ -218,12 +273,23 @@ def align(params: schemas.Align) -> schemas.AlignResponse:
             source_points = _restore_original_coordinates(geode_object, params.source_points)
         else:
             from_active = True
-    try:
-        source = _coordinate_system(source_points)
-        target = _coordinate_system(_points(params.target_points))
-    except RuntimeError:  # OpenGeode cannot build a coordinate system from colinear points
-        flask.abort(400, "Points must not be colinear")
+    target_points = _points(params.target_points)
+    scale: float | None = None
+    rotation: float | None = None
+    if mode == SIMILARITY:
+        source, target, scale, rotation = _similarity_coordinate_systems(
+            source_points, target_points
+        )
+    else:
+        try:
+            source = _coordinate_system(source_points)
+            target = _coordinate_system(target_points)
+        except RuntimeError:  # OpenGeode cannot build a coordinate system from colinear points
+            flask.abort(400, "Points must not be colinear")
     geode_object.create_crs("aligned", source, target)
+    # The aligned CRS is active: scale its Z so the data keeps its proportions
+    if scale is not None and scale != 1 and isinstance(geode_object, CRS_GEODE_OBJECTS_3D):
+        geode_object.scale_z(scale)
     if from_active:
         # The previous geographic CRS and its coordinates would clash with the new assignment
         _delete_other_crs(geode_object, "aligned", ORIGINAL_CRS)
@@ -232,4 +298,7 @@ def align(params: schemas.Align) -> schemas.AlignResponse:
         geode_object, data, geode_functions.data_file_path(params.id)
     )
     # The front rebuilds its local actor from the new light viewable
-    return schemas.AlignResponse.from_dict(_crs_response(saved))
+    response = _crs_response(saved)
+    if scale is not None:
+        response.update(scale=scale, rotation=rotation)
+    return schemas.AlignResponse.from_dict(response)

@@ -3,8 +3,14 @@ from opengeodeweb_microservice.schemas import Route, load_schema
 from typing import Optional
 from dataclasses_json import DataClassJsonMixin
 from opengeodeweb_microservice.schemas import print_dataclass
+from enum import Enum
 from dataclasses import dataclass
 from typing import Optional, List
+
+
+class Mode(Enum):
+    AFFINE = "affine"
+    SIMILARITY = "similarity"
 
 
 @dataclass
@@ -37,6 +43,7 @@ class Align(DataClassJsonMixin):
     name: str
     source_points: List[SourcePoint]
     target_points: List[TargetPoint]
+    mode: Optional[Mode] = None
 
 
 @dataclass
@@ -56,6 +63,8 @@ class AlignResponse(DataClassJsonMixin):
 
     binary_light_viewable: Optional[str] = None
     crs: Optional[CRS] = None
+    rotation: Optional[float] = None
+    scale: Optional[float] = None
 
 
 align_route = Route(
