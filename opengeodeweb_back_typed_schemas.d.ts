@@ -203,11 +203,12 @@ export interface PurpleCRS {
 }
 
 export interface CRSAssignGeographicParams {
-    authority:   string;
-    code:        string;
-    id:          string;
-    linked_ids?: string[];
-    name:        string;
+    authority:       string;
+    code:            string;
+    id:              string;
+    linked_ids?:     string[];
+    name:            string;
+    only_plausible?: boolean;
 }
 
 export interface CRSAssignGeographicResponse {

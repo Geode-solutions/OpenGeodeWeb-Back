@@ -127,32 +127,54 @@ def _assign(
     return info
 
 
+def _assign_entry(
+    geode_object: CrsGeodeObject, *, assigned: bool, implausible: bool
+) -> dict[str, Any]:
+    entry: dict[str, Any] = {"implausible": implausible}
+    if assigned:
+        entry["crs"] = active_crs(geode_object)
+    return entry
+
+
 @typed_route(routes, schemas.assign_geographic_route)
 def assign_geographic(params: schemas.AssignGeographic) -> schemas.AssignGeographicResponse:
     data, geode_object = _load_crs_object(params.id)
-    linked = _linked_objects(params.id, params.linked_ids)
-    # Every data is assigned in memory before any file is written
-    info = _assign(geode_object, params.authority, params.code)
-    linked_infos = [
-        _assign(linked_object, params.authority, params.code) for _, _, linked_object in linked
-    ]
-    # Assigning only relabels the coordinates: the viewables are unchanged
-    geode_object.save(geode_functions.data_file_path(params.id, data.native_file))
-    for linked_id, linked_data, linked_object in linked:
-        linked_object.save(geode_functions.data_file_path(linked_id, linked_data.native_file))
-    # A warning only: the label is kept, the front offers to align instead
-    response: dict[str, Any] = {
-        "crs": active_crs(geode_object),
-        "implausible": coordinates_implausible(geode_object, info),
+    targets = [(params.id, data, geode_object), *_linked_objects(params.id, params.linked_ids)]
+    # Checked before any change: with only_plausible, an implausible data is left as it is
+    implausible = {
+        target_id: coordinates_implausible(
+            target_object, _known_info(target_object, params.authority, params.code)
+        )
+        for target_id, _, target_object in targets
     }
-    if linked:
+    assigned = {
+        target_id
+        for target_id, _, _ in targets
+        if not (params.only_plausible and implausible[target_id])
+    }
+    # Every data is assigned in memory before any file is written
+    for target_id, _, target_object in targets:
+        if target_id in assigned:
+            _assign(target_object, params.authority, params.code)
+    # Assigning only relabels the coordinates: the viewables are unchanged
+    for target_id, target_data, target_object in targets:
+        if target_id in assigned:
+            target_object.save(geode_functions.data_file_path(target_id, target_data.native_file))
+    # Without only_plausible, a warning only: the label is kept, the front offers to align instead
+    response = _assign_entry(
+        geode_object, assigned=params.id in assigned, implausible=implausible[params.id]
+    )
+    if len(targets) > 1:
         response["linked"] = [
             {
-                "id": linked_id,
-                "crs": active_crs(linked_object),
-                "implausible": coordinates_implausible(linked_object, linked_info),
+                "id": target_id,
+                **_assign_entry(
+                    target_object,
+                    assigned=target_id in assigned,
+                    implausible=implausible[target_id],
+                ),
             }
-            for (linked_id, _, linked_object), linked_info in zip(linked, linked_infos, strict=True)
+            for target_id, _, target_object in targets[1:]
         ]
     return schemas.AssignGeographicResponse.from_dict(response)
 

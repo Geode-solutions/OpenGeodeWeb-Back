@@ -30,6 +30,9 @@
     "name": {
       "type": "string",
       "minLength": 1
+    },
+    "only_plausible": {
+      "type": "boolean"
     }
   },
   "required": [

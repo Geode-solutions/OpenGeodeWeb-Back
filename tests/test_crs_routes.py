@@ -688,6 +688,26 @@ def _active_crs(client: FlaskClient, data_id: str) -> dict[str, str] | None:
     )
 
 
+def test_assign_only_plausible(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/crs/assign_geographic"
+    # Local coordinates: implausible in Lambert-93
+    local_id = _create_point_set(client, [{"x": 1000, "y": 1000, "z": 0}])
+    plausible_id = _create_point_set(client, [{"x": 650000, "y": 6860000, "z": 0}])
+    response = client.post(
+        route,
+        json={"id": local_id, "linked_ids": [plausible_id], "only_plausible": True, **LAMBERT},
+    )
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["implausible"] is True
+    assert "crs" not in body
+    [linked] = body["linked"]
+    assert linked == {"id": plausible_id, "crs": LAMBERT, "implausible": False}
+    # The refused data was not written
+    assert _active_crs(client, local_id) is None
+    assert _active_crs(client, plausible_id) == LAMBERT
+
+
 def test_assign_linked(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/crs/assign_geographic"
     point_set_id = _create_point_set(client)

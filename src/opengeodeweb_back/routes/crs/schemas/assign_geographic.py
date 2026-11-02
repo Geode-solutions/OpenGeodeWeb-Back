@@ -17,6 +17,7 @@ class AssignGeographic(DataClassJsonMixin):
     id: str
     name: str
     linked_ids: Optional[List[str]] = None
+    only_plausible: Optional[bool] = None
 
 
 @dataclass
