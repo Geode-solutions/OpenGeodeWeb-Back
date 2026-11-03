@@ -25,7 +25,7 @@ from opengeodeweb_microservice.schemas import ErrorResponse, SchemaDict
 
 # Local application imports
 from . import geode_functions
-from .crs_functions import active_crs
+from .crs.crs_functions import active_crs
 from .geode_objects import geode_objects
 from .geode_objects.geode_model import GeodeModel
 from .geode_objects.geode_vertex_set import GeodeVertexSet

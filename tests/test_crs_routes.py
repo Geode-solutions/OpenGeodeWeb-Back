@@ -7,12 +7,14 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 # Third party imports
+import opengeode as og
 import pytest
 
 # Local application imports
 from opengeodeweb_microservice.database.data import Data
 
-from opengeodeweb_back import crs_functions, geode_functions, test_utils
+from opengeodeweb_back import geode_functions, test_utils
+from opengeodeweb_back.crs import crs_alignment, crs_functions
 from opengeodeweb_back.geode_objects.geode_brep import GeodeBRep
 from opengeodeweb_back.geode_objects.geode_point_set3d import GeodePointSet3D
 
@@ -547,6 +549,23 @@ def test_convert_out_of_domain(client: FlaskClient) -> None:
     client.post("/opengeodeweb_back/crs/assign_geographic", json={"id": point_set_id, **WGS84})
     response = client.post(convert_route, json={"id": point_set_id, **LAMBERT})
     assert response.status_code == 400
+    # The cause given by PROJ / OpenGeode is kept in the message
+    description = response.get_json()["description"]
+    assert description.startswith("Coordinates cannot be converted to EPSG:2154: ")
+    assert len(description) > len("Coordinates cannot be converted to EPSG:2154: ")
+
+
+def test_colinear_points_whatever_their_scale() -> None:
+    def frame(*xy: tuple[float, float]) -> list[og.Point2D]:
+        return [og.Point2D([x, y]) for x, y in xy]
+
+    # Lambert-93 coordinates: the check is relative to the size of the triangle
+    assert crs_alignment.colinear(frame((700000, 6600000), (700010, 6600010), (700020, 6600020)))
+    assert not crs_alignment.colinear(
+        frame((700000, 6600000), (700010, 6600000), (700000, 6600010))
+    )
+    assert crs_alignment.colinear(frame((0, 0), (0, 0), (1, 1)))
+    assert not crs_alignment.colinear(frame((0, 0), (1e-3, 0), (0, 1e-3)))
 
 
 def test_saved_native_file_keeps_its_crs(client: FlaskClient) -> None:

@@ -15,6 +15,7 @@ import opengeode as og
 import opengeode_geosciences as og_geosciences
 
 # Local application imports
+from opengeodeweb_back import geode_functions
 from opengeodeweb_back.geode_objects.geode_brep import GeodeBRep
 from opengeodeweb_back.geode_objects.geode_edged_curve2d import GeodeEdgedCurve2D
 from opengeodeweb_back.geode_objects.geode_edged_curve3d import GeodeEdgedCurve3D
@@ -26,10 +27,17 @@ from opengeodeweb_back.geode_objects.geode_surface_mesh2d import GeodeSurfaceMes
 from opengeodeweb_back.geode_objects.geode_surface_mesh3d import GeodeSurfaceMesh3D
 
 if TYPE_CHECKING:
+    from opengeodeweb_microservice.database.data import Data
+
     from opengeodeweb_back.geode_objects.crs_coordinates import Mesh
     from opengeodeweb_back.geode_objects.geode_object import GeodeObject
 
 logger = logging.getLogger(__name__)
+
+
+class CrsError(Exception):
+    """A CRS request the data cannot follow: reported to the user, the data is unchanged."""
+
 
 ORIGINAL_CRS = "points"
 # OpenGeode orders EPSG:4326 coordinates as (latitude, longitude)
@@ -312,3 +320,41 @@ def original_coordinates(
             active, original = frames
             return [original.global_coordinates(active.coordinates(point)) for point in points]
     return None
+
+
+def coordinate_system(points: list[og.Point2D]) -> og.CoordinateSystem2D:
+    origin, first, second = points
+    return og.CoordinateSystem2D(origin, [first, second])
+
+
+def load_crs_object(data_id: str) -> tuple[Data, CrsGeodeObject]:
+    data = geode_functions.get_data_info(data_id)
+    geode_object = geode_functions.geode_object_from_string(data.geode_object).load(
+        geode_functions.data_file_path(data_id, data.native_file)
+    )
+    if not isinstance(geode_object, CRS_GEODE_OBJECTS):
+        msg = f"{data_id} does not support coordinate reference systems"
+        raise CrsError(msg)
+    return data, geode_object
+
+
+def linked_objects(
+    data_id: str, linked_ids: list[str] | None
+) -> list[tuple[str, Data, CrsGeodeObject]]:
+    """Data sharing the change of the main one, all loaded before any file is written."""
+    linked_ids = linked_ids or []
+    if data_id in linked_ids:
+        msg = "The data cannot also be linked to itself"
+        raise CrsError(msg)
+    return [(linked_id, *load_crs_object(linked_id)) for linked_id in linked_ids]
+
+
+def known_info(
+    geode_object: CrsGeodeObject, authority: str, code: str
+) -> og_geosciences.GeographicCoordinateSystemInfo:
+    # PROJ crashes the process on an unknown CRS: only accept listed ones, with their own name
+    info = known_geographic_info(geode_object, authority, code)
+    if info is None:
+        msg = f"Unknown CRS {authority}:{code}"
+        raise CrsError(msg)
+    return info
