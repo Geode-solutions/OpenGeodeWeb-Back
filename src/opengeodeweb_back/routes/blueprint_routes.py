@@ -15,7 +15,6 @@ from typing import TYPE_CHECKING
 # Third party imports
 import flask
 import opengeode as og
-import opengeode_geosciences as og_geosciences
 import opengeode_geosciencesio as og_geosciencesio  # noqa: F401 (registers IO plugins)
 import opengeode_io as og_io  # noqa: F401 (registers IO plugins)
 import werkzeug
@@ -231,25 +230,6 @@ def time_series_missing_files(
     return schemas.TimeSeriesMissingFilesResponse.from_dict(
         _missing_files(additional_files, file_path)
     )
-
-
-@typed_route(routes, schemas.geographic_coordinate_systems_route)
-def crs_converter_geographic_coordinate_systems(
-    params: schemas.GeographicCoordinateSystems,
-) -> schemas.GeographicCoordinateSystemsResponse:
-    geode_object = geode_functions.geode_object_from_string(params.geode_object_type)
-    infos = (
-        og_geosciences.GeographicCoordinateSystem3D.geographic_coordinate_systems()
-        if geode_object.is_3d()
-        else og_geosciences.GeographicCoordinateSystem2D.geographic_coordinate_systems()
-    )
-    crs_list = [
-        schemas.geographic_coordinate_systems.CRSList(
-            name=info.name, code=info.code, authority=info.authority
-        )
-        for info in infos
-    ]
-    return schemas.GeographicCoordinateSystemsResponse(crs_list=crs_list)
 
 
 @typed_route(routes, schemas.validate_route)

@@ -5,6 +5,8 @@ from PyInstaller.utils.hooks import copy_metadata
 
 datas = []
 datas += collect_data_files('opengeodeweb_back')
+# TEMPORARY until OpenGeode ships a PyInstaller hook: PROJ database (proj.db) for the CRS
+datas += collect_data_files('opengeode', subdir='share')
 datas += copy_metadata('opengeodeweb-back', recursive=True)
 
 

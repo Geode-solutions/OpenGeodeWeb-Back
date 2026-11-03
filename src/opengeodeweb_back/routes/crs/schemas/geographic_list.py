@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class GeographicCoordinateSystems(DataClassJsonMixin):
+class GeographicList(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
@@ -25,17 +25,17 @@ class CRSList(DataClassJsonMixin):
 
 
 @dataclass
-class GeographicCoordinateSystemsResponse(DataClassJsonMixin):
+class GeographicListResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
     crs_list: List[CRSList]
 
 
-geographic_coordinate_systems_route = Route(
+geographic_list_route = Route(
     schema=load_schema(Path(__file__)),
-    params=GeographicCoordinateSystems,
-    response=GeographicCoordinateSystemsResponse,
+    params=GeographicList,
+    response=GeographicListResponse,
 )
 
-__all__ = ["GeographicCoordinateSystems", "GeographicCoordinateSystemsResponse", "geographic_coordinate_systems_route"]
+__all__ = ["GeographicList", "GeographicListResponse", "geographic_list_route"]

@@ -11,10 +11,13 @@ import opengeode_geosciences as og_geosciences
 import opengeode_inspector as og_inspector
 
 # Local application imports
+from .crs_coordinates import delete_crs_with_coordinates, scale_z
 from .geode_vertex_set import GeodeVertexSet
 
 if TYPE_CHECKING:
     from opengeodeweb_microservice.database.data_types import GeodeMeshType
+
+    from .crs_coordinates import Mesh
 
 
 class GeodePointSet3D(GeodeVertexSet):
@@ -101,6 +104,20 @@ class GeodePointSet3D(GeodeVertexSet):
     def validate(self) -> og_inspector.ObjectValidity:
         return og_inspector.is_pointset_valid3D(self.point_set)
 
+    def crs_manager(self) -> og.CoordinateReferenceSystemManager3D:
+        return self.point_set.main_coordinate_reference_system_manager()
+
+    def delete_crs(self, crs_name: str) -> None:
+        crs_builder = self.builder().main_coordinate_reference_system_manager_builder()
+        delete_crs_with_coordinates(self.point_set, crs_builder, crs_name)
+
+    def set_active_crs(self, crs_name: str) -> None:
+        crs_builder = self.builder().main_coordinate_reference_system_manager_builder()
+        crs_builder.set_active_coordinate_reference_system(crs_name)
+
+    def crs_meshes(self) -> list[Mesh]:
+        return [self.point_set]
+
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
     ) -> None:
@@ -127,3 +144,6 @@ class GeodePointSet3D(GeodeVertexSet):
         og.create_point_set_coordinate_system3D(
             self.point_set, builder, crs_name, input_crs, output_crs
         )
+
+    def scale_z(self, factor: float) -> None:
+        scale_z(self.point_set, self.builder(), factor)

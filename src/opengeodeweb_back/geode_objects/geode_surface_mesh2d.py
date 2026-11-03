@@ -9,10 +9,13 @@ import opengeode_geosciences as og_geosciences
 import opengeode_inspector as og_inspector
 
 # Local application imports
+from .crs_coordinates import delete_crs_with_coordinates
 from .geode_vertex_set import GeodeVertexSet
 
 if TYPE_CHECKING:
     from opengeodeweb_microservice.database.data_types import ViewerElementsType
+
+    from .crs_coordinates import Mesh
 
 
 class GeodeSurfaceMesh2D(GeodeVertexSet):
@@ -48,6 +51,20 @@ class GeodeSurfaceMesh2D(GeodeVertexSet):
     @override
     def validate(self) -> og_inspector.ObjectValidity:
         return og_inspector.is_surface_valid2D(self.surface_mesh)
+
+    def crs_manager(self) -> og.CoordinateReferenceSystemManager2D:
+        return self.surface_mesh.main_coordinate_reference_system_manager()
+
+    def delete_crs(self, crs_name: str) -> None:
+        crs_builder = self.builder().main_coordinate_reference_system_manager_builder()
+        delete_crs_with_coordinates(self.surface_mesh, crs_builder, crs_name)
+
+    def set_active_crs(self, crs_name: str) -> None:
+        crs_builder = self.builder().main_coordinate_reference_system_manager_builder()
+        crs_builder.set_active_coordinate_reference_system(crs_name)
+
+    def crs_meshes(self) -> list[Mesh]:
+        return [self.surface_mesh]
 
     def assign_crs(
         self, crs_name: str, info: og_geosciences.GeographicCoordinateSystemInfo
