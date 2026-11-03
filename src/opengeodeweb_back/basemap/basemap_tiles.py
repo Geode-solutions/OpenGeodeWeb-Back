@@ -9,6 +9,8 @@ import math
 import os
 import ssl
 import tempfile
+import threading
+import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
@@ -16,7 +18,7 @@ from pathlib import Path
 
 # Third party imports
 import certifi
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 # Local application imports
 from opengeodeweb_back.basemap.basemap_providers import (
@@ -30,11 +32,23 @@ from opengeodeweb_back.basemap.basemap_providers import (
 HALF_WORLD = 20037508.342789244
 MAX_ZOOM = 19
 FETCH_WORKERS = 8
+MAX_REQUESTS_PER_HOST = 8
 FETCH_TIMEOUT_SECONDS = 10
 # IncompleteRead and other HTTPException are not OSError
 DOWNLOAD_ERRORS = (OSError, http.client.HTTPException)
 # Packaged binaries ship their own OpenSSL, which may not find the system certificates
 SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
+
+
+_HOST_LIMITS: dict[str, threading.Semaphore] = {}
+_HOST_LIMITS_LOCK = threading.Lock()
+
+
+def _host_limit(url: str) -> threading.Semaphore:
+    # Sources fetched in parallel share the connections their server accepts
+    host = urllib.parse.urlparse(url).netloc
+    with _HOST_LIMITS_LOCK:
+        return _HOST_LIMITS.setdefault(host, threading.Semaphore(MAX_REQUESTS_PER_HOST))
 
 
 @dataclass(frozen=True)
@@ -142,13 +156,17 @@ def _fetch_tile(source: str, z: int, x: int, y: int) -> bytes | None:
     if cached_content is not None:
         return cached_content
     # Open tile servers ask every application to name itself
+    url = tile_url(source, z, x, y)
     request = urllib.request.Request(  # noqa: S310 URL from the source table or the environment
-        tile_url(source, z, x, y), headers={"User-Agent": USER_AGENT}
+        url, headers={"User-Agent": USER_AGENT}
     )
     try:
-        with urllib.request.urlopen(  # noqa: S310
-            request, timeout=FETCH_TIMEOUT_SECONDS, context=SSL_CONTEXT
-        ) as response:
+        with (
+            _host_limit(url),
+            urllib.request.urlopen(  # noqa: S310
+                request, timeout=FETCH_TIMEOUT_SECONDS, context=SSL_CONTEXT
+            ) as response,
+        ):
             content: bytes = response.read()
     except DOWNLOAD_ERRORS:
         return None
@@ -165,13 +183,21 @@ def _overzoomed(parent: bytes | None, depth: int, x: int, y: int) -> bytes | Non
     side = TILE_SIZE >> depth
     left = (x % (1 << depth)) * side
     top = (y % (1 << depth)) * side
-    with Image.open(io.BytesIO(parent)) as image:
-        # Same mode as the parent: transparent tiles stay transparent
-        part = image.crop((left, top, left + side, top + side)).resize(
-            (TILE_SIZE, TILE_SIZE), Image.Resampling.BILINEAR
-        )
-    output = io.BytesIO()
-    part.save(output, format="PNG")
+    try:
+        with Image.open(io.BytesIO(parent)) as opened:
+            image: Image.Image = opened
+            # Palette and bilevel modes ignore BILINEAR: they become true colour first
+            if opened.mode in ("P", "1", "L") and "transparency" in opened.info:
+                image = opened.convert("RGBA")
+            elif opened.mode in ("P", "1"):
+                image = opened.convert("RGB")
+            part = image.crop((left, top, left + side, top + side)).resize(
+                (TILE_SIZE, TILE_SIZE), Image.Resampling.BILINEAR
+            )
+        output = io.BytesIO()
+        part.save(output, format="PNG")
+    except OSError, UnidentifiedImageError:
+        return None
     return output.getvalue()
 
 

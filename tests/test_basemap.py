@@ -6,6 +6,9 @@ import io
 import logging
 import shutil
 import ssl
+import threading
+import time
+import urllib.parse
 import urllib.request
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -497,3 +500,42 @@ def test_tiles_are_requested_with_the_user_agent(monkeypatch: pytest.MonkeyPatch
         (0, 0): None
     }
     assert sent == [basemap_providers.USER_AGENT]
+
+
+def test_requests_to_one_host_are_limited(monkeypatch: pytest.MonkeyPatch) -> None:
+    lock = threading.Lock()
+    running: dict[str, int] = {}
+    peak: dict[str, int] = {}
+
+    def slow(request: urllib.request.Request, timeout: float, context: object) -> None:  # noqa: ARG001
+        host = urllib.parse.urlparse(request.full_url).netloc
+        with lock:
+            running[host] = running.get(host, 0) + 1
+            peak[host] = max(peak.get(host, 0), running[host])
+        time.sleep(0.02)
+        with lock:
+            running[host] -= 1
+        raise OSError
+
+    monkeypatch.setattr(urllib.request, "urlopen", slow)
+    _serve_every_source(monkeypatch, "https://tiles.example/{z}/{x}/{y}.png")
+    monkeypatch.setenv("BASEMAP_CACHE_FOLDER", "/nonexistent")
+    sources = ["ign_orthophotos", "ign_roads", "osm"]
+    basemap_tiles.fetch_sources(sources, basemap_tiles.TileRange(4, 0, 3, 0, 3))
+    assert peak["tiles.example"] == basemap_tiles.FETCH_WORKERS
+
+
+def test_corrupt_parent_tile_is_a_missing_tile() -> None:
+    assert basemap_tiles._overzoomed(b"\x89PNG" + b"garbage" * 10, 1, 0, 0) is None  # noqa: SLF001
+
+
+def test_palette_parent_tile_is_enlarged_smoothly() -> None:
+    palette = Image.new("P", (256, 256))
+    palette.putpalette([0, 0, 0, 255, 255, 255])
+    palette.paste(1, (0, 0, 64, 256))
+    buffer = io.BytesIO()
+    palette.save(buffer, format="PNG")
+    content = basemap_tiles._overzoomed(buffer.getvalue(), 1, 0, 0)  # noqa: SLF001
+    assert content is not None
+    with Image.open(io.BytesIO(content)) as tile:
+        assert tile.mode in ("RGB", "RGBA")
