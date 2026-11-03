@@ -12,7 +12,7 @@ export interface BasemapDeleteResponse {
 export interface BasemapBuildParams {
     bounds: Bounds;
     crs:    CRSParams;
-    style:  Style;
+    maps:   Map[];
     z:      number;
 }
 
@@ -29,7 +29,7 @@ export interface CRSParams {
     name:      string;
 }
 
-export type Style = "satellite" | "streets" | "topo";
+export type Map = "satellite" | "plan" | "routes";
 
 export interface BasemapBuildResponse {
     attribution:            string;
@@ -41,6 +41,7 @@ export interface BasemapBuildResponse {
     geode_object_type:      string;
     id:                     string;
     is_viewable:            boolean;
+    maps:                   MapElement[];
     mesh_components?:       BasemapBuildResponseMeshComponent[];
     name:                   string;
     native_file:            string;
@@ -63,6 +64,11 @@ export interface BasemapBuildResponseCRS {
     authority: string;
     code:      string;
     name:      string;
+}
+
+export interface MapElement {
+    map:     string;
+    sources: string[];
 }
 
 export interface BasemapBuildResponseMeshComponent {

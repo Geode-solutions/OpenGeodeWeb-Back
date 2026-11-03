@@ -239,28 +239,38 @@ def test_build_mesh_outside_the_project_crs() -> None:
 def test_build_route(client: FlaskClient) -> None:
     response = client.post(
         BUILD_ROUTE,
-        json={"style": "satellite", "bounds": PARIS_BOUNDS, "crs": LAMBERT_JSON, "z": 0.0},
+        json={
+            "maps": ["routes", "satellite"],
+            "bounds": PARIS_BOUNDS,
+            "crs": LAMBERT_JSON,
+            "z": 0.0,
+        },
     )
     assert response.status_code == 200
     body = response.get_json()
+    assert body["maps"] == [
+        {"map": "satellite", "sources": ["eox_s2cloudless_2016", "ign_orthophotos"]},
+        {"map": "routes", "sources": ["ign_roads"]},
+    ]
+    assert body["attribution"].startswith("Sentinel-2 cloudless 2016 by EOX")
+    assert body["attribution"].endswith("© IGN")
     assert body["tiles_folder"] == "tiles"
     assert body["columns"] >= 1
     assert body["rows"] >= 1
-    assert body["attribution"].startswith("Powered by Esri")
     assert body["crs"] == LAMBERT_JSON
     with client.application.app_context():
         tiles_path = Path(geode_functions.data_file_path(body["id"], "tiles"))
-    assert tiles_path.is_dir()
+    assert sorted(path.name for path in tiles_path.iterdir()) == [
+        "eox_s2cloudless_2016",
+        "ign_orthophotos",
+        "ign_roads",
+    ]
 
 
 def test_build_route_errors(client: FlaskClient, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("ARCGIS_API_KEY", raising=False)
     monkeypatch.delenv("BASEMAP_TILE_URL_IGN_ORTHOPHOTOS", raising=False)
-    params = {"style": "satellite", "bounds": PARIS_BOUNDS, "crs": LAMBERT_JSON, "z": 0.0}
-    response = client.post(BUILD_ROUTE, json=params)
-    assert response.status_code == 400
-    assert "no API key" in response.get_json()["description"]
-
+    params = {"maps": ["satellite"], "bounds": PARIS_BOUNDS, "crs": LAMBERT_JSON, "z": 0.0}
     unknown = {"authority": "FOO", "code": "1", "name": "x"}
     assert client.post(BUILD_ROUTE, json={**params, "crs": unknown}).status_code == 400
 
@@ -270,13 +280,16 @@ def test_build_route_errors(client: FlaskClient, monkeypatch: pytest.MonkeyPatch
     response = client.post(BUILD_ROUTE, json={**params, "crs": wgs84, "bounds": polar})
     assert response.status_code == 400
 
+    assert client.post(BUILD_ROUTE, json={**params, "maps": []}).status_code == 400
+    assert client.post(BUILD_ROUTE, json={**params, "maps": ["topo"]}).status_code == 400
+
 
 @pytest.mark.usefixtures("any_tile")
 def test_build_route_web_mercator(client: FlaskClient) -> None:
     crs = {"authority": "EPSG", "code": "3857", "name": "WGS 84 / Pseudo-Mercator"}
     bounds = {"x_min": 260_000.0, "y_min": 6_250_000.0, "x_max": 265_000.0, "y_max": 6_255_000.0}
     response = client.post(
-        BUILD_ROUTE, json={"style": "satellite", "bounds": bounds, "crs": crs, "z": 0.0}
+        BUILD_ROUTE, json={"maps": ["satellite"], "bounds": bounds, "crs": crs, "z": 0.0}
     )
     assert response.status_code == 200
     assert response.get_json()["crs"] == crs
@@ -292,13 +305,14 @@ def test_build_route_without_any_tile(
     with caplog.at_level(logging.WARNING):
         response = client.post(
             BUILD_ROUTE,
-            json={"style": "satellite", "bounds": PARIS_BOUNDS, "crs": LAMBERT_JSON, "z": 0.0},
+            json={"maps": ["satellite"], "bounds": PARIS_BOUNDS, "crs": LAMBERT_JSON, "z": 0.0},
         )
     assert response.status_code == 502
     assert "no tile could be downloaded" in response.get_json()["description"]
     with get_session() as session:
         assert session.query(Data).count() == count
     assert "satellite" in caplog.text
+    assert "zoom" in caplog.text
     assert TILES_FOLDER.as_uri() not in caplog.text
 
 
@@ -306,7 +320,7 @@ def test_build_route_without_any_tile(
 def test_delete_route(client: FlaskClient) -> None:
     response = client.post(
         BUILD_ROUTE,
-        json={"style": "satellite", "bounds": PARIS_BOUNDS, "crs": LAMBERT_JSON, "z": 0.0},
+        json={"maps": ["satellite"], "bounds": PARIS_BOUNDS, "crs": LAMBERT_JSON, "z": 0.0},
     )
     data_id = response.get_json()["id"]
     with client.application.app_context():
@@ -327,10 +341,37 @@ def test_build_route_geographic_crs(client: FlaskClient) -> None:
     bounds = {"x_min": 48.85, "y_min": 2.34, "x_max": 48.86, "y_max": 2.36}
     response = client.post(
         BUILD_ROUTE,
-        json={"style": "satellite", "bounds": bounds, "crs": wgs84, "z": 0.0},
+        json={"maps": ["satellite"], "bounds": bounds, "crs": wgs84, "z": 0.0},
     )
     assert response.status_code == 200
     assert response.get_json()["tiles_folder"] == "tiles"
+
+
+def test_build_route_skips_sources_without_tiles(
+    client: FlaskClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    # Outside France: no IGN tile, the world imagery alone makes the map
+    _serve_every_source(monkeypatch, (tmp_path / "none").as_uri() + "/{z}/{x}/{y}.png")
+    monkeypatch.setenv(
+        "BASEMAP_TILE_URL_EOX_S2CLOUDLESS_2016", (TILES_FOLDER / "1" / "0" / "0.png").as_uri()
+    )
+    monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(tmp_path / "cache"))
+    response = client.post(
+        BUILD_ROUTE,
+        json={
+            "maps": ["satellite", "routes"],
+            "bounds": PARIS_BOUNDS,
+            "crs": LAMBERT_JSON,
+            "z": 0.0,
+        },
+    )
+    assert response.status_code == 200
+    body = response.get_json()
+    assert "IGN" not in body["attribution"]
+    with client.application.app_context():
+        tiles_path = Path(geode_functions.data_file_path(body["id"], "tiles"))
+    # The folder of a source without tile stays empty: the viewer sees it transparent
+    assert not any((tiles_path / "ign_roads").iterdir())
 
 
 def test_padding_is_in_metres() -> None:

@@ -5,6 +5,7 @@ from dataclasses_json import DataClassJsonMixin
 from opengeodeweb_microservice.schemas import print_dataclass
 from dataclasses import dataclass
 from enum import Enum
+from typing import List
 
 
 @dataclass
@@ -28,10 +29,10 @@ class CRSParams(DataClassJsonMixin):
     name: str
 
 
-class Style(Enum):
+class Map(Enum):
+    PLAN = "plan"
+    ROUTES = "routes"
     SATELLITE = "satellite"
-    STREETS = "streets"
-    TOPO = "topo"
 
 
 @dataclass
@@ -41,7 +42,7 @@ class Build(DataClassJsonMixin):
 
     bounds: Bounds
     crs: CRSParams
-    style: Style
+    maps: List[Map]
     z: float
 
 
@@ -65,6 +66,15 @@ class CRS(DataClassJsonMixin):
     authority: str
     code: str
     name: str
+
+
+@dataclass
+class MapElement(DataClassJsonMixin):
+    def __post_init__(self) -> None:
+        print_dataclass(self)
+
+    map: str
+    sources: List[str]
 
 
 @dataclass
@@ -92,6 +102,7 @@ class BuildResponse(DataClassJsonMixin):
     geode_object_type: str
     id: str
     is_viewable: bool
+    maps: List[MapElement]
     name: str
     native_file: str
     rows: int

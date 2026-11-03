@@ -46,27 +46,35 @@ def build(params: schemas.Build) -> schemas.BuildResponse:
     crs = geographic_coordinate_systems(True).get(f"{params.crs.authority}:{params.crs.code}")  # noqa: FBT003
     if crs is None:
         flask.abort(400, f"Unknown CRS {params.crs.authority}:{params.crs.code}")
-    style = params.style.value
+    maps = basemap_providers.sorted_maps(map_.value for map_ in params.maps)
+    sources = basemap_providers.map_sources(maps)
     try:
         raw = (params.bounds.x_min, params.bounds.y_min, params.bounds.x_max, params.bounds.y_max)
         bounds = padded(basemap_mesh.bounds_to_3857(raw, crs))
-        tiles = basemap_tiles.tile_range(bounds, basemap_providers.STYLES[style].tile_size)
-        images = basemap_tiles.fetch_tiles(style, tiles)
-        if not any(images.values()):
-            # Never log the URL: it holds the API key
-            logger.warning("No basemap tile downloaded (style %s, zoom %d)", style, tiles.z)
+        # One tile grid for every source: the viewer stacks their mosaics pixel on pixel
+        tiles = basemap_tiles.tile_range(
+            bounds, basemap_providers.TILE_SIZE, max_zoom=basemap_providers.max_zoom(sources)
+        )
+        images = {source: basemap_tiles.fetch_tiles(source, tiles) for source in sources}
+        # Outside France the IGN sources have no tile: the others still make the map
+        served = [source for source in sources if any(images[source].values())]
+        if not served:
+            logger.warning("No basemap tile downloaded (maps %s, zoom %d)", maps, tiles.z)
             flask.abort(502, "Basemap unavailable: no tile could be downloaded")
         mesh = basemap_mesh.build_mesh(tiles, crs, params.z, "basemap")
-    except (basemap_providers.MissingApiKeyError, basemap_mesh.OutsideProjectionError) as error:
+    except basemap_mesh.OutsideProjectionError as error:
         flask.abort(400, str(error))
     response: dict[str, Any] = utils_functions.generate_files_from_object(mesh)
-    basemap_tiles.save_tiles(
-        tiles, images, Path(geode_functions.data_file_path(response["id"], TILES_FOLDER))
-    )
+    folder = Path(geode_functions.data_file_path(response["id"], TILES_FOLDER))
+    for source in sources:
+        basemap_tiles.save_tiles(tiles, images[source], folder / source)
     response["tiles_folder"] = TILES_FOLDER
     response["columns"] = tiles.x_max - tiles.x_min + 1
     response["rows"] = tiles.y_max - tiles.y_min + 1
-    response["attribution"] = basemap_providers.attribution(style)
+    response["maps"] = [
+        {"map": name, "sources": list(basemap_providers.MAPS[name])} for name in maps
+    ]
+    response["attribution"] = basemap_providers.attribution(served)
     return schemas.BuildResponse.from_dict(response)
 
 
