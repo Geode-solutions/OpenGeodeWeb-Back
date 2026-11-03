@@ -57,8 +57,9 @@ def build(params: schemas.Build) -> schemas.BuildResponse:
         )
         images = basemap_tiles.fetch_sources(sources, tiles)
         # Outside France the IGN sources have no tile: the others still make the map
-        served = [source for source in sources if any(images[source].values())]
-        if not served:
+        layers = basemap_providers.map_layers(maps, lambda source: any(images[source].values()))
+        drawn = [source for names in layers.values() for source in names]
+        if not drawn:
             logger.warning("No basemap tile downloaded (maps %s, zoom %d)", maps, tiles.z)
             flask.abort(502, "Basemap unavailable: no tile could be downloaded")
         mesh = basemap_mesh.build_mesh(tiles, crs, params.z, "basemap")
@@ -66,15 +67,13 @@ def build(params: schemas.Build) -> schemas.BuildResponse:
         flask.abort(400, str(error))
     response: dict[str, Any] = utils_functions.generate_files_from_object(mesh)
     folder = Path(geode_functions.data_file_path(response["id"], TILES_FOLDER))
-    for source in sources:
+    for source in drawn:
         basemap_tiles.save_tiles(tiles, images[source], folder / source)
     response["tiles_folder"] = TILES_FOLDER
     response["columns"] = tiles.x_max - tiles.x_min + 1
     response["rows"] = tiles.y_max - tiles.y_min + 1
-    response["maps"] = [
-        {"map": name, "sources": list(basemap_providers.MAPS[name])} for name in maps
-    ]
-    response["attribution"] = basemap_providers.attribution(served)
+    response["maps"] = [{"map": name, "sources": names} for name, names in layers.items()]
+    response["attribution"] = basemap_providers.attribution(drawn)
     return schemas.BuildResponse.from_dict(response)
 
 

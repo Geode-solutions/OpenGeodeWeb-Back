@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Callable, Iterable
 
 USER_AGENT = "Vease (+https://geode-solutions.com)"
 # Every source is cut in 256 px Web Mercator tiles: they share one tile grid
@@ -48,14 +48,21 @@ SOURCES: dict[str, Source] = {
     "ign_roads": Source(
         _GEOPLATEFORME.format(layer="TRANSPORTNETWORKS.ROADS", format="image/png"), 18, _IGN
     ),
+    "eox_overlay": Source(
+        "https://tiles.maps.eox.at/wmts/1.0.0/overlay_3857/default/g/{z}/{y}/{x}.png",
+        17,
+        "© OpenStreetMap contributors, rendering © EOX",
+    ),
 }
 
 # From the bottom up: in a map, the IGN covers the world source where it has tiles (France)
 MAPS: dict[str, tuple[str, ...]] = {
     "satellite": ("eox_s2cloudless_2016", "ign_orthophotos"),
     "plan": ("osm", "ign_plan"),
-    "routes": ("ign_roads",),
+    "routes": ("ign_roads", "eox_overlay"),
 }
+# Transparent maps whose sources would draw the same roads twice: the first one served wins
+FIRST_SERVED: frozenset[str] = frozenset({"routes"})
 
 
 def url_template(source: str) -> str:
@@ -73,6 +80,15 @@ def sorted_maps(maps: Iterable[str]) -> list[str]:
 
 def map_sources(maps: Iterable[str]) -> list[str]:
     return [source for name in sorted_maps(maps) for source in MAPS[name]]
+
+
+def map_layers(maps: Iterable[str], served: Callable[[str], bool]) -> dict[str, list[str]]:
+    """The sources drawn by each map, from the bottom up."""
+    layers: dict[str, list[str]] = {}
+    for name in sorted_maps(maps):
+        sources = [source for source in MAPS[name] if served(source)]
+        layers[name] = sources[:1] if name in FIRST_SERVED else sources
+    return layers
 
 
 def max_zoom(sources: Iterable[str]) -> int:

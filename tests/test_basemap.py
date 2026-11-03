@@ -364,6 +364,9 @@ def test_build_route_skips_sources_without_tiles(
     monkeypatch.setenv(
         "BASEMAP_TILE_URL_EOX_S2CLOUDLESS_2016", (TILES_FOLDER / "1" / "0" / "0.png").as_uri()
     )
+    monkeypatch.setenv(
+        "BASEMAP_TILE_URL_EOX_OVERLAY", (TILES_FOLDER / "1" / "0" / "0.png").as_uri()
+    )
     monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(tmp_path / "cache"))
     response = client.post(
         BUILD_ROUTE,
@@ -376,11 +379,13 @@ def test_build_route_skips_sources_without_tiles(
     )
     assert response.status_code == 200
     body = response.get_json()
+    assert body["maps"][1] == {"map": "routes", "sources": ["eox_overlay"]}
     assert "IGN" not in body["attribution"]
+    assert "rendering © EOX" in body["attribution"]
     with client.application.app_context():
         tiles_path = Path(geode_functions.data_file_path(body["id"], "tiles"))
-    # The folder of a source without tile stays empty: the viewer sees it transparent
-    assert not any((tiles_path / "ign_roads").iterdir())
+    # Only the drawn sources have a tiles folder
+    assert not (tiles_path / "ign_roads").exists()
 
 
 def test_padding_is_in_metres() -> None:
@@ -409,8 +414,22 @@ def test_map_sources_from_the_bottom_up() -> None:
         "eox_s2cloudless_2016",
         "ign_orthophotos",
         "ign_roads",
+        "eox_overlay",
     ]
     assert basemap_providers.max_zoom(["eox_s2cloudless_2016", "ign_roads"]) == 17
+
+
+def test_map_layers_stack_or_take_the_first_served() -> None:
+    served = {"eox_s2cloudless_2016", "ign_orthophotos", "eox_overlay"}
+    layers = basemap_providers.map_layers(["satellite", "routes"], lambda source: source in served)
+    # Satellite stacks its sources; routes take the IGN when served, else EOX
+    assert layers == {
+        "satellite": ["eox_s2cloudless_2016", "ign_orthophotos"],
+        "routes": ["eox_overlay"],
+    }
+    layers = basemap_providers.map_layers(["routes"], lambda _source: True)
+    assert layers == {"routes": ["ign_roads"]}
+    assert basemap_providers.map_layers(["routes"], lambda _source: False) == {"routes": []}
 
 
 def test_attribution_once_per_provider() -> None:
