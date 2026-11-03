@@ -13,7 +13,7 @@ from opengeodeweb_microservice.database.connection import get_session
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
 from opengeodeweb_back.basemap import basemap_mesh, basemap_providers, basemap_tiles
-from opengeodeweb_back.crs_functions import geographic_coordinate_systems
+from opengeodeweb_back.crs.crs_functions import geographic_coordinate_systems
 from opengeodeweb_back.routes.basemap import schemas
 from opengeodeweb_back.typed_route import typed_route
 

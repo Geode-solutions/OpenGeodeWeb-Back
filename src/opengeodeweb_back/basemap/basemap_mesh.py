@@ -10,7 +10,7 @@ import opengeode_geosciences as og_geosciences
 
 # Local application imports
 from opengeodeweb_back.basemap.basemap_tiles import HALF_WORLD
-from opengeodeweb_back.crs_functions import convert_xy_corners
+from opengeodeweb_back.crs.crs_functions import convert_xy_corners
 from opengeodeweb_back.geode_objects.geode_triangulated_surface3d import (
     GeodeTriangulatedSurface3D,
 )
