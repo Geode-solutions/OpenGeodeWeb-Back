@@ -55,7 +55,7 @@ def build(params: schemas.Build) -> schemas.BuildResponse:
         tiles = basemap_tiles.tile_range(
             bounds, basemap_providers.TILE_SIZE, max_zoom=basemap_providers.max_zoom(sources)
         )
-        images = {source: basemap_tiles.fetch_tiles(source, tiles) for source in sources}
+        images = basemap_tiles.fetch_sources(sources, tiles)
         # Outside France the IGN sources have no tile: the others still make the map
         served = [source for source in sources if any(images[source].values())]
         if not served:

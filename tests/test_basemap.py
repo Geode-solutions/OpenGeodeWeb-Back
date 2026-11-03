@@ -88,6 +88,14 @@ def test_fetch_and_save_tiles(tmp_path: Path) -> None:
 
 
 @pytest.mark.usefixtures("local_tiles")
+def test_fetch_sources_downloads_every_source() -> None:
+    tiles = basemap_tiles.TileRange(1, 0, 1, 0, 1)
+    images = basemap_tiles.fetch_sources(["ign_orthophotos", "ign_roads"], tiles)
+    assert list(images) == ["ign_orthophotos", "ign_roads"]
+    assert all(all(source.values()) for source in images.values())
+
+
+@pytest.mark.usefixtures("local_tiles")
 def test_missing_tile_is_not_written(tmp_path: Path) -> None:
     tiles = basemap_tiles.TileRange(1, 0, 1, 0, 1)
     images = basemap_tiles.fetch_tiles("ign_orthophotos", tiles)

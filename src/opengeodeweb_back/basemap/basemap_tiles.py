@@ -156,6 +156,15 @@ def fetch_tiles(source: str, tiles: TileRange) -> dict[tuple[int, int], bytes | 
         return dict(zip(tiles.tiles(), contents, strict=True))
 
 
+def fetch_sources(
+    sources: list[str], tiles: TileRange
+) -> dict[str, dict[tuple[int, int], bytes | None]]:
+    """Every source at once: the slowest server sets the wait, not the sum of them."""
+    with ThreadPoolExecutor(max(1, len(sources))) as executor:
+        downloads = executor.map(lambda source: fetch_tiles(source, tiles), sources)
+        return dict(zip(sources, downloads, strict=True))
+
+
 def _extension(content: bytes) -> str:
     # The viewer picks its image reader from the file extension
     return "png" if content.startswith(b"\x89PNG") else "jpg"
