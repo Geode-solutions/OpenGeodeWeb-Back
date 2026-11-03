@@ -4,6 +4,7 @@ from __future__ import annotations
 import http.client
 import logging
 import shutil
+import ssl
 import urllib.request
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -417,10 +418,24 @@ def test_tile_range_stops_at_the_max_zoom() -> None:
     assert basemap_tiles.tile_range(tiny, 256, max_zoom=12).z == 12
 
 
+def test_tiles_are_verified_with_the_bundled_certificates(monkeypatch: pytest.MonkeyPatch) -> None:
+    contexts: list[object] = []
+
+    def capture(_request: urllib.request.Request, timeout: float, context: object) -> None:  # noqa: ARG001
+        contexts.append(context)
+        raise OSError
+
+    monkeypatch.setattr(urllib.request, "urlopen", capture)
+    monkeypatch.setenv("BASEMAP_CACHE_FOLDER", "/nonexistent")
+    basemap_tiles.fetch_tiles("osm", basemap_tiles.TileRange(1, 0, 0, 0, 0))
+    assert contexts == [basemap_tiles.SSL_CONTEXT]
+    assert basemap_tiles.SSL_CONTEXT.verify_mode == ssl.CERT_REQUIRED
+
+
 def test_tiles_are_requested_with_the_user_agent(monkeypatch: pytest.MonkeyPatch) -> None:
     sent: list[str | None] = []
 
-    def capture(request: urllib.request.Request, timeout: float) -> None:  # noqa: ARG001
+    def capture(request: urllib.request.Request, timeout: float, context: object) -> None:  # noqa: ARG001
         sent.append(request.get_header("User-agent"))
         raise OSError
 

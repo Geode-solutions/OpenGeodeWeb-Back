@@ -8,6 +8,8 @@ asgiref==3.*
     # via flask
 blinker==1.*
     # via flask
+certifi==2026.7.22
+    # via -r requirements.in
 click==8.*
     # via flask
 defusedxml==0.7.1

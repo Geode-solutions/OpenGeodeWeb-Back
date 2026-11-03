@@ -6,11 +6,15 @@ import hashlib
 import http.client
 import math
 import os
+import ssl
 import tempfile
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
+
+# Third party imports
+import certifi
 
 # Local application imports
 from opengeodeweb_back.basemap.basemap_providers import USER_AGENT, tile_url, url_template
@@ -21,6 +25,8 @@ FETCH_WORKERS = 8
 FETCH_TIMEOUT_SECONDS = 10
 # IncompleteRead and other HTTPException are not OSError
 DOWNLOAD_ERRORS = (OSError, http.client.HTTPException)
+# Packaged binaries ship their own OpenSSL, which may not find the system certificates
+SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
 
 
 @dataclass(frozen=True)
@@ -132,7 +138,9 @@ def _fetch_tile(source: str, z: int, x: int, y: int) -> bytes | None:
         tile_url(source, z, x, y), headers={"User-Agent": USER_AGENT}
     )
     try:
-        with urllib.request.urlopen(request, timeout=FETCH_TIMEOUT_SECONDS) as response:  # noqa: S310
+        with urllib.request.urlopen(  # noqa: S310
+            request, timeout=FETCH_TIMEOUT_SECONDS, context=SSL_CONTEXT
+        ) as response:
             content: bytes = response.read()
     except DOWNLOAD_ERRORS:
         return None
