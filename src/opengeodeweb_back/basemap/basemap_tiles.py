@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 # Local application imports
-from opengeodeweb_back.basemap.basemap_providers import _url_template, tile_url
+from opengeodeweb_back.basemap.basemap_providers import USER_AGENT, tile_url, url_template
 
 HALF_WORLD = 20037508.342789244
 MAX_ZOOM = 19
@@ -67,11 +67,14 @@ def _range_at(bounds_3857: tuple[float, float, float, float], z: int) -> TileRan
 
 
 def tile_range(
-    bounds_3857: tuple[float, float, float, float], tile_size: int, max_pixels: int = 2048
+    bounds_3857: tuple[float, float, float, float],
+    tile_size: int,
+    max_pixels: int = 2048,
+    max_zoom: int = MAX_ZOOM,
 ) -> TileRange:
     """Most detailed tile range whose mosaic side stays within max_pixels."""
     best = _range_at(bounds_3857, 0)
-    for z in range(1, MAX_ZOOM + 1):
+    for z in range(1, max_zoom + 1):
         candidate = _range_at(bounds_3857, z)
         columns = candidate.x_max - candidate.x_min + 1
         rows = candidate.y_max - candidate.y_min + 1
@@ -117,17 +120,19 @@ def _write_cache(cached: Path, content: bytes) -> None:
             Path(temporary).unlink()
 
 
-def _fetch_tile(style: str, z: int, x: int, y: int) -> bytes | None:
-    # The template hash keeps tiles of different providers apart
-    template_hash = hashlib.sha256(_url_template(style).encode()).hexdigest()[:12]
-    cached = _cache_folder() / style / template_hash / str(z) / str(x) / str(y)
+def _fetch_tile(source: str, z: int, x: int, y: int) -> bytes | None:
+    # The template hash keeps tiles of an overridden URL apart
+    template_hash = hashlib.sha256(url_template(source).encode()).hexdigest()[:12]
+    cached = _cache_folder() / source / template_hash / str(z) / str(x) / str(y)
     cached_content = _read_cache(cached)
     if cached_content is not None:
         return cached_content
+    # Open tile servers ask every application to name itself
+    request = urllib.request.Request(  # noqa: S310 URL from the source table or the environment
+        tile_url(source, z, x, y), headers={"User-Agent": USER_AGENT}
+    )
     try:
-        # URL comes from the provider table or the environment
-        url = tile_url(style, z, x, y)
-        with urllib.request.urlopen(url, timeout=FETCH_TIMEOUT_SECONDS) as response:  # noqa: S310
+        with urllib.request.urlopen(request, timeout=FETCH_TIMEOUT_SECONDS) as response:  # noqa: S310
             content: bytes = response.read()
     except DOWNLOAD_ERRORS:
         return None
@@ -137,11 +142,9 @@ def _fetch_tile(style: str, z: int, x: int, y: int) -> bytes | None:
     return content
 
 
-def fetch_tiles(style: str, tiles: TileRange) -> dict[tuple[int, int], bytes | None]:
-    # The key check runs once, before any thread starts
-    tile_url(style, tiles.z, tiles.x_min, tiles.y_min)
+def fetch_tiles(source: str, tiles: TileRange) -> dict[tuple[int, int], bytes | None]:
     with ThreadPoolExecutor(FETCH_WORKERS) as executor:
-        contents = executor.map(lambda tile: _fetch_tile(style, tiles.z, *tile), tiles.tiles())
+        contents = executor.map(lambda tile: _fetch_tile(source, tiles.z, *tile), tiles.tiles())
         return dict(zip(tiles.tiles(), contents, strict=True))
 
 

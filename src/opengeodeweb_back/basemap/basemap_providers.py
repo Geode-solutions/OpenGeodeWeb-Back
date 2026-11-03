@@ -3,55 +3,81 @@ from __future__ import annotations
 # Standard library imports
 import os
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+USER_AGENT = "Vease (+https://geode-solutions.com)"
+# Every source is cut in 256 px Web Mercator tiles: they share one tile grid
+TILE_SIZE = 256
 
 
 @dataclass(frozen=True)
-class StyleInfo:
-    default_url: str
-    tile_size: int
+class Source:
+    url_template: str
+    max_zoom: int
     attribution: str
 
 
-class MissingApiKeyError(Exception):
-    pass
-
-
-_STATIC_TILES = (
-    "https://static-map-tiles-api.arcgis.com/arcgis/rest/services/"
-    "static-basemap-tiles-service/v1/arcgis/{style}/static/tile/{{z}}/{{y}}/{{x}}?token={{token}}"
+_GEOPLATEFORME = (
+    "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER={layer}"
+    "&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={{z}}&TILEROW={{y}}&TILECOL={{x}}&FORMAT={format}"
 )
-_ESRI_DATA = "Esri, HERE, Garmin, FAO, NOAA, USGS, © OpenStreetMap contributors"
+_IGN = "© IGN"
 
-STYLES: dict[str, StyleInfo] = {
-    "satellite": StyleInfo(
-        "https://ibasemaps-api.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/"
-        "{z}/{y}/{x}?token={token}",
-        256,
-        "Powered by Esri | Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+SOURCES: dict[str, Source] = {
+    "eox_s2cloudless_2016": Source(
+        "https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless_3857/default/g/{z}/{y}/{x}.jpg",
+        17,
+        "Sentinel-2 cloudless 2016 by EOX IT Services GmbH "
+        "(Contains modified Copernicus Sentinel data 2016)",
     ),
-    "streets": StyleInfo(
-        _STATIC_TILES.format(style="streets"), 512, f"Powered by Esri | {_ESRI_DATA}"
+    "ign_orthophotos": Source(
+        _GEOPLATEFORME.format(layer="ORTHOIMAGERY.ORTHOPHOTOS", format="image/jpeg"), 19, _IGN
     ),
-    "topo": StyleInfo(
-        _STATIC_TILES.format(style="outdoor"), 512, f"Powered by Esri | {_ESRI_DATA}"
+    # Volunteer servers: to be replaced before production, see the basemap design
+    "osm": Source(
+        "https://tile.openstreetmap.org/{z}/{x}/{y}.png", 19, "© OpenStreetMap contributors"
+    ),
+    "ign_plan": Source(
+        _GEOPLATEFORME.format(layer="GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2", format="image/png"),
+        19,
+        _IGN,
+    ),
+    "ign_roads": Source(
+        _GEOPLATEFORME.format(layer="TRANSPORTNETWORKS.ROADS", format="image/png"), 18, _IGN
     ),
 }
 
-
-def _url_template(style: str) -> str:
-    return os.environ.get(f"BASEMAP_TILE_URL_{style.upper()}", STYLES[style].default_url)
-
-
-def tile_url(style: str, z: int, x: int, y: int) -> str:
-    template = _url_template(style)
-    token = ""
-    if "{token}" in template:
-        token = os.environ.get("ARCGIS_API_KEY", "")
-        if not token:
-            msg = "Basemap unavailable: no API key"
-            raise MissingApiKeyError(msg)
-    return template.format(z=z, x=x, y=y, token=token)
+# From the bottom up: in a map, the IGN covers the world source where it has tiles (France)
+MAPS: dict[str, tuple[str, ...]] = {
+    "satellite": ("eox_s2cloudless_2016", "ign_orthophotos"),
+    "plan": ("osm", "ign_plan"),
+    "routes": ("ign_roads",),
+}
 
 
-def attribution(style: str) -> str:
-    return STYLES[style].attribution
+def url_template(source: str) -> str:
+    return os.environ.get(f"BASEMAP_TILE_URL_{source.upper()}", SOURCES[source].url_template)
+
+
+def tile_url(source: str, z: int, x: int, y: int) -> str:
+    return url_template(source).format(z=z, x=x, y=y)
+
+
+def sorted_maps(maps: Iterable[str]) -> list[str]:
+    requested = set(maps)
+    return [name for name in MAPS if name in requested]
+
+
+def map_sources(maps: Iterable[str]) -> list[str]:
+    return [source for name in sorted_maps(maps) for source in MAPS[name]]
+
+
+def max_zoom(sources: Iterable[str]) -> int:
+    return min(SOURCES[source].max_zoom for source in sources)
+
+
+def attribution(sources: Iterable[str]) -> str:
+    return " | ".join(dict.fromkeys(SOURCES[source].attribution for source in sources))

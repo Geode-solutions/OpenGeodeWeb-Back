@@ -3,7 +3,6 @@ from __future__ import annotations
 # Standard library imports
 import http.client
 import logging
-import os
 import shutil
 import urllib.request
 from pathlib import Path
@@ -36,9 +35,14 @@ PARIS_BOUNDS = {
 }
 
 
+def _serve_every_source(monkeypatch: pytest.MonkeyPatch, template: str) -> None:
+    for source in basemap_providers.SOURCES:
+        monkeypatch.setenv(f"BASEMAP_TILE_URL_{source.upper()}", template)
+
+
 @pytest.fixture
 def local_tiles(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
-    monkeypatch.setenv("BASEMAP_TILE_URL_SATELLITE", TILES_FOLDER.as_uri() + "/{z}/{x}/{y}.png")
+    _serve_every_source(monkeypatch, TILES_FOLDER.as_uri() + "/{z}/{x}/{y}.png")
     monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(tmp_path))
     return tmp_path
 
@@ -46,7 +50,7 @@ def local_tiles(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
 @pytest.fixture
 def any_tile(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
     # Same tile whatever z, x, y: routes get every tile at any zoom
-    monkeypatch.setenv("BASEMAP_TILE_URL_SATELLITE", (TILES_FOLDER / "1" / "0" / "0.png").as_uri())
+    _serve_every_source(monkeypatch, (TILES_FOLDER / "1" / "0" / "0.png").as_uri())
     monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(tmp_path))
     return tmp_path
 
@@ -65,19 +69,10 @@ def test_tile_range_keeps_the_image_small() -> None:
     assert tiles.z <= 19
 
 
-def test_tile_url_needs_a_key(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.delenv("ARCGIS_API_KEY", raising=False)
-    monkeypatch.delenv("BASEMAP_TILE_URL_SATELLITE", raising=False)
-    with pytest.raises(basemap_providers.MissingApiKeyError):
-        basemap_providers.tile_url("satellite", 1, 0, 0)
-    monkeypatch.setenv("ARCGIS_API_KEY", "key")
-    assert basemap_providers.tile_url("satellite", 3, 1, 2).endswith("/tile/3/2/1?token=key")
-
-
 @pytest.mark.usefixtures("local_tiles")
 def test_fetch_and_save_tiles(tmp_path: Path) -> None:
     tiles = basemap_tiles.TileRange(1, 0, 1, 0, 1)
-    images = basemap_tiles.fetch_tiles("satellite", tiles)
+    images = basemap_tiles.fetch_tiles("ign_orthophotos", tiles)
     assert all(images.values())
     folder = tmp_path / "tiles"
     basemap_tiles.save_tiles(tiles, images, folder)
@@ -94,7 +89,7 @@ def test_fetch_and_save_tiles(tmp_path: Path) -> None:
 @pytest.mark.usefixtures("local_tiles")
 def test_missing_tile_is_not_written(tmp_path: Path) -> None:
     tiles = basemap_tiles.TileRange(1, 0, 1, 0, 1)
-    images = basemap_tiles.fetch_tiles("satellite", tiles)
+    images = basemap_tiles.fetch_tiles("ign_orthophotos", tiles)
     images[(1, 1)] = None
     basemap_tiles.save_tiles(tiles, images, tmp_path)
     assert not (tmp_path / "1_1.png").exists()
@@ -105,21 +100,21 @@ def test_cached_tiles_are_not_fetched_again(
 ) -> None:
     copy = local_tiles / "copy"
     shutil.copytree(TILES_FOLDER, copy)
-    monkeypatch.setenv("BASEMAP_TILE_URL_SATELLITE", copy.as_uri() + "/{z}/{x}/{y}.png")
+    monkeypatch.setenv("BASEMAP_TILE_URL_IGN_ORTHOPHOTOS", copy.as_uri() + "/{z}/{x}/{y}.png")
     tiles = basemap_tiles.TileRange(1, 0, 1, 0, 1)
-    basemap_tiles.fetch_tiles("satellite", tiles)
+    basemap_tiles.fetch_tiles("ign_orthophotos", tiles)
     shutil.rmtree(copy)
-    assert all(basemap_tiles.fetch_tiles("satellite", tiles).values())
+    assert all(basemap_tiles.fetch_tiles("ign_orthophotos", tiles).values())
 
 
 def test_invalid_cached_tile_is_fetched_again(local_tiles: Path) -> None:
     tiles = basemap_tiles.TileRange(1, 0, 1, 0, 1)
-    basemap_tiles.fetch_tiles("satellite", tiles)
+    basemap_tiles.fetch_tiles("ign_orthophotos", tiles)
     cached_files = [path for path in local_tiles.rglob("*") if path.is_file()]
     assert len(cached_files) == 4
     for path in cached_files:
         path.write_bytes(b"\x89PN")
-    images = basemap_tiles.fetch_tiles("satellite", tiles)
+    images = basemap_tiles.fetch_tiles("ign_orthophotos", tiles)
     assert images[(1, 1)] == (TILES_FOLDER / "1" / "1" / "1.png").read_bytes()
     assert all(path.read_bytes().startswith(b"\x89PNG") for path in cached_files)
 
@@ -131,7 +126,7 @@ def test_failing_cache_write_still_returns_the_tile(
     blocker = tmp_path / "blocker"
     blocker.write_text("not a folder")
     monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(blocker))
-    images = basemap_tiles.fetch_tiles("satellite", basemap_tiles.TileRange(1, 0, 1, 0, 1))
+    images = basemap_tiles.fetch_tiles("ign_orthophotos", basemap_tiles.TileRange(1, 0, 1, 0, 1))
     assert all(images.values())
 
 
@@ -142,7 +137,7 @@ def test_truncated_download_is_a_missing_tile(monkeypatch: pytest.MonkeyPatch) -
         raise http.client.IncompleteRead(partial)
 
     monkeypatch.setattr(urllib.request, "urlopen", truncated)
-    images = basemap_tiles.fetch_tiles("satellite", basemap_tiles.TileRange(1, 0, 1, 0, 1))
+    images = basemap_tiles.fetch_tiles("ign_orthophotos", basemap_tiles.TileRange(1, 0, 1, 0, 1))
     assert not any(images.values())
 
 
@@ -150,10 +145,10 @@ def test_other_url_template_does_not_reuse_the_cache(
     local_tiles: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     tiles = basemap_tiles.TileRange(1, 0, 1, 0, 1)
-    basemap_tiles.fetch_tiles("satellite", tiles)
+    basemap_tiles.fetch_tiles("ign_orthophotos", tiles)
     missing = local_tiles / "missing"
-    monkeypatch.setenv("BASEMAP_TILE_URL_SATELLITE", missing.as_uri() + "/{z}/{x}/{y}.png")
-    assert not any(basemap_tiles.fetch_tiles("satellite", tiles).values())
+    monkeypatch.setenv("BASEMAP_TILE_URL_IGN_ORTHOPHOTOS", missing.as_uri() + "/{z}/{x}/{y}.png")
+    assert not any(basemap_tiles.fetch_tiles("ign_orthophotos", tiles).values())
 
 
 def test_non_image_tile_is_neither_returned_nor_cached(
@@ -165,11 +160,11 @@ def test_non_image_tile_is_neither_returned_nor_cached(
         for y in range(2):
             (fake / str(x) / f"{y}.png").write_text("<html>invalid token</html>")
     monkeypatch.setenv(
-        "BASEMAP_TILE_URL_SATELLITE", (local_tiles / "fake").as_uri() + "/{z}/{x}/{y}.png"
+        "BASEMAP_TILE_URL_IGN_ORTHOPHOTOS", (local_tiles / "fake").as_uri() + "/{z}/{x}/{y}.png"
     )
     cache = local_tiles / "cache"
     monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(cache))
-    images = basemap_tiles.fetch_tiles("satellite", basemap_tiles.TileRange(1, 0, 1, 0, 1))
+    images = basemap_tiles.fetch_tiles("ign_orthophotos", basemap_tiles.TileRange(1, 0, 1, 0, 1))
     assert not any(images.values())
     assert not any(path.is_file() for path in cache.rglob("*"))
 
@@ -260,7 +255,7 @@ def test_build_route(client: FlaskClient) -> None:
 
 def test_build_route_errors(client: FlaskClient, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("ARCGIS_API_KEY", raising=False)
-    monkeypatch.delenv("BASEMAP_TILE_URL_SATELLITE", raising=False)
+    monkeypatch.delenv("BASEMAP_TILE_URL_IGN_ORTHOPHOTOS", raising=False)
     params = {"style": "satellite", "bounds": PARIS_BOUNDS, "crs": LAMBERT_JSON, "z": 0.0}
     response = client.post(BUILD_ROUTE, json=params)
     assert response.status_code == 400
@@ -348,10 +343,49 @@ def test_padding_is_in_metres() -> None:
     assert wide == pytest.approx((-5_000.0, -2_000.0, 15_000.0, 6_000.0))
 
 
-@pytest.mark.skipif("ARCGIS_API_KEY" not in os.environ, reason="needs a real Esri API key")
-def test_esri_default_urls(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(tmp_path))
-    for style in basemap_providers.STYLES:
-        monkeypatch.delenv(f"BASEMAP_TILE_URL_{style.upper()}", raising=False)
-        images = basemap_tiles.fetch_tiles(style, basemap_tiles.TileRange(1, 0, 0, 0, 0))
-        assert images[(0, 0)], f"{style} default URL returned no tile"
+def test_tile_url_from_the_source_table(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("BASEMAP_TILE_URL_IGN_ROADS", raising=False)
+    url = basemap_providers.tile_url("ign_roads", 14, 8298, 5636)
+    assert url.startswith("https://data.geopf.fr/wmts?")
+    assert "LAYER=TRANSPORTNETWORKS.ROADS" in url
+    assert "TILEMATRIX=14&TILEROW=5636&TILECOL=8298" in url
+    monkeypatch.setenv("BASEMAP_TILE_URL_IGN_ROADS", "http://local/{z}/{x}/{y}.png")
+    assert basemap_providers.tile_url("ign_roads", 1, 2, 3) == "http://local/1/2/3.png"
+
+
+def test_map_sources_from_the_bottom_up() -> None:
+    # Whatever the requested order: satellite, plan, then routes
+    assert basemap_providers.map_sources(["routes", "satellite"]) == [
+        "eox_s2cloudless_2016",
+        "ign_orthophotos",
+        "ign_roads",
+    ]
+    assert basemap_providers.max_zoom(["eox_s2cloudless_2016", "ign_roads"]) == 17
+
+
+def test_attribution_once_per_provider() -> None:
+    assert (
+        basemap_providers.attribution(["ign_orthophotos", "ign_roads", "osm"])
+        == "© IGN | © OpenStreetMap contributors"
+    )
+
+
+def test_tile_range_stops_at_the_max_zoom() -> None:
+    # A tiny extent would go up to zoom 19: the sources stop earlier
+    tiny = (261_000.0, 6_251_000.0, 261_010.0, 6_251_010.0)
+    assert basemap_tiles.tile_range(tiny, 256, max_zoom=12).z == 12
+
+
+def test_tiles_are_requested_with_the_user_agent(monkeypatch: pytest.MonkeyPatch) -> None:
+    sent: list[str | None] = []
+
+    def capture(request: urllib.request.Request, timeout: float) -> None:  # noqa: ARG001
+        sent.append(request.get_header("User-agent"))
+        raise OSError
+
+    monkeypatch.setattr(urllib.request, "urlopen", capture)
+    monkeypatch.setenv("BASEMAP_CACHE_FOLDER", "/nonexistent")
+    assert basemap_tiles.fetch_tiles("osm", basemap_tiles.TileRange(1, 0, 0, 0, 0)) == {
+        (0, 0): None
+    }
+    assert sent == [basemap_providers.USER_AGENT]
