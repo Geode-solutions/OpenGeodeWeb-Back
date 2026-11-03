@@ -1215,16 +1215,9 @@
             },
             "uniqueItems": true
           },
-          "mode": {
-            "type": "string",
-            "enum": [
-              "similarity",
-              "affine"
-            ]
-          },
           "source_points": {
             "type": "array",
-            "minItems": 1,
+            "minItems": 3,
             "maxItems": 3,
             "items": {
               "type": "object",
@@ -1249,7 +1242,7 @@
           },
           "target_points": {
             "type": "array",
-            "minItems": 1,
+            "minItems": 3,
             "maxItems": 3,
             "items": {
               "type": "object",
@@ -1315,12 +1308,6 @@
                 "name"
               ],
               "additionalProperties": false
-            },
-            "scale": {
-              "type": "number"
-            },
-            "rotation": {
-              "type": "number"
             },
             "linked": {
               "type": "array",

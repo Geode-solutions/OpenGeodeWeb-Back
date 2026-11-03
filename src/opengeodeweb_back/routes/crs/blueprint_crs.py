@@ -15,7 +15,6 @@ from opengeodeweb_back.crs.crs_functions import (
     CrsError,
     geographic_coordinate_systems,
     geographic_info,
-    is_projected,
     known_info,
     linked_objects,
     load_crs_object,
@@ -121,29 +120,21 @@ def convert_geographic(params: schemas.ConvertGeographic) -> schemas.ConvertGeog
 
 @typed_route(routes, schemas.align_route)
 def align(params: schemas.Align) -> schemas.AlignResponse:
-    mode = params.mode.value if params.mode is not None else crs_alignment.SIMILARITY
     with _bad_request():
         data, geode_object = load_crs_object(params.id)
         info = known_info(geode_object, params.authority, params.code)
-        crs_alignment.check_pair_count(mode, len(params.source_points), len(params.target_points))
-        # In degrees, a uniform scale would flatten Z and (lat, lon) axes would mirror the data
-        if mode == crs_alignment.SIMILARITY and not is_projected(params.authority, params.code):
-            msg = "Alignment without distortion needs a projected CRS: use the affine mode"
-            raise CrsError(msg)
+        crs_alignment.check_pair_count(len(params.source_points), len(params.target_points))
         # Linked data share the local frame of the aligned one
         linked = linked_objects(params.id, params.linked_ids)
-        source, target, scale, rotation = crs_alignment.coordinate_systems(
-            mode,
+        source, target = crs_alignment.coordinate_systems(
             crs_alignment.source_points_in_original_coordinates(geode_object, params.source_points),
             crs_alignment.points(params.target_points),
         )
-        alignment = crs_alignment.Alignment(source, target, scale, info)
+        alignment = crs_alignment.Alignment(source, target, info)
         crs_alignment.apply_alignment(geode_object, alignment)
         for _, _, linked_object in linked:
             crs_alignment.apply_alignment(linked_object, alignment)
     response = _saved_response(params.id, data, geode_object)
-    if scale is not None:
-        response.update(scale=scale, rotation=rotation)
     if linked:
         response["linked"] = [
             {"id": linked_id, **_saved_response(linked_id, linked_data, linked_object)}

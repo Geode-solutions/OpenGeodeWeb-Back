@@ -2,14 +2,8 @@ from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from dataclasses_json import DataClassJsonMixin
 from opengeodeweb_microservice.schemas import print_dataclass
-from enum import Enum
 from dataclasses import dataclass
 from typing import Optional, List
-
-
-class Mode(Enum):
-    AFFINE = "affine"
-    SIMILARITY = "similarity"
 
 
 @dataclass
@@ -43,7 +37,6 @@ class Align(DataClassJsonMixin):
     source_points: List[SourcePoint]
     target_points: List[TargetPoint]
     linked_ids: Optional[List[str]] = None
-    mode: Optional[Mode] = None
 
 
 @dataclass
@@ -84,8 +77,6 @@ class AlignResponse(DataClassJsonMixin):
     binary_light_viewable: Optional[str] = None
     crs: Optional[AlignResponseCRS] = None
     linked: Optional[List[Linked]] = None
-    rotation: Optional[float] = None
-    scale: Optional[float] = None
 
 
 align_route = Route(

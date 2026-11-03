@@ -199,7 +199,6 @@ def test_align(client: FlaskClient) -> None:
             "id": point_set_id,
             "source_points": [dict(point) for point in SOURCE],
             "target_points": [dict(point) for point in TARGET],
-            "mode": "affine",
             **LAMBERT,
         }
 
@@ -215,16 +214,7 @@ def test_align(client: FlaskClient) -> None:
     response = client.post(route, json={**get_full_data(), "id": brep_id})
     assert response.status_code == 200
 
-    def get_similarity_data() -> test_utils.JsonData:
-        # Without the optional mode: every key left is required
-        return {
-            "id": point_set_id,
-            "source_points": [dict(point) for point in SOURCE[:2]],
-            "target_points": [dict(point) for point in TARGET[:2]],
-            **LAMBERT,
-        }
-
-    test_utils.test_route_wrong_params(client, route, get_similarity_data)
+    test_utils.test_route_wrong_params(client, route, get_full_data)
 
 
 def test_align_errors(client: FlaskClient) -> None:
@@ -238,7 +228,6 @@ def test_align_errors(client: FlaskClient) -> None:
             "id": point_set_id,
             "source_points": colinear,
             "target_points": TARGET,
-            "mode": "affine",
             **LAMBERT,
         },
     )
@@ -249,89 +238,21 @@ def _align(client: FlaskClient, data_id: str, **params: object) -> TestResponse:
     return client.post("/opengeodeweb_back/crs/align", json={"id": data_id, **LAMBERT, **params})
 
 
-def test_align_similarity_translation(client: FlaskClient) -> None:
+def test_align_pair_count(client: FlaskClient) -> None:
     point_set_id = _create_point_set(client)
-    # One pair: the data only moves, the default mode keeps its shape
-    response = _align(
-        client, point_set_id, source_points=SOURCE[:1], target_points=[{"x": 1000, "y": 2000}]
-    )
-    assert response.status_code == 200
-    assert response.get_json()["scale"] == pytest.approx(1)
-    assert response.get_json()["rotation"] == pytest.approx(0)
-    assert _first_point(client, point_set_id) == pytest.approx([1000, 2000, 5])
-
-
-def test_align_similarity_errors(client: FlaskClient) -> None:
-    point_set_id = _create_point_set(client)
-    # 3 pairs only in affine mode, 2 pairs never in affine mode
-    assert (
-        _align(client, point_set_id, source_points=SOURCE, target_points=TARGET).status_code == 400
-    )
-    response = _align(
-        client, point_set_id, source_points=SOURCE[:2], target_points=TARGET[:2], mode="affine"
-    )
-    assert response.status_code == 400
-    response = _align(client, point_set_id, source_points=SOURCE[:2], target_points=TARGET[:1])
-    assert response.status_code == 400
-    coincident = [{"x": 1, "y": 1}, {"x": 1, "y": 1}]
-    response = _align(client, point_set_id, source_points=coincident, target_points=TARGET[:2])
-    assert response.status_code == 400
-    response = _align(client, point_set_id, source_points=SOURCE[:2], target_points=coincident)
-    assert response.status_code == 400
-    # Degrees are no length: X/Y would be mirrored and Z flattened
-    response = _align(
-        client, point_set_id, source_points=SOURCE[:2], target_points=TARGET[:2], **WGS84
-    )
-    assert response.status_code == 400
-
-
-def _all_points(client: FlaskClient, data_id: str) -> list[list[float]]:
-    with client.application.app_context():
-        geode_object = geode_functions.load_geode_object(data_id)
-    assert isinstance(geode_object, GeodePointSet3D)
-    point_set = geode_object.point_set
-    return [
-        [point_set.point(vertex).value(axis) for axis in range(3)]
-        for vertex in range(point_set.nb_vertices())
-    ]
-
-
-def test_align_similarity(client: FlaskClient) -> None:
-    point_set_id = _create_point_set(client)
-    # (0, 0) -> (1000, 2000) and (10, 0) -> (1000, 2020): scale 2, rotation 90°
+    # Exactly 3 pairs: fewer points cannot place the data without guessing its distortion
     response = _align(client, point_set_id, source_points=SOURCE[:2], target_points=TARGET[:2])
-    assert response.status_code == 200
-    assert response.get_json()["scale"] == pytest.approx(2)
-    assert response.get_json()["rotation"] == pytest.approx(90)
-    # Z is scaled as well, around Z = 0
-    assert _all_points(client, point_set_id) == [
-        pytest.approx([1000, 2000, 10]),
-        pytest.approx([1000, 2020, 10]),
-        pytest.approx([980, 2000, 10]),
-    ]
-    # Re-aligning restarts from the original Z, not from the scaled one
-    picked = [{**point, "picked": True} for point in TARGET[:2]]
-    response = _align(client, point_set_id, source_points=picked, target_points=TARGET[:2])
-    assert response.status_code == 200
-    assert _first_point(client, point_set_id) == pytest.approx([1000, 2000, 10])
+    assert response.status_code == 400
+    response = _align(client, point_set_id, source_points=SOURCE, target_points=TARGET[:2])
+    assert response.status_code == 400
 
 
-def test_align_similarity_brep(client: FlaskClient) -> None:
-    brep_id = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep").get_json()["id"]
-    original = _brep_points(client, brep_id)
-    response = _align(client, brep_id, source_points=SOURCE[:2], target_points=TARGET[:2])
-    assert response.status_code == 200
-    # Every component mesh has its Z scaled by 2
-    aligned = _brep_points(client, brep_id)
-    assert aligned[2::3] == pytest.approx([2 * z for z in original[2::3]])
-
-
-def test_align_similarity_2d(client: FlaskClient) -> None:
+def test_align_2d(client: FlaskClient) -> None:
     # 2D data has no Z: only X and Y move
     point_set_id = test_utils.check_save_viewable_file(
         client, "PointSet2D", "test.og_pts2d"
     ).get_json()["id"]
-    response = _align(client, point_set_id, source_points=SOURCE[:2], target_points=TARGET[:2])
+    response = _align(client, point_set_id, source_points=SOURCE, target_points=TARGET)
     assert response.status_code == 200
 
 
@@ -339,10 +260,9 @@ def test_align_linked(client: FlaskClient) -> None:
     # A model and its wells share the local frame: one request aligns both
     point_set_id = _create_point_set(client)
     brep_id = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep").get_json()["id"]
-    pairs = {"source_points": SOURCE[:2], "target_points": TARGET[:2]}
+    pairs = {"source_points": SOURCE, "target_points": TARGET}
     response = _align(client, point_set_id, linked_ids=[brep_id], **pairs)
     assert response.status_code == 200
-    assert response.get_json()["scale"] == pytest.approx(2)
     [linked] = response.get_json()["linked"]
     assert linked["id"] == brep_id
     assert linked["crs"] == LAMBERT
@@ -354,8 +274,8 @@ def test_align_linked(client: FlaskClient) -> None:
     assert _brep_points(client, brep_id) == pytest.approx(_brep_points(client, fresh_brep_id))
 
     # Re-aligning both from points picked on the aligned data restarts from the originals
-    picked = [{**point, "picked": True} for point in TARGET[:2]]
-    other_target = [{"x": 500, "y": 700}, {"x": 500, "y": 720}]
+    picked = [{**point, "picked": True} for point in TARGET]
+    other_target = [{"x": 500, "y": 700}, {"x": 500, "y": 720}, {"x": 480, "y": 700}]
     response = _align(
         client,
         point_set_id,
@@ -365,9 +285,7 @@ def test_align_linked(client: FlaskClient) -> None:
     )
     assert response.status_code == 200
     assert (
-        _align(
-            client, fresh_brep_id, source_points=SOURCE[:2], target_points=other_target
-        ).status_code
+        _align(client, fresh_brep_id, source_points=SOURCE, target_points=other_target).status_code
         == 200
     )
     assert _brep_points(client, brep_id) == pytest.approx(_brep_points(client, fresh_brep_id))
@@ -383,8 +301,8 @@ def test_align_linked_2d(client: FlaskClient) -> None:
         client,
         point_set_id,
         linked_ids=[point_set_2d_id],
-        source_points=SOURCE[:2],
-        target_points=TARGET[:2],
+        source_points=SOURCE,
+        target_points=TARGET,
     )
     assert response.status_code == 200
     assert response.get_json()["linked"][0]["crs"] == LAMBERT
@@ -392,7 +310,7 @@ def test_align_linked_2d(client: FlaskClient) -> None:
 
 def test_align_linked_errors(client: FlaskClient) -> None:
     point_set_id = _create_point_set(client)
-    pairs = {"source_points": SOURCE[:2], "target_points": TARGET[:2]}
+    pairs = {"source_points": SOURCE, "target_points": TARGET}
     # Every data is checked before any is written: the main one stays untouched
     response = _align(client, point_set_id, linked_ids=["0" * 32], **pairs)
     assert response.status_code == 404
@@ -419,7 +337,6 @@ def test_realign(client: FlaskClient) -> None:
                 "id": data_id,
                 "source_points": source,
                 "target_points": target,
-                "mode": "affine",
                 **LAMBERT,
             },
         )
@@ -467,7 +384,6 @@ def test_align_after_assign(client: FlaskClient) -> None:
                 "id": data_id,
                 "source_points": source,
                 "target_points": target,
-                "mode": "affine",
                 **LAMBERT,
             },
         )
