@@ -50,7 +50,7 @@ SOURCES: dict[str, Source] = {
     ),
     "eox_overlay": Source(
         "https://tiles.maps.eox.at/wmts/1.0.0/overlay_3857/default/g/{z}/{y}/{x}.png",
-        17,
+        14,
         "© OpenStreetMap contributors, rendering © EOX",
     ),
 }
@@ -92,7 +92,8 @@ def map_layers(maps: Iterable[str], served: Callable[[str], bool]) -> dict[str, 
 
 
 def max_zoom(sources: Iterable[str]) -> int:
-    return min(SOURCES[source].max_zoom for source in sources)
+    # The grid follows the finest source: coarser ones are overzoomed
+    return max(SOURCES[source].max_zoom for source in sources)
 
 
 def attribution(sources: Iterable[str]) -> str:

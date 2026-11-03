@@ -4,6 +4,7 @@ from __future__ import annotations
 import contextlib
 import hashlib
 import http.client
+import io
 import math
 import os
 import ssl
@@ -15,9 +16,16 @@ from pathlib import Path
 
 # Third party imports
 import certifi
+from PIL import Image
 
 # Local application imports
-from opengeodeweb_back.basemap.basemap_providers import USER_AGENT, tile_url, url_template
+from opengeodeweb_back.basemap.basemap_providers import (
+    SOURCES,
+    TILE_SIZE,
+    USER_AGENT,
+    tile_url,
+    url_template,
+)
 
 HALF_WORLD = 20037508.342789244
 MAX_ZOOM = 19
@@ -150,10 +158,37 @@ def _fetch_tile(source: str, z: int, x: int, y: int) -> bytes | None:
     return content
 
 
+def _overzoomed(parent: bytes | None, depth: int, x: int, y: int) -> bytes | None:
+    """The sub-square of a parent tile that covers tile (x, y), `depth` zooms deeper."""
+    if parent is None:
+        return None
+    side = TILE_SIZE >> depth
+    left = (x % (1 << depth)) * side
+    top = (y % (1 << depth)) * side
+    with Image.open(io.BytesIO(parent)) as image:
+        # Same mode as the parent: transparent tiles stay transparent
+        part = image.crop((left, top, left + side, top + side)).resize(
+            (TILE_SIZE, TILE_SIZE), Image.Resampling.BILINEAR
+        )
+    output = io.BytesIO()
+    part.save(output, format="PNG")
+    return output.getvalue()
+
+
 def fetch_tiles(source: str, tiles: TileRange) -> dict[tuple[int, int], bytes | None]:
+    # Past its max zoom a source has no tile: its parent tiles are enlarged instead
+    depth = max(0, tiles.z - SOURCES[source].max_zoom)
+    z = tiles.z - depth
+    parents = sorted({(x >> depth, y >> depth) for x, y in tiles.tiles()})
     with ThreadPoolExecutor(FETCH_WORKERS) as executor:
-        contents = executor.map(lambda tile: _fetch_tile(source, tiles.z, *tile), tiles.tiles())
-        return dict(zip(tiles.tiles(), contents, strict=True))
+        contents = executor.map(lambda parent: _fetch_tile(source, z, *parent), parents)
+        downloaded = dict(zip(parents, contents, strict=True))
+    if depth == 0:
+        return {tile: downloaded[tile] for tile in tiles.tiles()}
+    return {
+        (x, y): _overzoomed(downloaded[(x >> depth, y >> depth)], depth, x, y)
+        for x, y in tiles.tiles()
+    }
 
 
 def fetch_sources(

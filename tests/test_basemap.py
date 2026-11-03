@@ -2,6 +2,7 @@ from __future__ import annotations
 
 # Standard library imports
 import http.client
+import io
 import logging
 import shutil
 import ssl
@@ -14,6 +15,7 @@ import opengeode_geosciences as og_geosciences
 import pytest
 from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_microservice.database.data import Data
+from PIL import Image
 
 # Local application imports
 from opengeodeweb_back import geode_functions
@@ -416,7 +418,8 @@ def test_map_sources_from_the_bottom_up() -> None:
         "ign_roads",
         "eox_overlay",
     ]
-    assert basemap_providers.max_zoom(["eox_s2cloudless_2016", "ign_roads"]) == 17
+    assert basemap_providers.max_zoom(["eox_s2cloudless_2016", "ign_roads"]) == 18
+    assert basemap_providers.max_zoom(["eox_overlay", "ign_orthophotos"]) == 19
 
 
 def test_map_layers_stack_or_take_the_first_served() -> None:
@@ -443,6 +446,28 @@ def test_tile_range_stops_at_the_max_zoom() -> None:
     # A tiny extent would go up to zoom 19: the sources stop earlier
     tiny = (261_000.0, 6_251_000.0, 261_010.0, 6_251_010.0)
     assert basemap_tiles.tile_range(tiny, 256, max_zoom=12).z == 12
+
+
+@pytest.mark.usefixtures("local_tiles")
+def test_tiles_past_the_max_zoom_are_cut_from_their_parent(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source = basemap_providers.SOURCES["ign_roads"]
+    monkeypatch.setitem(
+        basemap_providers.SOURCES,
+        "ign_roads",
+        basemap_providers.Source(source.url_template, 1, source.attribution),
+    )
+    images = basemap_tiles.fetch_tiles("ign_roads", basemap_tiles.TileRange(2, 0, 1, 0, 1))
+    assert len(images) == 4
+    with Image.open(TILES_FOLDER / "1" / "0" / "0.png") as parent:
+        for (x, y), content in images.items():
+            assert content is not None
+            with Image.open(io.BytesIO(content)) as tile:
+                assert tile.size == (256, 256)
+                quadrant = parent.crop((x * 128, y * 128, x * 128 + 128, y * 128 + 128))
+                expected = quadrant.resize((256, 256), Image.Resampling.BILINEAR)
+                assert tile.tobytes() == expected.tobytes()
 
 
 def test_tiles_are_verified_with_the_bundled_certificates(monkeypatch: pytest.MonkeyPatch) -> None:
