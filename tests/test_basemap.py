@@ -8,8 +8,10 @@ import shutil
 import ssl
 import threading
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
+from email.message import Message
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -144,6 +146,21 @@ def test_truncated_download_is_a_missing_tile(monkeypatch: pytest.MonkeyPatch) -
     monkeypatch.setattr(urllib.request, "urlopen", truncated)
     images = basemap_tiles.fetch_tiles("ign_orthophotos", WHOLE_WORLD)
     assert not any(images.values())
+
+
+@pytest.mark.usefixtures("local_tiles")
+def test_tile_not_found_is_not_requested_again(monkeypatch: pytest.MonkeyPatch) -> None:
+    requests: list[str] = []
+
+    def not_found(request: urllib.request.Request, timeout: float, context: object) -> None:  # noqa: ARG001
+        requests.append(request.full_url)
+        raise urllib.error.HTTPError(request.full_url, 404, "Not Found", Message(), None)
+
+    monkeypatch.setattr(urllib.request, "urlopen", not_found)
+    tiles = basemap_tiles.TileRange(1, 0, 0, 0, 0)
+    assert basemap_tiles.fetch_tiles("ign_orthophotos", tiles) == {(0, 0): None}
+    assert basemap_tiles.fetch_tiles("ign_orthophotos", tiles) == {(0, 0): None}
+    assert len(requests) == 1
 
 
 def test_other_url_template_does_not_reuse_the_cache(

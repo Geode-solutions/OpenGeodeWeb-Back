@@ -10,10 +10,12 @@ import os
 import ssl
 import tempfile
 import threading
+import urllib.error
 import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
+from http import HTTPStatus
 from pathlib import Path
 
 # Third party imports
@@ -34,6 +36,8 @@ TILES_FOLDER = "tiles"
 HALF_WORLD = 20037508.342789244
 DEFAULT_MAX_PIXELS = 2048
 PNG_SIGNATURE = b"\x89PNG"
+# Cached in place of a tile the server does not have, so it is not asked again
+MISSING_TILE = b"missing"
 FETCH_WORKERS = 8
 MAX_REQUESTS_PER_HOST = 8
 FETCH_TIMEOUT_SECONDS = 10
@@ -131,7 +135,7 @@ def _read_cache(cached: Path) -> bytes | None:
     except OSError:
         return None
     # A file broken by a crash or a disk error is downloaded again
-    return content if _is_image(content) else None
+    return content if content == MISSING_TILE or _is_image(content) else None
 
 
 def _write_cache(cached: Path, content: bytes) -> None:
@@ -158,7 +162,7 @@ def _fetch_tile(source: str, z: int, x: int, y: int) -> bytes | None:
     cached = _cache_folder() / source / template_hash / str(z) / str(x) / str(y)
     cached_content = _read_cache(cached)
     if cached_content is not None:
-        return cached_content
+        return None if cached_content == MISSING_TILE else cached_content
     # Open tile servers ask every application to name itself
     url = template.format(z=z, x=x, y=y)
     request = urllib.request.Request(  # noqa: S310 URL from the source table or the environment
@@ -172,6 +176,13 @@ def _fetch_tile(source: str, z: int, x: int, y: int) -> bytes | None:
             ) as response,
         ):
             content: bytes = response.read()
+    except urllib.error.HTTPError as error:
+        error.close()
+        # Outside its area (the IGN outside France) a server answers 404: unlike a timeout or a
+        # network error, asking again would give the same answer
+        if error.code == HTTPStatus.NOT_FOUND:
+            _write_cache(cached, MISSING_TILE)
+        return None
     except DOWNLOAD_ERRORS:
         return None
     if not _is_image(content):
