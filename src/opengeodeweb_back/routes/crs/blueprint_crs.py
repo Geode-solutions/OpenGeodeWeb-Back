@@ -123,7 +123,6 @@ def align(params: schemas.Align) -> schemas.AlignResponse:
     with _bad_request():
         data, geode_object = load_crs_object(params.id)
         info = known_info(geode_object, params.authority, params.code)
-        crs_alignment.check_pair_count(len(params.source_points), len(params.target_points))
         # Linked data share the local frame of the aligned one
         linked = linked_objects(params.id, params.linked_ids)
         source, target = crs_alignment.coordinate_systems(

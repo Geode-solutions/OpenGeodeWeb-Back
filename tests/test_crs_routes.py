@@ -240,7 +240,7 @@ def _align(client: FlaskClient, data_id: str, **params: object) -> TestResponse:
 
 def test_align_pair_count(client: FlaskClient) -> None:
     point_set_id = _create_point_set(client)
-    # Exactly 3 pairs: fewer points cannot place the data without guessing its distortion
+    # The schema asks for exactly 3 pairs: fewer cannot place the data without guessing
     response = _align(client, point_set_id, source_points=SOURCE[:2], target_points=TARGET[:2])
     assert response.status_code == 400
     response = _align(client, point_set_id, source_points=SOURCE, target_points=TARGET[:2])

@@ -26,8 +26,6 @@ if TYPE_CHECKING:
 
     from opengeodeweb_back.crs.crs_functions import CrsGeodeObject
 
-AFFINE_PAIRS = 3
-
 
 class ControlPoint(Protocol):
     x: float
@@ -48,15 +46,6 @@ class Alignment:
 
 def points(control_points: Sequence[ControlPoint]) -> list[og.Point2D]:
     return [og.Point2D([point.x, point.y]) for point in control_points]
-
-
-def check_pair_count(source_count: int, target_count: int) -> None:
-    if source_count != target_count:
-        msg = "Source and target points must come in pairs"
-        raise CrsError(msg)
-    if source_count != AFFINE_PAIRS:
-        msg = "Alignment needs 3 pairs of points"
-        raise CrsError(msg)
 
 
 def _crs_names(geode_object: CrsGeodeObject) -> set[str]:
