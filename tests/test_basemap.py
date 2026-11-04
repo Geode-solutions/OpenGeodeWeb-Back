@@ -361,6 +361,29 @@ def test_build_route_geographic_crs(client: FlaskClient) -> None:
     assert response.get_json()["tiles_folder"] == "tiles"
 
 
+@pytest.mark.usefixtures("any_tile")
+def test_build_route_detail_without_margin(client: FlaskClient) -> None:
+    params = {"maps": ["satellite"], "bounds": PARIS_BOUNDS, "crs": LAMBERT_JSON, "z": 0.0}
+    # Same pixel budget on both sides, so only the margin differs
+    base = client.post(BUILD_ROUTE, json={**params, "max_pixels": 512}).get_json()
+    detail = client.post(
+        BUILD_ROUTE, json={**params, "margin": False, "max_pixels": 512}
+    ).get_json()
+    # Without margin the mesh stays close to the requested bounds, at a finer zoom
+    assert detail["zoom"] >= base["zoom"]
+    assert detail["columns"] * 256 <= 512
+    width = detail["bounds"]["x_max"] - detail["bounds"]["x_min"]
+    base_width = base["bounds"]["x_max"] - base["bounds"]["x_min"]
+    assert width < base_width
+    assert base["bounds"]["x_min"] <= PARIS_BOUNDS["x_min"]
+
+
+def test_build_route_max_pixels_bounds(client: FlaskClient) -> None:
+    params = {"maps": ["satellite"], "bounds": PARIS_BOUNDS, "crs": LAMBERT_JSON, "z": 0.0}
+    assert client.post(BUILD_ROUTE, json={**params, "max_pixels": 100}).status_code == 400
+    assert client.post(BUILD_ROUTE, json={**params, "max_pixels": 5000}).status_code == 400
+
+
 def test_build_route_skips_sources_without_tiles(
     client: FlaskClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:

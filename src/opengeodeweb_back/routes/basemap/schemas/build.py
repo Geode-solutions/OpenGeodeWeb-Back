@@ -1,11 +1,10 @@
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
-from typing import List, Optional
 from dataclasses_json import DataClassJsonMixin
 from opengeodeweb_microservice.schemas import print_dataclass
 from dataclasses import dataclass
 from enum import Enum
-from typing import List
+from typing import List, Optional
 
 
 @dataclass
@@ -44,6 +43,19 @@ class Build(DataClassJsonMixin):
     crs: CRSParams
     maps: List[Map]
     z: float
+    margin: Optional[bool] = None
+    max_pixels: Optional[int] = None
+
+
+@dataclass
+class MeshBounds(DataClassJsonMixin):
+    def __post_init__(self) -> None:
+        print_dataclass(self)
+
+    x_max: float
+    x_min: float
+    y_max: float
+    y_min: float
 
 
 @dataclass
@@ -97,6 +109,7 @@ class BuildResponse(DataClassJsonMixin):
         print_dataclass(self)
 
     attribution: str
+    bounds: MeshBounds
     columns: int
     geode_id: str
     geode_object_type: str
@@ -108,6 +121,7 @@ class BuildResponse(DataClassJsonMixin):
     rows: int
     tiles_folder: str
     viewer_type: str
+    zoom: int
     binary_light_viewable: Optional[str] = None
     collection_components: Optional[List[CollectionComponent]] = None
     crs: Optional[CRS] = None

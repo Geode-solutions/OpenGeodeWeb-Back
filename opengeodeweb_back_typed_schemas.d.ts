@@ -10,10 +10,12 @@ export interface BasemapDeleteResponse {
 }
 
 export interface BasemapBuildParams {
-    bounds: Bounds;
-    crs:    CRSParams;
-    maps:   Map[];
-    z:      number;
+    bounds:      Bounds;
+    crs:         CRSParams;
+    maps:        Map[];
+    margin?:     boolean;
+    max_pixels?: number;
+    z:           number;
 }
 
 export interface Bounds {
@@ -34,6 +36,7 @@ export type Map = "satellite" | "plan" | "routes";
 export interface BasemapBuildResponse {
     attribution:            string;
     binary_light_viewable?: string;
+    bounds:                 MeshBounds;
     collection_components?: BasemapBuildResponseCollectionComponent[];
     columns:                number;
     crs?:                   BasemapBuildResponseCRS;
@@ -50,6 +53,14 @@ export interface BasemapBuildResponse {
     tiles_folder:           string;
     viewable_file?:         string;
     viewer_type:            string;
+    zoom:                   number;
+}
+
+export interface MeshBounds {
+    x_max: number;
+    x_min: number;
+    y_max: number;
+    y_min: number;
 }
 
 export interface BasemapBuildResponseCollectionComponent {

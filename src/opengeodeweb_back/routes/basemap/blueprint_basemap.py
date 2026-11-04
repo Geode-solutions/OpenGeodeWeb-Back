@@ -21,6 +21,7 @@ routes = flask.Blueprint("basemap", __name__, url_prefix="/basemap")
 logger = logging.getLogger(__name__)
 
 MARGIN_RATIO = 0.5
+DEFAULT_MAX_PIXELS = 2048
 MIN_SIZE = 1_000.0  # metres, in Web Mercator
 TILES_FOLDER = "tiles"
 
@@ -50,10 +51,15 @@ def build(params: schemas.Build) -> schemas.BuildResponse:
     sources = basemap_providers.map_sources(maps)
     try:
         raw = (params.bounds.x_min, params.bounds.y_min, params.bounds.x_max, params.bounds.y_max)
-        bounds = padded(basemap_mesh.bounds_to_3857(raw, crs))
+        projected = basemap_mesh.bounds_to_3857(raw, crs)
+        # A detail covers the visible area only: no margin around it
+        bounds = padded(projected) if params.margin is not False else projected
         # One tile grid for every source: the viewer stacks their mosaics pixel on pixel
         tiles = basemap_tiles.tile_range(
-            bounds, basemap_providers.TILE_SIZE, max_zoom=basemap_providers.max_zoom(sources)
+            bounds,
+            basemap_providers.TILE_SIZE,
+            max_pixels=params.max_pixels or DEFAULT_MAX_PIXELS,
+            max_zoom=basemap_providers.max_zoom(sources),
         )
         images = basemap_tiles.fetch_sources(sources, tiles)
         # Outside France the IGN sources have no tile: the others still make the map
@@ -65,6 +71,7 @@ def build(params: schemas.Build) -> schemas.BuildResponse:
         mesh = basemap_mesh.build_mesh(tiles, crs, params.z, "basemap")
     except basemap_mesh.OutsideProjectionError as error:
         flask.abort(400, str(error))
+    box = mesh.triangulated_surface.bounding_box()
     response: dict[str, Any] = utils_functions.generate_files_from_object(mesh)
     folder = Path(geode_functions.data_file_path(response["id"], TILES_FOLDER))
     for source in drawn:
@@ -74,6 +81,13 @@ def build(params: schemas.Build) -> schemas.BuildResponse:
     response["rows"] = tiles.y_max - tiles.y_min + 1
     response["maps"] = [{"map": name, "sources": names} for name, names in layers.items()]
     response["attribution"] = basemap_providers.attribution(drawn)
+    response["zoom"] = tiles.z
+    response["bounds"] = {
+        "x_min": box.min().value(0),
+        "y_min": box.min().value(1),
+        "x_max": box.max().value(0),
+        "y_max": box.max().value(1),
+    }
     return schemas.BuildResponse.from_dict(response)
 
 

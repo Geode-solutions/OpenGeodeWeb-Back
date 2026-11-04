@@ -103,6 +103,16 @@
           },
           "z": {
             "type": "number"
+          },
+          "margin": {
+            "type": "boolean",
+            "default": true
+          },
+          "max_pixels": {
+            "type": "integer",
+            "minimum": 256,
+            "maximum": 4096,
+            "default": 2048
           }
         },
         "required": [
@@ -272,6 +282,35 @@
             "attribution": {
               "type": "string"
             },
+            "zoom": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "bounds": {
+              "title": "MeshBounds",
+              "type": "object",
+              "properties": {
+                "x_min": {
+                  "type": "number"
+                },
+                "y_min": {
+                  "type": "number"
+                },
+                "x_max": {
+                  "type": "number"
+                },
+                "y_max": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "x_min",
+                "y_min",
+                "x_max",
+                "y_max"
+              ],
+              "additionalProperties": false
+            },
             "maps": {
               "type": "array",
               "items": {
@@ -308,7 +347,9 @@
             "columns",
             "rows",
             "attribution",
-            "maps"
+            "maps",
+            "zoom",
+            "bounds"
           ],
           "additionalProperties": false
         }
