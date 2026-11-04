@@ -20,7 +20,7 @@ import opengeode_geosciences as og_geosciences
 import pytest
 from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_microservice.database.data import Data
-from PIL import Image
+from PIL import Image, ImageChops, ImageStat
 
 # Local application imports
 from opengeodeweb_back import geode_functions
@@ -422,10 +422,12 @@ def test_tiles_past_the_max_zoom_are_cut_from_their_parent(
         for (x, y), content in images.items():
             assert content is not None
             with Image.open(io.BytesIO(content)) as tile:
-                assert tile.size == (256, 256)
+                # An opaque parent gives JPEG children
+                assert (tile.format, tile.size) == ("JPEG", (256, 256))
                 quadrant = parent.crop((x * 128, y * 128, x * 128 + 128, y * 128 + 128))
                 expected = quadrant.resize((256, 256), Image.Resampling.BILINEAR)
-                assert tile.tobytes() == expected.tobytes()
+                difference = ImageStat.Stat(ImageChops.difference(tile, expected)).mean
+                assert max(difference) < 2
 
 
 def test_tiles_are_requested_with_the_user_agent_and_certificates(
@@ -470,7 +472,8 @@ def test_requests_to_one_host_are_limited(monkeypatch: pytest.MonkeyPatch) -> No
 
 
 def test_corrupt_parent_tile_is_a_missing_tile() -> None:
-    assert basemap_tiles._overzoomed(b"\x89PNG" + b"garbage" * 10, 1, 0, 0) is None  # noqa: SLF001
+    corrupt = b"\x89PNG" + b"garbage" * 10
+    assert basemap_tiles._overzoomed(corrupt, 1, [(0, 0)]) == {(0, 0): None}  # noqa: SLF001
 
 
 def test_palette_parent_tile_is_enlarged_smoothly() -> None:
@@ -479,7 +482,7 @@ def test_palette_parent_tile_is_enlarged_smoothly() -> None:
     palette.paste(1, (0, 0, 64, 256))
     buffer = io.BytesIO()
     palette.save(buffer, format="PNG")
-    content = basemap_tiles._overzoomed(buffer.getvalue(), 1, 0, 0)  # noqa: SLF001
+    content = basemap_tiles._overzoomed(buffer.getvalue(), 1, [(0, 0)])[(0, 0)]  # noqa: SLF001
     assert content is not None
     with Image.open(io.BytesIO(content)) as tile:
         assert tile.mode in ("RGB", "RGBA")

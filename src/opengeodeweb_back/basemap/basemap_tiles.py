@@ -36,6 +36,7 @@ TILES_FOLDER = "tiles"
 HALF_WORLD = 20037508.342789244
 DEFAULT_MAX_PIXELS = 2048
 PNG_SIGNATURE = b"\x89PNG"
+JPEG_QUALITY = 90
 # Cached in place of a tile the server does not have, so it is not asked again
 MISSING_TILE = b"missing"
 FETCH_WORKERS = 8
@@ -191,45 +192,52 @@ def _fetch_tile(source: str, z: int, x: int, y: int) -> bytes | None:
     return content
 
 
-def _overzoomed(parent: bytes | None, depth: int, x: int, y: int) -> bytes | None:
-    """The sub-square of a parent tile that covers tile (x, y), `depth` zooms deeper."""
+def _overzoomed(
+    parent: bytes | None, depth: int, children: list[tuple[int, int]]
+) -> dict[tuple[int, int], bytes | None]:
+    """The sub-squares of a parent tile covering its children, `depth` zooms deeper."""
     if parent is None:
-        return None
+        return dict.fromkeys(children)
     side = TILE_SIZE >> depth
-    left = (x % (1 << depth)) * side
-    top = (y % (1 << depth)) * side
+    images: dict[tuple[int, int], bytes | None] = {}
     try:
+        # Decoded once for all its children
         with Image.open(io.BytesIO(parent)) as opened:
-            image: Image.Image = opened
+            transparent = opened.mode in ("RGBA", "LA", "PA") or "transparency" in opened.info
             # Palette and bilevel modes ignore BILINEAR: they become true colour first
-            if opened.mode in ("P", "1", "L") and "transparency" in opened.info:
-                image = opened.convert("RGBA")
-            elif opened.mode in ("P", "1"):
-                image = opened.convert("RGB")
+            image = opened.convert("RGBA" if transparent else "RGB")
+        # Opaque tiles stay JPEG: smaller and faster to encode than PNG, which ignores the quality
+        image_format = "PNG" if transparent else "JPEG"
+        for x, y in children:
+            left = (x % (1 << depth)) * side
+            top = (y % (1 << depth)) * side
             part = image.crop((left, top, left + side, top + side)).resize(
                 (TILE_SIZE, TILE_SIZE), Image.Resampling.BILINEAR
             )
-        output = io.BytesIO()
-        part.save(output, format="PNG")
+            output = io.BytesIO()
+            part.save(output, format=image_format, quality=JPEG_QUALITY)
+            images[(x, y)] = output.getvalue()
     except OSError:  # UnidentifiedImageError included
-        return None
-    return output.getvalue()
+        return dict.fromkeys(children)
+    return images
 
 
 def fetch_tiles(source: str, tiles: TileRange) -> dict[tuple[int, int], bytes | None]:
     # Past its max zoom a source has no tile: its parent tiles are enlarged instead
     depth = max(0, tiles.z - SOURCES[source].max_zoom)
     z = tiles.z - depth
-    parents = sorted({(x >> depth, y >> depth) for x, y in tiles.tiles()})
+    children: dict[tuple[int, int], list[tuple[int, int]]] = {}
+    for x, y in tiles.tiles():
+        children.setdefault((x >> depth, y >> depth), []).append((x, y))
     with ThreadPoolExecutor(FETCH_WORKERS) as executor:
-        contents = executor.map(lambda parent: _fetch_tile(source, z, *parent), parents)
-        downloaded = dict(zip(parents, contents, strict=True))
+        contents = executor.map(lambda parent: _fetch_tile(source, z, *parent), children)
+        downloaded = dict(zip(children, contents, strict=True))
     if depth == 0:
-        return {tile: downloaded[tile] for tile in tiles.tiles()}
-    return {
-        (x, y): _overzoomed(downloaded[(x >> depth, y >> depth)], depth, x, y)
-        for x, y in tiles.tiles()
-    }
+        return downloaded
+    images: dict[tuple[int, int], bytes | None] = {}
+    for parent, content in downloaded.items():
+        images |= _overzoomed(content, depth, children[parent])
+    return images
 
 
 def fetch_sources(
