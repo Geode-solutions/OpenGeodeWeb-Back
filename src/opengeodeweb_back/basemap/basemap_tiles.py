@@ -266,19 +266,32 @@ def fetch_tiles(source: str, tiles: TileRange) -> dict[tuple[int, int], bytes | 
         return _source_tiles(source, tiles, downloads, time.monotonic() + FETCH_DEADLINE_SECONDS)
 
 
-def fetch_sources(
-    sources: list[str], tiles: TileRange
+def _first_served(
+    layer: tuple[str, ...], tiles: TileRange, downloads: ThreadPoolExecutor, deadline: float
+) -> tuple[str, dict[tuple[int, int], bytes | None]] | None:
+    for source in layer:
+        images = _source_tiles(source, tiles, downloads, deadline)
+        if any(images.values()):
+            return source, images
+    return None
+
+
+def fetch_layers(
+    layers: list[tuple[str, ...]], tiles: TileRange
 ) -> dict[str, dict[tuple[int, int], bytes | None]]:
-    """Every source at once: the slowest server sets the wait, not the sum of them."""
+    """The tiles of the first source serving any in each layer, by source.
+
+    Every layer at once: the slowest server sets the wait, not the sum of them.
+    """
     deadline = time.monotonic() + FETCH_DEADLINE_SECONDS
     with (
-        _downloads(FETCH_WORKERS * max(1, len(sources))) as downloads,
-        ThreadPoolExecutor(max(1, len(sources))) as executor,
+        _downloads(FETCH_WORKERS * max(1, len(layers))) as downloads,
+        ThreadPoolExecutor(max(1, len(layers))) as executor,
     ):
-        images = executor.map(
-            lambda source: _source_tiles(source, tiles, downloads, deadline), sources
+        served = executor.map(
+            lambda layer: _first_served(layer, tiles, downloads, deadline), layers
         )
-        return dict(zip(sources, images, strict=True))
+        return dict(item for item in served if item is not None)
 
 
 def _extension(content: bytes) -> str:

@@ -46,7 +46,8 @@ def build(params: schemas.Build) -> schemas.BuildResponse:
     if crs is None:
         flask.abort(400, f"Unknown CRS {params.crs.authority}:{params.crs.code}")
     maps = basemap_providers.sorted_maps(map_.value for map_ in params.maps)
-    sources = [source for name in maps for source in basemap_providers.MAPS[name]]
+    fetched = [layer for name in maps for layer in basemap_providers.MAPS[name]]
+    sources = [source for layer in fetched for source in layer]
     try:
         raw = (params.bounds.x_min, params.bounds.y_min, params.bounds.x_max, params.bounds.y_max)
         projected = basemap_mesh.bounds_to_3857(raw, crs)
@@ -58,9 +59,9 @@ def build(params: schemas.Build) -> schemas.BuildResponse:
             basemap_providers.max_zoom(sources),
             params.max_pixels or basemap_tiles.DEFAULT_MAX_PIXELS,
         )
-        images = basemap_tiles.fetch_sources(sources, tiles)
+        images = basemap_tiles.fetch_layers(fetched, tiles)
         # Outside France the IGN sources have no tile: the others still make the map
-        layers = basemap_providers.map_layers(maps, lambda source: any(images[source].values()))
+        layers = basemap_providers.map_layers(maps, images)
         drawn = [source for names in layers.values() for source in names]
         if not drawn:
             logger.warning("No basemap tile downloaded (maps %s, zoom %d)", maps, tiles.z)

@@ -97,11 +97,13 @@ def test_fetch_and_save_tiles(tmp_path: Path) -> None:
     assert (folder / "1_1.png").read_bytes() == expected
 
 
-@pytest.mark.usefixtures("local_tiles")
-def test_fetch_sources_downloads_every_source() -> None:
-    images = basemap_tiles.fetch_sources(["ign_orthophotos", "ign_roads"], WHOLE_WORLD)
+def test_fetch_layers_downloads_every_layer(local_tiles: Path) -> None:
+    images = basemap_tiles.fetch_layers([("ign_orthophotos",), ("ign_roads",)], WHOLE_WORLD)
     assert list(images) == ["ign_orthophotos", "ign_roads"]
     assert all(all(source.values()) for source in images.values())
+    # The next source of a layer is not fetched while the first one serves tiles
+    assert list(basemap_tiles.fetch_layers([("osm", "eox_overlay")], WHOLE_WORLD)) == ["osm"]
+    assert not (local_tiles / "eox_overlay").exists()
 
 
 def test_cached_tiles_are_not_fetched_again(
@@ -381,16 +383,14 @@ def test_maps_from_the_bottom_up() -> None:
 
 def test_map_layers_stack_or_take_the_first_served() -> None:
     served = {"eox_s2cloudless_2016", "ign_orthophotos", "eox_overlay"}
-    layers = basemap_providers.map_layers(["satellite", "routes"], lambda source: source in served)
-    # Satellite stacks its sources; routes take the IGN when served, else EOX
+    layers = basemap_providers.map_layers(["satellite", "routes"], served)
+    # Satellite stacks its layers; routes take the IGN when served, else EOX
     assert layers == {
         "satellite": ["eox_s2cloudless_2016", "ign_orthophotos"],
         "routes": ["eox_overlay"],
     }
-    layers = basemap_providers.map_layers(["routes"], lambda _source: True)
-    assert layers == {"routes": ["ign_roads"]}
     # A map without any served source is left out
-    assert basemap_providers.map_layers(["routes"], lambda _source: False) == {}
+    assert basemap_providers.map_layers(["routes"], set()) == {}
 
 
 def test_attribution_once_per_provider() -> None:
@@ -467,7 +467,8 @@ def test_requests_to_one_host_are_limited(monkeypatch: pytest.MonkeyPatch) -> No
     monkeypatch.setattr(urllib.request, "urlopen", slow)
     _serve(monkeypatch, Path("/nonexistent"), "https://tiles.example/{z}/{x}/{y}.png")
     sources = ["ign_orthophotos", "ign_roads", "osm"]
-    basemap_tiles.fetch_sources(sources, basemap_tiles.TileRange(4, 0, 3, 0, 3))
+    layers = [(source,) for source in sources]
+    basemap_tiles.fetch_layers(layers, basemap_tiles.TileRange(4, 0, 3, 0, 3))
     assert peak["tiles.example"] == basemap_tiles.MAX_REQUESTS_PER_HOST
 
 
@@ -482,11 +483,11 @@ def test_tiles_past_the_deadline_are_missing(monkeypatch: pytest.MonkeyPatch) ->
     monkeypatch.setattr(basemap_tiles, "FETCH_DEADLINE_SECONDS", 0.1)
     monkeypatch.setenv("BASEMAP_CACHE_FOLDER", "/nonexistent")
     start = time.monotonic()
-    images = basemap_tiles.fetch_sources(["osm"], WHOLE_WORLD)
+    images = basemap_tiles.fetch_tiles("osm", WHOLE_WORLD)
     # The build does not wait for the hanging requests
     assert time.monotonic() - start < 1
     released.set()
-    assert not any(images["osm"].values())
+    assert not any(images.values())
 
 
 def test_corrupt_parent_tile_is_a_missing_tile() -> None:

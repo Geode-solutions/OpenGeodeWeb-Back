@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable
+    from collections.abc import Container, Iterable
 
 USER_AGENT = "Vease (+https://geode-solutions.com)"
 # Every source is cut in 256 px Web Mercator tiles: they share one tile grid
@@ -55,11 +55,14 @@ SOURCES: dict[str, Source] = {
     ),
 }
 
-# From the bottom up: in a map, the IGN covers the world source where it has tiles (France)
-MAPS: dict[str, tuple[str, ...]] = {
-    "satellite": ("eox_s2cloudless_2016", "ign_orthophotos"),
-    "plan": ("osm", "ign_plan"),
-    "routes": ("ign_roads", "eox_overlay"),
+# The layers of each map, from the bottom up. A layer draws the first of its sources serving a
+# tile: the next one is only fetched when it serves none
+MAPS: dict[str, tuple[tuple[str, ...], ...]] = {
+    # The IGN covers the world imagery or map where it has tiles (France)
+    "satellite": (("eox_s2cloudless_2016",), ("ign_orthophotos",)),
+    "plan": (("osm",), ("ign_plan",)),
+    # Transparent: both sources would draw the same roads twice, EOX outside France
+    "routes": (("ign_roads", "eox_overlay"),),
 }
 
 
@@ -72,17 +75,13 @@ def sorted_maps(maps: Iterable[str]) -> list[str]:
     return [name for name in MAPS if name in requested]
 
 
-def map_layers(maps: list[str], served: Callable[[str], bool]) -> dict[str, list[str]]:
-    """The sources drawn by each sorted map, from the bottom up: maps without any are left out."""
-    layers: dict[str, list[str]] = {}
-    for name in maps:
-        sources = [source for source in MAPS[name] if served(source)]
-        # Transparent routes: both sources would draw the same roads, the first served wins
-        if name == "routes":
-            sources = sources[:1]
-        if sources:
-            layers[name] = sources
-    return layers
+def map_layers(maps: list[str], served: Container[str]) -> dict[str, list[str]]:
+    """The served sources of each sorted map, from the bottom up: maps without any are left out."""
+    layers = {
+        name: [source for layer in MAPS[name] for source in layer if source in served]
+        for name in maps
+    }
+    return {name: sources for name, sources in layers.items() if sources}
 
 
 def max_zoom(sources: Iterable[str]) -> int:
