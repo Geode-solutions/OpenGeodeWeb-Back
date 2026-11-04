@@ -51,8 +51,9 @@ def build(params: schemas.Build) -> schemas.BuildResponse:
     try:
         raw = (params.bounds.x_min, params.bounds.y_min, params.bounds.x_max, params.bounds.y_max)
         projected = basemap_mesh.bounds_to_3857(raw, crs)
-        # A detail covers the visible area only: no margin around it
-        bounds = padded(projected) if params.margin is not False else projected
+        # The margin is on unless asked off: a detail covers the visible area only
+        with_margin = params.margin is None or params.margin
+        bounds = padded(projected) if with_margin else projected
         # One tile grid for every source: the viewer stacks their mosaics pixel on pixel
         tiles = basemap_tiles.tile_range(
             bounds,
