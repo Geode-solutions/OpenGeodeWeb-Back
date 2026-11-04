@@ -10,6 +10,7 @@ import threading
 import time
 import urllib.parse
 import urllib.request
+from dataclasses import replace
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -22,13 +23,20 @@ from PIL import Image
 
 # Local application imports
 from opengeodeweb_back import geode_functions
-from opengeodeweb_back.basemap import basemap_mesh, basemap_providers, basemap_tiles
+from opengeodeweb_back.basemap import (
+    basemap_mesh,
+    basemap_providers,
+    basemap_tiles,
+    basemap_vector,
+)
 from opengeodeweb_back.routes.basemap import blueprint_basemap
 
 if TYPE_CHECKING:
     from flask.testing import FlaskClient
 
 TILES_FOLDER = Path(__file__).parent / "data" / "basemap_tiles"
+# One primary road, from the north-west corner to the south-east corner of the tile
+ROADS_TILE = TILES_FOLDER / "roads.pbf"
 HALF_WORLD = 20037508.342789244
 BUILD_ROUTE = "/opengeodeweb_back/basemap/build"
 DELETE_ROUTE = "/opengeodeweb_back/basemap/delete"
@@ -392,9 +400,7 @@ def test_build_route_skips_sources_without_tiles(
     monkeypatch.setenv(
         "BASEMAP_TILE_URL_EOX_S2CLOUDLESS_2016", (TILES_FOLDER / "1" / "0" / "0.png").as_uri()
     )
-    monkeypatch.setenv(
-        "BASEMAP_TILE_URL_EOX_OVERLAY", (TILES_FOLDER / "1" / "0" / "0.png").as_uri()
-    )
+    monkeypatch.setenv("BASEMAP_TILE_URL_OPENFREEMAP_ROADS", ROADS_TILE.as_uri())
     monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(tmp_path / "cache"))
     response = client.post(
         BUILD_ROUTE,
@@ -407,9 +413,9 @@ def test_build_route_skips_sources_without_tiles(
     )
     assert response.status_code == 200
     body = response.get_json()
-    assert body["maps"][1] == {"map": "routes", "sources": ["eox_overlay"]}
+    assert body["maps"][1] == {"map": "routes", "sources": ["openfreemap_roads"]}
     assert "IGN" not in body["attribution"]
-    assert "rendering © EOX" in body["attribution"]
+    assert "OpenFreeMap" in body["attribution"]
     with client.application.app_context():
         tiles_path = Path(geode_functions.data_file_path(body["id"], "tiles"))
     # Only the drawn sources have a tiles folder
@@ -442,19 +448,19 @@ def test_map_sources_from_the_bottom_up() -> None:
         "eox_s2cloudless_2016",
         "ign_orthophotos",
         "ign_roads",
-        "eox_overlay",
+        "openfreemap_roads",
     ]
     assert basemap_providers.max_zoom(["eox_s2cloudless_2016", "ign_roads"]) == 18
-    assert basemap_providers.max_zoom(["eox_overlay", "ign_orthophotos"]) == 19
+    assert basemap_providers.max_zoom(["openfreemap_roads", "ign_orthophotos"]) == 19
 
 
 def test_map_layers_stack_or_take_the_first_served() -> None:
-    served = {"eox_s2cloudless_2016", "ign_orthophotos", "eox_overlay"}
+    served = {"eox_s2cloudless_2016", "ign_orthophotos", "openfreemap_roads"}
     layers = basemap_providers.map_layers(["satellite", "routes"], lambda source: source in served)
-    # Satellite stacks its sources; routes take the IGN when served, else EOX
+    # Satellite stacks its sources; routes take the IGN when served, else OpenFreeMap
     assert layers == {
         "satellite": ["eox_s2cloudless_2016", "ign_orthophotos"],
-        "routes": ["eox_overlay"],
+        "routes": ["openfreemap_roads"],
     }
     layers = basemap_providers.map_layers(["routes"], lambda _source: True)
     assert layers == {"routes": ["ign_roads"]}
@@ -562,3 +568,54 @@ def test_palette_parent_tile_is_enlarged_smoothly() -> None:
     assert content is not None
     with Image.open(io.BytesIO(content)) as tile:
         assert tile.mode in ("RGB", "RGBA")
+
+
+def test_roads_are_decoded_from_the_vector_tile() -> None:
+    roads = basemap_vector.decode_roads(ROADS_TILE.read_bytes())
+    assert roads is not None
+    assert [(road.style, road.lines) for road in roads.roads] == [
+        ("primary", [[(0, 0), (4096, 4096)]])
+    ]
+    assert basemap_vector.decode_roads(b"<html>invalid token</html>") is None
+    assert basemap_vector.decode_roads(b"") == basemap_vector.Roads(4096, [])
+
+
+def test_roads_are_drawn_on_a_transparent_tile() -> None:
+    roads = basemap_vector.decode_roads(ROADS_TILE.read_bytes())
+    assert roads is not None
+    # South-east quarter of the vector tile, one zoom deeper
+    with Image.open(io.BytesIO(basemap_vector.draw_roads(roads, 1, 1, 1, 15))) as image:
+        alpha = image.getchannel("A")
+        assert alpha.getpixel((128, 128)) == 255
+        assert alpha.getpixel((20, 230)) == 0
+
+
+def test_vector_source_is_drawn_past_its_max_zoom(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("BASEMAP_TILE_URL_OPENFREEMAP_ROADS", ROADS_TILE.as_uri())
+    monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(tmp_path))
+    images = basemap_tiles.fetch_tiles("openfreemap_roads", basemap_tiles.TileRange(16, 0, 1, 0, 1))
+    assert all(
+        content is not None and content.startswith(b"\x89PNG") for content in images.values()
+    )
+
+
+def test_vector_tile_url_is_read_from_the_tilejson(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    tilejson = tmp_path / "tilejson"
+    tilejson.write_text(f'{{"tiles": ["{ROADS_TILE.as_uri()}"]}}')
+    source = basemap_providers.SOURCES["openfreemap_roads"]
+    monkeypatch.setitem(
+        basemap_providers.SOURCES, "openfreemap_roads", replace(source, tilejson=tilejson.as_uri())
+    )
+    monkeypatch.setattr(basemap_tiles, "_TILEJSON_TEMPLATES", {})
+    monkeypatch.delenv("BASEMAP_TILE_URL_OPENFREEMAP_ROADS", raising=False)
+    monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(tmp_path / "cache"))
+    tiles = basemap_tiles.TileRange(14, 0, 0, 0, 0)
+    assert all(basemap_tiles.fetch_tiles("openfreemap_roads", tiles).values())
+    # A TileJSON that cannot be read keeps the release read before
+    tilejson.write_text("<html>maintenance</html>")
+    monkeypatch.setattr(basemap_tiles, "TILEJSON_SECONDS", 0)
+    assert all(basemap_tiles.fetch_tiles("openfreemap_roads", tiles).values())

@@ -18,6 +18,10 @@ class Source:
     url_template: str
     max_zoom: int
     attribution: str
+    # Vector tiles are drawn by the back, they are not images
+    vector: bool = False
+    # Read in the TileJSON when the tile URL changes with each data release
+    tilejson: str | None = None
 
 
 _GEOPLATEFORME = (
@@ -48,10 +52,12 @@ SOURCES: dict[str, Source] = {
     "ign_roads": Source(
         _GEOPLATEFORME.format(layer="TRANSPORTNETWORKS.ROADS", format="image/png"), 18, _IGN
     ),
-    "eox_overlay": Source(
-        "https://tiles.maps.eox.at/wmts/1.0.0/overlay_3857/default/g/{z}/{y}/{x}.png",
+    "openfreemap_roads": Source(
+        "",
         14,
-        "© OpenStreetMap contributors, rendering © EOX",
+        "OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+        vector=True,
+        tilejson="https://tiles.openfreemap.org/planet",
     ),
 }
 
@@ -59,7 +65,7 @@ SOURCES: dict[str, Source] = {
 MAPS: dict[str, tuple[str, ...]] = {
     "satellite": ("eox_s2cloudless_2016", "ign_orthophotos"),
     "plan": ("osm", "ign_plan"),
-    "routes": ("ign_roads", "eox_overlay"),
+    "routes": ("ign_roads", "openfreemap_roads"),
 }
 # Transparent maps whose sources would draw the same roads twice: the first one served wins
 FIRST_SERVED: frozenset[str] = frozenset({"routes"})
