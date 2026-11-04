@@ -46,8 +46,7 @@ WHOLE_WORLD = basemap_tiles.TileRange(1, 0, 1, 0, 1)
 
 
 def _serve(monkeypatch: pytest.MonkeyPatch, cache: Path, template: str) -> None:
-    for source in basemap_providers.SOURCES:
-        monkeypatch.setenv(f"BASEMAP_TILE_URL_{source.upper()}", template)
+    monkeypatch.setenv("BASEMAP_TILE_URL", template)
     monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(cache))
 
 
@@ -366,10 +365,14 @@ def test_padding_is_in_metres() -> None:
 
 def test_url_template_from_the_source_table(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("BASEMAP_TILE_URL_IGN_ROADS", raising=False)
+    monkeypatch.delenv("BASEMAP_TILE_URL", raising=False)
     url = basemap_providers.url_template("ign_roads").format(z=14, x=8298, y=5636)
     assert url.startswith("https://data.geopf.fr/wmts?")
     assert "LAYER=TRANSPORTNETWORKS.ROADS" in url
     assert "TILEMATRIX=14&TILEROW=5636&TILECOL=8298" in url
+    monkeypatch.setenv("BASEMAP_TILE_URL", "http://local/{source}/{z}/{x}/{y}.png")
+    assert basemap_providers.url_template("ign_roads") == "http://local/ign_roads/{z}/{x}/{y}.png"
+    # The variable of the source wins
     monkeypatch.setenv("BASEMAP_TILE_URL_IGN_ROADS", "http://local/{z}/{x}/{y}.png")
     assert basemap_providers.url_template("ign_roads") == "http://local/{z}/{x}/{y}.png"
 

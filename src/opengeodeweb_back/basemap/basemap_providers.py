@@ -67,7 +67,14 @@ MAPS: dict[str, tuple[tuple[str, ...], ...]] = {
 
 
 def url_template(source: str) -> str:
-    return os.environ.get(f"BASEMAP_TILE_URL_{source.upper()}", SOURCES[source].url_template)
+    # Local servers for tests: one variable per source, else one for all where {source} is replaced
+    template = os.environ.get(f"BASEMAP_TILE_URL_{source.upper()}")
+    if template is not None:
+        return template
+    shared = os.environ.get("BASEMAP_TILE_URL")
+    if shared is not None:
+        return shared.replace("{source}", source)
+    return SOURCES[source].url_template
 
 
 def sorted_maps(maps: Iterable[str]) -> list[str]:
