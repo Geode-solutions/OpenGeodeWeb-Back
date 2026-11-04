@@ -2,20 +2,16 @@ from __future__ import annotations
 
 # Standard library imports
 import contextlib
-import gzip
 import hashlib
 import http.client
 import io
-import json
 import math
 import os
 import ssl
 import tempfile
 import threading
-import time
 import urllib.parse
 import urllib.request
-import zlib
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
@@ -25,11 +21,11 @@ import certifi
 from PIL import Image, UnidentifiedImageError
 
 # Local application imports
-from opengeodeweb_back.basemap import basemap_vector
 from opengeodeweb_back.basemap.basemap_providers import (
     SOURCES,
     TILE_SIZE,
     USER_AGENT,
+    tile_url,
     url_template,
 )
 
@@ -38,20 +34,14 @@ MAX_ZOOM = 19
 FETCH_WORKERS = 8
 MAX_REQUESTS_PER_HOST = 8
 FETCH_TIMEOUT_SECONDS = 10
-# IncompleteRead and other HTTPException are not OSError, nor a truncated gzip body
-DOWNLOAD_ERRORS = (OSError, EOFError, zlib.error, http.client.HTTPException)
-# A TileJSON names the current data release: it is read again once a day
-TILEJSON_SECONDS = 24 * 3600
-# A vector tile only holds layers: protobuf field 3, length delimited
-VECTOR_TILE_FIRST_BYTE = 0x1A
+# IncompleteRead and other HTTPException are not OSError
+DOWNLOAD_ERRORS = (OSError, http.client.HTTPException)
 # Packaged binaries ship their own OpenSSL, which may not find the system certificates
 SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
 
 
 _HOST_LIMITS: dict[str, threading.Semaphore] = {}
 _HOST_LIMITS_LOCK = threading.Lock()
-_TILEJSON_TEMPLATES: dict[str, tuple[str, float]] = {}
-_TILEJSON_LOCK = threading.Lock()
 
 
 def _host_limit(url: str) -> threading.Semaphore:
@@ -132,20 +122,13 @@ def _is_image(content: bytes) -> bool:
     return content.startswith((b"\x89PNG", b"\xff\xd8"))
 
 
-def _is_tile(source: str, content: bytes) -> bool:
-    if SOURCES[source].vector:
-        # An empty vector tile has no road
-        return content == b"" or content[0] == VECTOR_TILE_FIRST_BYTE
-    return _is_image(content)
-
-
-def _read_cache(source: str, cached: Path) -> bytes | None:
+def _read_cache(cached: Path) -> bytes | None:
     try:
         content = cached.read_bytes()
     except OSError:
         return None
     # A file broken by a crash or a disk error is downloaded again
-    return content if _is_tile(source, content) else None
+    return content if _is_image(content) else None
 
 
 def _write_cache(cached: Path, content: bytes) -> None:
@@ -165,10 +148,17 @@ def _write_cache(cached: Path, content: bytes) -> None:
             Path(temporary).unlink()
 
 
-def _download(url: str) -> bytes | None:
+def _fetch_tile(source: str, z: int, x: int, y: int) -> bytes | None:
+    # The template hash keeps tiles of an overridden URL apart
+    template_hash = hashlib.sha256(url_template(source).encode()).hexdigest()[:12]
+    cached = _cache_folder() / source / template_hash / str(z) / str(x) / str(y)
+    cached_content = _read_cache(cached)
+    if cached_content is not None:
+        return cached_content
     # Open tile servers ask every application to name itself
+    url = tile_url(source, z, x, y)
     request = urllib.request.Request(  # noqa: S310 URL from the source table or the environment
-        url, headers={"User-Agent": USER_AGENT, "Accept-Encoding": "gzip"}
+        url, headers={"User-Agent": USER_AGENT}
     )
     try:
         with (
@@ -178,49 +168,9 @@ def _download(url: str) -> bytes | None:
             ) as response,
         ):
             content: bytes = response.read()
-            if response.headers.get("Content-Encoding") == "gzip":
-                content = gzip.decompress(content)
     except DOWNLOAD_ERRORS:
         return None
-    return content
-
-
-def _tilejson_template(tilejson: str) -> str | None:
-    with _TILEJSON_LOCK:
-        known = _TILEJSON_TEMPLATES.get(tilejson)
-    if known is not None and time.monotonic() - known[1] < TILEJSON_SECONDS:
-        return known[0]
-    content = _download(tilejson)
-    try:
-        template = str(json.loads(content or b"")["tiles"][0])
-    except ValueError, KeyError, IndexError, TypeError:
-        # The release read before stays in use while the TileJSON cannot be read
-        return known[0] if known is not None else None
-    with _TILEJSON_LOCK:
-        _TILEJSON_TEMPLATES[tilejson] = (template, time.monotonic())
-    return template
-
-
-def _source_template(source: str) -> str | None:
-    template = url_template(source)
-    tilejson = SOURCES[source].tilejson
-    if template or tilejson is None:
-        return template
-    return _tilejson_template(tilejson)
-
-
-def _fetch_tile(source: str, z: int, x: int, y: int) -> bytes | None:
-    template = _source_template(source)
-    if template is None:
-        return None
-    # The template hash keeps tiles of an overridden URL, or of another release, apart
-    template_hash = hashlib.sha256(template.encode()).hexdigest()[:12]
-    cached = _cache_folder() / source / template_hash / str(z) / str(x) / str(y)
-    cached_content = _read_cache(source, cached)
-    if cached_content is not None:
-        return cached_content
-    content = _download(template.format(z=z, x=x, y=y))
-    if content is None or not _is_tile(source, content):
+    if not _is_image(content):
         return None
     _write_cache(cached, content)
     return content
@@ -259,32 +209,12 @@ def fetch_tiles(source: str, tiles: TileRange) -> dict[tuple[int, int], bytes | 
     with ThreadPoolExecutor(FETCH_WORKERS) as executor:
         contents = executor.map(lambda parent: _fetch_tile(source, z, *parent), parents)
         downloaded = dict(zip(parents, contents, strict=True))
-    if SOURCES[source].vector:
-        return _drawn_tiles(downloaded, depth, tiles)
     if depth == 0:
         return {tile: downloaded[tile] for tile in tiles.tiles()}
     return {
         (x, y): _overzoomed(downloaded[(x >> depth, y >> depth)], depth, x, y)
         for x, y in tiles.tiles()
     }
-
-
-def _drawn_tiles(
-    downloaded: dict[tuple[int, int], bytes | None], depth: int, tiles: TileRange
-) -> dict[tuple[int, int], bytes | None]:
-    # Vector tiles are decoded once, then drawn sharp at the requested zoom
-    roads = {
-        parent: None if content is None else basemap_vector.decode_roads(content)
-        for parent, content in downloaded.items()
-    }
-
-    def drawn(tile: tuple[int, int]) -> bytes | None:
-        x, y = tile
-        parent = roads[(x >> depth, y >> depth)]
-        return None if parent is None else basemap_vector.draw_roads(parent, depth, x, y, tiles.z)
-
-    with ThreadPoolExecutor(FETCH_WORKERS) as executor:
-        return dict(zip(tiles.tiles(), executor.map(drawn, tiles.tiles()), strict=True))
 
 
 def fetch_sources(
