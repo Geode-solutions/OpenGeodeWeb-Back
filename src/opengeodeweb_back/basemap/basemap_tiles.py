@@ -18,7 +18,7 @@ from pathlib import Path
 
 # Third party imports
 import certifi
-from PIL import Image, UnidentifiedImageError
+from PIL import Image
 
 # Local application imports
 from opengeodeweb_back import geode_functions
@@ -200,7 +200,7 @@ def _overzoomed(parent: bytes | None, depth: int, x: int, y: int) -> bytes | Non
             )
         output = io.BytesIO()
         part.save(output, format="PNG")
-    except OSError, UnidentifiedImageError:
+    except OSError:  # UnidentifiedImageError included
         return None
     return output.getvalue()
 
