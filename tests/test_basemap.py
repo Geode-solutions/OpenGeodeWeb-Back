@@ -471,6 +471,24 @@ def test_requests_to_one_host_are_limited(monkeypatch: pytest.MonkeyPatch) -> No
     assert peak["tiles.example"] == basemap_tiles.MAX_REQUESTS_PER_HOST
 
 
+def test_tiles_past_the_deadline_are_missing(monkeypatch: pytest.MonkeyPatch) -> None:
+    released = threading.Event()
+
+    def hanging(*_args: object, **_kwargs: object) -> None:
+        released.wait(5)
+        raise OSError
+
+    monkeypatch.setattr(urllib.request, "urlopen", hanging)
+    monkeypatch.setattr(basemap_tiles, "FETCH_DEADLINE_SECONDS", 0.1)
+    monkeypatch.setenv("BASEMAP_CACHE_FOLDER", "/nonexistent")
+    start = time.monotonic()
+    images = basemap_tiles.fetch_sources(["osm"], WHOLE_WORLD)
+    # The build does not wait for the hanging requests
+    assert time.monotonic() - start < 1
+    released.set()
+    assert not any(images["osm"].values())
+
+
 def test_corrupt_parent_tile_is_a_missing_tile() -> None:
     corrupt = b"\x89PNG" + b"garbage" * 10
     assert basemap_tiles._overzoomed(corrupt, 1, [(0, 0)]) == {(0, 0): None}  # noqa: SLF001

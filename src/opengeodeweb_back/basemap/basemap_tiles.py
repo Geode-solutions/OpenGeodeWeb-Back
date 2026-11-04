@@ -10,13 +10,15 @@ import os
 import ssl
 import tempfile
 import threading
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, wait
 from dataclasses import dataclass
 from http import HTTPStatus
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 # Third party imports
 import certifi
@@ -31,6 +33,9 @@ from opengeodeweb_back.basemap.basemap_providers import (
     url_template,
 )
 
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
 # Folder of a basemap data holding its tiles: only basemaps have one
 TILES_FOLDER = "tiles"
 HALF_WORLD = 20037508.342789244
@@ -42,6 +47,8 @@ MISSING_TILE = b"missing"
 FETCH_WORKERS = 8
 MAX_REQUESTS_PER_HOST = 8
 FETCH_TIMEOUT_SECONDS = 10
+# Whole download of a build: a hanging server must not hold the request for minutes
+FETCH_DEADLINE_SECONDS = 30
 # IncompleteRead and other HTTPException are not OSError
 DOWNLOAD_ERRORS = (OSError, http.client.HTTPException)
 # Packaged binaries ship their own OpenSSL, which may not find the system certificates
@@ -222,31 +229,56 @@ def _overzoomed(
     return images
 
 
-def fetch_tiles(source: str, tiles: TileRange) -> dict[tuple[int, int], bytes | None]:
+@contextlib.contextmanager
+def _downloads(workers: int) -> Iterator[ThreadPoolExecutor]:
+    executor = ThreadPoolExecutor(workers)
+    try:
+        yield executor
+    finally:
+        # Past the deadline the requests still running end on their own: the build does not wait
+        executor.shutdown(wait=False, cancel_futures=True)
+
+
+def _source_tiles(
+    source: str, tiles: TileRange, downloads: ThreadPoolExecutor, deadline: float
+) -> dict[tuple[int, int], bytes | None]:
     # Past its max zoom a source has no tile: its parent tiles are enlarged instead
     depth = max(0, tiles.z - SOURCES[source].max_zoom)
     z = tiles.z - depth
     children: dict[tuple[int, int], list[tuple[int, int]]] = {}
     for x, y in tiles.tiles():
         children.setdefault((x >> depth, y >> depth), []).append((x, y))
-    with ThreadPoolExecutor(FETCH_WORKERS) as executor:
-        contents = executor.map(lambda parent: _fetch_tile(source, z, *parent), children)
-        downloaded = dict(zip(children, contents, strict=True))
-    if depth == 0:
-        return downloaded
+    futures = {parent: downloads.submit(_fetch_tile, source, z, *parent) for parent in children}
+    done, _ = wait(futures.values(), timeout=max(0.0, deadline - time.monotonic()))
     images: dict[tuple[int, int], bytes | None] = {}
-    for parent, content in downloaded.items():
-        images |= _overzoomed(content, depth, children[parent])
+    for parent, future in futures.items():
+        # An unfinished tile counts as missing
+        content = future.result() if future in done else None
+        if depth == 0:
+            images[parent] = content
+        else:
+            images |= _overzoomed(content, depth, children[parent])
     return images
+
+
+def fetch_tiles(source: str, tiles: TileRange) -> dict[tuple[int, int], bytes | None]:
+    with _downloads(FETCH_WORKERS) as downloads:
+        return _source_tiles(source, tiles, downloads, time.monotonic() + FETCH_DEADLINE_SECONDS)
 
 
 def fetch_sources(
     sources: list[str], tiles: TileRange
 ) -> dict[str, dict[tuple[int, int], bytes | None]]:
     """Every source at once: the slowest server sets the wait, not the sum of them."""
-    with ThreadPoolExecutor(max(1, len(sources))) as executor:
-        downloads = executor.map(lambda source: fetch_tiles(source, tiles), sources)
-        return dict(zip(sources, downloads, strict=True))
+    deadline = time.monotonic() + FETCH_DEADLINE_SECONDS
+    with (
+        _downloads(FETCH_WORKERS * max(1, len(sources))) as downloads,
+        ThreadPoolExecutor(max(1, len(sources))) as executor,
+    ):
+        images = executor.map(
+            lambda source: _source_tiles(source, tiles, downloads, deadline), sources
+        )
+        return dict(zip(sources, images, strict=True))
 
 
 def _extension(content: bytes) -> str:
