@@ -29,6 +29,7 @@ from sqlalchemy.exc import OperationalError
 
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
+from opengeodeweb_back.basemap import basemap_tiles
 from opengeodeweb_back.geode_objects import geode_objects
 from opengeodeweb_back.geode_objects.geode_brep import GeodeBRep
 from opengeodeweb_back.geode_objects.geode_graph import GeodeGraph
@@ -785,7 +786,7 @@ def kill(_params: schemas.Kill) -> schemas.KillResponse:
     return schemas.KillResponse(message="Flask server is dead")
 
 
-def _copy_database_without(source: Path, destination: Path, data_ids: list[str]) -> None:
+def _copy_database_without(source: Path, destination: Path, data_ids: set[str]) -> None:
     """Consistent copy of the project database, even while it is in use, without some rows."""
     with (
         contextlib.closing(sqlite3.connect(source)) as source_connection,
@@ -813,9 +814,7 @@ def export_project() -> flask.Response:
     with get_session() as session:
         rows = session.query(Data.id, Data.native_file).all()
     # Basemaps are rebuilt from the project style: neither their rows nor their tiles are exported
-    basemap_ids = [
-        data_id for data_id, _ in rows if (Path(project_folder) / data_id / "tiles").is_dir()
-    ]
+    basemap_ids = {data_id for data_id, _ in rows if basemap_tiles.is_basemap(data_id)}
 
     with zipfile.ZipFile(export_vease_path, "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
         database_root_path = Path(project_folder) / "project.db"
@@ -826,9 +825,9 @@ def export_project() -> flask.Response:
                 zip_file.write(exported_database, "project.db")
 
         for data_id, _native_file in rows:
-            base_dir = Path(project_folder) / data_id
             if data_id in basemap_ids:
                 continue
+            base_dir = Path(project_folder) / data_id
             if base_dir.is_dir():
                 for file_path in base_dir.rglob("*"):
                     if file_path.is_file():

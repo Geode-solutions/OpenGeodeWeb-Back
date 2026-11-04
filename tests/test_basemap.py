@@ -27,48 +27,53 @@ from opengeodeweb_back.routes.basemap import blueprint_basemap
 
 if TYPE_CHECKING:
     from flask.testing import FlaskClient
+    from werkzeug.test import TestResponse
 
 TILES_FOLDER = Path(__file__).parent / "data" / "basemap_tiles"
-HALF_WORLD = 20037508.342789244
+ANY_TILE = TILES_FOLDER / "1" / "0" / "0.png"
+HALF_WORLD = basemap_tiles.HALF_WORLD
 BUILD_ROUTE = "/opengeodeweb_back/basemap/build"
 DELETE_ROUTE = "/opengeodeweb_back/basemap/delete"
+LAMBERT = og_geosciences.GeographicCoordinateSystemInfo("EPSG", "2154", "RGF93 v1 / Lambert-93")
 LAMBERT_JSON = {"authority": "EPSG", "code": "2154", "name": "RGF93 v1 / Lambert-93"}
-PARIS_BOUNDS = {
-    "x_min": 650_000.0,
-    "y_min": 6_860_000.0,
-    "x_max": 655_000.0,
-    "y_max": 6_865_000.0,
-}
+# Around Paris in Lambert-93
+PARIS = (650_000.0, 6_860_000.0, 655_000.0, 6_865_000.0)
+PARIS_BOUNDS = dict(zip(("x_min", "y_min", "x_max", "y_max"), PARIS, strict=True))
+WGS84_JSON = {"authority": "EPSG", "code": "4326", "name": "WGS 84"}
+WHOLE_WORLD = basemap_tiles.TileRange(1, 0, 1, 0, 1)
 
 
-def _serve_every_source(monkeypatch: pytest.MonkeyPatch, template: str) -> None:
+def _serve(monkeypatch: pytest.MonkeyPatch, cache: Path, template: str) -> None:
     for source in basemap_providers.SOURCES:
         monkeypatch.setenv(f"BASEMAP_TILE_URL_{source.upper()}", template)
+    monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(cache))
 
 
 @pytest.fixture
 def local_tiles(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
-    _serve_every_source(monkeypatch, TILES_FOLDER.as_uri() + "/{z}/{x}/{y}.png")
-    monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(tmp_path))
+    _serve(monkeypatch, tmp_path, TILES_FOLDER.as_uri() + "/{z}/{x}/{y}.png")
     return tmp_path
 
 
 @pytest.fixture
-def any_tile(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
+def any_tile(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     # Same tile whatever z, x, y: routes get every tile at any zoom
-    _serve_every_source(monkeypatch, (TILES_FOLDER / "1" / "0" / "0.png").as_uri())
-    monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(tmp_path))
-    return tmp_path
+    _serve(monkeypatch, tmp_path, ANY_TILE.as_uri())
+
+
+def _build(client: FlaskClient, **params: object) -> TestResponse:
+    json = {"maps": ["satellite"], "bounds": PARIS_BOUNDS, "crs": LAMBERT_JSON, "z": 0.0}
+    return client.post(BUILD_ROUTE, json={**json, **params})
 
 
 def test_tile_range_whole_world() -> None:
-    tiles = basemap_tiles.tile_range((-HALF_WORLD, -HALF_WORLD, HALF_WORLD, HALF_WORLD), 256, 512)
+    tiles = basemap_tiles.tile_range((-HALF_WORLD, -HALF_WORLD, HALF_WORLD, HALF_WORLD), 19, 512)
     assert tiles == basemap_tiles.TileRange(1, 0, 1, 0, 1)
     assert tiles.bounds_3857() == pytest.approx((-HALF_WORLD, -HALF_WORLD, HALF_WORLD, HALF_WORLD))
 
 
 def test_tile_range_keeps_the_image_small() -> None:
-    tiles = basemap_tiles.tile_range((0, 0, 10_000, 10_000), 256)
+    tiles = basemap_tiles.tile_range((0, 0, 10_000, 10_000), 19)
     width = (tiles.x_max - tiles.x_min + 1) * 256
     height = (tiles.y_max - tiles.y_min + 1) * 256
     assert max(width, height) <= 2048
@@ -77,36 +82,24 @@ def test_tile_range_keeps_the_image_small() -> None:
 
 @pytest.mark.usefixtures("local_tiles")
 def test_fetch_and_save_tiles(tmp_path: Path) -> None:
-    tiles = basemap_tiles.TileRange(1, 0, 1, 0, 1)
-    images = basemap_tiles.fetch_tiles("ign_orthophotos", tiles)
+    images = basemap_tiles.fetch_tiles("ign_orthophotos", WHOLE_WORLD)
     assert all(images.values())
+    expected = images[(1, 1)]
+    # A missing tile is not written
+    images[(1, 0)] = None
     folder = tmp_path / "tiles"
-    basemap_tiles.save_tiles(tiles, images, folder)
+    basemap_tiles.save_tiles(WHOLE_WORLD, images, folder)
     # Column then row, from the north-west corner
-    assert sorted(path.name for path in folder.iterdir()) == [
-        "0_0.png",
-        "0_1.png",
-        "1_0.png",
-        "1_1.png",
-    ]
-    assert (folder / "1_1.png").read_bytes() == (TILES_FOLDER / "1" / "1" / "1.png").read_bytes()
+    assert sorted(path.name for path in folder.iterdir()) == ["0_0.png", "0_1.png", "1_1.png"]
+    assert expected == (TILES_FOLDER / "1" / "1" / "1.png").read_bytes()
+    assert (folder / "1_1.png").read_bytes() == expected
 
 
 @pytest.mark.usefixtures("local_tiles")
 def test_fetch_sources_downloads_every_source() -> None:
-    tiles = basemap_tiles.TileRange(1, 0, 1, 0, 1)
-    images = basemap_tiles.fetch_sources(["ign_orthophotos", "ign_roads"], tiles)
+    images = basemap_tiles.fetch_sources(["ign_orthophotos", "ign_roads"], WHOLE_WORLD)
     assert list(images) == ["ign_orthophotos", "ign_roads"]
     assert all(all(source.values()) for source in images.values())
-
-
-@pytest.mark.usefixtures("local_tiles")
-def test_missing_tile_is_not_written(tmp_path: Path) -> None:
-    tiles = basemap_tiles.TileRange(1, 0, 1, 0, 1)
-    images = basemap_tiles.fetch_tiles("ign_orthophotos", tiles)
-    images[(1, 1)] = None
-    basemap_tiles.save_tiles(tiles, images, tmp_path)
-    assert not (tmp_path / "1_1.png").exists()
 
 
 def test_cached_tiles_are_not_fetched_again(
@@ -115,20 +108,18 @@ def test_cached_tiles_are_not_fetched_again(
     copy = local_tiles / "copy"
     shutil.copytree(TILES_FOLDER, copy)
     monkeypatch.setenv("BASEMAP_TILE_URL_IGN_ORTHOPHOTOS", copy.as_uri() + "/{z}/{x}/{y}.png")
-    tiles = basemap_tiles.TileRange(1, 0, 1, 0, 1)
-    basemap_tiles.fetch_tiles("ign_orthophotos", tiles)
+    basemap_tiles.fetch_tiles("ign_orthophotos", WHOLE_WORLD)
     shutil.rmtree(copy)
-    assert all(basemap_tiles.fetch_tiles("ign_orthophotos", tiles).values())
+    assert all(basemap_tiles.fetch_tiles("ign_orthophotos", WHOLE_WORLD).values())
 
 
 def test_invalid_cached_tile_is_fetched_again(local_tiles: Path) -> None:
-    tiles = basemap_tiles.TileRange(1, 0, 1, 0, 1)
-    basemap_tiles.fetch_tiles("ign_orthophotos", tiles)
+    basemap_tiles.fetch_tiles("ign_orthophotos", WHOLE_WORLD)
     cached_files = [path for path in local_tiles.rglob("*") if path.is_file()]
     assert len(cached_files) == 4
     for path in cached_files:
         path.write_bytes(b"\x89PN")
-    images = basemap_tiles.fetch_tiles("ign_orthophotos", tiles)
+    images = basemap_tiles.fetch_tiles("ign_orthophotos", WHOLE_WORLD)
     assert images[(1, 1)] == (TILES_FOLDER / "1" / "1" / "1.png").read_bytes()
     assert all(path.read_bytes().startswith(b"\x89PNG") for path in cached_files)
 
@@ -140,7 +131,7 @@ def test_failing_cache_write_still_returns_the_tile(
     blocker = tmp_path / "blocker"
     blocker.write_text("not a folder")
     monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(blocker))
-    images = basemap_tiles.fetch_tiles("ign_orthophotos", basemap_tiles.TileRange(1, 0, 1, 0, 1))
+    images = basemap_tiles.fetch_tiles("ign_orthophotos", WHOLE_WORLD)
     assert all(images.values())
 
 
@@ -151,18 +142,17 @@ def test_truncated_download_is_a_missing_tile(monkeypatch: pytest.MonkeyPatch) -
         raise http.client.IncompleteRead(partial)
 
     monkeypatch.setattr(urllib.request, "urlopen", truncated)
-    images = basemap_tiles.fetch_tiles("ign_orthophotos", basemap_tiles.TileRange(1, 0, 1, 0, 1))
+    images = basemap_tiles.fetch_tiles("ign_orthophotos", WHOLE_WORLD)
     assert not any(images.values())
 
 
 def test_other_url_template_does_not_reuse_the_cache(
     local_tiles: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    tiles = basemap_tiles.TileRange(1, 0, 1, 0, 1)
-    basemap_tiles.fetch_tiles("ign_orthophotos", tiles)
+    basemap_tiles.fetch_tiles("ign_orthophotos", WHOLE_WORLD)
     missing = local_tiles / "missing"
     monkeypatch.setenv("BASEMAP_TILE_URL_IGN_ORTHOPHOTOS", missing.as_uri() + "/{z}/{x}/{y}.png")
-    assert not any(basemap_tiles.fetch_tiles("ign_orthophotos", tiles).values())
+    assert not any(basemap_tiles.fetch_tiles("ign_orthophotos", WHOLE_WORLD).values())
 
 
 def test_non_image_tile_is_neither_returned_nor_cached(
@@ -178,14 +168,9 @@ def test_non_image_tile_is_neither_returned_nor_cached(
     )
     cache = local_tiles / "cache"
     monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(cache))
-    images = basemap_tiles.fetch_tiles("ign_orthophotos", basemap_tiles.TileRange(1, 0, 1, 0, 1))
+    images = basemap_tiles.fetch_tiles("ign_orthophotos", WHOLE_WORLD)
     assert not any(images.values())
     assert not any(path.is_file() for path in cache.rglob("*"))
-
-
-LAMBERT = og_geosciences.GeographicCoordinateSystemInfo("EPSG", "2154", "RGF93 v1 / Lambert-93")
-# Around Paris in Lambert-93
-PARIS = (650_000.0, 6_860_000.0, 655_000.0, 6_865_000.0)
 
 
 def test_bounds_to_3857_paris() -> None:
@@ -195,16 +180,11 @@ def test_bounds_to_3857_paris() -> None:
     assert 6_200_000 < y_min < y_max < 6_300_000
 
 
-WEB_MERCATOR = og_geosciences.GeographicCoordinateSystemInfo(
-    "EPSG", "3857", "WGS 84 / Pseudo-Mercator"
-)
-
-
 def test_bounds_already_in_web_mercator() -> None:
     bounds = (260_000.0, 6_250_000.0, 265_000.0, 6_255_000.0)
-    assert basemap_mesh.bounds_to_3857(bounds, WEB_MERCATOR) == bounds
+    assert basemap_mesh.bounds_to_3857(bounds, basemap_mesh.WEB_MERCATOR) == bounds
     with pytest.raises(basemap_mesh.OutsideProjectionError):
-        basemap_mesh.bounds_to_3857((0.0, 0.0, 1.0, 2 * HALF_WORLD), WEB_MERCATOR)
+        basemap_mesh.bounds_to_3857((0.0, 0.0, 1.0, 2 * HALF_WORLD), basemap_mesh.WEB_MERCATOR)
 
 
 def test_bounds_outside_web_mercator() -> None:
@@ -215,8 +195,8 @@ def test_bounds_outside_web_mercator() -> None:
 
 
 def test_build_mesh() -> None:
-    tiles = basemap_tiles.tile_range(basemap_mesh.bounds_to_3857(PARIS, LAMBERT), 256)
-    mesh = basemap_mesh.build_mesh(tiles, LAMBERT, -12.5, "basemap")
+    tiles = basemap_tiles.tile_range(basemap_mesh.bounds_to_3857(PARIS, LAMBERT), 19)
+    mesh = basemap_mesh.build_mesh(tiles, LAMBERT, -12.5)
     surface = mesh.triangulated_surface
     assert surface.nb_vertices() == basemap_mesh.GRID_SIZE**2
     assert surface.nb_polygons() == 2 * (basemap_mesh.GRID_SIZE - 1) ** 2
@@ -236,8 +216,8 @@ def test_build_mesh() -> None:
 
 
 def test_build_mesh_in_web_mercator() -> None:
-    tiles = basemap_tiles.TileRange(1, 0, 1, 0, 1)
-    surface = basemap_mesh.build_mesh(tiles, WEB_MERCATOR, 0.0, "basemap").triangulated_surface
+    mesh = basemap_mesh.build_mesh(WHOLE_WORLD, basemap_mesh.WEB_MERCATOR, 0.0)
+    surface = mesh.triangulated_surface
     manager = surface.main_coordinate_reference_system_manager()
     assert manager.active_coordinate_reference_system_name() == "EPSG:3857"
     assert surface.point(0).value(0) == pytest.approx(-HALF_WORLD)
@@ -246,20 +226,12 @@ def test_build_mesh_in_web_mercator() -> None:
 def test_build_mesh_outside_the_project_crs() -> None:
     utm = og_geosciences.GeographicCoordinateSystemInfo("EPSG", "32631", "WGS 84 / UTM zone 31N")
     with pytest.raises(basemap_mesh.OutsideProjectionError):
-        basemap_mesh.build_mesh(basemap_tiles.TileRange(0, 0, 0, 0, 0), utm, 0.0, "basemap")
+        basemap_mesh.build_mesh(basemap_tiles.TileRange(0, 0, 0, 0, 0), utm, 0.0)
 
 
 @pytest.mark.usefixtures("any_tile")
 def test_build_route(client: FlaskClient) -> None:
-    response = client.post(
-        BUILD_ROUTE,
-        json={
-            "maps": ["routes", "satellite"],
-            "bounds": PARIS_BOUNDS,
-            "crs": LAMBERT_JSON,
-            "z": 0.0,
-        },
-    )
+    response = _build(client, maps=["routes", "satellite"])
     assert response.status_code == 200
     body = response.get_json()
     assert body["maps"] == [
@@ -268,7 +240,6 @@ def test_build_route(client: FlaskClient) -> None:
     ]
     assert body["attribution"].startswith("Sentinel-2 cloudless 2016 by EOX")
     assert body["attribution"].endswith("© IGN")
-    assert body["tiles_folder"] == "tiles"
     assert body["columns"] >= 1
     assert body["rows"] >= 1
     assert body["crs"] == LAMBERT_JSON
@@ -281,32 +252,16 @@ def test_build_route(client: FlaskClient) -> None:
     ]
 
 
-def test_build_route_errors(client: FlaskClient, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.delenv("ARCGIS_API_KEY", raising=False)
-    monkeypatch.delenv("BASEMAP_TILE_URL_IGN_ORTHOPHOTOS", raising=False)
-    params = {"maps": ["satellite"], "bounds": PARIS_BOUNDS, "crs": LAMBERT_JSON, "z": 0.0}
+def test_build_route_errors(client: FlaskClient) -> None:
     unknown = {"authority": "FOO", "code": "1", "name": "x"}
-    assert client.post(BUILD_ROUTE, json={**params, "crs": unknown}).status_code == 400
-
+    assert _build(client, crs=unknown).status_code == 400
+    assert _build(client, maps=[]).status_code == 400
+    assert _build(client, maps=["topo"]).status_code == 400
+    assert _build(client, max_pixels=100).status_code == 400
+    assert _build(client, max_pixels=5000).status_code == 400
     # EPSG:4326 follows the authority axis order: x is the latitude
-    wgs84 = {"authority": "EPSG", "code": "4326", "name": "WGS 84"}
     polar = {"x_min": 86.0, "y_min": 0.0, "x_max": 87.0, "y_max": 1.0}
-    response = client.post(BUILD_ROUTE, json={**params, "crs": wgs84, "bounds": polar})
-    assert response.status_code == 400
-
-    assert client.post(BUILD_ROUTE, json={**params, "maps": []}).status_code == 400
-    assert client.post(BUILD_ROUTE, json={**params, "maps": ["topo"]}).status_code == 400
-
-
-@pytest.mark.usefixtures("any_tile")
-def test_build_route_web_mercator(client: FlaskClient) -> None:
-    crs = {"authority": "EPSG", "code": "3857", "name": "WGS 84 / Pseudo-Mercator"}
-    bounds = {"x_min": 260_000.0, "y_min": 6_250_000.0, "x_max": 265_000.0, "y_max": 6_255_000.0}
-    response = client.post(
-        BUILD_ROUTE, json={"maps": ["satellite"], "bounds": bounds, "crs": crs, "z": 0.0}
-    )
-    assert response.status_code == 200
-    assert response.get_json()["crs"] == crs
+    assert _build(client, crs=WGS84_JSON, bounds=polar).status_code == 400
 
 
 @pytest.mark.usefixtures("local_tiles")
@@ -317,10 +272,7 @@ def test_build_route_without_any_tile(
     with get_session() as session:
         count = session.query(Data).count()
     with caplog.at_level(logging.WARNING):
-        response = client.post(
-            BUILD_ROUTE,
-            json={"maps": ["satellite"], "bounds": PARIS_BOUNDS, "crs": LAMBERT_JSON, "z": 0.0},
-        )
+        response = _build(client)
     assert response.status_code == 502
     assert "no tile could be downloaded" in response.get_json()["description"]
     with get_session() as session:
@@ -332,11 +284,7 @@ def test_build_route_without_any_tile(
 
 @pytest.mark.usefixtures("any_tile")
 def test_delete_route(client: FlaskClient) -> None:
-    response = client.post(
-        BUILD_ROUTE,
-        json={"maps": ["satellite"], "bounds": PARIS_BOUNDS, "crs": LAMBERT_JSON, "z": 0.0},
-    )
-    data_id = response.get_json()["id"]
+    data_id = _build(client).get_json()["id"]
     with client.application.app_context():
         folder = Path(geode_functions.data_file_path(data_id))
     assert folder.is_dir()
@@ -350,25 +298,15 @@ def test_delete_route(client: FlaskClient) -> None:
 
 @pytest.mark.usefixtures("any_tile")
 def test_build_route_geographic_crs(client: FlaskClient) -> None:
-    # EPSG:4326 follows the authority axis order: x is the latitude
-    wgs84 = {"authority": "EPSG", "code": "4326", "name": "WGS 84"}
     bounds = {"x_min": 48.85, "y_min": 2.34, "x_max": 48.86, "y_max": 2.36}
-    response = client.post(
-        BUILD_ROUTE,
-        json={"maps": ["satellite"], "bounds": bounds, "crs": wgs84, "z": 0.0},
-    )
-    assert response.status_code == 200
-    assert response.get_json()["tiles_folder"] == "tiles"
+    assert _build(client, crs=WGS84_JSON, bounds=bounds).status_code == 200
 
 
 @pytest.mark.usefixtures("any_tile")
 def test_build_route_detail_without_margin(client: FlaskClient) -> None:
-    params = {"maps": ["satellite"], "bounds": PARIS_BOUNDS, "crs": LAMBERT_JSON, "z": 0.0}
     # Same pixel budget on both sides, so only the margin differs
-    base = client.post(BUILD_ROUTE, json={**params, "max_pixels": 512}).get_json()
-    detail = client.post(
-        BUILD_ROUTE, json={**params, "margin": False, "max_pixels": 512}
-    ).get_json()
+    base = _build(client, max_pixels=512).get_json()
+    detail = _build(client, margin=False, max_pixels=512).get_json()
     # Without margin the mesh stays close to the requested bounds, at a finer zoom
     assert detail["zoom"] >= base["zoom"]
     assert detail["columns"] * 256 <= 512
@@ -378,33 +316,14 @@ def test_build_route_detail_without_margin(client: FlaskClient) -> None:
     assert base["bounds"]["x_min"] <= PARIS_BOUNDS["x_min"]
 
 
-def test_build_route_max_pixels_bounds(client: FlaskClient) -> None:
-    params = {"maps": ["satellite"], "bounds": PARIS_BOUNDS, "crs": LAMBERT_JSON, "z": 0.0}
-    assert client.post(BUILD_ROUTE, json={**params, "max_pixels": 100}).status_code == 400
-    assert client.post(BUILD_ROUTE, json={**params, "max_pixels": 5000}).status_code == 400
-
-
 def test_build_route_skips_sources_without_tiles(
     client: FlaskClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     # Outside France: no IGN tile, the world imagery alone makes the map
-    _serve_every_source(monkeypatch, (tmp_path / "none").as_uri() + "/{z}/{x}/{y}.png")
-    monkeypatch.setenv(
-        "BASEMAP_TILE_URL_EOX_S2CLOUDLESS_2016", (TILES_FOLDER / "1" / "0" / "0.png").as_uri()
-    )
-    monkeypatch.setenv(
-        "BASEMAP_TILE_URL_EOX_OVERLAY", (TILES_FOLDER / "1" / "0" / "0.png").as_uri()
-    )
-    monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(tmp_path / "cache"))
-    response = client.post(
-        BUILD_ROUTE,
-        json={
-            "maps": ["satellite", "routes"],
-            "bounds": PARIS_BOUNDS,
-            "crs": LAMBERT_JSON,
-            "z": 0.0,
-        },
-    )
+    _serve(monkeypatch, tmp_path / "cache", (tmp_path / "none").as_uri() + "/{z}/{x}/{y}.png")
+    monkeypatch.setenv("BASEMAP_TILE_URL_EOX_S2CLOUDLESS_2016", ANY_TILE.as_uri())
+    monkeypatch.setenv("BASEMAP_TILE_URL_EOX_OVERLAY", ANY_TILE.as_uri())
+    response = _build(client, maps=["satellite", "routes"])
     assert response.status_code == 200
     body = response.get_json()
     assert body["maps"][1] == {"map": "routes", "sources": ["eox_overlay"]}
@@ -426,24 +345,19 @@ def test_padding_is_in_metres() -> None:
     assert wide == pytest.approx((-5_000.0, -2_000.0, 15_000.0, 6_000.0))
 
 
-def test_tile_url_from_the_source_table(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_url_template_from_the_source_table(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("BASEMAP_TILE_URL_IGN_ROADS", raising=False)
-    url = basemap_providers.tile_url("ign_roads", 14, 8298, 5636)
+    url = basemap_providers.url_template("ign_roads").format(z=14, x=8298, y=5636)
     assert url.startswith("https://data.geopf.fr/wmts?")
     assert "LAYER=TRANSPORTNETWORKS.ROADS" in url
     assert "TILEMATRIX=14&TILEROW=5636&TILECOL=8298" in url
     monkeypatch.setenv("BASEMAP_TILE_URL_IGN_ROADS", "http://local/{z}/{x}/{y}.png")
-    assert basemap_providers.tile_url("ign_roads", 1, 2, 3) == "http://local/1/2/3.png"
+    assert basemap_providers.url_template("ign_roads") == "http://local/{z}/{x}/{y}.png"
 
 
-def test_map_sources_from_the_bottom_up() -> None:
+def test_maps_from_the_bottom_up() -> None:
     # Whatever the requested order: satellite, plan, then routes
-    assert basemap_providers.map_sources(["routes", "satellite"]) == [
-        "eox_s2cloudless_2016",
-        "ign_orthophotos",
-        "ign_roads",
-        "eox_overlay",
-    ]
+    assert basemap_providers.sorted_maps(["routes", "satellite"]) == ["satellite", "routes"]
     assert basemap_providers.max_zoom(["eox_s2cloudless_2016", "ign_roads"]) == 18
     assert basemap_providers.max_zoom(["eox_overlay", "ign_orthophotos"]) == 19
 
@@ -458,7 +372,8 @@ def test_map_layers_stack_or_take_the_first_served() -> None:
     }
     layers = basemap_providers.map_layers(["routes"], lambda _source: True)
     assert layers == {"routes": ["ign_roads"]}
-    assert basemap_providers.map_layers(["routes"], lambda _source: False) == {"routes": []}
+    # A map without any served source is left out
+    assert basemap_providers.map_layers(["routes"], lambda _source: False) == {}
 
 
 def test_attribution_once_per_provider() -> None:
@@ -471,7 +386,7 @@ def test_attribution_once_per_provider() -> None:
 def test_tile_range_stops_at_the_max_zoom() -> None:
     # A tiny extent would go up to zoom 19: the sources stop earlier
     tiny = (261_000.0, 6_251_000.0, 261_010.0, 6_251_010.0)
-    assert basemap_tiles.tile_range(tiny, 256, max_zoom=12).z == 12
+    assert basemap_tiles.tile_range(tiny, 12).z == 12
 
 
 @pytest.mark.usefixtures("local_tiles")
@@ -496,25 +411,13 @@ def test_tiles_past_the_max_zoom_are_cut_from_their_parent(
                 assert tile.tobytes() == expected.tobytes()
 
 
-def test_tiles_are_verified_with_the_bundled_certificates(monkeypatch: pytest.MonkeyPatch) -> None:
-    contexts: list[object] = []
-
-    def capture(_request: urllib.request.Request, timeout: float, context: object) -> None:  # noqa: ARG001
-        contexts.append(context)
-        raise OSError
-
-    monkeypatch.setattr(urllib.request, "urlopen", capture)
-    monkeypatch.setenv("BASEMAP_CACHE_FOLDER", "/nonexistent")
-    basemap_tiles.fetch_tiles("osm", basemap_tiles.TileRange(1, 0, 0, 0, 0))
-    assert contexts == [basemap_tiles.SSL_CONTEXT]
-    assert basemap_tiles.SSL_CONTEXT.verify_mode == ssl.CERT_REQUIRED
-
-
-def test_tiles_are_requested_with_the_user_agent(monkeypatch: pytest.MonkeyPatch) -> None:
-    sent: list[str | None] = []
+def test_tiles_are_requested_with_the_user_agent_and_certificates(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sent: list[tuple[str | None, object]] = []
 
     def capture(request: urllib.request.Request, timeout: float, context: object) -> None:  # noqa: ARG001
-        sent.append(request.get_header("User-agent"))
+        sent.append((request.get_header("User-agent"), context))
         raise OSError
 
     monkeypatch.setattr(urllib.request, "urlopen", capture)
@@ -522,7 +425,9 @@ def test_tiles_are_requested_with_the_user_agent(monkeypatch: pytest.MonkeyPatch
     assert basemap_tiles.fetch_tiles("osm", basemap_tiles.TileRange(1, 0, 0, 0, 0)) == {
         (0, 0): None
     }
-    assert sent == [basemap_providers.USER_AGENT]
+    assert sent == [(basemap_providers.USER_AGENT, basemap_tiles.SSL_CONTEXT)]
+    # Packaged binaries verify the servers with the bundled certificates
+    assert basemap_tiles.SSL_CONTEXT.verify_mode == ssl.CERT_REQUIRED
 
 
 def test_requests_to_one_host_are_limited(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -541,11 +446,10 @@ def test_requests_to_one_host_are_limited(monkeypatch: pytest.MonkeyPatch) -> No
         raise OSError
 
     monkeypatch.setattr(urllib.request, "urlopen", slow)
-    _serve_every_source(monkeypatch, "https://tiles.example/{z}/{x}/{y}.png")
-    monkeypatch.setenv("BASEMAP_CACHE_FOLDER", "/nonexistent")
+    _serve(monkeypatch, Path("/nonexistent"), "https://tiles.example/{z}/{x}/{y}.png")
     sources = ["ign_orthophotos", "ign_roads", "osm"]
     basemap_tiles.fetch_sources(sources, basemap_tiles.TileRange(4, 0, 3, 0, 3))
-    assert peak["tiles.example"] == basemap_tiles.FETCH_WORKERS
+    assert peak["tiles.example"] == basemap_tiles.MAX_REQUESTS_PER_HOST
 
 
 def test_corrupt_parent_tile_is_a_missing_tile() -> None:

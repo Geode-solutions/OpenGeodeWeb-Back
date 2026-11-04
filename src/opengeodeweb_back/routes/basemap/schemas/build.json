@@ -111,95 +111,6 @@
       "nb_vertices": {
         "type": "integer"
       },
-      "mesh_components": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "viewer_id": {
-              "type": "integer"
-            },
-            "geode_id": {
-              "type": "string",
-              "minLength": 36,
-              "maxLength": 36
-            },
-            "name": {
-              "type": "string"
-            },
-            "type": {
-              "type": "string"
-            },
-            "boundaries": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 36,
-                "maxLength": 36
-              }
-            },
-            "internals": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 36,
-                "maxLength": 36
-              }
-            },
-            "is_active": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "viewer_id",
-            "geode_id",
-            "name",
-            "type",
-            "boundaries",
-            "internals",
-            "is_active"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "collection_components": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "geode_id": {
-              "type": "string",
-              "minLength": 36,
-              "maxLength": 36
-            },
-            "name": {
-              "type": "string"
-            },
-            "type": {
-              "type": "string"
-            },
-            "items": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 36,
-                "maxLength": 36
-              }
-            },
-            "is_active": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "geode_id",
-            "name",
-            "type",
-            "items",
-            "is_active"
-          ],
-          "additionalProperties": false
-        }
-      },
       "geode_id": {
         "type": "string",
         "minLength": 36,
@@ -224,9 +135,6 @@
           "name"
         ],
         "additionalProperties": false
-      },
-      "tiles_folder": {
-        "type": "string"
       },
       "columns": {
         "type": "integer",
@@ -284,7 +192,6 @@
       "is_viewable",
       "geode_object_type",
       "geode_id",
-      "tiles_folder",
       "columns",
       "rows",
       "attribution",

@@ -59,18 +59,6 @@ class MeshBounds(DataClassJsonMixin):
 
 
 @dataclass
-class CollectionComponent(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    geode_id: str
-    is_active: bool
-    items: List[str]
-    name: str
-    type: str
-
-
-@dataclass
 class CRS(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
@@ -90,20 +78,6 @@ class MapElement(DataClassJsonMixin):
 
 
 @dataclass
-class MeshComponent(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    boundaries: List[str]
-    geode_id: str
-    internals: List[str]
-    is_active: bool
-    name: str
-    type: str
-    viewer_id: int
-
-
-@dataclass
 class BuildResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
@@ -119,13 +93,10 @@ class BuildResponse(DataClassJsonMixin):
     name: str
     native_file: str
     rows: int
-    tiles_folder: str
     viewer_type: str
     zoom: int
     binary_light_viewable: Optional[str] = None
-    collection_components: Optional[List[CollectionComponent]] = None
     crs: Optional[CRS] = None
-    mesh_components: Optional[List[MeshComponent]] = None
     nb_vertices: Optional[int] = None
     viewable_file: Optional[str] = None
 

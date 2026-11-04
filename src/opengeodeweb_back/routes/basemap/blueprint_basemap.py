@@ -21,9 +21,7 @@ routes = flask.Blueprint("basemap", __name__, url_prefix="/basemap")
 logger = logging.getLogger(__name__)
 
 MARGIN_RATIO = 0.5
-DEFAULT_MAX_PIXELS = 2048
 MIN_SIZE = 1_000.0  # metres, in Web Mercator
-TILES_FOLDER = "tiles"
 
 
 def padded(bounds: tuple[float, float, float, float]) -> tuple[float, float, float, float]:
@@ -48,7 +46,7 @@ def build(params: schemas.Build) -> schemas.BuildResponse:
     if crs is None:
         flask.abort(400, f"Unknown CRS {params.crs.authority}:{params.crs.code}")
     maps = basemap_providers.sorted_maps(map_.value for map_ in params.maps)
-    sources = basemap_providers.map_sources(maps)
+    sources = [source for name in maps for source in basemap_providers.MAPS[name]]
     try:
         raw = (params.bounds.x_min, params.bounds.y_min, params.bounds.x_max, params.bounds.y_max)
         projected = basemap_mesh.bounds_to_3857(raw, crs)
@@ -57,9 +55,8 @@ def build(params: schemas.Build) -> schemas.BuildResponse:
         # One tile grid for every source: the viewer stacks their mosaics pixel on pixel
         tiles = basemap_tiles.tile_range(
             bounds,
-            basemap_providers.TILE_SIZE,
-            max_pixels=params.max_pixels or DEFAULT_MAX_PIXELS,
-            max_zoom=basemap_providers.max_zoom(sources),
+            basemap_providers.max_zoom(sources),
+            params.max_pixels or basemap_tiles.DEFAULT_MAX_PIXELS,
         )
         images = basemap_tiles.fetch_sources(sources, tiles)
         # Outside France the IGN sources have no tile: the others still make the map
@@ -68,15 +65,21 @@ def build(params: schemas.Build) -> schemas.BuildResponse:
         if not drawn:
             logger.warning("No basemap tile downloaded (maps %s, zoom %d)", maps, tiles.z)
             flask.abort(502, "Basemap unavailable: no tile could be downloaded")
-        mesh = basemap_mesh.build_mesh(tiles, crs, params.z, "basemap")
+        mesh = basemap_mesh.build_mesh(tiles, crs, params.z)
     except basemap_mesh.OutsideProjectionError as error:
         flask.abort(400, str(error))
     box = mesh.triangulated_surface.bounding_box()
     response: dict[str, Any] = utils_functions.generate_files_from_object(mesh)
-    folder = Path(geode_functions.data_file_path(response["id"], TILES_FOLDER))
-    for source in drawn:
-        basemap_tiles.save_tiles(tiles, images[source], folder / source)
-    response["tiles_folder"] = TILES_FOLDER
+    data_folder = Path(geode_functions.data_file_path(response["id"]))
+    try:
+        for source in drawn:
+            basemap_tiles.save_tiles(
+                tiles, images[source], data_folder / basemap_tiles.TILES_FOLDER / source
+            )
+    except OSError:
+        # The request rolls the data row back: its folder must not stay behind
+        shutil.rmtree(data_folder, ignore_errors=True)
+        raise
     response["columns"] = tiles.x_max - tiles.x_min + 1
     response["rows"] = tiles.y_max - tiles.y_min + 1
     response["maps"] = [{"map": name, "sources": names} for name, names in layers.items()]
@@ -94,10 +97,9 @@ def build(params: schemas.Build) -> schemas.BuildResponse:
 @typed_route(routes, schemas.delete_route)
 def delete(params: schemas.Delete) -> schemas.DeleteResponse:
     data = geode_functions.get_data_info(params.id)
-    folder = Path(geode_functions.data_file_path(params.id))
-    # Only basemaps have a tiles folder: no other data can be deleted here
-    if not (folder / TILES_FOLDER).is_dir():
+    # No other data can be deleted here
+    if not basemap_tiles.is_basemap(params.id):
         flask.abort(400, f"Data {params.id} is not a basemap")
     get_session().delete(data)
-    shutil.rmtree(folder)
+    shutil.rmtree(geode_functions.data_file_path(params.id))
     return schemas.DeleteResponse(id=params.id)

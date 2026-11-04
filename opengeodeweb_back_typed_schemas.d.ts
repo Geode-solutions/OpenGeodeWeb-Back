@@ -37,7 +37,6 @@ export interface BasemapBuildResponse {
     attribution:            string;
     binary_light_viewable?: string;
     bounds:                 MeshBounds;
-    collection_components?: BasemapBuildResponseCollectionComponent[];
     columns:                number;
     crs?:                   BasemapBuildResponseCRS;
     geode_id:               string;
@@ -45,12 +44,10 @@ export interface BasemapBuildResponse {
     id:                     string;
     is_viewable:            boolean;
     maps:                   MapElement[];
-    mesh_components?:       BasemapBuildResponseMeshComponent[];
     name:                   string;
     native_file:            string;
     nb_vertices?:           number;
     rows:                   number;
-    tiles_folder:           string;
     viewable_file?:         string;
     viewer_type:            string;
     zoom:                   number;
@@ -63,14 +60,6 @@ export interface MeshBounds {
     y_min: number;
 }
 
-export interface BasemapBuildResponseCollectionComponent {
-    geode_id:  string;
-    is_active: boolean;
-    items:     string[];
-    name:      string;
-    type:      string;
-}
-
 export interface BasemapBuildResponseCRS {
     authority: string;
     code:      string;
@@ -80,16 +69,6 @@ export interface BasemapBuildResponseCRS {
 export interface MapElement {
     map:     string;
     sources: string[];
-}
-
-export interface BasemapBuildResponseMeshComponent {
-    boundaries: string[];
-    geode_id:   string;
-    internals:  string[];
-    is_active:  boolean;
-    name:       string;
-    type:       string;
-    viewer_id:  number;
 }
 
 export interface CreatePolygonalSurfaceParams {

@@ -61,16 +61,10 @@ MAPS: dict[str, tuple[str, ...]] = {
     "plan": ("osm", "ign_plan"),
     "routes": ("ign_roads", "eox_overlay"),
 }
-# Transparent maps whose sources would draw the same roads twice: the first one served wins
-FIRST_SERVED: frozenset[str] = frozenset({"routes"})
 
 
 def url_template(source: str) -> str:
     return os.environ.get(f"BASEMAP_TILE_URL_{source.upper()}", SOURCES[source].url_template)
-
-
-def tile_url(source: str, z: int, x: int, y: int) -> str:
-    return url_template(source).format(z=z, x=x, y=y)
 
 
 def sorted_maps(maps: Iterable[str]) -> list[str]:
@@ -78,16 +72,16 @@ def sorted_maps(maps: Iterable[str]) -> list[str]:
     return [name for name in MAPS if name in requested]
 
 
-def map_sources(maps: Iterable[str]) -> list[str]:
-    return [source for name in sorted_maps(maps) for source in MAPS[name]]
-
-
-def map_layers(maps: Iterable[str], served: Callable[[str], bool]) -> dict[str, list[str]]:
-    """The sources drawn by each map, from the bottom up."""
+def map_layers(maps: list[str], served: Callable[[str], bool]) -> dict[str, list[str]]:
+    """The sources drawn by each sorted map, from the bottom up: maps without any are left out."""
     layers: dict[str, list[str]] = {}
-    for name in sorted_maps(maps):
+    for name in maps:
         sources = [source for source in MAPS[name] if served(source)]
-        layers[name] = sources[:1] if name in FIRST_SERVED else sources
+        # Transparent routes: both sources would draw the same roads, the first served wins
+        if name == "routes":
+            sources = sources[:1]
+        if sources:
+            layers[name] = sources
     return layers
 
 

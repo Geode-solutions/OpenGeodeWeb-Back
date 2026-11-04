@@ -21,16 +21,19 @@ import certifi
 from PIL import Image, UnidentifiedImageError
 
 # Local application imports
+from opengeodeweb_back import geode_functions
 from opengeodeweb_back.basemap.basemap_providers import (
     SOURCES,
     TILE_SIZE,
     USER_AGENT,
-    tile_url,
     url_template,
 )
 
+# Folder of a basemap data holding its tiles: only basemaps have one
+TILES_FOLDER = "tiles"
 HALF_WORLD = 20037508.342789244
-MAX_ZOOM = 19
+DEFAULT_MAX_PIXELS = 2048
+PNG_SIGNATURE = b"\x89PNG"
 FETCH_WORKERS = 8
 MAX_REQUESTS_PER_HOST = 8
 FETCH_TIMEOUT_SECONDS = 10
@@ -51,6 +54,10 @@ def _host_limit(url: str) -> threading.Semaphore:
         return _HOST_LIMITS.setdefault(host, threading.Semaphore(MAX_REQUESTS_PER_HOST))
 
 
+def _tile_span(z: int) -> float:
+    return 2 * HALF_WORLD / (1 << z)
+
+
 @dataclass(frozen=True)
 class TileRange:
     z: int
@@ -59,11 +66,8 @@ class TileRange:
     y_min: int
     y_max: int
 
-    def tile_span(self) -> float:
-        return 2 * HALF_WORLD / (1 << self.z)
-
     def bounds_3857(self) -> tuple[float, float, float, float]:
-        span = self.tile_span()
+        span = _tile_span(self.z)
         # Tile rows grow southward from the north edge of the world
         return (
             -HALF_WORLD + self.x_min * span,
@@ -81,7 +85,7 @@ class TileRange:
 
 
 def _range_at(bounds_3857: tuple[float, float, float, float], z: int) -> TileRange:
-    span = 2 * HALF_WORLD / (1 << z)
+    span = _tile_span(z)
     last = (1 << z) - 1
     x_min, y_min, x_max, y_max = bounds_3857
 
@@ -96,9 +100,8 @@ def _range_at(bounds_3857: tuple[float, float, float, float], z: int) -> TileRan
 
 def tile_range(
     bounds_3857: tuple[float, float, float, float],
-    tile_size: int,
-    max_pixels: int = 2048,
-    max_zoom: int = MAX_ZOOM,
+    max_zoom: int,
+    max_pixels: int = DEFAULT_MAX_PIXELS,
 ) -> TileRange:
     """Most detailed tile range whose mosaic side stays within max_pixels."""
     best = _range_at(bounds_3857, 0)
@@ -106,7 +109,7 @@ def tile_range(
         candidate = _range_at(bounds_3857, z)
         columns = candidate.x_max - candidate.x_min + 1
         rows = candidate.y_max - candidate.y_min + 1
-        if max(columns, rows) * tile_size > max_pixels:
+        if max(columns, rows) * TILE_SIZE > max_pixels:
             break
         best = candidate
     return best
@@ -119,7 +122,7 @@ def _cache_folder() -> Path:
 
 def _is_image(content: bytes) -> bool:
     # Error pages come back as HTTP 200 with a text body
-    return content.startswith((b"\x89PNG", b"\xff\xd8"))
+    return content.startswith((PNG_SIGNATURE, b"\xff\xd8"))
 
 
 def _read_cache(cached: Path) -> bytes | None:
@@ -150,13 +153,14 @@ def _write_cache(cached: Path, content: bytes) -> None:
 
 def _fetch_tile(source: str, z: int, x: int, y: int) -> bytes | None:
     # The template hash keeps tiles of an overridden URL apart
-    template_hash = hashlib.sha256(url_template(source).encode()).hexdigest()[:12]
+    template = url_template(source)
+    template_hash = hashlib.sha256(template.encode()).hexdigest()[:12]
     cached = _cache_folder() / source / template_hash / str(z) / str(x) / str(y)
     cached_content = _read_cache(cached)
     if cached_content is not None:
         return cached_content
     # Open tile servers ask every application to name itself
-    url = tile_url(source, z, x, y)
+    url = template.format(z=z, x=x, y=y)
     request = urllib.request.Request(  # noqa: S310 URL from the source table or the environment
         url, headers={"User-Agent": USER_AGENT}
     )
@@ -228,7 +232,7 @@ def fetch_sources(
 
 def _extension(content: bytes) -> str:
     # The viewer picks its image reader from the file extension
-    return "png" if content.startswith(b"\x89PNG") else "jpg"
+    return "png" if content.startswith(PNG_SIGNATURE) else "jpg"
 
 
 def save_tiles(tiles: TileRange, images: dict[tuple[int, int], bytes | None], folder: Path) -> None:
@@ -238,3 +242,7 @@ def save_tiles(tiles: TileRange, images: dict[tuple[int, int], bytes | None], fo
         if content is not None:
             name = f"{x - tiles.x_min}_{y - tiles.y_min}.{_extension(content)}"
             (folder / name).write_bytes(content)
+
+
+def is_basemap(data_id: str) -> bool:
+    return Path(geode_functions.data_file_path(data_id, TILES_FOLDER)).is_dir()
