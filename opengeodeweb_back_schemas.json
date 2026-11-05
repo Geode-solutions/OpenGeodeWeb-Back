@@ -2840,6 +2840,77 @@
         "additionalProperties": false
       }
     },
+    "horizon_stack_info": {
+      "$id": "opengeodeweb_back/horizon_stack_info",
+      "route": "/horizon_stack_info",
+      "methods": [
+        "POST"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 32
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false,
+      "response": {
+        "type": "object",
+        "properties": {
+          "horizons": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 36,
+                  "maxLength": 36
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "units": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 36,
+                  "maxLength": 36
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "horizons",
+          "units"
+        ],
+        "additionalProperties": false
+      }
+    },
     "geode_objects_and_output_extensions": {
       "$id": "opengeodeweb_back/geode_objects_and_output_extensions",
       "route": "/geode_objects_and_output_extensions",

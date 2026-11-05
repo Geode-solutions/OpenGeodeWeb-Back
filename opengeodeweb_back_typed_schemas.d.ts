@@ -711,6 +711,25 @@ export interface ImportProjectResponse {
     snapshot: { [key: string]: any };
 }
 
+export interface HorizonStackInfoParams {
+    id: string;
+}
+
+export interface HorizonStackInfoResponse {
+    horizons: Horizon[];
+    units:    Unit[];
+}
+
+export interface Horizon {
+    id:   string;
+    name: string;
+}
+
+export interface Unit {
+    id:   string;
+    name: string;
+}
+
 export interface GeodeObjectsAndOutputExtensionsParams {
     filename:          string;
     geode_object_type: string;
@@ -881,6 +900,7 @@ export interface Schemas {
     readonly model_component_edge_attribute_names: (typeof json)["opengeodeweb_back"]["model_component_edge_attribute_names"] & TypedSchema<ModelComponentEdgeAttributeNamesParams, ModelComponentEdgeAttributeNamesResponse>;
     readonly kill: (typeof json)["opengeodeweb_back"]["kill"] & TypedSchema<KillParams, KillResponse>;
     readonly import_project: (typeof json)["opengeodeweb_back"]["import_project"] & TypedSchema<ImportProjectParams, ImportProjectResponse>;
+    readonly horizon_stack_info: (typeof json)["opengeodeweb_back"]["horizon_stack_info"] & TypedSchema<HorizonStackInfoParams, HorizonStackInfoResponse>;
     readonly geode_objects_and_output_extensions: (typeof json)["opengeodeweb_back"]["geode_objects_and_output_extensions"] & TypedSchema<GeodeObjectsAndOutputExtensionsParams, GeodeObjectsAndOutputExtensionsResponse>;
     readonly geode_object_inheritance: (typeof json)["opengeodeweb_back"]["geode_object_inheritance"] & TypedSchema<GeodeObjectInheritanceParams, GeodeObjectInheritanceResponse>;
     readonly export_project: (typeof json)["opengeodeweb_back"]["export_project"] & TypedSchema<ExportProjectParams, Blob>;

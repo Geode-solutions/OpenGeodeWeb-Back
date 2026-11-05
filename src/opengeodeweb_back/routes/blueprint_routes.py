@@ -35,6 +35,7 @@ from opengeodeweb_back.geode_objects.geode_brep import GeodeBRep
 from opengeodeweb_back.geode_objects.geode_graph import GeodeGraph
 from opengeodeweb_back.geode_objects.geode_grid2d import GeodeGrid2D
 from opengeodeweb_back.geode_objects.geode_grid3d import GeodeGrid3D
+from opengeodeweb_back.geode_objects.geode_horizon_stack3d import GeodeHorizonStack3D
 from opengeodeweb_back.geode_objects.geode_mesh import GeodeMesh
 from opengeodeweb_back.geode_objects.geode_model import GeodeModel
 from opengeodeweb_back.geode_objects.geode_solid_mesh3d import GeodeSolidMesh3D
@@ -769,6 +770,27 @@ def model_component_polyhedron_attribute_range(
     ]
     return schemas.ModelComponentPolyhedronAttributeRangeResponse.from_dict(
         attributes_range(managers, params.attribute_name)
+    )
+
+
+@typed_route(routes, schemas.horizon_stack_info_route)
+def horizon_stack_info(params: schemas.HorizonStackInfo) -> schemas.HorizonStackInfoResponse:
+    """Horizons and stratigraphic units of a horizon stack, top to bottom."""
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeHorizonStack3D):
+        flask.abort(400, f"{params.id} is not a HorizonStack3D")
+    stack = geode_object.horizon_stack
+    return schemas.HorizonStackInfoResponse(
+        horizons=[
+            schemas.horizon_stack_info.Horizon(
+                id=horizon.id().string(), name=horizon.name() or horizon.id().string()
+            )
+            for horizon in stack.top_to_bottom_horizons()
+        ],
+        units=[
+            schemas.horizon_stack_info.Unit(id=unit.id().string(), name=unit.name() or "")
+            for unit in stack.top_to_bottom_units()
+        ],
     )
 
 

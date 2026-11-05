@@ -164,7 +164,7 @@ def horizon_stack_data() -> test_utils.JsonData:
 
 
 def test_create_horizon_stack(client: FlaskClient, horizon_stack_data: test_utils.JsonData) -> None:
-    """Test the creation of a horizon stack from scratch."""
+    """Test the creation of a horizon stack from scratch, then read it back top to bottom."""
     route: str = "/opengeodeweb_back/create/horizon_stack"
 
     response = client.post(route, json=horizon_stack_data)
@@ -175,6 +175,12 @@ def test_create_horizon_stack(client: FlaskClient, horizon_stack_data: test_util
     assert response_data["geode_object_type"] == "HorizonStack3D"
     assert response_data["is_viewable"] is False
 
+    info = client.post("/opengeodeweb_back/horizon_stack_info", json={"id": response_data["id"]})
+    assert info.status_code == 200
+    info_data = info.get_json()
+    assert [horizon["name"] for horizon in info_data["horizons"]] == horizon_stack_data["horizons"]
+    assert [unit["name"] for unit in info_data["units"]] == horizon_stack_data["unit_names"]
+
     test_utils.test_route_wrong_params(client, route, lambda: copy.deepcopy(horizon_stack_data))
 
 
@@ -184,6 +190,12 @@ def test_create_horizon_stack_without_unit_names(client: FlaskClient) -> None:
     response = client.post(route, json={"name": "stack", "horizons": ["H1"], "unit_names": []})
     assert response.status_code == 200
 
+    info = client.post(
+        "/opengeodeweb_back/horizon_stack_info", json={"id": response.get_json()["id"]}
+    )
+    assert info.status_code == 200
+    assert len(info.get_json()["units"]) == 2
+
 
 def test_create_horizon_stack_wrong_unit_count(client: FlaskClient) -> None:
     """There must be one more unit than horizons."""
@@ -192,3 +204,14 @@ def test_create_horizon_stack_wrong_unit_count(client: FlaskClient) -> None:
         route, json={"name": "stack", "horizons": ["H1", "H2"], "unit_names": ["U1", "U2"]}
     )
     assert response.status_code == 400
+
+
+def test_horizon_stack_info_wrong_type(
+    client: FlaskClient, point_data: test_utils.JsonData
+) -> None:
+    """Reading the horizon stack of another object is a client error."""
+    point_set = client.post("/opengeodeweb_back/create/point_set", json=point_data)
+    info = client.post(
+        "/opengeodeweb_back/horizon_stack_info", json={"id": point_set.get_json()["id"]}
+    )
+    assert info.status_code == 400
