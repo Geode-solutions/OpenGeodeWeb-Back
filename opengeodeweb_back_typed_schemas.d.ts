@@ -174,6 +174,52 @@ export interface CreatePointSetResponseMeshComponent {
     viewer_id:  number;
 }
 
+export interface CreateHorizonStackParams {
+    horizons:   string[];
+    name:       string;
+    unit_names: string[];
+}
+
+export interface CreateHorizonStackResponse {
+    binary_light_viewable?: string;
+    collection_components?: CreateHorizonStackResponseCollectionComponent[];
+    crs?:                   CreateHorizonStackResponseCRS;
+    geode_id:               string;
+    geode_object_type:      string;
+    id:                     string;
+    is_viewable:            boolean;
+    mesh_components?:       CreateHorizonStackResponseMeshComponent[];
+    name:                   string;
+    native_file:            string;
+    nb_vertices?:           number;
+    viewable_file?:         string;
+    viewer_type:            string;
+}
+
+export interface CreateHorizonStackResponseCollectionComponent {
+    geode_id:  string;
+    is_active: boolean;
+    items:     string[];
+    name:      string;
+    type:      string;
+}
+
+export interface CreateHorizonStackResponseCRS {
+    authority: string;
+    code:      string;
+    name:      string;
+}
+
+export interface CreateHorizonStackResponseMeshComponent {
+    boundaries: string[];
+    geode_id:   string;
+    internals:  string[];
+    is_active:  boolean;
+    name:       string;
+    type:       string;
+    viewer_id:  number;
+}
+
 export interface CreateEdgedCurveParams {
     edges:  Array<number[]>;
     name:   string;
@@ -802,6 +848,7 @@ export interface Schemas {
     readonly create: {
       readonly polygonal_surface: (typeof json)["opengeodeweb_back"]["create"]["polygonal_surface"] & TypedSchema<CreatePolygonalSurfaceParams, CreatePolygonalSurfaceResponse>;
       readonly point_set: (typeof json)["opengeodeweb_back"]["create"]["point_set"] & TypedSchema<CreatePointSetParams, CreatePointSetResponse>;
+      readonly horizon_stack: (typeof json)["opengeodeweb_back"]["create"]["horizon_stack"] & TypedSchema<CreateHorizonStackParams, CreateHorizonStackResponse>;
       readonly edged_curve: (typeof json)["opengeodeweb_back"]["create"]["edged_curve"] & TypedSchema<CreateEdgedCurveParams, CreateEdgedCurveResponse>;
     };
     readonly crs: {
