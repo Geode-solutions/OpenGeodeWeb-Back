@@ -10,4 +10,6 @@ flask[async]==3.1.2
 flask-cors==6.0.2
 werkzeug==3.1.8
 defusedxml==0.7.1
+pillow==13.0.0
+certifi==2026.7.22
 types-defusedxml==0.7.0.20260504

@@ -164,17 +164,6 @@ AND usage.object_table_name IN ('projected_crs', 'geodetic_crs', 'compound_crs')
 """
 
 
-# Projected CRS, alone or as the horizontal part of a compound CRS
-PROJECTED_QUERY = """
-SELECT 1 FROM projected_crs WHERE auth_name = ? AND code = ?
-UNION
-SELECT 1 FROM compound_crs JOIN projected_crs
-ON projected_crs.auth_name = compound_crs.horiz_crs_auth_name
-AND projected_crs.code = compound_crs.horiz_crs_code
-WHERE compound_crs.auth_name = ? AND compound_crs.code = ?
-"""
-
-
 def _query_proj_database(query: str, parameters: tuple[str, ...]) -> list[tuple[Any, ...]] | None:
     """Rows from the PROJ database opengeode ships, None when it cannot be read.
 
@@ -197,13 +186,6 @@ def area_of_use(authority: str, code: str) -> list[tuple[float, float, float, fl
     """Extents where PROJ declares the CRS usable, empty when unknown."""
     rows = _query_proj_database(AREA_OF_USE_QUERY, (authority, code)) or []
     return [(float(s), float(n), float(w), float(e)) for s, n, w, e in rows]
-
-
-@functools.cache
-def is_projected(authority: str, code: str) -> bool:
-    """Whether the CRS measures X and Y as lengths, not angles. True when unknown."""
-    rows = _query_proj_database(PROJECTED_QUERY, (authority, code, authority, code))
-    return rows is None or len(rows) > 0
 
 
 def _overlaps(
