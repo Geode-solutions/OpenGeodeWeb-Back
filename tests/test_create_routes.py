@@ -206,6 +206,15 @@ def test_create_horizon_stack_wrong_unit_count(client: FlaskClient) -> None:
     assert response.status_code == 400
 
 
+def test_create_horizon_stack_duplicate_horizons(client: FlaskClient) -> None:
+    """Horizon names must be unique."""
+    route: str = "/opengeodeweb_back/create/horizon_stack"
+    response = client.post(
+        route, json={"name": "stack", "horizons": ["H1", "H1"], "unit_names": []}
+    )
+    assert response.status_code == 400
+
+
 def test_horizon_stack_info_wrong_type(
     client: FlaskClient, point_data: test_utils.JsonData
 ) -> None:
