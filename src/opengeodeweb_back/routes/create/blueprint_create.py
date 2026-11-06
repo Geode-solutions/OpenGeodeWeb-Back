@@ -3,10 +3,12 @@
 # Third party imports
 import flask
 import opengeode
+import opengeode_geosciences
 
 # Local application imports
 from opengeodeweb_back import utils_functions
 from opengeodeweb_back.geode_objects.geode_edged_curve3d import GeodeEdgedCurve3D
+from opengeodeweb_back.geode_objects.geode_horizon_stack3d import GeodeHorizonStack3D
 from opengeodeweb_back.geode_objects.geode_point_set3d import GeodePointSet3D
 from opengeodeweb_back.geode_objects.geode_polygonal_surface3d import (
     GeodePolygonalSurface3D,
@@ -64,4 +66,24 @@ def polygonal_surface(
 
     return schemas.PolygonalSurfaceResponse.from_dict(
         utils_functions.generate_files_from_object(polygonal_surface_obj)
+    )
+
+
+@typed_route(routes, schemas.horizon_stack_route)
+def horizon_stack(params: schemas.HorizonStack) -> schemas.HorizonStackResponse:
+    """Endpoint to create a horizon stack from its horizon and unit names, top to bottom."""
+    if len(params.unit_names) not in (0, len(params.horizons) + 1):
+        flask.abort(
+            400,
+            f"Expected {len(params.horizons) + 1} unit names for {len(params.horizons)} horizons,"
+            f" got {len(params.unit_names)}",
+        )
+    horizon_stack_obj = GeodeHorizonStack3D(
+        opengeode_geosciences.horizons_stack_from_top_to_bottom_names_3d(
+            params.horizons, params.unit_names
+        )
+    )
+    horizon_stack_obj.builder().set_name(params.name)
+    return schemas.HorizonStackResponse.from_dict(
+        utils_functions.generate_files_from_object(horizon_stack_obj)
     )
