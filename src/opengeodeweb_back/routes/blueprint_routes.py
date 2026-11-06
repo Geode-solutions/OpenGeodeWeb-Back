@@ -782,9 +782,7 @@ def horizon_stack_info(params: schemas.HorizonStackInfo) -> schemas.HorizonStack
     stack = geode_object.horizon_stack
     return schemas.HorizonStackInfoResponse(
         horizons=[
-            schemas.horizon_stack_info.Horizon(
-                id=horizon.id().string(), name=horizon.name() or horizon.id().string()
-            )
+            schemas.horizon_stack_info.Horizon(id=horizon.id().string(), name=horizon.name() or "")
             for horizon in stack.top_to_bottom_horizons()
         ],
         units=[
