@@ -12,7 +12,9 @@ from typing import TYPE_CHECKING
 # Third party imports
 import flask
 import pytest
+from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_microservice.database.data import Data
+from werkzeug.exceptions import HTTPException
 
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
@@ -21,9 +23,14 @@ from opengeodeweb_back.geode_objects.geode_polygonal_surface3d import (
     GeodePolygonalSurface3D,
 )
 from opengeodeweb_back.geode_objects.geode_raster_image2d import GeodeRasterImage2D
+from opengeodeweb_back.geode_objects.geode_triangulated_surface3d import (
+    GeodeTriangulatedSurface3D,
+)
 
 if TYPE_CHECKING:
     from flask.testing import FlaskClient
+
+    from opengeodeweb_back.geode_objects.geode_object import GeodeObject
 
 base_dir = Path(__file__).resolve().parent
 data_dir = base_dir / "data"
@@ -218,12 +225,14 @@ def test_generate_files_from_file(
 ) -> None:
     app = client.application
     with app.app_context():
-        result = utils_functions.generate_files_from_file(
+        results = utils_functions.generate_files_from_file(
             GeodeBRep.geode_object_type(), "test.og_brep"
         )
 
-    assert isinstance(result, dict)
-    assert result["name"] == "test"
+    assert isinstance(results, list)
+    [result] = results
+    # A named object keeps its own name
+    assert result["name"] == "test_remesh"
     assert isinstance(result["native_file"], str)
     assert result["native_file"] == "native.og_brep"
     assert isinstance(result["viewable_file"], str)
@@ -239,7 +248,7 @@ def test_generate_files_from_file_with_multi_dots(
 ) -> None:
     app = client.application
     with app.app_context():
-        result = utils_functions.generate_files_from_file(
+        [result] = utils_functions.generate_files_from_file(
             GeodeBRep.geode_object_type(), "cube.test.og_brep"
         )
     assert result["name"] == "cube.test"
@@ -251,7 +260,7 @@ def test_generate_files_from_raster_image(
     # Raster images have no dedicated builder: naming them must still work
     app = client.application
     with app.app_context():
-        result = utils_functions.generate_files_from_file(
+        [result] = utils_functions.generate_files_from_file(
             GeodeRasterImage2D.geode_object_type(), "test.jpg"
         )
     assert result["name"] == "test"
@@ -261,7 +270,7 @@ def test_generate_files_from_raster_image(
 def test_generate_files_from_file_returns_geode_id(client: FlaskClient) -> None:
     app = client.application
     with app.app_context():
-        result = utils_functions.generate_files_from_file(
+        [result] = utils_functions.generate_files_from_file(
             GeodeBRep.geode_object_type(), "test.og_brep"
         )
         expected_geode_id = (
@@ -278,10 +287,10 @@ def test_generate_files_from_file_returns_geode_id(client: FlaskClient) -> None:
 def test_generate_files_from_file_twice_shares_geode_id(client: FlaskClient) -> None:
     app = client.application
     with app.app_context():
-        first = utils_functions.generate_files_from_file(
+        [first] = utils_functions.generate_files_from_file(
             GeodeBRep.geode_object_type(), "test.og_brep"
         )
-        second = utils_functions.generate_files_from_file(
+        [second] = utils_functions.generate_files_from_file(
             GeodeBRep.geode_object_type(), "test.og_brep"
         )
     assert first["id"] != second["id"]
@@ -293,17 +302,118 @@ def test_generate_files_from_non_native_file_twice_shares_geode_id(
 ) -> None:
     app = client.application
     with app.app_context():
-        first = utils_functions.generate_files_from_file(
+        [first] = utils_functions.generate_files_from_file(
             GeodePolygonalSurface3D.geode_object_type(), "hat.vtp"
         )
-        second = utils_functions.generate_files_from_file(
+        [second] = utils_functions.generate_files_from_file(
             GeodePolygonalSurface3D.geode_object_type(), "hat.vtp"
         )
         assert first["id"] != second["id"]
         assert first["geode_id"] == second["geode_id"]
+        # Ids of existing single object imports must not change
+        assert first["geode_id"] == (
+            utils_functions.content_based_uuid(str(data_dir / "hat.vtp")).string()
+        )
+        # An unnamed single object takes the file stem
+        assert first["name"] == "hat"
         native_path = geode_functions.data_file_path(first["id"], first["native_file"])
         reloaded = GeodePolygonalSurface3D.load_one(native_path)
         assert reloaded.identifier.id().string() == first["geode_id"]
+
+
+def test_generate_files_from_multi_object_file(client: FlaskClient) -> None:
+    app = client.application
+    with app.app_context():
+        first_import = utils_functions.generate_files_from_file(
+            GeodeTriangulatedSurface3D.geode_object_type(), "two_surfaces.ts"
+        )
+        second_import = utils_functions.generate_files_from_file(
+            GeodeTriangulatedSurface3D.geode_object_type(), "two_surfaces.ts"
+        )
+        assert [item["name"] for item in first_import] == ["first_surf", "second_surf"]
+        assert len({item["id"] for item in first_import}) == 2
+        geode_ids = [item["geode_id"] for item in first_import]
+        assert len(set(geode_ids)) == 2
+        # The same file gives the same geode ids, in the same order
+        assert [item["geode_id"] for item in second_import] == geode_ids
+        # A multi object file does not reuse the single object content uuid
+        single_uuid = utils_functions.content_based_uuid(str(data_dir / "two_surfaces.ts"))
+        assert single_uuid.string() not in geode_ids
+        for item in first_import:
+            data = Data.get(item["id"])
+            assert data is not None
+            assert data.geode_id == item["geode_id"]
+            native_path = geode_functions.data_file_path(item["id"], item["native_file"])
+            reloaded = GeodeTriangulatedSurface3D.load_one(native_path)
+            assert reloaded.identifier.id().string() == item["geode_id"]
+            assert reloaded.identifier.name() == item["name"]
+
+
+def test_generate_files_from_multi_object_file_names_unnamed_objects(
+    client: FlaskClient,
+) -> None:
+    app = client.application
+    with app.app_context():
+        results = utils_functions.generate_files_from_file(
+            GeodeTriangulatedSurface3D.geode_object_type(), "two_unnamed_surfaces.ts"
+        )
+    assert [item["name"] for item in results] == [
+        "two_unnamed_surfaces_1",
+        "two_unnamed_surfaces_2",
+    ]
+
+
+def _data_count() -> int:
+    return get_session().query(Data).count()
+
+
+def _data_folders(app: flask.Flask) -> set[str]:
+    return {path.name for path in Path(app.config["DATA_FOLDER_PATH"]).iterdir()}
+
+
+def test_generate_files_from_empty_file_aborts(
+    client: FlaskClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(GeodeTriangulatedSurface3D, "load", staticmethod(lambda _filename: []))
+    app = client.application
+    with app.app_context():
+        nb_data = _data_count()
+        folders = _data_folders(app)
+        with pytest.raises(HTTPException) as error:
+            utils_functions.generate_files_from_file(
+                GeodeTriangulatedSurface3D.geode_object_type(), "two_surfaces.ts"
+            )
+        assert error.value.code == 400
+        assert "two_surfaces.ts" in str(error.value.description)
+        assert _data_count() == nb_data
+        assert _data_folders(app) == folders
+
+
+def test_generate_files_from_file_rolls_back_on_failure(
+    client: FlaskClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    save_all = utils_functions.save_all_viewables_and_return_info
+    calls: list[str] = []
+
+    def failing_save(geode_object: GeodeObject, data: Data, data_path: str) -> dict[str, object]:
+        calls.append(data.id)
+        if len(calls) == 2:
+            flask.abort(500, "Save failed")
+        return save_all(geode_object, data, data_path)
+
+    monkeypatch.setattr(utils_functions, "save_all_viewables_and_return_info", failing_save)
+    app = client.application
+    with app.app_context():
+        nb_data = _data_count()
+        folders = _data_folders(app)
+        with pytest.raises(HTTPException):
+            utils_functions.generate_files_from_file(
+                GeodeTriangulatedSurface3D.geode_object_type(), "two_surfaces.ts"
+            )
+        assert len(calls) == 2
+        assert Data.get(calls[0]) is None
+        assert _data_count() == nb_data
+        assert _data_folders(app) == folders
 
 
 def test_generate_files_from_object_returns_geode_id(client: FlaskClient) -> None:

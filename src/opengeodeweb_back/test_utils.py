@@ -12,7 +12,6 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     from flask.testing import FlaskClient
-    from werkzeug.test import TestResponse
 
 # Local application imports
 
@@ -92,7 +91,11 @@ def check_save_viewable_file(
     client: FlaskClient,
     geode_object_type: str,
     filename: str,
-) -> TestResponse:
+) -> list[JsonData]:
+    """Upload and import a file, check every created item and return them all.
+
+    A file holding several objects gives one item per object, in file order.
+    """
     check_upload_file(client, filename)
     route = "/opengeodeweb_back/save_viewable_file"
 
@@ -104,13 +107,15 @@ def check_save_viewable_file(
 
     response = client.post(route, json=get_full_data())
     _check(response.status_code == HTTPStatus.OK, f"Saving {filename} failed")
-    json = response.get_json()
-    _check(type(json["native_file"]) is str, "native_file is not a string")
-    _check(type(json["viewable_file"]) is str, "viewable_file is not a string")
-    _check(type(json.get("id")) is str, "id is not a string")
-    _check(json["viewer_type"] in ["model", "mesh"], "viewer_type is not model or mesh")
-    _check(type(json["binary_light_viewable"]) is str, "binary_light_viewable is not a string")
+    items: list[JsonData] = response.get_json()["data"]
+    _check(len(items) > 0, f"Saving {filename} created no data")
+    for item in items:
+        _check(type(item["native_file"]) is str, "native_file is not a string")
+        _check(type(item["viewable_file"]) is str, "viewable_file is not a string")
+        _check(type(item.get("id")) is str, "id is not a string")
+        _check(item["viewer_type"] in ["model", "mesh"], "viewer_type is not model or mesh")
+        _check(type(item["binary_light_viewable"]) is str, "binary_light_viewable is not a string")
 
     # Test all params
     test_route_wrong_params(client, route, get_full_data)
-    return response
+    return items

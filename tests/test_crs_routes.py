@@ -47,9 +47,8 @@ def test_geographic_list(client: FlaskClient) -> None:
 
 def test_active(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/crs/active"
-    point_set_id = test_utils.check_save_viewable_file(
-        client, "PointSet3D", "test.og_pts3d"
-    ).get_json()["id"]
+    [point_set] = test_utils.check_save_viewable_file(client, "PointSet3D", "test.og_pts3d")
+    point_set_id = point_set["id"]
 
     def get_full_data() -> test_utils.JsonData:
         return {"id": point_set_id}
@@ -65,9 +64,8 @@ def test_active(client: FlaskClient) -> None:
 def test_assign_geographic(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/crs/assign_geographic"
     active_route = "/opengeodeweb_back/crs/active"
-    point_set_id = test_utils.check_save_viewable_file(
-        client, "PointSet3D", "test.og_pts3d"
-    ).get_json()["id"]
+    [point_set] = test_utils.check_save_viewable_file(client, "PointSet3D", "test.og_pts3d")
+    point_set_id = point_set["id"]
 
     def get_full_data() -> test_utils.JsonData:
         return {"id": point_set_id, **LAMBERT}
@@ -80,7 +78,8 @@ def test_assign_geographic(client: FlaskClient) -> None:
     response = client.post(active_route, json={"id": point_set_id})
     assert response.get_json() == {"crs_name": "EPSG:32631", "crs_info": UTM}
 
-    brep_id = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep").get_json()["id"]
+    [brep] = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep")
+    brep_id = brep["id"]
     response = client.post(route, json={"id": brep_id, **LAMBERT})
     assert response.status_code == 200
     response = client.post(active_route, json={"id": brep_id})
@@ -98,9 +97,8 @@ def test_crs_errors(client: FlaskClient) -> None:
     response = client.post(assign_route, json={"id": "0" * 32, **LAMBERT})
     assert response.status_code == 404
 
-    grid_id = test_utils.check_save_viewable_file(
-        client, "LightRegularGrid3D", "test.og_lrgd3d"
-    ).get_json()["id"]
+    [grid] = test_utils.check_save_viewable_file(client, "LightRegularGrid3D", "test.og_lrgd3d")
+    grid_id = grid["id"]
     response = client.post(active_route, json={"id": grid_id})
     assert response.status_code == 400
     response = client.post(assign_route, json={"id": grid_id, **LAMBERT})
@@ -119,9 +117,8 @@ def test_convert_geographic(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/crs/convert_geographic"
     assign_route = "/opengeodeweb_back/crs/assign_geographic"
     active_route = "/opengeodeweb_back/crs/active"
-    point_set_id = test_utils.check_save_viewable_file(
-        client, "PointSet3D", "test.og_pts3d"
-    ).get_json()["id"]
+    [point_set] = test_utils.check_save_viewable_file(client, "PointSet3D", "test.og_pts3d")
+    point_set_id = point_set["id"]
     client.post(assign_route, json={"id": point_set_id, **LAMBERT})
     lambert_point = _first_point(client, point_set_id)
 
@@ -143,7 +140,8 @@ def test_convert_geographic(client: FlaskClient) -> None:
     assert response.get_json()["crs_name"] == "EPSG:2154"
     assert _first_point(client, point_set_id) == pytest.approx(lambert_point, abs=1e-6)
 
-    brep_id = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep").get_json()["id"]
+    [brep] = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep")
+    brep_id = brep["id"]
     client.post(assign_route, json={"id": brep_id, **LAMBERT})
     response = client.post(route, json={"id": brep_id, **UTM})
     assert response.status_code == 200
@@ -155,9 +153,8 @@ def test_convert_geographic(client: FlaskClient) -> None:
 
 def test_convert_geographic_errors(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/crs/convert_geographic"
-    point_set_id = test_utils.check_save_viewable_file(
-        client, "PointSet3D", "test.og_pts3d"
-    ).get_json()["id"]
+    [point_set] = test_utils.check_save_viewable_file(client, "PointSet3D", "test.og_pts3d")
+    point_set_id = point_set["id"]
 
     response = client.post(route, json={"id": point_set_id, **UTM})
     assert response.status_code == 400
@@ -210,7 +207,8 @@ def test_align(client: FlaskClient) -> None:
     assert response.get_json() == {"crs_name": "EPSG:2154", "crs_info": LAMBERT}
     assert _first_point(client, point_set_id) == [1000, 2000, 5]
 
-    brep_id = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep").get_json()["id"]
+    [brep] = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep")
+    brep_id = brep["id"]
     response = client.post(route, json={**get_full_data(), "id": brep_id})
     assert response.status_code == 200
 
@@ -249,9 +247,8 @@ def test_align_pair_count(client: FlaskClient) -> None:
 
 def test_align_2d(client: FlaskClient) -> None:
     # 2D data has no Z: only X and Y move
-    point_set_id = test_utils.check_save_viewable_file(
-        client, "PointSet2D", "test.og_pts2d"
-    ).get_json()["id"]
+    [point_set] = test_utils.check_save_viewable_file(client, "PointSet2D", "test.og_pts2d")
+    point_set_id = point_set["id"]
     response = _align(client, point_set_id, source_points=SOURCE, target_points=TARGET)
     assert response.status_code == 200
 
@@ -259,7 +256,8 @@ def test_align_2d(client: FlaskClient) -> None:
 def test_align_linked(client: FlaskClient) -> None:
     # A model and its wells share the local frame: one request aligns both
     point_set_id = _create_point_set(client)
-    brep_id = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep").get_json()["id"]
+    [brep] = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep")
+    brep_id = brep["id"]
     pairs = {"source_points": SOURCE, "target_points": TARGET}
     response = _align(client, point_set_id, linked_ids=[brep_id], **pairs)
     assert response.status_code == 200
@@ -267,9 +265,8 @@ def test_align_linked(client: FlaskClient) -> None:
     assert linked["id"] == brep_id
     assert linked["crs"] == LAMBERT
     assert type(linked["binary_light_viewable"]) is str
-    fresh_brep_id = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep").get_json()[
-        "id"
-    ]
+    [fresh_brep] = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep")
+    fresh_brep_id = fresh_brep["id"]
     assert _align(client, fresh_brep_id, **pairs).status_code == 200
     assert _brep_points(client, brep_id) == pytest.approx(_brep_points(client, fresh_brep_id))
 
@@ -294,9 +291,8 @@ def test_align_linked(client: FlaskClient) -> None:
 def test_align_linked_2d(client: FlaskClient) -> None:
     # 2D and 3D data each get the CRS of their own dimension
     point_set_id = _create_point_set(client)
-    point_set_2d_id = test_utils.check_save_viewable_file(
-        client, "PointSet2D", "test.og_pts2d"
-    ).get_json()["id"]
+    [point_set_2d] = test_utils.check_save_viewable_file(client, "PointSet2D", "test.og_pts2d")
+    point_set_2d_id = point_set_2d["id"]
     response = _align(
         client,
         point_set_id,
@@ -354,7 +350,8 @@ def test_realign(client: FlaskClient) -> None:
     assert _crs_names(client, point_set_id) == ["EPSG:2154", "points"]
     assert _attribute_count(client, point_set_id) == _attribute_count(client, fresh_id)
 
-    brep_id = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep").get_json()["id"]
+    [brep] = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep")
+    brep_id = brep["id"]
     assert align(brep_id, SOURCE, TARGET) == 200
     assert align(brep_id, picked, shifted_target) == 200
 
@@ -410,12 +407,12 @@ def test_align_after_assign(client: FlaskClient) -> None:
     assert align(other_fresh_id, SOURCE, other_target) == 200
     assert _first_point(client, point_set_id) == pytest.approx(_first_point(client, other_fresh_id))
 
-    brep_id = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep").get_json()["id"]
+    [brep] = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep")
+    brep_id = brep["id"]
     client.post(assign_route, json={"id": brep_id, **LAMBERT})
     assert align(brep_id, SOURCE) == 200
-    fresh_brep_id = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep").get_json()[
-        "id"
-    ]
+    [fresh_brep] = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep")
+    fresh_brep_id = fresh_brep["id"]
     assert align(fresh_brep_id, SOURCE) == 200
     assert _brep_points(client, brep_id) == pytest.approx(_brep_points(client, fresh_brep_id))
     with client.application.app_context():
@@ -434,9 +431,8 @@ PSEUDO_MERCATOR = {"authority": "EPSG", "code": "3857", "name": "WGS 84 / Pseudo
 def test_reassign_after_convert(client: FlaskClient) -> None:
     assign_route = "/opengeodeweb_back/crs/assign_geographic"
     convert_route = "/opengeodeweb_back/crs/convert_geographic"
-    point_set_id = test_utils.check_save_viewable_file(
-        client, "PointSet3D", "test.og_pts3d"
-    ).get_json()["id"]
+    [point_set] = test_utils.check_save_viewable_file(client, "PointSet3D", "test.og_pts3d")
+    point_set_id = point_set["id"]
     client.post(assign_route, json={"id": point_set_id, **LAMBERT})
     client.post(convert_route, json={"id": point_set_id, **UTM})
     stale_utm_point = _first_point(client, point_set_id)
@@ -455,9 +451,8 @@ def test_reassign_after_convert(client: FlaskClient) -> None:
 
 
 def test_convert_out_of_domain(client: FlaskClient) -> None:
-    point_set_id = test_utils.check_save_viewable_file(
-        client, "PointSet3D", "test.og_pts3d"
-    ).get_json()["id"]
+    [point_set] = test_utils.check_save_viewable_file(client, "PointSet3D", "test.og_pts3d")
+    point_set_id = point_set["id"]
     convert_route = "/opengeodeweb_back/crs/convert_geographic"
     client.post("/opengeodeweb_back/crs/assign_geographic", json={"id": point_set_id, **LAMBERT})
     client.post(convert_route, json={"id": point_set_id, **UTM})
@@ -485,9 +480,8 @@ def test_colinear_points_whatever_their_scale() -> None:
 
 
 def test_saved_native_file_keeps_its_crs(client: FlaskClient) -> None:
-    point_set_id = test_utils.check_save_viewable_file(
-        client, "PointSet3D", "test.og_pts3d"
-    ).get_json()["id"]
+    [point_set] = test_utils.check_save_viewable_file(client, "PointSet3D", "test.og_pts3d")
+    point_set_id = point_set["id"]
     client.post("/opengeodeweb_back/crs/assign_geographic", json={"id": point_set_id, **LAMBERT})
     with client.application.app_context():
         data = Data.get(point_set_id)
@@ -504,7 +498,8 @@ def test_saved_native_file_keeps_its_crs(client: FlaskClient) -> None:
     finally:
         upload_path.unlink()
     assert response.status_code == 200
-    assert response.get_json()["crs"] == LAMBERT
+    [item] = response.get_json()["data"]
+    assert item["crs"] == LAMBERT
     # The copy lives in the shared test data folder: it must not outlive the test
     assert not upload_path.exists()
 
@@ -518,9 +513,8 @@ def _attribute_count(client: FlaskClient, data_id: str) -> int:
 
 def test_round_trips_do_not_grow_the_native_file(client: FlaskClient) -> None:
     convert_route = "/opengeodeweb_back/crs/convert_geographic"
-    point_set_id = test_utils.check_save_viewable_file(
-        client, "PointSet3D", "test.og_pts3d"
-    ).get_json()["id"]
+    [point_set] = test_utils.check_save_viewable_file(client, "PointSet3D", "test.og_pts3d")
+    point_set_id = point_set["id"]
     client.post("/opengeodeweb_back/crs/assign_geographic", json={"id": point_set_id, **LAMBERT})
     client.post(convert_route, json={"id": point_set_id, **UTM})
     client.post(convert_route, json={"id": point_set_id, **LAMBERT})
@@ -534,9 +528,8 @@ def test_round_trips_do_not_grow_the_native_file(client: FlaskClient) -> None:
 
 def test_unknown_crs(client: FlaskClient) -> None:
     unknown = {"authority": "FOO", "code": "1", "name": "Unknown"}
-    point_set_id = test_utils.check_save_viewable_file(
-        client, "PointSet3D", "test.og_pts3d"
-    ).get_json()["id"]
+    [point_set] = test_utils.check_save_viewable_file(client, "PointSet3D", "test.og_pts3d")
+    point_set_id = point_set["id"]
 
     response = client.post(
         "/opengeodeweb_back/crs/assign_geographic", json={"id": point_set_id, **unknown}
@@ -566,9 +559,8 @@ def test_unknown_crs(client: FlaskClient) -> None:
 
 
 def test_assign_only_rewrites_the_native_file(client: FlaskClient) -> None:
-    point_set_id = test_utils.check_save_viewable_file(
-        client, "PointSet3D", "test.og_pts3d"
-    ).get_json()["id"]
+    [point_set] = test_utils.check_save_viewable_file(client, "PointSet3D", "test.og_pts3d")
+    point_set_id = point_set["id"]
     with client.application.app_context():
         data = Data.get(point_set_id)
         assert data is not None
@@ -646,7 +638,8 @@ def test_assign_only_plausible(client: FlaskClient) -> None:
 def test_assign_linked(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/crs/assign_geographic"
     point_set_id = _create_point_set(client)
-    brep_id = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep").get_json()["id"]
+    [brep] = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep")
+    brep_id = brep["id"]
     response = client.post(route, json={"id": point_set_id, "linked_ids": [brep_id], **LAMBERT})
     assert response.status_code == 200
     [linked] = response.get_json()["linked"]
@@ -660,12 +653,10 @@ def test_assign_linked(client: FlaskClient) -> None:
 def test_convert_linked(client: FlaskClient) -> None:
     assign_route = "/opengeodeweb_back/crs/assign_geographic"
     route = "/opengeodeweb_back/crs/convert_geographic"
-    first_id = test_utils.check_save_viewable_file(
-        client, "PointSet3D", "test.og_pts3d"
-    ).get_json()["id"]
-    second_id = test_utils.check_save_viewable_file(
-        client, "PointSet3D", "test.og_pts3d"
-    ).get_json()["id"]
+    [first] = test_utils.check_save_viewable_file(client, "PointSet3D", "test.og_pts3d")
+    first_id = first["id"]
+    [second] = test_utils.check_save_viewable_file(client, "PointSet3D", "test.og_pts3d")
+    second_id = second["id"]
     client.post(assign_route, json={"id": first_id, "linked_ids": [second_id], **LAMBERT})
     response = client.post(route, json={"id": first_id, "linked_ids": [second_id], **UTM})
     assert response.status_code == 200

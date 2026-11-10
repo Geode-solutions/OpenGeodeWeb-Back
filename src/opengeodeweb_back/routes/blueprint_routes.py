@@ -275,10 +275,12 @@ def save_viewable_file(
     params: schemas.SaveViewableFile,
 ) -> schemas.SaveViewableFileResponse:
     return schemas.SaveViewableFileResponse.from_dict(
-        utils_functions.generate_files_from_file(
-            geode_object_type=geode_object_type(params.geode_object_type),
-            input_file=params.filename,
-        )
+        {
+            "data": utils_functions.generate_files_from_file(
+                geode_object_type=geode_object_type(params.geode_object_type),
+                input_file=params.filename,
+            )
+        }
     )
 
 
