@@ -40,7 +40,7 @@ class CrsError(Exception):
 
 
 ORIGINAL_CRS = "points"
-# OpenGeode orders EPSG:4326 coordinates as (latitude, longitude)
+# OpenGeode orders EPSG:4326 coordinates as (longitude, latitude), the usual GIS order
 WGS84 = og_geosciences.GeographicCoordinateSystemInfo("EPSG", "4326", "WGS 84")
 MAX_LATITUDE = 90.0
 MAX_LONGITUDE = 180.0
@@ -220,8 +220,8 @@ def coordinates_implausible(
         corners = convert_xy_corners(bounds, info, WGS84)
     except RuntimeError:
         return True
-    latitudes = [latitude for latitude, _ in corners]
-    longitudes = [longitude for _, longitude in corners]
+    longitudes = [longitude for longitude, _ in corners]
+    latitudes = [latitude for _, latitude in corners]
     # Written as "not within" so NaN counts as outside
     if not all(abs(value) <= MAX_LATITUDE for value in latitudes) or not all(
         abs(value) <= MAX_LONGITUDE for value in longitudes

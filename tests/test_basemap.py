@@ -208,8 +208,8 @@ def test_bounds_already_in_web_mercator() -> None:
 def test_bounds_outside_web_mercator() -> None:
     wgs84 = og_geosciences.GeographicCoordinateSystemInfo("EPSG", "4326", "WGS 84")
     with pytest.raises(basemap_mesh.OutsideProjectionError):
-        # EPSG:4326 axis order is (latitude, longitude)
-        basemap_mesh.bounds_to_3857((86.0, 0.0, 87.0, 1.0), wgs84)
+        # EPSG:4326 coordinates are (longitude, latitude): 86 N is beyond Web Mercator
+        basemap_mesh.bounds_to_3857((0.0, 86.0, 1.0, 87.0), wgs84)
 
 
 def test_build_mesh() -> None:
@@ -277,8 +277,8 @@ def test_build_route_errors(client: FlaskClient) -> None:
     assert _build(client, maps=["topo"]).status_code == 400
     assert _build(client, max_pixels=100).status_code == 400
     assert _build(client, max_pixels=5000).status_code == 400
-    # EPSG:4326 follows the authority axis order: x is the latitude
-    polar = {"x_min": 86.0, "y_min": 0.0, "x_max": 87.0, "y_max": 1.0}
+    # EPSG:4326 coordinates are (longitude, latitude): y is the latitude
+    polar = {"x_min": 0.0, "y_min": 86.0, "x_max": 1.0, "y_max": 87.0}
     assert _build(client, crs=WGS84_JSON, bounds=polar).status_code == 400
 
 
@@ -316,7 +316,8 @@ def test_delete_route(client: FlaskClient) -> None:
 
 @pytest.mark.usefixtures("any_tile")
 def test_build_route_geographic_crs(client: FlaskClient) -> None:
-    bounds = {"x_min": 48.85, "y_min": 2.34, "x_max": 48.86, "y_max": 2.36}
+    # Paris as (longitude, latitude)
+    bounds = {"x_min": 2.34, "y_min": 48.85, "x_max": 2.36, "y_max": 48.86}
     assert _build(client, crs=WGS84_JSON, bounds=bounds).status_code == 200
 
 
