@@ -12,6 +12,8 @@ import opengeode_geosciences as og_geosciences
 from .geode_brep import GeodeBRep
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     import opengeode as og
     from opengeodeweb_microservice.database.data_types import GeodeModelType
 
@@ -40,8 +42,8 @@ class GeodeStructuralModel(GeodeBRep):
 
     @override
     @classmethod
-    def load(cls, filename: str) -> GeodeStructuralModel:
-        return GeodeStructuralModel(og_geosciences.load_structural_model(filename))
+    def load(cls, filename: str) -> Sequence[GeodeStructuralModel]:
+        return [GeodeStructuralModel(obj) for obj in og_geosciences.load_structural_model(filename)]
 
     @override
     @classmethod

@@ -14,6 +14,8 @@ from .geode_grid3d import GeodeGrid3D
 from .geode_solid_mesh3d import GeodeSolidMesh3D
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     import opengeode_inspector as og_inspector
     from opengeodeweb_microservice.database.data_types import GeodeMeshType
 
@@ -40,8 +42,8 @@ class GeodeRegularGrid3D(GeodeSolidMesh3D, GeodeGrid3D):
 
     @override
     @classmethod
-    def load(cls, filename: str) -> GeodeRegularGrid3D:
-        return GeodeRegularGrid3D(og.load_regular_grid3D(filename))
+    def load(cls, filename: str) -> Sequence[GeodeRegularGrid3D]:
+        return [GeodeRegularGrid3D(obj) for obj in og.load_regular_grid3D(filename)]
 
     @override
     @classmethod

@@ -12,6 +12,8 @@ import opengeode_geosciences as og_geosciences
 from .geode_structural_model import GeodeStructuralModel
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     import opengeode as og
     from opengeodeweb_microservice.database.data_types import GeodeModelType
 
@@ -45,8 +47,11 @@ class GeodeImplicitStructuralModel(GeodeStructuralModel):
 
     @override
     @classmethod
-    def load(cls, filename: str) -> GeodeImplicitStructuralModel:
-        return GeodeImplicitStructuralModel(og_geosciences.load_implicit_structural_model(filename))
+    def load(cls, filename: str) -> Sequence[GeodeImplicitStructuralModel]:
+        return [
+            GeodeImplicitStructuralModel(obj)
+            for obj in og_geosciences.load_implicit_structural_model(filename)
+        ]
 
     @override
     @classmethod

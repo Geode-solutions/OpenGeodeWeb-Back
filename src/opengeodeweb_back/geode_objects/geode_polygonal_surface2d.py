@@ -12,6 +12,8 @@ import opengeode as og
 from .geode_surface_mesh2d import GeodeSurfaceMesh2D
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from opengeodeweb_microservice.database.data_types import GeodeMeshType
 
 
@@ -39,8 +41,8 @@ class GeodePolygonalSurface2D(GeodeSurfaceMesh2D):
 
     @override
     @classmethod
-    def load(cls, filename: str) -> GeodePolygonalSurface2D:
-        return GeodePolygonalSurface2D(og.load_polygonal_surface2D(filename))
+    def load(cls, filename: str) -> Sequence[GeodePolygonalSurface2D]:
+        return [GeodePolygonalSurface2D(obj) for obj in og.load_polygonal_surface2D(filename)]
 
     @override
     @classmethod

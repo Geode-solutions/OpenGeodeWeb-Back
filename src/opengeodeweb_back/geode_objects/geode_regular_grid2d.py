@@ -14,6 +14,8 @@ from .geode_grid2d import GeodeGrid2D
 from .geode_surface_mesh2d import GeodeSurfaceMesh2D
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     import opengeode_inspector as og_inspector
     from opengeodeweb_microservice.database.data_types import GeodeMeshType
 
@@ -44,8 +46,8 @@ class GeodeRegularGrid2D(GeodeSurfaceMesh2D, GeodeGrid2D):
 
     @override
     @classmethod
-    def load(cls, filename: str) -> GeodeRegularGrid2D:
-        return GeodeRegularGrid2D(og.load_regular_grid2D(filename))
+    def load(cls, filename: str) -> Sequence[GeodeRegularGrid2D]:
+        return [GeodeRegularGrid2D(obj) for obj in og.load_regular_grid2D(filename)]
 
     @override
     @classmethod

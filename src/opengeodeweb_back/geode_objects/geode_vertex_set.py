@@ -11,6 +11,8 @@ import opengeode_inspector as og_inspector
 from .geode_mesh import GeodeMesh
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from opengeodeweb_microservice.database.data_types import (
         GeodeMeshType,
         ViewerElementsType,
@@ -54,8 +56,8 @@ class GeodeVertexSet(GeodeMesh):
 
     @override
     @classmethod
-    def load(cls, filename: str) -> GeodeVertexSet:
-        return GeodeVertexSet(og.load_vertex_set(filename))
+    def load(cls, filename: str) -> Sequence[GeodeVertexSet]:
+        return [GeodeVertexSet(obj) for obj in og.load_vertex_set(filename)]
 
     @override
     @classmethod

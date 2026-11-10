@@ -12,6 +12,8 @@ import opengeode as og
 from .geode_solid_mesh3d import GeodeSolidMesh3D
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from opengeodeweb_microservice.database.data_types import GeodeMeshType
 
 
@@ -37,8 +39,8 @@ class GeodeHybridSolid3D(GeodeSolidMesh3D):
 
     @override
     @classmethod
-    def load(cls, filename: str) -> GeodeHybridSolid3D:
-        return GeodeHybridSolid3D(og.load_hybrid_solid3D(filename))
+    def load(cls, filename: str) -> Sequence[GeodeHybridSolid3D]:
+        return [GeodeHybridSolid3D(obj) for obj in og.load_hybrid_solid3D(filename)]
 
     @override
     @classmethod

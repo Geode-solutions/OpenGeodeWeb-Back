@@ -311,7 +311,7 @@ def coordinate_system(points: list[og.Point2D]) -> og.CoordinateSystem2D:
 
 def load_crs_object(data_id: str) -> tuple[Data, CrsGeodeObject]:
     data = geode_functions.get_data_info(data_id)
-    geode_object = geode_functions.geode_object_from_string(data.geode_object).load(
+    geode_object = geode_functions.geode_object_from_string(data.geode_object).load_one(
         geode_functions.data_file_path(data_id, data.native_file)
     )
     if not isinstance(geode_object, CRS_GEODE_OBJECTS):

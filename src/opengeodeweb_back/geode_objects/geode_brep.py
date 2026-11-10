@@ -15,6 +15,8 @@ from .crs_coordinates import delete_crs_with_coordinates, scale_z
 from .geode_model import ComponentRegistry, GeodeModel
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from opengeodeweb_microservice.database.data_types import GeodeModelType
 
     from .crs_coordinates import Mesh
@@ -52,8 +54,8 @@ class GeodeBRep(GeodeModel):
 
     @override
     @classmethod
-    def load(cls, filename: str) -> GeodeBRep:
-        return GeodeBRep(og.load_brep(filename))
+    def load(cls, filename: str) -> Sequence[GeodeBRep]:
+        return [GeodeBRep(obj) for obj in og.load_brep(filename)]
 
     @override
     @classmethod

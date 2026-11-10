@@ -11,6 +11,8 @@ import opengeode_inspector as og_inspector
 from .geode_model import ComponentRegistry, GeodeModel
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     import opengeode as og
     from opengeodeweb_microservice.database.data_types import GeodeModelType
 
@@ -49,8 +51,8 @@ class GeodeHorizonStack3D(GeodeModel):
 
     @override
     @classmethod
-    def load(cls, filename: str) -> GeodeHorizonStack3D:
-        return GeodeHorizonStack3D(og_geosciences.load_horizons_stack3D(filename))
+    def load(cls, filename: str) -> Sequence[GeodeHorizonStack3D]:
+        return [GeodeHorizonStack3D(obj) for obj in og_geosciences.load_horizons_stack3D(filename)]
 
     @override
     @classmethod

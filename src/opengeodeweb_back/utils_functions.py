@@ -367,7 +367,7 @@ def generate_files_from_object(
 def generate_files_from_file(geode_object_type: GeodeObjectType, input_file: str) -> dict[str, Any]:
     generic_geode_object = geode_objects[geode_object_type]
     full_input_filename = geode_functions.upload_file_path(input_file)
-    geode_object = generic_geode_object.load(full_input_filename)
+    geode_object = generic_geode_object.load_one(full_input_filename)
     geode_object.builder().set_name(Path(input_file).stem)
     if not input_file.lower().endswith("." + geode_object.native_extension()):
         geode_object.builder().set_id(content_based_uuid(full_input_filename))
