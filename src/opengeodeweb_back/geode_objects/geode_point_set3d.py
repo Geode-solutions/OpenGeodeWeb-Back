@@ -15,6 +15,8 @@ from .crs_coordinates import delete_crs_with_coordinates, scale_z
 from .geode_vertex_set import GeodeVertexSet
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from opengeodeweb_microservice.database.data_types import GeodeMeshType
 
     from .crs_coordinates import Mesh
@@ -52,8 +54,8 @@ class GeodePointSet3D(GeodeVertexSet):
 
     @override
     @classmethod
-    def load(cls, filename: str) -> GeodePointSet3D:
-        return GeodePointSet3D(og.load_point_set3D(filename))
+    def load(cls, filename: str) -> Sequence[GeodePointSet3D]:
+        return [GeodePointSet3D(obj) for obj in og.load_point_set3D(filename)]
 
     @override
     @classmethod

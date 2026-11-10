@@ -12,6 +12,8 @@ import opengeode_geosciences as og_geosciences
 from .geode_cross_section import GeodeCrossSection
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     import opengeode as og
     from opengeodeweb_microservice.database.data_types import GeodeModelType
 
@@ -44,8 +46,11 @@ class GeodeImplicitCrossSection(GeodeCrossSection):
 
     @override
     @classmethod
-    def load(cls, filename: str) -> GeodeImplicitCrossSection:
-        return GeodeImplicitCrossSection(og_geosciences.load_implicit_cross_section(filename))
+    def load(cls, filename: str) -> Sequence[GeodeImplicitCrossSection]:
+        return [
+            GeodeImplicitCrossSection(obj)
+            for obj in og_geosciences.load_implicit_cross_section(filename)
+        ]
 
     @override
     @classmethod

@@ -40,7 +40,7 @@ class CrsError(Exception):
 
 
 ORIGINAL_CRS = "points"
-# OpenGeode orders EPSG:4326 coordinates as (latitude, longitude)
+# OpenGeode orders EPSG:4326 coordinates as (longitude, latitude), the usual GIS order
 WGS84 = og_geosciences.GeographicCoordinateSystemInfo("EPSG", "4326", "WGS 84")
 MAX_LATITUDE = 90.0
 MAX_LONGITUDE = 180.0
@@ -220,8 +220,8 @@ def coordinates_implausible(
         corners = convert_xy_corners(bounds, info, WGS84)
     except RuntimeError:
         return True
-    latitudes = [latitude for latitude, _ in corners]
-    longitudes = [longitude for _, longitude in corners]
+    longitudes = [longitude for longitude, _ in corners]
+    latitudes = [latitude for _, latitude in corners]
     # Written as "not within" so NaN counts as outside
     if not all(abs(value) <= MAX_LATITUDE for value in latitudes) or not all(
         abs(value) <= MAX_LONGITUDE for value in longitudes
@@ -311,7 +311,7 @@ def coordinate_system(points: list[og.Point2D]) -> og.CoordinateSystem2D:
 
 def load_crs_object(data_id: str) -> tuple[Data, CrsGeodeObject]:
     data = geode_functions.get_data_info(data_id)
-    geode_object = geode_functions.geode_object_from_string(data.geode_object).load(
+    geode_object = geode_functions.geode_object_from_string(data.geode_object).load_one(
         geode_functions.data_file_path(data_id, data.native_file)
     )
     if not isinstance(geode_object, CRS_GEODE_OBJECTS):

@@ -12,6 +12,8 @@ import opengeode_geosciences as og_geosciences
 from .geode_section import GeodeSection
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     import opengeode as og
     from opengeodeweb_microservice.database.data_types import GeodeModelType
 
@@ -40,8 +42,8 @@ class GeodeCrossSection(GeodeSection):
 
     @override
     @classmethod
-    def load(cls, filename: str) -> GeodeCrossSection:
-        return GeodeCrossSection(og_geosciences.load_cross_section(filename))
+    def load(cls, filename: str) -> Sequence[GeodeCrossSection]:
+        return [GeodeCrossSection(obj) for obj in og_geosciences.load_cross_section(filename)]
 
     @override
     @classmethod

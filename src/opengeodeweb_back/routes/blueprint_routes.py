@@ -253,9 +253,12 @@ def geode_objects_and_output_extensions(
     params: schemas.GeodeObjectsAndOutputExtensions,
 ) -> schemas.GeodeObjectsAndOutputExtensionsResponse:
     file_path = geode_functions.upload_file_path(params.filename)
-    geode_object = geode_functions.geode_object_from_string(params.geode_object_type).load(
+    loaded_objects = geode_functions.geode_object_from_string(params.geode_object_type).load(
         file_path
     )
+    if not loaded_objects:
+        flask.abort(400, f"No {params.geode_object_type} object found in {params.filename}")
+    geode_object = loaded_objects[0]
     geode_objects_and_output_extensions = geode_functions.geode_object_output_extensions(
         geode_object
     )
@@ -272,10 +275,12 @@ def save_viewable_file(
     params: schemas.SaveViewableFile,
 ) -> schemas.SaveViewableFileResponse:
     return schemas.SaveViewableFileResponse.from_dict(
-        utils_functions.generate_files_from_file(
-            geode_object_type=geode_object_type(params.geode_object_type),
-            input_file=params.filename,
-        )
+        {
+            "data": utils_functions.generate_files_from_file(
+                geode_object_type=geode_object_type(params.geode_object_type),
+                input_file=params.filename,
+            )
+        }
     )
 
 
@@ -287,7 +292,7 @@ def apply_time_series(
     _check_time_series_extension(params.filename)
     if data.geode_object != GeodeBRep.geode_object_type():
         flask.abort(400, f"{data.geode_object} is not a BRep: time series cannot be applied")
-    geode_object = GeodeBRep.load(geode_functions.data_file_path(params.id, data.native_file))
+    geode_object = GeodeBRep.load_one(geode_functions.data_file_path(params.id, data.native_file))
     # Applied in memory first: if OpenGeode fails, nothing is written.
     geode_object.load_time_series(geode_functions.upload_file_path(params.filename))
     utils_functions.save_all_viewables_and_return_info(
@@ -932,7 +937,7 @@ def _regenerate_missing_viewables(rows: list[Data]) -> None:
             if not Path(native_full).is_file():
                 continue
 
-            geode_object = geode_functions.geode_object_from_string(data.geode_object).load(
+            geode_object = geode_functions.geode_object_from_string(data.geode_object).load_one(
                 native_full
             )
             utils_functions.save_all_viewables_and_return_info(geode_object, data, data_path)

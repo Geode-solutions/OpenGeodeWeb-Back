@@ -15,6 +15,8 @@ from .crs_coordinates import delete_crs_with_coordinates, scale_z
 from .geode_graph import GeodeGraph
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from opengeodeweb_microservice.database.data_types import GeodeMeshType
 
     from .crs_coordinates import Mesh
@@ -52,8 +54,8 @@ class GeodeEdgedCurve3D(GeodeGraph):
 
     @override
     @classmethod
-    def load(cls, filename: str) -> GeodeEdgedCurve3D:
-        return GeodeEdgedCurve3D(og.load_edged_curve3D(filename))
+    def load(cls, filename: str) -> Sequence[GeodeEdgedCurve3D]:
+        return [GeodeEdgedCurve3D(obj) for obj in og.load_edged_curve3D(filename)]
 
     @override
     @classmethod

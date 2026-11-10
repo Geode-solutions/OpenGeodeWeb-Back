@@ -4,6 +4,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import logging
+import shutil
 import threading
 import time
 import uuid
@@ -33,7 +34,7 @@ from .geode_objects.geode_vertex_set import GeodeVertexSet
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Sequence
 
     from opengeodeweb_microservice.database.data_types import GeodeObjectType
     from werkzeug.exceptions import HTTPException
@@ -205,10 +206,22 @@ def create_data_folder_from_id(data_id: str) -> str:
     return str(data_path)
 
 
-def content_based_uuid(file_path: str) -> og.uuid:
+def _file_digest(file_path: str) -> str:
     with Path(file_path).open("rb") as file:
-        digest = hashlib.file_digest(file, "sha256").hexdigest()
-    return og.uuid(str(uuid.uuid5(uuid.NAMESPACE_OID, digest)))
+        return hashlib.file_digest(file, "sha256").hexdigest()
+
+
+def content_based_uuid(file_path: str) -> og.uuid:
+    return og.uuid(str(uuid.uuid5(uuid.NAMESPACE_OID, _file_digest(file_path))))
+
+
+def content_based_uuids(file_path: str, nb_objects: int) -> list[og.uuid]:
+    """One distinct, deterministic uuid per object of a file holding several objects."""
+    digest = _file_digest(file_path)
+    return [
+        og.uuid(str(uuid.uuid5(uuid.NAMESPACE_OID, f"{digest}:{index}")))
+        for index in range(1, nb_objects + 1)
+    ]
 
 
 def _uuid_to_flat_index(data_id: str, viewable_file: str | None) -> dict[str, int]:
@@ -364,18 +377,61 @@ def generate_files_from_object(
     return save_all_viewables_and_return_info(geode_object, data, data_path)
 
 
-def generate_files_from_file(geode_object_type: GeodeObjectType, input_file: str) -> dict[str, Any]:
+def _name_loaded_objects(objects: Sequence[GeodeObject], input_file: str) -> None:
+    # Each object keeps its own name; unnamed ones are named after the file
+    stem = Path(input_file).stem
+    for index, geode_object in enumerate(objects, start=1):
+        if geode_object.identifier.name():
+            continue
+        name = stem if len(objects) == 1 else f"{stem}_{index}"
+        geode_object.builder().set_name(name)
+
+
+def _set_content_based_ids(objects: Sequence[GeodeObject], full_input_filename: str) -> None:
+    if len(objects) == 1:
+        # Same id as before multi object files: existing imports keep their ids
+        objects[0].builder().set_id(content_based_uuid(full_input_filename))
+        return
+    for geode_object, geode_id in zip(
+        objects, content_based_uuids(full_input_filename, len(objects)), strict=True
+    ):
+        geode_object.builder().set_id(geode_id)
+
+
+def _remove_created_data(created: list[Data]) -> None:
+    session = get_session()
+    for data in created:
+        session.delete(data)
+        shutil.rmtree(geode_functions.data_file_path(data.id), ignore_errors=True)
+    session.flush()
+
+
+def generate_files_from_file(
+    geode_object_type: GeodeObjectType, input_file: str
+) -> list[dict[str, Any]]:
+    """Create one data item per object held by the file, all or none."""
     generic_geode_object = geode_objects[geode_object_type]
     full_input_filename = geode_functions.upload_file_path(input_file)
-    geode_object = generic_geode_object.load(full_input_filename)
-    geode_object.builder().set_name(Path(input_file).stem)
-    if not input_file.lower().endswith("." + geode_object.native_extension()):
-        geode_object.builder().set_id(content_based_uuid(full_input_filename))
-    data = Data.create(
-        geode_id=geode_object.identifier.id().string(),
-        geode_object=geode_object_type,
-        viewer_object=generic_geode_object.viewer_type(),
-        viewer_elements_type=generic_geode_object.viewer_elements_type(),
-    )
-    data_path = create_data_folder_from_id(data.id)
-    return save_all_viewables_and_return_info(geode_object, data, data_path)
+    objects = generic_geode_object.load(full_input_filename)
+    if not objects:
+        flask.abort(400, f"No {geode_object_type} object found in {input_file}")
+    _name_loaded_objects(objects, input_file)
+    if not input_file.lower().endswith("." + objects[0].native_extension()):
+        _set_content_based_ids(objects, full_input_filename)
+    created: list[Data] = []
+    responses: list[dict[str, Any]] = []
+    try:
+        for geode_object in objects:
+            data = Data.create(
+                geode_id=geode_object.identifier.id().string(),
+                geode_object=geode_object_type,
+                viewer_object=generic_geode_object.viewer_type(),
+                viewer_elements_type=generic_geode_object.viewer_elements_type(),
+            )
+            created.append(data)
+            data_path = create_data_folder_from_id(data.id)
+            responses.append(save_all_viewables_and_return_info(geode_object, data, data_path))
+    except BaseException:
+        _remove_created_data(created)
+        raise
+    return responses

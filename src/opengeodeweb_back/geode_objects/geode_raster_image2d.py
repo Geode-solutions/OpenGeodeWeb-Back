@@ -13,6 +13,8 @@ import opengeode_inspector as og_inspector
 from .geode_mesh import GeodeMesh
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from opengeodeweb_microservice.database.data_types import (
         GeodeMeshType,
         ViewerElementsType,
@@ -56,8 +58,8 @@ class GeodeRasterImage2D(GeodeMesh):
 
     @override
     @classmethod
-    def load(cls, filename: str) -> GeodeRasterImage2D:
-        return GeodeRasterImage2D(og.load_raster_image2D(filename))
+    def load(cls, filename: str) -> Sequence[GeodeRasterImage2D]:
+        return [GeodeRasterImage2D(obj) for obj in og.load_raster_image2D(filename)]
 
     @override
     @classmethod

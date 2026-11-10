@@ -15,6 +15,8 @@ from .crs_coordinates import delete_crs_with_coordinates
 from .geode_model import ComponentRegistry, GeodeModel
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from opengeodeweb_microservice.database.data_types import GeodeModelType
 
     from .crs_coordinates import Mesh
@@ -52,8 +54,8 @@ class GeodeSection(GeodeModel):
 
     @override
     @classmethod
-    def load(cls, filename: str) -> GeodeSection:
-        return GeodeSection(og.load_section(filename))
+    def load(cls, filename: str) -> Sequence[GeodeSection]:
+        return [GeodeSection(obj) for obj in og.load_section(filename)]
 
     @override
     @classmethod

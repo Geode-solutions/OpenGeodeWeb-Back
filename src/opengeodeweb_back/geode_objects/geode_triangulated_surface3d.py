@@ -12,6 +12,8 @@ import opengeode as og
 from .geode_surface_mesh3d import GeodeSurfaceMesh3D
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from opengeodeweb_microservice.database.data_types import GeodeMeshType
 
 
@@ -41,8 +43,8 @@ class GeodeTriangulatedSurface3D(GeodeSurfaceMesh3D):
 
     @override
     @classmethod
-    def load(cls, filename: str) -> GeodeTriangulatedSurface3D:
-        return GeodeTriangulatedSurface3D(og.load_triangulated_surface3D(filename))
+    def load(cls, filename: str) -> Sequence[GeodeTriangulatedSurface3D]:
+        return [GeodeTriangulatedSurface3D(obj) for obj in og.load_triangulated_surface3D(filename)]
 
     @override
     @classmethod

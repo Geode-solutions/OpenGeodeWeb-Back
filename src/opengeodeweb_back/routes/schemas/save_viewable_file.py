@@ -52,7 +52,7 @@ class MeshComponent(DataClassJsonMixin):
 
 
 @dataclass
-class SaveViewableFileResponse(DataClassJsonMixin):
+class SaveViewableFileItem(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
@@ -69,6 +69,14 @@ class SaveViewableFileResponse(DataClassJsonMixin):
     mesh_components: Optional[List[MeshComponent]] = None
     nb_vertices: Optional[int] = None
     viewable_file: Optional[str] = None
+
+
+@dataclass
+class SaveViewableFileResponse(DataClassJsonMixin):
+    def __post_init__(self) -> None:
+        print_dataclass(self)
+
+    data: List[SaveViewableFileItem]
 
 
 save_viewable_file_route = Route(

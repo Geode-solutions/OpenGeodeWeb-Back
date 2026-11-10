@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 # Third party imports
 import opengeode as og
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     import opengeode_inspector as og_inspector
     from opengeodeweb_microservice.database.data_types import (
         GeodeObjectType,
@@ -53,7 +55,19 @@ class GeodeObject(ABC):
 
     @classmethod
     @abstractmethod
-    def load(cls, filename: str) -> GeodeObject: ...
+    def load(cls, filename: str) -> Sequence[GeodeObject]: ...
+
+    @classmethod
+    def load_one(cls, filename: str) -> Self:
+        objects = cls.load(filename)
+        if len(objects) != 1:
+            message = f"Expected exactly 1 object in {filename}, but {len(objects)} were loaded"
+            raise ValueError(message)
+        (geode_object,) = objects
+        if not isinstance(geode_object, cls):
+            message = f"Object loaded from {filename} is not a {cls.__name__}"
+            raise TypeError(message)
+        return geode_object
 
     @classmethod
     @abstractmethod

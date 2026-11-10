@@ -47,7 +47,7 @@ def load_geode_object(data_id: str) -> GeodeObject:
         file_absolute_path,
         Path(file_absolute_path).exists(),
     )
-    return geode_object_from_string(data.geode_object).load(file_absolute_path)
+    return geode_object_from_string(data.geode_object).load_one(file_absolute_path)
 
 
 def get_data_info(data_id: str) -> Data:

@@ -31,9 +31,13 @@ from opengeodeweb_back.geode_objects.geode_polyhedral_solid3d import (
 from opengeodeweb_back.geode_objects.geode_regular_grid2d import (
     GeodeRegularGrid2D,
 )
+from opengeodeweb_back.geode_objects.geode_triangulated_surface3d import (
+    GeodeTriangulatedSurface3D,
+)
 from opengeodeweb_back.routes.blueprint_routes import extract_valid_attribute_values
 
 if TYPE_CHECKING:
+    import pytest
     from flask.testing import FlaskClient
     from werkzeug.test import TestResponse
 
@@ -185,9 +189,8 @@ def test_data_missing_files(client: FlaskClient) -> None:
 
 
 def test_validate_object(client: FlaskClient) -> None:
-    response_save = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep")
-    assert response_save.status_code == 200
-    model_id = response_save.get_json()["id"]
+    [model] = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep")
+    model_id = model["id"]
     response = client.post("/opengeodeweb_back/validate", json={"id": model_id})
     assert response.status_code == 200
     json_data = response.get_json()
@@ -197,11 +200,10 @@ def test_validate_object(client: FlaskClient) -> None:
 
 
 def test_validate_invalid_object(client: FlaskClient) -> None:
-    response_save = test_utils.check_save_viewable_file(
+    [model] = test_utils.check_save_viewable_file(
         client, "BRep", "wrong_boundary_surface_model.og_brep"
     )
-    assert response_save.status_code == 200
-    model_id = response_save.get_json()["id"]
+    model_id = model["id"]
     response = client.post("/opengeodeweb_back/validate", json={"id": model_id})
     assert response.status_code == 200
     json_data = response.get_json()
@@ -234,8 +236,48 @@ def test_geode_objects_and_output_extensions(client: FlaskClient) -> None:
 
 
 def test_save_viewable_file(client: FlaskClient) -> None:
-    response = test_utils.check_save_viewable_file(client, "BRep", "corbi.og_brep")
-    assert "crs" not in response.get_json()
+    [item] = test_utils.check_save_viewable_file(client, "BRep", "corbi.og_brep")
+    assert "crs" not in item
+
+
+def test_save_viewable_file_multi_object(client: FlaskClient) -> None:
+    first_import = test_utils.check_save_viewable_file(
+        client, "TriangulatedSurface3D", "two_surfaces.ts"
+    )
+    second_import = test_utils.check_save_viewable_file(
+        client, "TriangulatedSurface3D", "two_surfaces.ts"
+    )
+    assert [item["name"] for item in first_import] == ["first_surf", "second_surf"]
+    assert len({item["id"] for item in first_import}) == 2
+    geode_ids = [item["geode_id"] for item in first_import]
+    assert len(set(geode_ids)) == 2
+    assert [item["geode_id"] for item in second_import] == geode_ids
+
+
+def test_save_viewable_file_multi_object_unnamed(client: FlaskClient) -> None:
+    items = test_utils.check_save_viewable_file(
+        client, "TriangulatedSurface3D", "two_unnamed_surfaces.ts"
+    )
+    assert [item["name"] for item in items] == [
+        "two_unnamed_surfaces_1",
+        "two_unnamed_surfaces_2",
+    ]
+
+
+def test_save_viewable_file_without_object(
+    client: FlaskClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(GeodeTriangulatedSurface3D, "load", staticmethod(lambda _filename: []))
+    with client.application.app_context():
+        nb_data = get_session().query(Data).count()
+    response = client.post(
+        "/opengeodeweb_back/save_viewable_file",
+        json={"geode_object_type": "TriangulatedSurface3D", "filename": "two_surfaces.ts"},
+    )
+    assert response.status_code == 400
+    assert "two_surfaces.ts" in response.get_json()["description"]
+    with client.application.app_context():
+        assert get_session().query(Data).count() == nb_data
 
 
 def test_texture_coordinates(client: FlaskClient) -> None:
@@ -464,10 +506,9 @@ def test_geode_object_inheritance(client: FlaskClient) -> None:
 def test_model_components(client: FlaskClient) -> None:
     geode_object_type = "BRep"
     filename = "cube.og_brep"
-    response = test_utils.check_save_viewable_file(client, geode_object_type, filename)
-    assert response.status_code == 200
-    assert "mesh_components" in response.get_json()
-    mesh_components = response.get_json()["mesh_components"]
+    [model] = test_utils.check_save_viewable_file(client, geode_object_type, filename)
+    assert "mesh_components" in model
+    mesh_components = model["mesh_components"]
     assert isinstance(mesh_components, list)
     assert len(mesh_components) > 0
     for mesh_component in mesh_components:
@@ -483,8 +524,8 @@ def test_model_components(client: FlaskClient) -> None:
         for internal_uuid in mesh_component["internals"]:
             assert isinstance(internal_uuid, str)
         assert isinstance(mesh_component["is_active"], bool)
-    assert "collection_components" in response.get_json()
-    collection_components = response.get_json()["collection_components"]
+    assert "collection_components" in model
+    collection_components = model["collection_components"]
     assert isinstance(collection_components, list)
     for collection_component in collection_components:
         assert isinstance(collection_component, dict)
@@ -641,10 +682,9 @@ def test_save_viewable_workflow_from_object(client: FlaskClient) -> None:
 
 def _load_brep_components(client: FlaskClient) -> tuple[str, dict[str, list[str]]]:
     """Load cube.og_brep and return (model_id, {component_type: [geode_id, ...]})."""
-    response = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep")
-    assert response.status_code == 200
-    model_id: str = response.get_json()["id"]
-    mesh_components: list[dict[str, object]] = response.get_json()["mesh_components"]
+    [model] = test_utils.check_save_viewable_file(client, "BRep", "cube.og_brep")
+    model_id: str = model["id"]
+    mesh_components: list[dict[str, object]] = model["mesh_components"]
     by_type: dict[str, list[str]] = {}
     for mesh_component in mesh_components:
         component_type = mesh_component["type"]
@@ -994,8 +1034,7 @@ def test_apply_time_series_errors(client: FlaskClient) -> None:
     response = client.post(route, json={"id": "0" * 32, "filename": filename})
     assert response.status_code == 404
 
-    point_set_id = test_utils.check_save_viewable_file(
-        client, "PointSet3D", "test.og_pts3d"
-    ).get_json()["id"]
+    [point_set] = test_utils.check_save_viewable_file(client, "PointSet3D", "test.og_pts3d")
+    point_set_id = point_set["id"]
     response = client.post(route, json={"id": point_set_id, "filename": filename})
     assert response.status_code == 400

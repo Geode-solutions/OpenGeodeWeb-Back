@@ -487,14 +487,18 @@ export interface SaveViewableFileParams {
 }
 
 export interface SaveViewableFileResponse {
+    data: SaveViewableFileItem[];
+}
+
+export interface SaveViewableFileItem {
     binary_light_viewable?: string;
-    collection_components?: SaveViewableFileResponseCollectionComponent[];
-    crs?:                   SaveViewableFileResponseCRS;
+    collection_components?: DatumCollectionComponent[];
+    crs?:                   DatumCRS;
     geode_id:               string;
     geode_object_type:      string;
     id:                     string;
     is_viewable:            boolean;
-    mesh_components?:       SaveViewableFileResponseMeshComponent[];
+    mesh_components?:       DatumMeshComponent[];
     name:                   string;
     native_file:            string;
     nb_vertices?:           number;
@@ -502,7 +506,7 @@ export interface SaveViewableFileResponse {
     viewer_type:            string;
 }
 
-export interface SaveViewableFileResponseCollectionComponent {
+export interface DatumCollectionComponent {
     geode_id:  string;
     is_active: boolean;
     items:     string[];
@@ -510,13 +514,13 @@ export interface SaveViewableFileResponseCollectionComponent {
     type:      string;
 }
 
-export interface SaveViewableFileResponseCRS {
+export interface DatumCRS {
     authority: string;
     code:      string;
     name:      string;
 }
 
-export interface SaveViewableFileResponseMeshComponent {
+export interface DatumMeshComponent {
     boundaries: string[];
     geode_id:   string;
     internals:  string[];
