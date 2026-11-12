@@ -1,11 +1,11 @@
-opengeode-core==20.0.0
-opengeode-io==8.0.0
+opengeode-core==20.0.1
+opengeode-io==8.1.0
 opengeode-geosciences==10.0.0
-opengeode-geosciencesio==6.0.0
-opengeode-inspector==6.18.0
+opengeode-geosciencesio==6.0.1
+opengeode-inspector==6.19.0
 opengeode-inspector-geosciences==1.4.0
-geode-common==33.29.0
-geode-viewables==3.6.0
+geode-common==33.30.0
+geode-viewables==3.7.0
 flask[async]==3.1.2
 flask-cors==6.0.2
 werkzeug==3.1.8
