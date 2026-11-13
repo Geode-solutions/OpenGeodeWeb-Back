@@ -127,3 +127,8 @@ class GeodeHorizonStack3D(GeodeModel):
     @override
     def validate(self) -> og_inspector.ObjectValidity:
         return og_inspector.ObjectValidity()
+
+    @override
+    @classmethod
+    def loadable_family(cls) -> str:
+        return "HorizonsStack"

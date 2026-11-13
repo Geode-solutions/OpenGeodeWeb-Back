@@ -211,17 +211,21 @@ def _file_digest(file_path: str) -> str:
         return hashlib.file_digest(file, "sha256").hexdigest()
 
 
+def _seeded_uuid(seed: str) -> og.uuid:
+    return og.uuid(str(uuid.uuid5(uuid.NAMESPACE_OID, seed)))
+
+
+def _seeded_uuids(seed: str, nb_objects: int) -> list[og.uuid]:
+    """One distinct, deterministic uuid per object of a file holding several objects."""
+    return [_seeded_uuid(f"{seed}:{index}") for index in range(1, nb_objects + 1)]
+
+
 def content_based_uuid(file_path: str) -> og.uuid:
-    return og.uuid(str(uuid.uuid5(uuid.NAMESPACE_OID, _file_digest(file_path))))
+    return _seeded_uuid(_file_digest(file_path))
 
 
 def content_based_uuids(file_path: str, nb_objects: int) -> list[og.uuid]:
-    """One distinct, deterministic uuid per object of a file holding several objects."""
-    digest = _file_digest(file_path)
-    return [
-        og.uuid(str(uuid.uuid5(uuid.NAMESPACE_OID, f"{digest}:{index}")))
-        for index in range(1, nb_objects + 1)
-    ]
+    return _seeded_uuids(_file_digest(file_path), nb_objects)
 
 
 def _uuid_to_flat_index(data_id: str, viewable_file: str | None) -> dict[str, int]:
@@ -387,14 +391,34 @@ def _name_loaded_objects(objects: Sequence[GeodeObject], input_file: str) -> Non
         geode_object.builder().set_name(name)
 
 
-def _set_content_based_ids(objects: Sequence[GeodeObject], full_input_filename: str) -> None:
+def _holds_other_loadable_family(
+    geode_object_type: GeodeObjectType, full_input_filename: str
+) -> bool:
+    family = geode_objects[geode_object_type].loadable_family()
+    extension = extension_from_filename(Path(full_input_filename).name)
+    return any(
+        geode_object.loadable_family() != family
+        and extension in geode_object.input_extensions()
+        and geode_object.is_loadable(full_input_filename).value() > 0
+        for geode_object in geode_objects.values()
+    )
+
+
+def _content_seed(geode_object_type: GeodeObjectType, full_input_filename: str) -> str:
+    digest = _file_digest(full_input_filename)
+    if not _holds_other_loadable_family(geode_object_type, full_input_filename):
+        # Single content family: existing imports keep their ids
+        return digest
+    # Each content family of a mixed file is a distinct object
+    return f"{digest}:{geode_objects[geode_object_type].loadable_family()}"
+
+
+def _set_content_based_ids(objects: Sequence[GeodeObject], seed: str) -> None:
     if len(objects) == 1:
         # Same id as before multi object files: existing imports keep their ids
-        objects[0].builder().set_id(content_based_uuid(full_input_filename))
+        objects[0].builder().set_id(_seeded_uuid(seed))
         return
-    for geode_object, geode_id in zip(
-        objects, content_based_uuids(full_input_filename, len(objects)), strict=True
-    ):
+    for geode_object, geode_id in zip(objects, _seeded_uuids(seed, len(objects)), strict=True):
         geode_object.builder().set_id(geode_id)
 
 
@@ -417,7 +441,7 @@ def generate_files_from_file(
         flask.abort(400, f"No {geode_object_type} object found in {input_file}")
     _name_loaded_objects(objects, input_file)
     if not input_file.lower().endswith("." + objects[0].native_extension()):
-        _set_content_based_ids(objects, full_input_filename)
+        _set_content_based_ids(objects, _content_seed(geode_object_type, full_input_filename))
     created: list[Data] = []
     responses: list[dict[str, Any]] = []
     try:

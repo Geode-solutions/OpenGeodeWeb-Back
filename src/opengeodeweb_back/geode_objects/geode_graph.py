@@ -110,3 +110,8 @@ class GeodeGraph(GeodeVertexSet):
 
     def edge_attribute_manager(self) -> og.AttributeManager:
         return self.graph.edge_attribute_manager()
+
+    @override
+    @classmethod
+    def loadable_family(cls) -> str:
+        return "Graph"

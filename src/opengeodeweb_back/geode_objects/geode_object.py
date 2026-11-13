@@ -40,6 +40,10 @@ class GeodeObject(ABC):
 
     @classmethod
     @abstractmethod
+    def loadable_family(cls) -> str: ...
+
+    @classmethod
+    @abstractmethod
     def is_3d(cls) -> bool: ...
 
     @classmethod

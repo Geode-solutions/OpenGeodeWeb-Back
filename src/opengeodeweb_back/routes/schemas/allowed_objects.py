@@ -1,6 +1,6 @@
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
-from typing import Dict
+from typing import Dict, List
 from dataclasses_json import DataClassJsonMixin
 from opengeodeweb_microservice.schemas import print_dataclass
 from dataclasses import dataclass
@@ -20,6 +20,7 @@ class AllowedObject(DataClassJsonMixin):
         print_dataclass(self)
 
     is_loadable: float
+    loadable_family: str
     object_priority: int
 
 
@@ -29,6 +30,7 @@ class AllowedObjectsResponse(DataClassJsonMixin):
         print_dataclass(self)
 
     allowed_objects: Dict[str, AllowedObject]
+    objects_to_load: List[str]
 
 
 allowed_objects_route = Route(

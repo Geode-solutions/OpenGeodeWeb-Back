@@ -146,3 +146,8 @@ class GeodePointSet2D(GeodeVertexSet):
         og.create_point_set_coordinate_system2D(
             self.point_set, builder, crs_name, input_crs, output_crs
         )
+
+    @override
+    @classmethod
+    def loadable_family(cls) -> str:
+        return "PointSet"

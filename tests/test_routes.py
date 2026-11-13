@@ -83,8 +83,28 @@ def test_allowed_objects(client: FlaskClient) -> None:
     for allowed_object in allowed_objects:
         assert type(allowed_object) is str
 
+    assert allowed_objects["BRep"]["loadable_family"] == "BRep"
+    assert response.get_json()["objects_to_load"] == ["BRep"]
+
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
+
+
+def test_allowed_objects_multi_content(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/allowed_objects"
+    response = client.post(route, json={"filename": "mixed_polygons_polyhedra.vtu"})
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["allowed_objects"]["TriangulatedSurface3D"]["loadable_family"] == "SurfaceMesh"
+    assert body["allowed_objects"]["TetrahedralSolid3D"]["loadable_family"] == "SolidMesh"
+    assert body["objects_to_load"] == ["TriangulatedSurface3D", "TetrahedralSolid3D"]
+
+
+def test_allowed_objects_single_content(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/allowed_objects"
+    response = client.post(route, json={"filename": "polyhedron_attribute.vtu"})
+    assert response.status_code == 200
+    assert response.get_json()["objects_to_load"] == ["HybridSolid3D"]
 
 
 def test_upload_file(client: FlaskClient) -> None:

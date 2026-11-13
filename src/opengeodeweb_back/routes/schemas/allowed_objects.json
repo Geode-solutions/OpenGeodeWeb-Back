@@ -27,18 +27,29 @@
             },
             "object_priority": {
               "type": "integer"
+            },
+            "loadable_family": {
+              "type": "string"
             }
           },
           "required": [
             "is_loadable",
-            "object_priority"
+            "object_priority",
+            "loadable_family"
           ],
           "additionalProperties": false
+        }
+      },
+      "objects_to_load": {
+        "type": "array",
+        "items": {
+          "type": "string"
         }
       }
     },
     "required": [
-      "allowed_objects"
+      "allowed_objects",
+      "objects_to_load"
     ],
     "additionalProperties": false
   }

@@ -19,6 +19,7 @@ from .geode_objects import geode_objects
 
 if TYPE_CHECKING:
     from .geode_objects.geode_object import GeodeObject
+    from .routes.schemas.allowed_objects import AllowedObject
 
 
 logger = logging.getLogger(__name__)
@@ -85,3 +86,27 @@ def geode_object_output_extensions(
         if hasattr(mixin_geode_object, "geode_object_type"):
             results[mixin_geode_object.geode_object_type()] = object_output_extensions
     return results
+
+
+def objects_to_load(allowed: dict[str, AllowedObject]) -> list[str]:
+    """Pick the one type to load per content family so the whole file is loaded.
+
+    Per family: keep loadable candidates, then highest is_loadable, then highest
+    object_priority. Any remaining tie makes the whole choice ambiguous ([]).
+    """
+    families: dict[str, list[tuple[str, AllowedObject]]] = {}
+    for object_type, allowed_object in allowed.items():
+        if allowed_object.is_loadable > 0:
+            families.setdefault(allowed_object.loadable_family, []).append(
+                (object_type, allowed_object)
+            )
+    winners: list[str] = []
+    for candidates in families.values():
+        best_loadable = max(candidate.is_loadable for _, candidate in candidates)
+        best = [c for c in candidates if c[1].is_loadable == best_loadable]
+        best_priority = max(candidate.object_priority for _, candidate in best)
+        best = [c for c in best if c[1].object_priority == best_priority]
+        if len(best) != 1:
+            return []
+        winners.append(best[0][0])
+    return winners

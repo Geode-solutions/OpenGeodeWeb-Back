@@ -101,3 +101,8 @@ class GeodeSurfaceMesh3D(GeodeVertexSet):
 
     def texture_manager(self) -> og.TextureManager2D:
         return self.surface_mesh.texture_manager()
+
+    @override
+    @classmethod
+    def loadable_family(cls) -> str:
+        return "SurfaceMesh"

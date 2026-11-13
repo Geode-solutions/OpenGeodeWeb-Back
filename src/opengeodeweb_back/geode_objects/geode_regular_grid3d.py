@@ -95,3 +95,8 @@ class GeodeRegularGrid3D(GeodeSolidMesh3D, GeodeGrid3D):
     @override
     def inspect(self) -> og_inspector.SolidInspectionResult:
         return super().inspect()
+
+    @override
+    @classmethod
+    def loadable_family(cls) -> str:
+        return "Grid"

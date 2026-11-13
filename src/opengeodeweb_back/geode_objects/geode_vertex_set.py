@@ -111,3 +111,8 @@ class GeodeVertexSet(GeodeMesh):
     @override
     def vertex_attribute_manager(self) -> og.AttributeManager:
         return self.vertex_set.vertex_attribute_manager()
+
+    @override
+    @classmethod
+    def loadable_family(cls) -> str:
+        return "VertexSet"
