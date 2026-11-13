@@ -41,3 +41,8 @@ class GeodeGrid2D(GeodeMesh):
 
     @abstractmethod
     def cell_attribute_manager(self) -> og.AttributeManager: ...
+
+    @override
+    @classmethod
+    def loadable_family(cls) -> str:
+        return "Grid"

@@ -149,3 +149,8 @@ class GeodePointSet3D(GeodeVertexSet):
 
     def scale_z(self, factor: float) -> None:
         scale_z(self.point_set, self.builder(), factor)
+
+    @override
+    @classmethod
+    def loadable_family(cls) -> str:
+        return "PointSet"

@@ -245,3 +245,8 @@ class GeodeBRep(GeodeModel):
             scale_z(surface.mesh(), builder.surface_mesh_builder(surface), factor)
         for block in self.brep.blocks():
             scale_z(block.mesh(), builder.block_mesh_builder(block), factor)
+
+    @override
+    @classmethod
+    def loadable_family(cls) -> str:
+        return "BRep"

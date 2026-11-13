@@ -834,10 +834,12 @@ export interface AllowedObjectsParams {
 
 export interface AllowedObjectsResponse {
     allowed_objects: { [key: string]: AllowedObject };
+    objects_to_load: string[];
 }
 
 export interface AllowedObject {
     is_loadable:     number;
+    loadable_family: string;
     object_priority: number;
 }
 

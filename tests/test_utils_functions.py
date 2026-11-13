@@ -19,10 +19,14 @@ from werkzeug.exceptions import HTTPException
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
 from opengeodeweb_back.geode_objects.geode_brep import GeodeBRep
+from opengeodeweb_back.geode_objects.geode_hybrid_solid3d import GeodeHybridSolid3D
 from opengeodeweb_back.geode_objects.geode_polygonal_surface3d import (
     GeodePolygonalSurface3D,
 )
 from opengeodeweb_back.geode_objects.geode_raster_image2d import GeodeRasterImage2D
+from opengeodeweb_back.geode_objects.geode_tetrahedral_solid3d import (
+    GeodeTetrahedralSolid3D,
+)
 from opengeodeweb_back.geode_objects.geode_triangulated_surface3d import (
     GeodeTriangulatedSurface3D,
 )
@@ -319,6 +323,40 @@ def test_generate_files_from_non_native_file_twice_shares_geode_id(
         native_path = geode_functions.data_file_path(first["id"], first["native_file"])
         reloaded = GeodePolygonalSurface3D.load_one(native_path)
         assert reloaded.identifier.id().string() == first["geode_id"]
+
+
+def test_generate_files_from_mixed_file_gives_distinct_geode_ids(
+    client: FlaskClient,
+) -> None:
+    app = client.application
+    with app.app_context():
+        [surface] = utils_functions.generate_files_from_file(
+            GeodeTriangulatedSurface3D.geode_object_type(), "mixed_polygons_polyhedra.vtu"
+        )
+        [solid] = utils_functions.generate_files_from_file(
+            GeodeTetrahedralSolid3D.geode_object_type(), "mixed_polygons_polyhedra.vtu"
+        )
+        [surface_again] = utils_functions.generate_files_from_file(
+            GeodeTriangulatedSurface3D.geode_object_type(), "mixed_polygons_polyhedra.vtu"
+        )
+    # Each content family of one file is a distinct object
+    assert surface["geode_id"] != solid["geode_id"]
+    # Still deterministic per family
+    assert surface_again["geode_id"] == surface["geode_id"]
+
+
+def test_generate_files_from_single_content_file_keeps_geode_id(
+    client: FlaskClient,
+) -> None:
+    app = client.application
+    with app.app_context():
+        [result] = utils_functions.generate_files_from_file(
+            GeodeHybridSolid3D.geode_object_type(), "polyhedron_attribute.vtu"
+        )
+    # Ids of existing single content imports must not change
+    assert result["geode_id"] == (
+        utils_functions.content_based_uuid(str(data_dir / "polyhedron_attribute.vtu")).string()
+    )
 
 
 def test_generate_files_from_multi_object_file(client: FlaskClient) -> None:

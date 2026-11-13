@@ -167,8 +167,12 @@ def allowed_objects(
         allowed_objects[object_type] = schemas.allowed_objects.AllowedObject(
             is_loadable=loadability_score.value(),
             object_priority=priority_score,
+            loadable_family=geode_object.loadable_family(),
         )
-    return schemas.AllowedObjectsResponse(allowed_objects=allowed_objects)
+    return schemas.AllowedObjectsResponse(
+        allowed_objects=allowed_objects,
+        objects_to_load=geode_functions.objects_to_load(allowed_objects),
+    )
 
 
 def _check_time_series_extension(filename: str) -> None:

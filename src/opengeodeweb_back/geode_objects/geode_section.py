@@ -212,3 +212,8 @@ class GeodeSection(GeodeModel):
     ) -> None:
         builder = self.builder()
         og.create_section_coordinate_system(self.section, builder, crs_name, input_crs, output_crs)
+
+    @override
+    @classmethod
+    def loadable_family(cls) -> str:
+        return "Section"

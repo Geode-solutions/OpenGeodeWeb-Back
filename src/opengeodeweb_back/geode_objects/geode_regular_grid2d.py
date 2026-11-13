@@ -95,3 +95,8 @@ class GeodeRegularGrid2D(GeodeSurfaceMesh2D, GeodeGrid2D):
     @override
     def cell_attribute_manager(self) -> og.AttributeManager:
         return self.regular_grid.cell_attribute_manager()
+
+    @override
+    @classmethod
+    def loadable_family(cls) -> str:
+        return "Grid"

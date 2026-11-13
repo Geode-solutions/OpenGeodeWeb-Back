@@ -115,3 +115,8 @@ class GeodeRasterImage3D(GeodeMesh):
     @override
     def vertex_attribute_manager(self) -> og.AttributeManager:
         return og.AttributeManager()
+
+    @override
+    @classmethod
+    def loadable_family(cls) -> str:
+        return "RasterImage"
