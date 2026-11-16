@@ -114,7 +114,8 @@ def upload_file() -> flask.Response:
         # Relative paths (folder uploads) go through the raw upload below.
         file_path = Path(geode_functions.upload_file_path(Path(file.filename).name))
         file_path.parent.mkdir(parents=True, exist_ok=True)
-        file.save(file_path)
+        with utils_functions.log_duration(f"upload {file_path.name}"):
+            file.save(file_path)
         return _finalize_upload(file_path.name)
 
     raw_filename = flask.request.args.get("filename")
@@ -125,7 +126,8 @@ def upload_file() -> flask.Response:
 
     total_chunks = flask.request.args.get("total_chunks", type=int)
     if total_chunks is None:
-        _write_stream(file_path, flask.request.stream)
+        with utils_functions.log_duration(f"upload {file_path.name}"):
+            _write_stream(file_path, flask.request.stream)
         return _finalize_upload(file_path.name)
 
     chunk_index = flask.request.args.get("chunk_index", type=int)
@@ -133,7 +135,9 @@ def upload_file() -> flask.Response:
         flask.abort(400, "Invalid chunk_index")
 
     part_path = file_path.with_name(f"{file_path.name}.part")
-    _write_stream(part_path, flask.request.stream, "wb" if chunk_index == 0 else "ab")
+    # Per chunk timings show whether appending to the growing file slows down (antivirus rescans)
+    with utils_functions.log_duration(f"upload chunk {chunk_index + 1}/{total_chunks}"):
+        _write_stream(part_path, flask.request.stream, "wb" if chunk_index == 0 else "ab")
     if chunk_index < total_chunks - 1:
         return _upload_response("Chunk received", 200)
 
@@ -278,14 +282,15 @@ def geode_objects_and_output_extensions(
 def save_viewable_file(
     params: schemas.SaveViewableFile,
 ) -> schemas.SaveViewableFileResponse:
-    return schemas.SaveViewableFileResponse.from_dict(
-        {
-            "data": utils_functions.generate_files_from_file(
-                geode_object_type=geode_object_type(params.geode_object_type),
-                input_file=params.filename,
-            )
-        }
-    )
+    with utils_functions.log_duration(f"save_viewable_file {params.filename}"):
+        return schemas.SaveViewableFileResponse.from_dict(
+            {
+                "data": utils_functions.generate_files_from_file(
+                    geode_object_type=geode_object_type(params.geode_object_type),
+                    input_file=params.filename,
+                )
+            }
+        )
 
 
 @typed_route(routes, schemas.apply_time_series_route)
