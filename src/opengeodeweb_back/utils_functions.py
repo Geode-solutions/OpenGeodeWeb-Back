@@ -2,6 +2,7 @@ from __future__ import annotations
 
 # Standard library imports
 import base64
+import contextlib
 import hashlib
 import logging
 import shutil
@@ -34,12 +35,22 @@ from .geode_objects.geode_vertex_set import GeodeVertexSet
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable, Iterator, Sequence
 
     from opengeodeweb_microservice.database.data_types import GeodeObjectType
     from werkzeug.exceptions import HTTPException
 
     from .geode_objects.geode_object import GeodeObject
+
+
+@contextlib.contextmanager
+def log_duration(step: str) -> Iterator[None]:
+    """Log how long a step takes, to compare import timings across platforms."""
+    start = time.perf_counter()
+    try:
+        yield
+    finally:
+        logger.info("[timing] %s: %.2fs", step, time.perf_counter() - start)
 
 
 def increment_request_counter(current_app: flask.Flask) -> None:
@@ -326,7 +337,13 @@ def save_all_viewables_and_return_info(
                 ]
             )
 
-        results = list(executor.map(lambda args: args[0](args[1]), tasks))
+        def run_task[T](task: tuple[Callable[[str], T], str]) -> T:
+            save, path = task
+            with log_duration(f"{save.__name__} {Path(path).name}"):
+                return save(path)
+
+        with log_duration("save all files"):
+            results = list(executor.map(run_task, tasks))
         native_files = results[0]
         if geode_object.is_viewable():
             viewable_path = results[1]
@@ -436,12 +453,14 @@ def generate_files_from_file(
     """Create one data item per object held by the file, all or none."""
     generic_geode_object = geode_objects[geode_object_type]
     full_input_filename = geode_functions.upload_file_path(input_file)
-    objects = generic_geode_object.load(full_input_filename)
+    with log_duration(f"load {input_file}"):
+        objects = generic_geode_object.load(full_input_filename)
     if not objects:
         flask.abort(400, f"No {geode_object_type} object found in {input_file}")
     _name_loaded_objects(objects, input_file)
     if not input_file.lower().endswith("." + objects[0].native_extension()):
-        _set_content_based_ids(objects, _content_seed(geode_object_type, full_input_filename))
+        with log_duration("content based ids"):
+            _set_content_based_ids(objects, _content_seed(geode_object_type, full_input_filename))
     created: list[Data] = []
     responses: list[dict[str, Any]] = []
     try:
