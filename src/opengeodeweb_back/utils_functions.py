@@ -353,7 +353,7 @@ def save_all_viewables_and_return_info(
             "name": name,
             "viewer_object_type": data.viewer_object_type,
             "is_viewable": geode_object.is_viewable(),
-            "geode_object_type": data.geode_object,
+            "geode_object_type": data.geode_object_type,
         }
         if geode_object.is_viewable():
             response["viewable_file"] = data.viewable_file
@@ -373,7 +373,7 @@ def generate_files_from_object(
 ) -> dict[str, Any]:
     data = Data.create(
         geode_id=geode_object.identifier.id().string(),
-        geode_object=geode_object.geode_object_type(),
+        geode_object_type=geode_object.geode_object_type(),
         viewer_object_type=geode_object.viewer_object_type(),
         viewer_elements_type=geode_object.viewer_elements_type(),
     )
@@ -448,7 +448,7 @@ def generate_files_from_file(
         for geode_object in objects:
             data = Data.create(
                 geode_id=geode_object.identifier.id().string(),
-                geode_object=geode_object_type,
+                geode_object_type=geode_object_type,
                 viewer_object_type=generic_geode_object.viewer_object_type(),
                 viewer_elements_type=generic_geode_object.viewer_elements_type(),
             )

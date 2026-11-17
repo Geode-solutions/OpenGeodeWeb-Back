@@ -305,7 +305,7 @@ def test_texture_coordinates(client: FlaskClient) -> None:
         file = str(data_dir / "hat.vtp")
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
-            geode_object=GeodePolygonalSurface3D.geode_object_type(),
+            geode_object_type=GeodePolygonalSurface3D.geode_object_type(),
             viewer_object_type=GeodePolygonalSurface3D.viewer_object_type(),
             viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
         )
@@ -332,7 +332,7 @@ def test_vertex_attribute_names(client: FlaskClient) -> None:
         file = str(data_dir / "test.vtp")
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
-            geode_object=GeodePolygonalSurface3D.geode_object_type(),
+            geode_object_type=GeodePolygonalSurface3D.geode_object_type(),
             viewer_object_type=GeodePolygonalSurface3D.viewer_object_type(),
             viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
         )
@@ -362,7 +362,7 @@ def test_cell_attribute_names(client: FlaskClient) -> None:
         file = str(data_dir / "test.og_rgd2d")
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
-            geode_object=GeodeRegularGrid2D.geode_object_type(),
+            geode_object_type=GeodeRegularGrid2D.geode_object_type(),
             viewer_object_type=GeodeRegularGrid2D.viewer_object_type(),
             viewer_elements_type=GeodeRegularGrid2D.viewer_elements_type(),
         )
@@ -390,7 +390,7 @@ def test_polygon_attribute_names(client: FlaskClient) -> None:
         file = str(data_dir / "test.vtp")
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
-            geode_object=GeodePolygonalSurface3D.geode_object_type(),
+            geode_object_type=GeodePolygonalSurface3D.geode_object_type(),
             viewer_object_type=GeodePolygonalSurface3D.viewer_object_type(),
             viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
         )
@@ -418,7 +418,7 @@ def test_polyhedron_attribute_names(client: FlaskClient) -> None:
         file = str(data_dir / "test.vtu")
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
-            geode_object=GeodePolyhedralSolid3D.geode_object_type(),
+            geode_object_type=GeodePolyhedralSolid3D.geode_object_type(),
             viewer_object_type=GeodePolyhedralSolid3D.viewer_object_type(),
             viewer_elements_type=GeodePolyhedralSolid3D.viewer_elements_type(),
         )
@@ -446,7 +446,7 @@ def test_edge_attribute_names(client: FlaskClient) -> None:
         file = str(data_dir / "test.og_edc3d")
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
-            geode_object=GeodeEdgedCurve3D.geode_object_type(),
+            geode_object_type=GeodeEdgedCurve3D.geode_object_type(),
             viewer_object_type=GeodeEdgedCurve3D.viewer_object_type(),
             viewer_elements_type=GeodeEdgedCurve3D.viewer_elements_type(),
         )
@@ -572,7 +572,7 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
         data1 = Data(
             id="test_data_1",
             geode_id=DUMMY_GEODE_ID,
-            geode_object="BRep",
+            geode_object_type="BRep",
             viewer_object_type="BRep",
             viewer_elements_type="default",
             native_file="native.txt",
@@ -580,7 +580,7 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
         data2 = Data(
             id="test_data_2",
             geode_id=DUMMY_GEODE_ID,
-            geode_object="Section",
+            geode_object_type="Section",
             viewer_object_type="Section",
             viewer_elements_type="default",
             native_file="native.txt",
@@ -588,7 +588,7 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
         basemap = Data(
             id="test_basemap",
             geode_id=DUMMY_GEODE_ID,
-            geode_object="TriangulatedSurface3D",
+            geode_object_type="TriangulatedSurface3D",
             viewer_object_type="mesh",
             viewer_elements_type="polygons",
             native_file="native.og_tsf3d",
@@ -652,7 +652,7 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
     temp_db = tmp_path / "temp_project.db"
     conn = sqlite3.connect(str(temp_db))
     conn.execute(
-        "CREATE TABLE datas (id TEXT PRIMARY KEY, geode_id TEXT, geode_object TEXT, "
+        "CREATE TABLE datas (id TEXT PRIMARY KEY, geode_id TEXT, geode_object_type TEXT, "
         "viewer_object_type TEXT, viewer_elements_type TEXT, native_file TEXT, "
         "viewable_file TEXT, light_viewable_file TEXT)"
     )
@@ -853,7 +853,7 @@ def test_vertex_attribute_names_time_series(client: FlaskClient) -> None:
         file = str(data_dir / "time_series.og_psf3d")
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
-            geode_object=GeodePolygonalSurface3D.geode_object_type(),
+            geode_object_type=GeodePolygonalSurface3D.geode_object_type(),
             viewer_object_type=GeodePolygonalSurface3D.viewer_object_type(),
             viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
         )
@@ -882,7 +882,7 @@ def test_polyhedron_attribute_range(client: FlaskClient) -> None:
         file = str(data_dir / "polyhedron_attribute.vtu")
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
-            geode_object=GeodePolyhedralSolid3D.geode_object_type(),
+            geode_object_type=GeodePolyhedralSolid3D.geode_object_type(),
             viewer_object_type=GeodePolyhedralSolid3D.viewer_object_type(),
             viewer_elements_type=GeodePolyhedralSolid3D.viewer_elements_type(),
         )
@@ -988,7 +988,7 @@ def test_vertex_attribute_range_time_series(client: FlaskClient) -> None:
         file = str(data_dir / "time_series.og_psf3d")
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
-            geode_object=GeodePolygonalSurface3D.geode_object_type(),
+            geode_object_type=GeodePolygonalSurface3D.geode_object_type(),
             viewer_object_type=GeodePolygonalSurface3D.viewer_object_type(),
             viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
         )

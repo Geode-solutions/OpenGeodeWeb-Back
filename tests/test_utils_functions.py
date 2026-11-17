@@ -133,7 +133,7 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
 
         data_entry = Data.create(
             geode_id=geode_object.identifier.id().string(),
-            geode_object=geode_object.geode_object_type(),
+            geode_object_type=geode_object.geode_object_type(),
             viewer_object_type=geode_object.viewer_object_type(),
             viewer_elements_type=geode_object.viewer_elements_type(),
         )
@@ -162,7 +162,7 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
         assert db_entry is not None
         assert db_entry.native_file == result["native_file"]
         assert db_entry.viewable_file == result["viewable_file"]
-        assert db_entry.geode_object == geode_object.geode_object_type()
+        assert db_entry.geode_object_type == geode_object.geode_object_type()
 
         expected_data_path = Path(app.config["DATA_FOLDER_PATH"]) / result["id"]
         assert expected_data_path.exists()
@@ -174,7 +174,7 @@ def test_save_all_viewables_commits_to_db(client: FlaskClient) -> None:
         geode_object = GeodeBRep.load_one(str(data_dir / "test.og_brep"))
         data_entry = Data.create(
             geode_id=geode_object.identifier.id().string(),
-            geode_object=geode_object.geode_object_type(),
+            geode_object_type=geode_object.geode_object_type(),
             viewer_object_type=geode_object.viewer_object_type(),
             viewer_elements_type=geode_object.viewer_elements_type(),
         )
