@@ -74,7 +74,7 @@ class PolygonalSurfaceResponse(DataClassJsonMixin):
     is_viewable: bool
     name: str
     native_file: str
-    viewer_type: str
+    viewer_object_type: str
     binary_light_viewable: Optional[str] = None
     collection_components: Optional[List[CollectionComponent]] = None
     crs: Optional[CRS] = None

@@ -306,7 +306,7 @@ def test_texture_coordinates(client: FlaskClient) -> None:
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
             geode_object=GeodePolygonalSurface3D.geode_object_type(),
-            viewer_object=GeodePolygonalSurface3D.viewer_type(),
+            viewer_object_type=GeodePolygonalSurface3D.viewer_object_type(),
             viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
         )
         data.native_file = file
@@ -333,7 +333,7 @@ def test_vertex_attribute_names(client: FlaskClient) -> None:
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
             geode_object=GeodePolygonalSurface3D.geode_object_type(),
-            viewer_object=GeodePolygonalSurface3D.viewer_type(),
+            viewer_object_type=GeodePolygonalSurface3D.viewer_object_type(),
             viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
         )
         data.native_file = file
@@ -363,7 +363,7 @@ def test_cell_attribute_names(client: FlaskClient) -> None:
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
             geode_object=GeodeRegularGrid2D.geode_object_type(),
-            viewer_object=GeodeRegularGrid2D.viewer_type(),
+            viewer_object_type=GeodeRegularGrid2D.viewer_object_type(),
             viewer_elements_type=GeodeRegularGrid2D.viewer_elements_type(),
         )
         data.native_file = file
@@ -391,7 +391,7 @@ def test_polygon_attribute_names(client: FlaskClient) -> None:
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
             geode_object=GeodePolygonalSurface3D.geode_object_type(),
-            viewer_object=GeodePolygonalSurface3D.viewer_type(),
+            viewer_object_type=GeodePolygonalSurface3D.viewer_object_type(),
             viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
         )
         data.native_file = file
@@ -419,7 +419,7 @@ def test_polyhedron_attribute_names(client: FlaskClient) -> None:
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
             geode_object=GeodePolyhedralSolid3D.geode_object_type(),
-            viewer_object=GeodePolyhedralSolid3D.viewer_type(),
+            viewer_object_type=GeodePolyhedralSolid3D.viewer_object_type(),
             viewer_elements_type=GeodePolyhedralSolid3D.viewer_elements_type(),
         )
         data.native_file = file
@@ -447,7 +447,7 @@ def test_edge_attribute_names(client: FlaskClient) -> None:
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
             geode_object=GeodeEdgedCurve3D.geode_object_type(),
-            viewer_object=GeodeEdgedCurve3D.viewer_type(),
+            viewer_object_type=GeodeEdgedCurve3D.viewer_object_type(),
             viewer_elements_type=GeodeEdgedCurve3D.viewer_elements_type(),
         )
         data.native_file = file
@@ -573,7 +573,7 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
             id="test_data_1",
             geode_id=DUMMY_GEODE_ID,
             geode_object="BRep",
-            viewer_object="BRep",
+            viewer_object_type="BRep",
             viewer_elements_type="default",
             native_file="native.txt",
         )
@@ -581,7 +581,7 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
             id="test_data_2",
             geode_id=DUMMY_GEODE_ID,
             geode_object="Section",
-            viewer_object="Section",
+            viewer_object_type="Section",
             viewer_elements_type="default",
             native_file="native.txt",
         )
@@ -589,7 +589,7 @@ def test_export_project_route(client: FlaskClient, tmp_path: Path) -> None:
             id="test_basemap",
             geode_id=DUMMY_GEODE_ID,
             geode_object="TriangulatedSurface3D",
-            viewer_object="mesh",
+            viewer_object_type="mesh",
             viewer_elements_type="polygons",
             native_file="native.og_tsf3d",
         )
@@ -653,7 +653,7 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
     conn = sqlite3.connect(str(temp_db))
     conn.execute(
         "CREATE TABLE datas (id TEXT PRIMARY KEY, geode_id TEXT, geode_object TEXT, "
-        "viewer_object TEXT, viewer_elements_type TEXT, native_file TEXT, "
+        "viewer_object_type TEXT, viewer_elements_type TEXT, native_file TEXT, "
         "viewable_file TEXT, light_viewable_file TEXT)"
     )
     conn.commit()
@@ -854,7 +854,7 @@ def test_vertex_attribute_names_time_series(client: FlaskClient) -> None:
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
             geode_object=GeodePolygonalSurface3D.geode_object_type(),
-            viewer_object=GeodePolygonalSurface3D.viewer_type(),
+            viewer_object_type=GeodePolygonalSurface3D.viewer_object_type(),
             viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
         )
         data.native_file = file
@@ -883,7 +883,7 @@ def test_polyhedron_attribute_range(client: FlaskClient) -> None:
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
             geode_object=GeodePolyhedralSolid3D.geode_object_type(),
-            viewer_object=GeodePolyhedralSolid3D.viewer_type(),
+            viewer_object_type=GeodePolyhedralSolid3D.viewer_object_type(),
             viewer_elements_type=GeodePolyhedralSolid3D.viewer_elements_type(),
         )
         data.native_file = file
@@ -989,7 +989,7 @@ def test_vertex_attribute_range_time_series(client: FlaskClient) -> None:
         data = Data.create(
             geode_id=DUMMY_GEODE_ID,
             geode_object=GeodePolygonalSurface3D.geode_object_type(),
-            viewer_object=GeodePolygonalSurface3D.viewer_type(),
+            viewer_object_type=GeodePolygonalSurface3D.viewer_object_type(),
             viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
         )
         data.native_file = file

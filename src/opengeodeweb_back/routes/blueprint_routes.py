@@ -930,7 +930,7 @@ def _regenerate_missing_viewables(rows: list[Data]) -> None:
                 vpath = Path(geode_functions.data_file_path(data.id, viewable_name))
                 viewable_dir = Path(data_path) / "viewable"
                 has_components = viewable_dir.is_dir() and any(viewable_dir.iterdir())
-                if vpath.is_file() and (data.viewer_object != "model" or has_components):
+                if vpath.is_file() and (data.viewer_object_type != "model" or has_components):
                     continue
 
             native_file = str(data.native_file or "")

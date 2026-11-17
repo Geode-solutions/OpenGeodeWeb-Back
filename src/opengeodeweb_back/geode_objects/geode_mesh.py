@@ -10,13 +10,13 @@ from .geode_object import GeodeObject
 
 if TYPE_CHECKING:
     import opengeode as og
-    from opengeodeweb_microservice.database.data_types import ViewerType
+    from opengeodeweb_microservice.database.data_types import ViewerObjectType
 
 
 class GeodeMesh(GeodeObject):
     @override
     @classmethod
-    def viewer_type(cls) -> ViewerType:
+    def viewer_object_type(cls) -> ViewerObjectType:
         return "mesh"
 
     @abstractmethod

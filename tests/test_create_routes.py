@@ -56,11 +56,11 @@ def test_create_point(client: FlaskClient, point_data: test_utils.JsonData) -> N
     assert "id" in response_data
     assert "name" in response_data
     assert "native_file" in response_data
-    assert "viewer_type" in response_data
+    assert "viewer_object_type" in response_data
     assert "geode_object_type" in response_data
 
     assert response_data["name"] == point_data["name"]
-    assert response_data["viewer_type"] == "mesh"
+    assert response_data["viewer_object_type"] == "mesh"
     assert response_data["geode_object_type"] == "PointSet3D"
 
     # Test with missing parameters
@@ -118,11 +118,11 @@ def test_create_curve(client: FlaskClient, curve_data: test_utils.JsonData) -> N
     assert "id" in response_data
     assert "name" in response_data
     assert "native_file" in response_data
-    assert "viewer_type" in response_data
+    assert "viewer_object_type" in response_data
     assert "geode_object_type" in response_data
 
     assert response_data["name"] == curve_data["name"]
-    assert response_data["viewer_type"] == "mesh"
+    assert response_data["viewer_object_type"] == "mesh"
     assert response_data["geode_object_type"] == "EdgedCurve3D"
 
     # Test with missing parameters
@@ -143,11 +143,11 @@ def test_create_polygonal_surface(client: FlaskClient, surface_data: test_utils.
     assert "id" in response_data
     assert "name" in response_data
     assert "native_file" in response_data
-    assert "viewer_type" in response_data
+    assert "viewer_object_type" in response_data
     assert "geode_object_type" in response_data
 
     assert response_data["name"] == surface_data["name"]
-    assert response_data["viewer_type"] == "mesh"
+    assert response_data["viewer_object_type"] == "mesh"
     assert response_data["geode_object_type"] == "PolygonalSurface3D"
 
     # Test with missing parameters

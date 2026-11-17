@@ -67,7 +67,7 @@
       "name": {
         "type": "string"
       },
-      "viewer_type": {
+      "viewer_object_type": {
         "type": "string"
       },
       "is_viewable": {
@@ -204,7 +204,7 @@
       "native_file",
       "id",
       "name",
-      "viewer_type",
+      "viewer_object_type",
       "is_viewable",
       "geode_object_type",
       "geode_id"
