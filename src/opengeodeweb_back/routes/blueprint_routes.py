@@ -199,7 +199,7 @@ def _missing_files(additional_files: og.AdditionalFiles, main_file: Path) -> dic
     return {
         "has_missing_files": any(
             file.is_missing
-            for file in additional_files.mandatory_files + additional_files.optional_files
+            for file in [*additional_files.mandatory_files, *additional_files.optional_files]
         ),
         "mandatory_files": [
             _path_relative_to_main_file(file.filename, main_file)
@@ -233,7 +233,7 @@ def time_series_missing_files(
     # files referenced outside of it could never be provided
     if any(
         not _resolved_path(file.filename, file_path).is_relative_to(file_path.parent)
-        for file in additional_files.mandatory_files + additional_files.optional_files
+        for file in [*additional_files.mandatory_files, *additional_files.optional_files]
     ):
         flask.abort(400, f"{file_path.name} references files outside its folder")
     return schemas.TimeSeriesMissingFilesResponse.from_dict(
