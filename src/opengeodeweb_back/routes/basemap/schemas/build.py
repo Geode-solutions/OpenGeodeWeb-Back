@@ -93,7 +93,7 @@ class BuildResponse(DataClassJsonMixin):
     name: str
     native_file: str
     rows: int
-    viewer_type: str
+    viewer_object_type: str
     zoom: int
     binary_light_viewable: Optional[str] = None
     crs: Optional[CRS] = None

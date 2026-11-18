@@ -294,8 +294,8 @@ def apply_time_series(
 ) -> schemas.ApplyTimeSeriesResponse:
     data = geode_functions.get_data_info(params.id)
     _check_time_series_extension(params.filename)
-    if data.geode_object != GeodeBRep.geode_object_type():
-        flask.abort(400, f"{data.geode_object} is not a BRep: time series cannot be applied")
+    if data.geode_object_type != GeodeBRep.geode_object_type():
+        flask.abort(400, f"{data.geode_object_type} is not a BRep: time series cannot be applied")
     geode_object = GeodeBRep.load_one(geode_functions.data_file_path(params.id, data.native_file))
     # Applied in memory first: if OpenGeode fails, nothing is written.
     geode_object.load_time_series(geode_functions.upload_file_path(params.filename))
@@ -930,7 +930,7 @@ def _regenerate_missing_viewables(rows: list[Data]) -> None:
                 vpath = Path(geode_functions.data_file_path(data.id, viewable_name))
                 viewable_dir = Path(data_path) / "viewable"
                 has_components = viewable_dir.is_dir() and any(viewable_dir.iterdir())
-                if vpath.is_file() and (data.viewer_object != "model" or has_components):
+                if vpath.is_file() and (data.viewer_object_type != "model" or has_components):
                     continue
 
             native_file = str(data.native_file or "")
@@ -941,9 +941,9 @@ def _regenerate_missing_viewables(rows: list[Data]) -> None:
             if not Path(native_full).is_file():
                 continue
 
-            geode_object = geode_functions.geode_object_from_string(data.geode_object).load_one(
-                native_full
-            )
+            geode_object = geode_functions.geode_object_from_string(
+                data.geode_object_type
+            ).load_one(native_full)
             utils_functions.save_all_viewables_and_return_info(geode_object, data, data_path)
         session.commit()
 

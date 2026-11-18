@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from opengeodeweb_microservice.database.data_types import (
         GeodeObjectType,
         ViewerElementsType,
-        ViewerType,
+        ViewerObjectType,
     )
 
 # Local application imports
@@ -32,7 +32,7 @@ class GeodeObject(ABC):
 
     @classmethod
     @abstractmethod
-    def viewer_type(cls) -> ViewerType: ...
+    def viewer_object_type(cls) -> ViewerObjectType: ...
 
     @classmethod
     @abstractmethod

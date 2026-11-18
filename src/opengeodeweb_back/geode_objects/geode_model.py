@@ -13,7 +13,7 @@ from .geode_object import GeodeObject
 if TYPE_CHECKING:
     from opengeodeweb_microservice.database.data_types import (
         ViewerElementsType,
-        ViewerType,
+        ViewerObjectType,
     )
 
 ComponentRegistry = dict[og.ComponentType, list[og.uuid]]
@@ -22,7 +22,7 @@ ComponentRegistry = dict[og.ComponentType, list[og.uuid]]
 class GeodeModel(GeodeObject):
     @override
     @classmethod
-    def viewer_type(cls) -> ViewerType:
+    def viewer_object_type(cls) -> ViewerObjectType:
         return "model"
 
     @override

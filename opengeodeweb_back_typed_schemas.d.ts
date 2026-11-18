@@ -49,7 +49,7 @@ export interface BasemapBuildResponse {
     nb_vertices?:           number;
     rows:                   number;
     viewable_file?:         string;
-    viewer_type:            string;
+    viewer_object_type:     string;
     zoom:                   number;
 }
 
@@ -96,7 +96,7 @@ export interface CreatePolygonalSurfaceResponse {
     native_file:            string;
     nb_vertices?:           number;
     viewable_file?:         string;
-    viewer_type:            string;
+    viewer_object_type:     string;
 }
 
 export interface CreatePolygonalSurfaceResponseCollectionComponent {
@@ -147,7 +147,7 @@ export interface CreatePointSetResponse {
     native_file:            string;
     nb_vertices?:           number;
     viewable_file?:         string;
-    viewer_type:            string;
+    viewer_object_type:     string;
 }
 
 export interface CreatePointSetResponseCollectionComponent {
@@ -193,7 +193,7 @@ export interface CreateHorizonStackResponse {
     native_file:            string;
     nb_vertices?:           number;
     viewable_file?:         string;
-    viewer_type:            string;
+    viewer_object_type:     string;
 }
 
 export interface CreateHorizonStackResponseCollectionComponent {
@@ -245,7 +245,7 @@ export interface CreateEdgedCurveResponse {
     native_file:            string;
     nb_vertices?:           number;
     viewable_file?:         string;
-    viewer_type:            string;
+    viewer_object_type:     string;
 }
 
 export interface CreateEdgedCurveResponseCollectionComponent {
@@ -503,7 +503,7 @@ export interface SaveViewableFileItem {
     native_file:            string;
     nb_vertices?:           number;
     viewable_file?:         string;
-    viewer_type:            string;
+    viewer_object_type:     string;
 }
 
 export interface DatumCollectionComponent {
