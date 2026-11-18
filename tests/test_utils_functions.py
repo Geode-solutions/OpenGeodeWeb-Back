@@ -133,8 +133,8 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
 
         data_entry = Data.create(
             geode_id=geode_object.identifier.id().string(),
-            geode_object=geode_object.geode_object_type(),
-            viewer_object=geode_object.viewer_type(),
+            geode_object_type=geode_object.geode_object_type(),
+            viewer_object_type=geode_object.viewer_object_type(),
             viewer_elements_type=geode_object.viewer_elements_type(),
         )
         data_path = utils_functions.create_data_folder_from_id(data_entry.id)
@@ -154,7 +154,7 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
         assert len(result["id"]) == 32
         assert re.match(r"[0-9a-f]{32}", result["id"])
         assert result["geode_id"] == geode_object.identifier.id().string()
-        assert isinstance(result["viewer_type"], str)
+        assert isinstance(result["viewer_object_type"], str)
         assert isinstance(result["binary_light_viewable"], str)
         assert result["geode_object_type"] == geode_object.geode_object_type()
 
@@ -162,7 +162,7 @@ def test_save_all_viewables_and_return_info(client: FlaskClient) -> None:
         assert db_entry is not None
         assert db_entry.native_file == result["native_file"]
         assert db_entry.viewable_file == result["viewable_file"]
-        assert db_entry.geode_object == geode_object.geode_object_type()
+        assert db_entry.geode_object_type == geode_object.geode_object_type()
 
         expected_data_path = Path(app.config["DATA_FOLDER_PATH"]) / result["id"]
         assert expected_data_path.exists()
@@ -174,8 +174,8 @@ def test_save_all_viewables_commits_to_db(client: FlaskClient) -> None:
         geode_object = GeodeBRep.load_one(str(data_dir / "test.og_brep"))
         data_entry = Data.create(
             geode_id=geode_object.identifier.id().string(),
-            geode_object=geode_object.geode_object_type(),
-            viewer_object=geode_object.viewer_type(),
+            geode_object_type=geode_object.geode_object_type(),
+            viewer_object_type=geode_object.viewer_object_type(),
             viewer_elements_type=geode_object.viewer_elements_type(),
         )
         data_path = utils_functions.create_data_folder_from_id(data_entry.id)
@@ -206,7 +206,7 @@ def test_generate_files_from_object(
         assert result["viewable_file"].endswith(".vtm")
         assert isinstance(result["id"], str)
         assert re.match(r"[0-9a-f]{32}", result["id"])
-        assert isinstance(result["viewer_type"], str)
+        assert isinstance(result["viewer_object_type"], str)
         assert isinstance(result["binary_light_viewable"], str)
         light_viewable_bytes = base64.b64decode(result["binary_light_viewable"], validate=True)
         assert light_viewable_bytes.startswith(b'<?xml version="1.0"?>')
@@ -243,7 +243,7 @@ def test_generate_files_from_file(
     assert result["viewable_file"].endswith(".vtm")
     assert isinstance(result["id"], str)
     assert re.match(r"[0-9a-f]{32}", result["id"])
-    assert isinstance(result["viewer_type"], str)
+    assert isinstance(result["viewer_object_type"], str)
     assert isinstance(result["binary_light_viewable"], str)
 
 
