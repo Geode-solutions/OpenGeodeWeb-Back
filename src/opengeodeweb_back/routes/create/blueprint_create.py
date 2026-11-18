@@ -79,7 +79,7 @@ def horizon_stack(params: schemas.HorizonStack) -> schemas.HorizonStackResponse:
             f" got {len(params.unit_names)}",
         )
     horizon_stack_obj = GeodeHorizonStack3D(
-        opengeode_geosciences.horizons_stack_from_top_to_bottom_names_3d(
+        opengeode_geosciences.horizons_stack_from_top_to_bottom_names3D(
             params.horizons, params.unit_names
         )
     )
