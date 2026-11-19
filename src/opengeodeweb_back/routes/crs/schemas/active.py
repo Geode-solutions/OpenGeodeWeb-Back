@@ -1,3 +1,4 @@
+from opengeodeweb_back.schema_types import CRS
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from typing import Optional
@@ -15,22 +16,12 @@ class Active(DataClassJsonMixin):
 
 
 @dataclass
-class CRSInfo(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    authority: str
-    code: str
-    name: str
-
-
-@dataclass
 class ActiveResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
     crs_name: str
-    crs_info: Optional[CRSInfo] = None
+    crs_info: Optional[CRS] = None
 
 
 active_route = Route(

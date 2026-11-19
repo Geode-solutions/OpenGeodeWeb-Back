@@ -1,3 +1,6 @@
+from opengeodeweb_microservice.database.data_types import GeodeObjectType, ViewerObjectType
+from opengeodeweb_microservice.schema_types import Point3D
+from opengeodeweb_back.schema_types import CRS, CollectionComponent, MeshComponent
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from typing import List, Optional
@@ -8,59 +11,13 @@ from typing import List
 
 
 @dataclass
-class EdgedCurvePoint(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    x: float
-    y: float
-    z: float
-
-
-@dataclass
 class EdgedCurve(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
     edges: List[List[int]]
     name: str
-    points: List[EdgedCurvePoint]
-
-
-@dataclass
-class CollectionComponent(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    geode_id: str
-    is_active: bool
-    items: List[str]
-    name: str
-    type: str
-
-
-@dataclass
-class CRS(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    authority: str
-    code: str
-    name: str
-
-
-@dataclass
-class MeshComponent(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    boundaries: List[str]
-    geode_id: str
-    internals: List[str]
-    is_active: bool
-    name: str
-    type: str
-    viewer_id: int
+    points: List[Point3D]
 
 
 @dataclass
@@ -69,12 +26,12 @@ class EdgedCurveResponse(DataClassJsonMixin):
         print_dataclass(self)
 
     geode_id: str
-    geode_object_type: str
+    geode_object_type: GeodeObjectType
     id: str
     is_viewable: bool
     name: str
     native_file: str
-    viewer_object_type: str
+    viewer_object_type: ViewerObjectType
     binary_light_viewable: Optional[str] = None
     collection_components: Optional[List[CollectionComponent]] = None
     crs: Optional[CRS] = None
@@ -89,4 +46,4 @@ edged_curve_route = Route(
     response=EdgedCurveResponse,
 )
 
-__all__ = ["EdgedCurvePoint", "EdgedCurve", "EdgedCurveResponse", "edged_curve_route"]
+__all__ = ["Point3D", "EdgedCurve", "EdgedCurveResponse", "edged_curve_route"]

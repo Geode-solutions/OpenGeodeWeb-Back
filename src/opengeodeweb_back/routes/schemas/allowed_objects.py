@@ -1,3 +1,4 @@
+from opengeodeweb_microservice.database.data_types import GeodeObjectType
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from typing import Dict, List
@@ -30,7 +31,7 @@ class AllowedObjectsResponse(DataClassJsonMixin):
         print_dataclass(self)
 
     allowed_objects: Dict[str, AllowedObject]
-    objects_to_load: List[str]
+    objects_to_load: List[GeodeObjectType]
 
 
 allowed_objects_route = Route(

@@ -1,3 +1,4 @@
+from opengeodeweb_microservice.database.data_types import GeodeObjectType
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from typing import Dict
@@ -12,7 +13,7 @@ class GeodeObjectsAndOutputExtensions(DataClassJsonMixin):
         print_dataclass(self)
 
     filename: str
-    geode_object_type: str
+    geode_object_type: GeodeObjectType
 
 
 @dataclass

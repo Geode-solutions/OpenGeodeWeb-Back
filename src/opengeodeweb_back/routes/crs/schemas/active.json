@@ -6,9 +6,7 @@
   "type": "object",
   "properties": {
     "id": {
-      "type": "string",
-      "minLength": 32,
-      "maxLength": 32
+      "title": "DataId"
     }
   },
   "required": [
@@ -22,24 +20,7 @@
         "type": "string"
       },
       "crs_info": {
-        "type": "object",
-        "properties": {
-          "authority": {
-            "type": "string"
-          },
-          "code": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "authority",
-          "code",
-          "name"
-        ],
-        "additionalProperties": false
+        "title": "CRS"
       }
     },
     "required": [
