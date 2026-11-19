@@ -5,8 +5,22 @@
 from dataclasses import dataclass
 
 from dataclasses_json import DataClassJsonMixin
-from opengeodeweb_microservice.schema_types import AttributeName, GeodeId, ViewerId
+from opengeodeweb_microservice.schema_types import GeodeId
 from opengeodeweb_microservice.schemas import print_dataclass
+
+ViewerId = int
+AttributeName = str
+Filename = str
+
+
+@dataclass
+class Point3D(DataClassJsonMixin):
+    def __post_init__(self) -> None:
+        print_dataclass(self)
+
+    x: float
+    y: float
+    z: float
 
 
 @dataclass
@@ -59,6 +73,10 @@ class CollectionComponent(DataClassJsonMixin):
 __all__ = [
     "CRS",
     "AttributeInfo",
+    "AttributeName",
     "CollectionComponent",
+    "Filename",
     "MeshComponent",
+    "Point3D",
+    "ViewerId",
 ]

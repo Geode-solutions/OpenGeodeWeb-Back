@@ -1,4 +1,5 @@
-from opengeodeweb_microservice.schema_types import AttributeName, DataId
+from opengeodeweb_back.schema_types import AttributeName
+from opengeodeweb_microservice.schema_types import DataId
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from typing import List

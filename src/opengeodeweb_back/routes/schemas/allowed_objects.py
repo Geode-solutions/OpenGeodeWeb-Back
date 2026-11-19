@@ -1,4 +1,4 @@
-from opengeodeweb_microservice.schema_types import Filename
+from opengeodeweb_back.schema_types import Filename
 from opengeodeweb_microservice.database.data_types import GeodeObjectType
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema

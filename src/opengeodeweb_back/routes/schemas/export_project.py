@@ -1,4 +1,4 @@
-from opengeodeweb_microservice.schema_types import Filename
+from opengeodeweb_back.schema_types import Filename
 from pathlib import Path
 from opengeodeweb_microservice.schemas import BinaryResponse, Route, load_schema
 from dataclasses_json import DataClassJsonMixin

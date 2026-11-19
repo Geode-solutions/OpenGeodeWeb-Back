@@ -1,5 +1,5 @@
-from opengeodeweb_microservice.schema_types import AttributeName, DataId, GeodeId
-from opengeodeweb_back.schema_types import AttributeInfo
+from opengeodeweb_microservice.schema_types import DataId, GeodeId
+from opengeodeweb_back.schema_types import AttributeInfo, AttributeName
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from dataclasses_json import DataClassJsonMixin

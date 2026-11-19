@@ -1,4 +1,35 @@
 {
+  "ViewerId": {
+    "type": "integer"
+  },
+  "AttributeName": {
+    "type": "string",
+    "minLength": 1
+  },
+  "Filename": {
+    "type": "string",
+    "minLength": 1
+  },
+  "Point3D": {
+    "type": "object",
+    "properties": {
+      "x": {
+        "type": "number"
+      },
+      "y": {
+        "type": "number"
+      },
+      "z": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "x",
+      "y",
+      "z"
+    ],
+    "additionalProperties": false
+  },
   "AttributeInfo": {
     "type": "object",
     "properties": {
@@ -18,7 +49,12 @@
         }
       }
     },
-    "required": ["attribute_name", "attribute_id", "nb_items", "time_steps"],
+    "required": [
+      "attribute_name",
+      "attribute_id",
+      "nb_items",
+      "time_steps"
+    ],
     "additionalProperties": false
   },
   "CRS": {
@@ -37,7 +73,11 @@
         "minLength": 1
       }
     },
-    "required": ["authority", "code", "name"],
+    "required": [
+      "authority",
+      "code",
+      "name"
+    ],
     "additionalProperties": false
   },
   "MeshComponent": {
@@ -71,7 +111,15 @@
         "type": "boolean"
       }
     },
-    "required": ["viewer_id", "geode_id", "name", "type", "boundaries", "internals", "is_active"],
+    "required": [
+      "viewer_id",
+      "geode_id",
+      "name",
+      "type",
+      "boundaries",
+      "internals",
+      "is_active"
+    ],
     "additionalProperties": false
   },
   "CollectionComponent": {
@@ -96,7 +144,13 @@
         "type": "boolean"
       }
     },
-    "required": ["geode_id", "name", "type", "items", "is_active"],
+    "required": [
+      "geode_id",
+      "name",
+      "type",
+      "items",
+      "is_active"
+    ],
     "additionalProperties": false
   }
 }
