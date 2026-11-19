@@ -1,0 +1,102 @@
+{
+  "AttributeInfo": {
+    "type": "object",
+    "properties": {
+      "attribute_name": {
+        "title": "AttributeName"
+      },
+      "attribute_id": {
+        "type": "string"
+      },
+      "nb_items": {
+        "type": "integer"
+      },
+      "time_steps": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      }
+    },
+    "required": ["attribute_name", "attribute_id", "nb_items", "time_steps"],
+    "additionalProperties": false
+  },
+  "CRS": {
+    "type": "object",
+    "properties": {
+      "authority": {
+        "type": "string",
+        "minLength": 1
+      },
+      "code": {
+        "type": "string",
+        "minLength": 1
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "required": ["authority", "code", "name"],
+    "additionalProperties": false
+  },
+  "MeshComponent": {
+    "type": "object",
+    "properties": {
+      "viewer_id": {
+        "title": "ViewerId"
+      },
+      "geode_id": {
+        "title": "GeodeId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      },
+      "boundaries": {
+        "type": "array",
+        "items": {
+          "title": "GeodeId"
+        }
+      },
+      "internals": {
+        "type": "array",
+        "items": {
+          "title": "GeodeId"
+        }
+      },
+      "is_active": {
+        "type": "boolean"
+      }
+    },
+    "required": ["viewer_id", "geode_id", "name", "type", "boundaries", "internals", "is_active"],
+    "additionalProperties": false
+  },
+  "CollectionComponent": {
+    "type": "object",
+    "properties": {
+      "geode_id": {
+        "title": "GeodeId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      },
+      "items": {
+        "type": "array",
+        "items": {
+          "title": "GeodeId"
+        }
+      },
+      "is_active": {
+        "type": "boolean"
+      }
+    },
+    "required": ["geode_id", "name", "type", "items", "is_active"],
+    "additionalProperties": false
+  }
+}
