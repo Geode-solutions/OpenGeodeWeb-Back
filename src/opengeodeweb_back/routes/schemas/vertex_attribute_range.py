@@ -1,3 +1,4 @@
+from opengeodeweb_microservice.schema_types import AttributeName, DataId
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from typing import List
@@ -11,8 +12,8 @@ class VertexAttributeRange(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    attribute_name: str
-    id: str
+    attribute_name: AttributeName
+    id: DataId
 
 
 @dataclass

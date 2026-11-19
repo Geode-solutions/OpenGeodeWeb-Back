@@ -1,3 +1,4 @@
+from opengeodeweb_microservice.schema_types import AttributeName, DataId
 from opengeodeweb_back.schema_types import AttributeInfo
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
@@ -12,7 +13,7 @@ class PolyhedronAttributeNames(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    id: str
+    id: DataId
 
 
 @dataclass

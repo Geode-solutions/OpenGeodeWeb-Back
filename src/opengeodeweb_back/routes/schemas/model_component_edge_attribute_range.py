@@ -1,3 +1,4 @@
+from opengeodeweb_microservice.schema_types import AttributeName, DataId, GeodeId
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from dataclasses_json import DataClassJsonMixin
@@ -11,9 +12,9 @@ class ModelComponentEdgeAttributeRange(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    attribute_name: str
-    component_ids: List[str]
-    id: str
+    attribute_name: AttributeName
+    component_ids: List[GeodeId]
+    id: DataId
 
 
 @dataclass

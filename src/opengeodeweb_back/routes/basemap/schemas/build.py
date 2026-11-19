@@ -1,3 +1,4 @@
+from opengeodeweb_microservice.schema_types import DataId, GeodeId
 from opengeodeweb_microservice.database.data_types import GeodeObjectType, ViewerObjectType
 from opengeodeweb_back.schema_types import CRS
 from pathlib import Path
@@ -67,9 +68,9 @@ class BuildResponse(DataClassJsonMixin):
     attribution: str
     bounds: MeshBounds
     columns: int
-    geode_id: str
+    geode_id: GeodeId
     geode_object_type: GeodeObjectType
-    id: str
+    id: DataId
     is_viewable: bool
     maps: List[MapElement]
     name: str

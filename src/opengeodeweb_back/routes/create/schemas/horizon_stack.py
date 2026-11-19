@@ -1,3 +1,4 @@
+from opengeodeweb_microservice.schema_types import DataId, GeodeId, ViewerId
 from opengeodeweb_microservice.database.data_types import GeodeObjectType, ViewerObjectType
 from opengeodeweb_back.schema_types import CRS, CollectionComponent, MeshComponent
 from pathlib import Path
@@ -24,9 +25,9 @@ class HorizonStackResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    geode_id: str
+    geode_id: GeodeId
     geode_object_type: GeodeObjectType
-    id: str
+    id: DataId
     is_viewable: bool
     name: str
     native_file: str
