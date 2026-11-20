@@ -2,8 +2,10 @@ from __future__ import annotations
 
 # Standard library imports
 import base64
+import os
 import re
 import shutil
+import sqlite3
 import uuid
 import zipfile
 from pathlib import Path
@@ -12,6 +14,7 @@ from typing import TYPE_CHECKING
 # Third party imports
 import flask
 import pytest
+from opengeodeweb_microservice.database import connection
 from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_microservice.database.data import Data
 from werkzeug.exceptions import HTTPException
@@ -75,6 +78,26 @@ def test_teardown_request() -> None:
     utils_functions.teardown_request(flask.current_app)
     assert flask.current_app.config.get("REQUEST_COUNTER") == 0
     assert flask.current_app.config.get("LAST_REQUEST_TIME", 0) >= last_request_time
+
+
+@pytest.mark.usefixtures("app_context")
+def test_teardown_commits_a_session_opened_after_the_database_reopened() -> None:
+    # A request started while import_project had the database closed, then the route used it
+    db_path = Path(os.environ["TEST_DB_PATH"])
+    connection.close_database()
+    utils_functions.before_request(flask.current_app)
+    connection.init_database(db_path)
+    data = Data.create(
+        geode_id="teardown_test",
+        geode_object_type=GeodePolygonalSurface3D.geode_object_type(),
+        viewer_object_type=GeodePolygonalSurface3D.viewer_object_type(),
+        viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
+    )
+    data_id = data.id
+    utils_functions.teardown_request(flask.current_app)
+    with sqlite3.connect(db_path) as reader:
+        row = reader.execute("SELECT id FROM datas WHERE id = ?", (data_id,)).fetchone()
+    assert row is not None
 
 
 def test_versions() -> None:
