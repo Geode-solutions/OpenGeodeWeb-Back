@@ -38,10 +38,14 @@ def geode_object_from_string(value: str) -> type[GeodeObject]:
 
 
 def load_geode_object(data_id: str) -> GeodeObject:
+    # Local import: utils_functions imports this module
+    from .utils_functions import wait_native_saved  # noqa: PLC0415
+
     data = Data.get(data_id)
     if not data:
         flask.abort(404, f"Data with id {data_id} not found")
 
+    wait_native_saved(data_id)
     file_absolute_path = data_file_path(data_id, data.native_file)
     logger.debug(
         "Loading file: %s (exists: %s)",
