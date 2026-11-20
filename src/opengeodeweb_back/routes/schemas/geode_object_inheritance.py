@@ -1,3 +1,4 @@
+from opengeodeweb_microservice.database.data_types import GeodeObjectType
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from typing import List
@@ -11,7 +12,7 @@ class GeodeObjectInheritance(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    geode_object_type: str
+    geode_object_type: GeodeObjectType
 
 
 @dataclass
@@ -19,8 +20,8 @@ class GeodeObjectInheritanceResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    children: List[str]
-    parents: List[str]
+    children: List[GeodeObjectType]
+    parents: List[GeodeObjectType]
 
 
 geode_object_inheritance_route = Route(

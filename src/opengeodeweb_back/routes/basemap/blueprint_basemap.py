@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from opengeodeweb_back.geode_objects.geode_triangulated_surface3d import (
         GeodeTriangulatedSurface3D,
     )
+    from opengeodeweb_back.schema_types import CRS
 
 routes = flask.Blueprint("basemap", __name__, url_prefix="/basemap")
 logger = logging.getLogger(__name__)
@@ -47,7 +48,7 @@ def padded(bounds: tuple[float, float, float, float]) -> tuple[float, float, flo
     )
 
 
-def _crs(params: schemas.CRSParams) -> og_geosciences.GeographicCoordinateSystemInfo:
+def _crs(params: CRS) -> og_geosciences.GeographicCoordinateSystemInfo:
     key = f"{params.authority}:{params.code}"
     # The basemap is a 3D mesh: only list the CRS a 3D object accepts
     crs = geographic_coordinate_systems(True).get(key)  # noqa: FBT003

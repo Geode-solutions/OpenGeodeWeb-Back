@@ -1,3 +1,6 @@
+from opengeodeweb_microservice.schema_types import DataId, GeodeId
+from opengeodeweb_back.schema_types import CRS, CollectionComponent, MeshComponent, ViewerId
+from opengeodeweb_microservice.database.data_types import GeodeObjectType, ViewerObjectType
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from typing import List, Optional
@@ -18,53 +21,17 @@ class HorizonStack(DataClassJsonMixin):
 
 
 @dataclass
-class CollectionComponent(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    geode_id: str
-    is_active: bool
-    items: List[str]
-    name: str
-    type: str
-
-
-@dataclass
-class CRS(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    authority: str
-    code: str
-    name: str
-
-
-@dataclass
-class MeshComponent(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    boundaries: List[str]
-    geode_id: str
-    internals: List[str]
-    is_active: bool
-    name: str
-    type: str
-    viewer_id: int
-
-
-@dataclass
 class HorizonStackResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    geode_id: str
-    geode_object_type: str
-    id: str
+    geode_id: GeodeId
+    geode_object_type: GeodeObjectType
+    id: DataId
     is_viewable: bool
     name: str
     native_file: str
-    viewer_object_type: str
+    viewer_object_type: ViewerObjectType
     binary_light_viewable: Optional[str] = None
     collection_components: Optional[List[CollectionComponent]] = None
     crs: Optional[CRS] = None

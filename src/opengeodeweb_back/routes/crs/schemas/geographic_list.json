@@ -6,8 +6,7 @@
   "type": "object",
   "properties": {
     "geode_object_type": {
-      "type": "string",
-      "minLength": 1
+      "title": "GeodeObjectType"
     }
   },
   "required": [
@@ -20,24 +19,7 @@
       "crs_list": {
         "type": "array",
         "items": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "code": {
-              "type": "string"
-            },
-            "authority": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "name",
-            "code",
-            "authority"
-          ],
-          "additionalProperties": false
+          "title": "CRS"
         }
       }
     },

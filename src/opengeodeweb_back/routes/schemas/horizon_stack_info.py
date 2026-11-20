@@ -1,3 +1,4 @@
+from opengeodeweb_microservice.schema_types import DataId, GeodeId
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from typing import List
@@ -11,7 +12,7 @@ class HorizonStackInfo(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    id: str
+    id: DataId
 
 
 @dataclass
@@ -19,7 +20,7 @@ class Horizon(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    id: str
+    id: GeodeId
     name: str
 
 
@@ -28,7 +29,7 @@ class Unit(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    id: str
+    id: GeodeId
     name: str
 
 

@@ -6,8 +6,7 @@
   "type": "object",
   "properties": {
     "geode_object_type": {
-      "type": "string",
-      "minLength": 1
+      "title": "GeodeObjectType"
     }
   },
   "required": [
@@ -20,13 +19,13 @@
       "parents": {
         "type": "array",
         "items": {
-          "type": "string"
+          "title": "GeodeObjectType"
         }
       },
       "children": {
         "type": "array",
         "items": {
-          "type": "string"
+          "title": "GeodeObjectType"
         }
       }
     },

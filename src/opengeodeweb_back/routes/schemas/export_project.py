@@ -1,3 +1,4 @@
+from opengeodeweb_back.schema_types import Filename
 from pathlib import Path
 from opengeodeweb_microservice.schemas import BinaryResponse, Route, load_schema
 from dataclasses_json import DataClassJsonMixin
@@ -11,7 +12,7 @@ class ExportProject(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    filename: str
+    filename: Filename
     snapshot: Dict[str, Any]
 
 

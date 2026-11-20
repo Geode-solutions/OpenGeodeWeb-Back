@@ -1,3 +1,5 @@
+from opengeodeweb_microservice.schema_types import DataId, GeodeId
+from opengeodeweb_back.schema_types import AttributeInfo, AttributeName
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from dataclasses_json import DataClassJsonMixin
@@ -11,19 +13,8 @@ class ModelComponentPolygonAttributeNames(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    component_ids: List[str]
-    id: str
-
-
-@dataclass
-class Attribute(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    attribute_id: str
-    attribute_name: str
-    nb_items: int
-    time_steps: List[float]
+    component_ids: List[GeodeId]
+    id: DataId
 
 
 @dataclass
@@ -31,7 +22,7 @@ class ModelComponentPolygonAttributeNamesResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    attributes: List[Attribute]
+    attributes: List[AttributeInfo]
 
 
 model_component_polygon_attribute_names_route = Route(
