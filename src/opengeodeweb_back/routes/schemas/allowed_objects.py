@@ -1,10 +1,11 @@
+from opengeodeweb_back.schema_types import Filename
+from opengeodeweb_microservice.database.data_types import GeodeObjectType
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
-from typing import Dict, List, Any
+from typing import Dict, List
 from dataclasses_json import DataClassJsonMixin
 from opengeodeweb_microservice.schemas import print_dataclass
 from dataclasses import dataclass
-from typing import Any
 
 
 @dataclass
@@ -12,7 +13,7 @@ class AllowedObjects(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    filename: Any
+    filename: Filename
 
 
 @dataclass
@@ -31,7 +32,7 @@ class AllowedObjectsResponse(DataClassJsonMixin):
         print_dataclass(self)
 
     allowed_objects: Dict[str, AllowedObject]
-    objects_to_load: List[Any]
+    objects_to_load: List[GeodeObjectType]
 
 
 allowed_objects_route = Route(

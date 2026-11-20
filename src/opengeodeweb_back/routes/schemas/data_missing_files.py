@@ -1,10 +1,11 @@
+from opengeodeweb_back.schema_types import Filename
+from opengeodeweb_microservice.database.data_types import GeodeObjectType
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from typing import List
 from dataclasses_json import DataClassJsonMixin
 from opengeodeweb_microservice.schemas import print_dataclass
 from dataclasses import dataclass
-from typing import Any
 
 
 @dataclass
@@ -12,8 +13,8 @@ class DataMissingFiles(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    filename: Any
-    geode_object_type: Any
+    filename: Filename
+    geode_object_type: GeodeObjectType
 
 
 @dataclass
