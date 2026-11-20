@@ -2,6 +2,7 @@ from __future__ import annotations
 
 # Standard library imports
 import base64
+import contextlib
 import hashlib
 import logging
 import shutil
@@ -20,7 +21,10 @@ import fastjsonschema  # type: ignore[import-untyped]
 import flask
 import opengeode as og
 from defusedxml.ElementTree import parse
-from opengeodeweb_microservice.database.connection import get_session
+from opengeodeweb_microservice.database.connection import (
+    DatabaseNotInitializedError,
+    get_session,
+)
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.schemas import ErrorResponse, SchemaDict
 
@@ -64,6 +68,11 @@ def update_last_request_time(current_app: flask.Flask) -> None:
 def terminate_session(exception: BaseException | None) -> None:
     session = flask.g.pop("session", None)
     if session is None:
+        # The database was closed when the request started (see before_request): it may have
+        # been reopened since, and the route may have used a session that must be committed
+        with contextlib.suppress(DatabaseNotInitializedError):
+            session = get_session()
+    if session is None:
         return
     if exception is None:
         session.commit()
@@ -74,7 +83,10 @@ def terminate_session(exception: BaseException | None) -> None:
 
 def before_request(current_app: flask.Flask) -> None:
     increment_request_counter(current_app)
-    flask.g.session = get_session()
+    # The database is closed while import_project replaces the project files: requests that
+    # do not use it (ping) still answer, the others fail on their own get_session()
+    with contextlib.suppress(DatabaseNotInitializedError):
+        flask.g.session = get_session()
     flask.g.start_time = time.perf_counter()
 
 
