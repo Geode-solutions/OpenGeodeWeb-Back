@@ -10,10 +10,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "title": "DataId",
-            "type": "string",
-            "minLength": 32,
-            "maxLength": 32
+            "title": "DataId"
           }
         },
         "required": [
@@ -24,10 +21,7 @@
           "type": "object",
           "properties": {
             "id": {
-              "title": "DataId",
-              "type": "string",
-              "minLength": 32,
-              "maxLength": 32
+              "title": "DataId"
             }
           },
           "required": [
@@ -82,28 +76,7 @@
             "additionalProperties": false
           },
           "crs": {
-            "title": "CRS",
-            "type": "object",
-            "properties": {
-              "authority": {
-                "type": "string",
-                "minLength": 1
-              },
-              "code": {
-                "type": "string",
-                "minLength": 1
-              },
-              "name": {
-                "type": "string",
-                "minLength": 1
-              }
-            },
-            "required": [
-              "authority",
-              "code",
-              "name"
-            ],
-            "additionalProperties": false
+            "title": "CRS"
           },
           "z": {
             "type": "number"
@@ -133,56 +106,19 @@
               "type": "string"
             },
             "id": {
-              "title": "DataId",
-              "type": "string",
-              "minLength": 32,
-              "maxLength": 32
+              "title": "DataId"
             },
             "name": {
               "type": "string"
             },
             "viewer_object_type": {
-              "title": "ViewerObjectType",
-              "type": "string",
-              "enum": [
-                "mesh",
-                "model"
-              ]
+              "title": "ViewerObjectType"
             },
             "is_viewable": {
               "type": "boolean"
             },
             "geode_object_type": {
-              "title": "GeodeObjectType",
-              "type": "string",
-              "enum": [
-                "VertexSet",
-                "Graph",
-                "PointSet2D",
-                "PointSet3D",
-                "EdgedCurve2D",
-                "EdgedCurve3D",
-                "RasterImage2D",
-                "PolygonalSurface2D",
-                "PolygonalSurface3D",
-                "TriangulatedSurface2D",
-                "TriangulatedSurface3D",
-                "RegularGrid2D",
-                "LightRegularGrid2D",
-                "RasterImage3D",
-                "PolyhedralSolid3D",
-                "TetrahedralSolid3D",
-                "HybridSolid3D",
-                "RegularGrid3D",
-                "LightRegularGrid3D",
-                "BRep",
-                "Section",
-                "StructuralModel",
-                "CrossSection",
-                "ImplicitStructuralModel",
-                "ImplicitCrossSection",
-                "HorizonStack3D"
-              ]
+              "title": "GeodeObjectType"
             },
             "viewable_file": {
               "type": "string"
@@ -194,34 +130,10 @@
               "type": "integer"
             },
             "geode_id": {
-              "title": "GeodeId",
-              "type": "string",
-              "minLength": 36,
-              "maxLength": 36
+              "title": "GeodeId"
             },
             "crs": {
-              "title": "CRS",
-              "type": "object",
-              "properties": {
-                "authority": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "code": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "name": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "authority",
-                "code",
-                "name"
-              ],
-              "additionalProperties": false
+              "title": "CRS"
             },
             "columns": {
               "type": "integer",
@@ -322,25 +234,7 @@
           "points": {
             "type": "array",
             "items": {
-              "title": "Point3D",
-              "type": "object",
-              "properties": {
-                "x": {
-                  "type": "number"
-                },
-                "y": {
-                  "type": "number"
-                },
-                "z": {
-                  "type": "number"
-                }
-              },
-              "required": [
-                "x",
-                "y",
-                "z"
-              ],
-              "additionalProperties": false
+              "title": "Point3D"
             },
             "minItems": 3
           },
@@ -369,56 +263,19 @@
               "type": "string"
             },
             "id": {
-              "title": "DataId",
-              "type": "string",
-              "minLength": 32,
-              "maxLength": 32
+              "title": "DataId"
             },
             "name": {
               "type": "string"
             },
             "viewer_object_type": {
-              "title": "ViewerObjectType",
-              "type": "string",
-              "enum": [
-                "mesh",
-                "model"
-              ]
+              "title": "ViewerObjectType"
             },
             "is_viewable": {
               "type": "boolean"
             },
             "geode_object_type": {
-              "title": "GeodeObjectType",
-              "type": "string",
-              "enum": [
-                "VertexSet",
-                "Graph",
-                "PointSet2D",
-                "PointSet3D",
-                "EdgedCurve2D",
-                "EdgedCurve3D",
-                "RasterImage2D",
-                "PolygonalSurface2D",
-                "PolygonalSurface3D",
-                "TriangulatedSurface2D",
-                "TriangulatedSurface3D",
-                "RegularGrid2D",
-                "LightRegularGrid2D",
-                "RasterImage3D",
-                "PolyhedralSolid3D",
-                "TetrahedralSolid3D",
-                "HybridSolid3D",
-                "RegularGrid3D",
-                "LightRegularGrid3D",
-                "BRep",
-                "Section",
-                "StructuralModel",
-                "CrossSection",
-                "ImplicitStructuralModel",
-                "ImplicitCrossSection",
-                "HorizonStack3D"
-              ]
+              "title": "GeodeObjectType"
             },
             "viewable_file": {
               "type": "string"
@@ -432,129 +289,20 @@
             "mesh_components": {
               "type": "array",
               "items": {
-                "title": "MeshComponent",
-                "type": "object",
-                "properties": {
-                  "viewer_id": {
-                    "title": "ViewerId",
-                    "type": "integer"
-                  },
-                  "geode_id": {
-                    "title": "GeodeId",
-                    "type": "string",
-                    "minLength": 36,
-                    "maxLength": 36
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "type": {
-                    "type": "string"
-                  },
-                  "boundaries": {
-                    "type": "array",
-                    "items": {
-                      "title": "GeodeId",
-                      "type": "string",
-                      "minLength": 36,
-                      "maxLength": 36
-                    }
-                  },
-                  "internals": {
-                    "type": "array",
-                    "items": {
-                      "title": "GeodeId",
-                      "type": "string",
-                      "minLength": 36,
-                      "maxLength": 36
-                    }
-                  },
-                  "is_active": {
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "viewer_id",
-                  "geode_id",
-                  "name",
-                  "type",
-                  "boundaries",
-                  "internals",
-                  "is_active"
-                ],
-                "additionalProperties": false
+                "title": "MeshComponent"
               }
             },
             "collection_components": {
               "type": "array",
               "items": {
-                "title": "CollectionComponent",
-                "type": "object",
-                "properties": {
-                  "geode_id": {
-                    "title": "GeodeId",
-                    "type": "string",
-                    "minLength": 36,
-                    "maxLength": 36
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "type": {
-                    "type": "string"
-                  },
-                  "items": {
-                    "type": "array",
-                    "items": {
-                      "title": "GeodeId",
-                      "type": "string",
-                      "minLength": 36,
-                      "maxLength": 36
-                    }
-                  },
-                  "is_active": {
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "geode_id",
-                  "name",
-                  "type",
-                  "items",
-                  "is_active"
-                ],
-                "additionalProperties": false
+                "title": "CollectionComponent"
               }
             },
             "geode_id": {
-              "title": "GeodeId",
-              "type": "string",
-              "minLength": 36,
-              "maxLength": 36
+              "title": "GeodeId"
             },
             "crs": {
-              "title": "CRS",
-              "type": "object",
-              "properties": {
-                "authority": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "code": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "name": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "authority",
-                "code",
-                "name"
-              ],
-              "additionalProperties": false
+              "title": "CRS"
             }
           },
           "required": [
@@ -584,25 +332,7 @@
           "points": {
             "type": "array",
             "items": {
-              "title": "Point3D",
-              "type": "object",
-              "properties": {
-                "x": {
-                  "type": "number"
-                },
-                "y": {
-                  "type": "number"
-                },
-                "z": {
-                  "type": "number"
-                }
-              },
-              "required": [
-                "x",
-                "y",
-                "z"
-              ],
-              "additionalProperties": false
+              "title": "Point3D"
             },
             "minItems": 1
           }
@@ -619,56 +349,19 @@
               "type": "string"
             },
             "id": {
-              "title": "DataId",
-              "type": "string",
-              "minLength": 32,
-              "maxLength": 32
+              "title": "DataId"
             },
             "name": {
               "type": "string"
             },
             "viewer_object_type": {
-              "title": "ViewerObjectType",
-              "type": "string",
-              "enum": [
-                "mesh",
-                "model"
-              ]
+              "title": "ViewerObjectType"
             },
             "is_viewable": {
               "type": "boolean"
             },
             "geode_object_type": {
-              "title": "GeodeObjectType",
-              "type": "string",
-              "enum": [
-                "VertexSet",
-                "Graph",
-                "PointSet2D",
-                "PointSet3D",
-                "EdgedCurve2D",
-                "EdgedCurve3D",
-                "RasterImage2D",
-                "PolygonalSurface2D",
-                "PolygonalSurface3D",
-                "TriangulatedSurface2D",
-                "TriangulatedSurface3D",
-                "RegularGrid2D",
-                "LightRegularGrid2D",
-                "RasterImage3D",
-                "PolyhedralSolid3D",
-                "TetrahedralSolid3D",
-                "HybridSolid3D",
-                "RegularGrid3D",
-                "LightRegularGrid3D",
-                "BRep",
-                "Section",
-                "StructuralModel",
-                "CrossSection",
-                "ImplicitStructuralModel",
-                "ImplicitCrossSection",
-                "HorizonStack3D"
-              ]
+              "title": "GeodeObjectType"
             },
             "viewable_file": {
               "type": "string"
@@ -682,129 +375,20 @@
             "mesh_components": {
               "type": "array",
               "items": {
-                "title": "MeshComponent",
-                "type": "object",
-                "properties": {
-                  "viewer_id": {
-                    "title": "ViewerId",
-                    "type": "integer"
-                  },
-                  "geode_id": {
-                    "title": "GeodeId",
-                    "type": "string",
-                    "minLength": 36,
-                    "maxLength": 36
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "type": {
-                    "type": "string"
-                  },
-                  "boundaries": {
-                    "type": "array",
-                    "items": {
-                      "title": "GeodeId",
-                      "type": "string",
-                      "minLength": 36,
-                      "maxLength": 36
-                    }
-                  },
-                  "internals": {
-                    "type": "array",
-                    "items": {
-                      "title": "GeodeId",
-                      "type": "string",
-                      "minLength": 36,
-                      "maxLength": 36
-                    }
-                  },
-                  "is_active": {
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "viewer_id",
-                  "geode_id",
-                  "name",
-                  "type",
-                  "boundaries",
-                  "internals",
-                  "is_active"
-                ],
-                "additionalProperties": false
+                "title": "MeshComponent"
               }
             },
             "collection_components": {
               "type": "array",
               "items": {
-                "title": "CollectionComponent",
-                "type": "object",
-                "properties": {
-                  "geode_id": {
-                    "title": "GeodeId",
-                    "type": "string",
-                    "minLength": 36,
-                    "maxLength": 36
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "type": {
-                    "type": "string"
-                  },
-                  "items": {
-                    "type": "array",
-                    "items": {
-                      "title": "GeodeId",
-                      "type": "string",
-                      "minLength": 36,
-                      "maxLength": 36
-                    }
-                  },
-                  "is_active": {
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "geode_id",
-                  "name",
-                  "type",
-                  "items",
-                  "is_active"
-                ],
-                "additionalProperties": false
+                "title": "CollectionComponent"
               }
             },
             "geode_id": {
-              "title": "GeodeId",
-              "type": "string",
-              "minLength": 36,
-              "maxLength": 36
+              "title": "GeodeId"
             },
             "crs": {
-              "title": "CRS",
-              "type": "object",
-              "properties": {
-                "authority": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "code": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "name": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "authority",
-                "code",
-                "name"
-              ],
-              "additionalProperties": false
+              "title": "CRS"
             }
           },
           "required": [
@@ -860,56 +444,19 @@
               "type": "string"
             },
             "id": {
-              "title": "DataId",
-              "type": "string",
-              "minLength": 32,
-              "maxLength": 32
+              "title": "DataId"
             },
             "name": {
               "type": "string"
             },
             "viewer_object_type": {
-              "title": "ViewerObjectType",
-              "type": "string",
-              "enum": [
-                "mesh",
-                "model"
-              ]
+              "title": "ViewerObjectType"
             },
             "is_viewable": {
               "type": "boolean"
             },
             "geode_object_type": {
-              "title": "GeodeObjectType",
-              "type": "string",
-              "enum": [
-                "VertexSet",
-                "Graph",
-                "PointSet2D",
-                "PointSet3D",
-                "EdgedCurve2D",
-                "EdgedCurve3D",
-                "RasterImage2D",
-                "PolygonalSurface2D",
-                "PolygonalSurface3D",
-                "TriangulatedSurface2D",
-                "TriangulatedSurface3D",
-                "RegularGrid2D",
-                "LightRegularGrid2D",
-                "RasterImage3D",
-                "PolyhedralSolid3D",
-                "TetrahedralSolid3D",
-                "HybridSolid3D",
-                "RegularGrid3D",
-                "LightRegularGrid3D",
-                "BRep",
-                "Section",
-                "StructuralModel",
-                "CrossSection",
-                "ImplicitStructuralModel",
-                "ImplicitCrossSection",
-                "HorizonStack3D"
-              ]
+              "title": "GeodeObjectType"
             },
             "viewable_file": {
               "type": "string"
@@ -923,129 +470,20 @@
             "mesh_components": {
               "type": "array",
               "items": {
-                "title": "MeshComponent",
-                "type": "object",
-                "properties": {
-                  "viewer_id": {
-                    "title": "ViewerId",
-                    "type": "integer"
-                  },
-                  "geode_id": {
-                    "title": "GeodeId",
-                    "type": "string",
-                    "minLength": 36,
-                    "maxLength": 36
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "type": {
-                    "type": "string"
-                  },
-                  "boundaries": {
-                    "type": "array",
-                    "items": {
-                      "title": "GeodeId",
-                      "type": "string",
-                      "minLength": 36,
-                      "maxLength": 36
-                    }
-                  },
-                  "internals": {
-                    "type": "array",
-                    "items": {
-                      "title": "GeodeId",
-                      "type": "string",
-                      "minLength": 36,
-                      "maxLength": 36
-                    }
-                  },
-                  "is_active": {
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "viewer_id",
-                  "geode_id",
-                  "name",
-                  "type",
-                  "boundaries",
-                  "internals",
-                  "is_active"
-                ],
-                "additionalProperties": false
+                "title": "MeshComponent"
               }
             },
             "collection_components": {
               "type": "array",
               "items": {
-                "title": "CollectionComponent",
-                "type": "object",
-                "properties": {
-                  "geode_id": {
-                    "title": "GeodeId",
-                    "type": "string",
-                    "minLength": 36,
-                    "maxLength": 36
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "type": {
-                    "type": "string"
-                  },
-                  "items": {
-                    "type": "array",
-                    "items": {
-                      "title": "GeodeId",
-                      "type": "string",
-                      "minLength": 36,
-                      "maxLength": 36
-                    }
-                  },
-                  "is_active": {
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "geode_id",
-                  "name",
-                  "type",
-                  "items",
-                  "is_active"
-                ],
-                "additionalProperties": false
+                "title": "CollectionComponent"
               }
             },
             "geode_id": {
-              "title": "GeodeId",
-              "type": "string",
-              "minLength": 36,
-              "maxLength": 36
+              "title": "GeodeId"
             },
             "crs": {
-              "title": "CRS",
-              "type": "object",
-              "properties": {
-                "authority": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "code": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "name": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "authority",
-                "code",
-                "name"
-              ],
-              "additionalProperties": false
+              "title": "CRS"
             }
           },
           "required": [
@@ -1075,25 +513,7 @@
           "points": {
             "type": "array",
             "items": {
-              "title": "Point3D",
-              "type": "object",
-              "properties": {
-                "x": {
-                  "type": "number"
-                },
-                "y": {
-                  "type": "number"
-                },
-                "z": {
-                  "type": "number"
-                }
-              },
-              "required": [
-                "x",
-                "y",
-                "z"
-              ],
-              "additionalProperties": false
+              "title": "Point3D"
             },
             "minItems": 2
           },
@@ -1123,56 +543,19 @@
               "type": "string"
             },
             "id": {
-              "title": "DataId",
-              "type": "string",
-              "minLength": 32,
-              "maxLength": 32
+              "title": "DataId"
             },
             "name": {
               "type": "string"
             },
             "viewer_object_type": {
-              "title": "ViewerObjectType",
-              "type": "string",
-              "enum": [
-                "mesh",
-                "model"
-              ]
+              "title": "ViewerObjectType"
             },
             "is_viewable": {
               "type": "boolean"
             },
             "geode_object_type": {
-              "title": "GeodeObjectType",
-              "type": "string",
-              "enum": [
-                "VertexSet",
-                "Graph",
-                "PointSet2D",
-                "PointSet3D",
-                "EdgedCurve2D",
-                "EdgedCurve3D",
-                "RasterImage2D",
-                "PolygonalSurface2D",
-                "PolygonalSurface3D",
-                "TriangulatedSurface2D",
-                "TriangulatedSurface3D",
-                "RegularGrid2D",
-                "LightRegularGrid2D",
-                "RasterImage3D",
-                "PolyhedralSolid3D",
-                "TetrahedralSolid3D",
-                "HybridSolid3D",
-                "RegularGrid3D",
-                "LightRegularGrid3D",
-                "BRep",
-                "Section",
-                "StructuralModel",
-                "CrossSection",
-                "ImplicitStructuralModel",
-                "ImplicitCrossSection",
-                "HorizonStack3D"
-              ]
+              "title": "GeodeObjectType"
             },
             "viewable_file": {
               "type": "string"
@@ -1186,129 +569,20 @@
             "mesh_components": {
               "type": "array",
               "items": {
-                "title": "MeshComponent",
-                "type": "object",
-                "properties": {
-                  "viewer_id": {
-                    "title": "ViewerId",
-                    "type": "integer"
-                  },
-                  "geode_id": {
-                    "title": "GeodeId",
-                    "type": "string",
-                    "minLength": 36,
-                    "maxLength": 36
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "type": {
-                    "type": "string"
-                  },
-                  "boundaries": {
-                    "type": "array",
-                    "items": {
-                      "title": "GeodeId",
-                      "type": "string",
-                      "minLength": 36,
-                      "maxLength": 36
-                    }
-                  },
-                  "internals": {
-                    "type": "array",
-                    "items": {
-                      "title": "GeodeId",
-                      "type": "string",
-                      "minLength": 36,
-                      "maxLength": 36
-                    }
-                  },
-                  "is_active": {
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "viewer_id",
-                  "geode_id",
-                  "name",
-                  "type",
-                  "boundaries",
-                  "internals",
-                  "is_active"
-                ],
-                "additionalProperties": false
+                "title": "MeshComponent"
               }
             },
             "collection_components": {
               "type": "array",
               "items": {
-                "title": "CollectionComponent",
-                "type": "object",
-                "properties": {
-                  "geode_id": {
-                    "title": "GeodeId",
-                    "type": "string",
-                    "minLength": 36,
-                    "maxLength": 36
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "type": {
-                    "type": "string"
-                  },
-                  "items": {
-                    "type": "array",
-                    "items": {
-                      "title": "GeodeId",
-                      "type": "string",
-                      "minLength": 36,
-                      "maxLength": 36
-                    }
-                  },
-                  "is_active": {
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "geode_id",
-                  "name",
-                  "type",
-                  "items",
-                  "is_active"
-                ],
-                "additionalProperties": false
+                "title": "CollectionComponent"
               }
             },
             "geode_id": {
-              "title": "GeodeId",
-              "type": "string",
-              "minLength": 36,
-              "maxLength": 36
+              "title": "GeodeId"
             },
             "crs": {
-              "title": "CRS",
-              "type": "object",
-              "properties": {
-                "authority": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "code": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "name": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "authority",
-                "code",
-                "name"
-              ],
-              "additionalProperties": false
+              "title": "CRS"
             }
           },
           "required": [
@@ -1334,36 +608,7 @@
         "type": "object",
         "properties": {
           "geode_object_type": {
-            "title": "GeodeObjectType",
-            "type": "string",
-            "enum": [
-              "VertexSet",
-              "Graph",
-              "PointSet2D",
-              "PointSet3D",
-              "EdgedCurve2D",
-              "EdgedCurve3D",
-              "RasterImage2D",
-              "PolygonalSurface2D",
-              "PolygonalSurface3D",
-              "TriangulatedSurface2D",
-              "TriangulatedSurface3D",
-              "RegularGrid2D",
-              "LightRegularGrid2D",
-              "RasterImage3D",
-              "PolyhedralSolid3D",
-              "TetrahedralSolid3D",
-              "HybridSolid3D",
-              "RegularGrid3D",
-              "LightRegularGrid3D",
-              "BRep",
-              "Section",
-              "StructuralModel",
-              "CrossSection",
-              "ImplicitStructuralModel",
-              "ImplicitCrossSection",
-              "HorizonStack3D"
-            ]
+            "title": "GeodeObjectType"
           }
         },
         "required": [
@@ -1376,28 +621,7 @@
             "crs_list": {
               "type": "array",
               "items": {
-                "title": "CRS",
-                "type": "object",
-                "properties": {
-                  "authority": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "code": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "name": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
-                "required": [
-                  "authority",
-                  "code",
-                  "name"
-                ],
-                "additionalProperties": false
+                "title": "CRS"
               }
             }
           },
@@ -1416,18 +640,12 @@
         "type": "object",
         "properties": {
           "id": {
-            "title": "DataId",
-            "type": "string",
-            "minLength": 32,
-            "maxLength": 32
+            "title": "DataId"
           },
           "linked_ids": {
             "type": "array",
             "items": {
-              "title": "DataId",
-              "type": "string",
-              "minLength": 32,
-              "maxLength": 32
+              "title": "DataId"
             },
             "uniqueItems": true
           },
@@ -1458,28 +676,7 @@
               "type": "string"
             },
             "crs": {
-              "title": "CRS",
-              "type": "object",
-              "properties": {
-                "authority": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "code": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "name": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "authority",
-                "code",
-                "name"
-              ],
-              "additionalProperties": false
+              "title": "CRS"
             },
             "linked": {
               "type": "array",
@@ -1487,34 +684,10 @@
                 "type": "object",
                 "properties": {
                   "id": {
-                    "title": "DataId",
-                    "type": "string",
-                    "minLength": 32,
-                    "maxLength": 32
+                    "title": "DataId"
                   },
                   "crs": {
-                    "title": "CRS",
-                    "type": "object",
-                    "properties": {
-                      "authority": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "code": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "name": {
-                        "type": "string",
-                        "minLength": 1
-                      }
-                    },
-                    "required": [
-                      "authority",
-                      "code",
-                      "name"
-                    ],
-                    "additionalProperties": false
+                    "title": "CRS"
                   },
                   "binary_light_viewable": {
                     "type": "string"
@@ -1540,18 +713,12 @@
         "type": "object",
         "properties": {
           "id": {
-            "title": "DataId",
-            "type": "string",
-            "minLength": 32,
-            "maxLength": 32
+            "title": "DataId"
           },
           "linked_ids": {
             "type": "array",
             "items": {
-              "title": "DataId",
-              "type": "string",
-              "minLength": 32,
-              "maxLength": 32
+              "title": "DataId"
             },
             "uniqueItems": true
           },
@@ -1582,28 +749,7 @@
           "type": "object",
           "properties": {
             "crs": {
-              "title": "CRS",
-              "type": "object",
-              "properties": {
-                "authority": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "code": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "name": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "authority",
-                "code",
-                "name"
-              ],
-              "additionalProperties": false
+              "title": "CRS"
             },
             "implausible": {
               "type": "boolean"
@@ -1614,34 +760,10 @@
                 "type": "object",
                 "properties": {
                   "id": {
-                    "title": "DataId",
-                    "type": "string",
-                    "minLength": 32,
-                    "maxLength": 32
+                    "title": "DataId"
                   },
                   "crs": {
-                    "title": "CRS",
-                    "type": "object",
-                    "properties": {
-                      "authority": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "code": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "name": {
-                        "type": "string",
-                        "minLength": 1
-                      }
-                    },
-                    "required": [
-                      "authority",
-                      "code",
-                      "name"
-                    ],
-                    "additionalProperties": false
+                    "title": "CRS"
                   },
                   "implausible": {
                     "type": "boolean"
@@ -1667,18 +789,12 @@
         "type": "object",
         "properties": {
           "id": {
-            "title": "DataId",
-            "type": "string",
-            "minLength": 32,
-            "maxLength": 32
+            "title": "DataId"
           },
           "linked_ids": {
             "type": "array",
             "items": {
-              "title": "DataId",
-              "type": "string",
-              "minLength": 32,
-              "maxLength": 32
+              "title": "DataId"
             },
             "uniqueItems": true
           },
@@ -1757,28 +873,7 @@
               "type": "string"
             },
             "crs": {
-              "title": "CRS",
-              "type": "object",
-              "properties": {
-                "authority": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "code": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "name": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "authority",
-                "code",
-                "name"
-              ],
-              "additionalProperties": false
+              "title": "CRS"
             },
             "linked": {
               "type": "array",
@@ -1786,37 +881,13 @@
                 "type": "object",
                 "properties": {
                   "id": {
-                    "title": "DataId",
-                    "type": "string",
-                    "minLength": 32,
-                    "maxLength": 32
+                    "title": "DataId"
                   },
                   "binary_light_viewable": {
                     "type": "string"
                   },
                   "crs": {
-                    "title": "CRS",
-                    "type": "object",
-                    "properties": {
-                      "authority": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "code": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "name": {
-                        "type": "string",
-                        "minLength": 1
-                      }
-                    },
-                    "required": [
-                      "authority",
-                      "code",
-                      "name"
-                    ],
-                    "additionalProperties": false
+                    "title": "CRS"
                   }
                 },
                 "required": [
@@ -1839,10 +910,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "title": "DataId",
-            "type": "string",
-            "minLength": 32,
-            "maxLength": 32
+            "title": "DataId"
           }
         },
         "required": [
@@ -1856,28 +924,7 @@
               "type": "string"
             },
             "crs_info": {
-              "title": "CRS",
-              "type": "object",
-              "properties": {
-                "authority": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "code": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "name": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              },
-              "required": [
-                "authority",
-                "code",
-                "name"
-              ],
-              "additionalProperties": false
+              "title": "CRS"
             }
           },
           "required": [
@@ -1896,15 +943,10 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         },
         "attribute_name": {
-          "title": "AttributeName",
-          "type": "string",
-          "minLength": 1
+          "title": "AttributeName"
         }
       },
       "required": [
@@ -1948,10 +990,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         }
       },
       "required": [
@@ -1964,34 +1003,7 @@
           "attributes": {
             "type": "array",
             "items": {
-              "title": "AttributeInfo",
-              "type": "object",
-              "properties": {
-                "attribute_name": {
-                  "title": "AttributeName",
-                  "type": "string",
-                  "minLength": 1
-                },
-                "attribute_id": {
-                  "type": "string"
-                },
-                "nb_items": {
-                  "type": "integer"
-                },
-                "time_steps": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                }
-              },
-              "required": [
-                "attribute_name",
-                "attribute_id",
-                "nb_items",
-                "time_steps"
-              ],
-              "additionalProperties": false
+              "title": "AttributeInfo"
             }
           }
         },
@@ -2010,10 +1022,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         }
       },
       "required": [
@@ -2054,9 +1063,7 @@
       "type": "object",
       "properties": {
         "filename": {
-          "title": "Filename",
-          "type": "string",
-          "minLength": 1
+          "title": "Filename"
         }
       },
       "additionalProperties": false,
@@ -2082,9 +1089,7 @@
       "type": "object",
       "properties": {
         "filename": {
-          "title": "Filename",
-          "type": "string",
-          "minLength": 1
+          "title": "Filename"
         }
       },
       "required": [
@@ -2127,9 +1132,7 @@
       "type": "object",
       "properties": {
         "filename": {
-          "title": "Filename",
-          "type": "string",
-          "minLength": 1
+          "title": "Filename"
         }
       },
       "required": [
@@ -2161,10 +1164,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         }
       },
       "required": [
@@ -2196,41 +1196,10 @@
       "type": "object",
       "properties": {
         "geode_object_type": {
-          "title": "GeodeObjectType",
-          "type": "string",
-          "enum": [
-            "VertexSet",
-            "Graph",
-            "PointSet2D",
-            "PointSet3D",
-            "EdgedCurve2D",
-            "EdgedCurve3D",
-            "RasterImage2D",
-            "PolygonalSurface2D",
-            "PolygonalSurface3D",
-            "TriangulatedSurface2D",
-            "TriangulatedSurface3D",
-            "RegularGrid2D",
-            "LightRegularGrid2D",
-            "RasterImage3D",
-            "PolyhedralSolid3D",
-            "TetrahedralSolid3D",
-            "HybridSolid3D",
-            "RegularGrid3D",
-            "LightRegularGrid3D",
-            "BRep",
-            "Section",
-            "StructuralModel",
-            "CrossSection",
-            "ImplicitStructuralModel",
-            "ImplicitCrossSection",
-            "HorizonStack3D"
-          ]
+          "title": "GeodeObjectType"
         },
         "filename": {
-          "title": "Filename",
-          "type": "string",
-          "minLength": 1
+          "title": "Filename"
         }
       },
       "required": [
@@ -2251,56 +1220,19 @@
                   "type": "string"
                 },
                 "id": {
-                  "title": "DataId",
-                  "type": "string",
-                  "minLength": 32,
-                  "maxLength": 32
+                  "title": "DataId"
                 },
                 "name": {
                   "type": "string"
                 },
                 "viewer_object_type": {
-                  "title": "ViewerObjectType",
-                  "type": "string",
-                  "enum": [
-                    "mesh",
-                    "model"
-                  ]
+                  "title": "ViewerObjectType"
                 },
                 "is_viewable": {
                   "type": "boolean"
                 },
                 "geode_object_type": {
-                  "title": "GeodeObjectType",
-                  "type": "string",
-                  "enum": [
-                    "VertexSet",
-                    "Graph",
-                    "PointSet2D",
-                    "PointSet3D",
-                    "EdgedCurve2D",
-                    "EdgedCurve3D",
-                    "RasterImage2D",
-                    "PolygonalSurface2D",
-                    "PolygonalSurface3D",
-                    "TriangulatedSurface2D",
-                    "TriangulatedSurface3D",
-                    "RegularGrid2D",
-                    "LightRegularGrid2D",
-                    "RasterImage3D",
-                    "PolyhedralSolid3D",
-                    "TetrahedralSolid3D",
-                    "HybridSolid3D",
-                    "RegularGrid3D",
-                    "LightRegularGrid3D",
-                    "BRep",
-                    "Section",
-                    "StructuralModel",
-                    "CrossSection",
-                    "ImplicitStructuralModel",
-                    "ImplicitCrossSection",
-                    "HorizonStack3D"
-                  ]
+                  "title": "GeodeObjectType"
                 },
                 "viewable_file": {
                   "type": "string"
@@ -2314,129 +1246,20 @@
                 "mesh_components": {
                   "type": "array",
                   "items": {
-                    "title": "MeshComponent",
-                    "type": "object",
-                    "properties": {
-                      "viewer_id": {
-                        "title": "ViewerId",
-                        "type": "integer"
-                      },
-                      "geode_id": {
-                        "title": "GeodeId",
-                        "type": "string",
-                        "minLength": 36,
-                        "maxLength": 36
-                      },
-                      "name": {
-                        "type": "string"
-                      },
-                      "type": {
-                        "type": "string"
-                      },
-                      "boundaries": {
-                        "type": "array",
-                        "items": {
-                          "title": "GeodeId",
-                          "type": "string",
-                          "minLength": 36,
-                          "maxLength": 36
-                        }
-                      },
-                      "internals": {
-                        "type": "array",
-                        "items": {
-                          "title": "GeodeId",
-                          "type": "string",
-                          "minLength": 36,
-                          "maxLength": 36
-                        }
-                      },
-                      "is_active": {
-                        "type": "boolean"
-                      }
-                    },
-                    "required": [
-                      "viewer_id",
-                      "geode_id",
-                      "name",
-                      "type",
-                      "boundaries",
-                      "internals",
-                      "is_active"
-                    ],
-                    "additionalProperties": false
+                    "title": "MeshComponent"
                   }
                 },
                 "collection_components": {
                   "type": "array",
                   "items": {
-                    "title": "CollectionComponent",
-                    "type": "object",
-                    "properties": {
-                      "geode_id": {
-                        "title": "GeodeId",
-                        "type": "string",
-                        "minLength": 36,
-                        "maxLength": 36
-                      },
-                      "name": {
-                        "type": "string"
-                      },
-                      "type": {
-                        "type": "string"
-                      },
-                      "items": {
-                        "type": "array",
-                        "items": {
-                          "title": "GeodeId",
-                          "type": "string",
-                          "minLength": 36,
-                          "maxLength": 36
-                        }
-                      },
-                      "is_active": {
-                        "type": "boolean"
-                      }
-                    },
-                    "required": [
-                      "geode_id",
-                      "name",
-                      "type",
-                      "items",
-                      "is_active"
-                    ],
-                    "additionalProperties": false
+                    "title": "CollectionComponent"
                   }
                 },
                 "geode_id": {
-                  "title": "GeodeId",
-                  "type": "string",
-                  "minLength": 36,
-                  "maxLength": 36
+                  "title": "GeodeId"
                 },
                 "crs": {
-                  "title": "CRS",
-                  "type": "object",
-                  "properties": {
-                    "authority": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "code": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "name": {
-                      "type": "string",
-                      "minLength": 1
-                    }
-                  },
-                  "required": [
-                    "authority",
-                    "code",
-                    "name"
-                  ],
-                  "additionalProperties": false
+                  "title": "CRS"
                 }
               },
               "required": [
@@ -2467,15 +1290,10 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         },
         "attribute_name": {
-          "title": "AttributeName",
-          "type": "string",
-          "minLength": 1
+          "title": "AttributeName"
         }
       },
       "required": [
@@ -2519,10 +1337,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         }
       },
       "required": [
@@ -2535,34 +1350,7 @@
           "attributes": {
             "type": "array",
             "items": {
-              "title": "AttributeInfo",
-              "type": "object",
-              "properties": {
-                "attribute_name": {
-                  "title": "AttributeName",
-                  "type": "string",
-                  "minLength": 1
-                },
-                "attribute_id": {
-                  "type": "string"
-                },
-                "nb_items": {
-                  "type": "integer"
-                },
-                "time_steps": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                }
-              },
-              "required": [
-                "attribute_name",
-                "attribute_id",
-                "nb_items",
-                "time_steps"
-              ],
-              "additionalProperties": false
+              "title": "AttributeInfo"
             }
           }
         },
@@ -2581,15 +1369,10 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         },
         "attribute_name": {
-          "title": "AttributeName",
-          "type": "string",
-          "minLength": 1
+          "title": "AttributeName"
         }
       },
       "required": [
@@ -2633,10 +1416,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         }
       },
       "required": [
@@ -2649,34 +1429,7 @@
           "attributes": {
             "type": "array",
             "items": {
-              "title": "AttributeInfo",
-              "type": "object",
-              "properties": {
-                "attribute_name": {
-                  "title": "AttributeName",
-                  "type": "string",
-                  "minLength": 1
-                },
-                "attribute_id": {
-                  "type": "string"
-                },
-                "nb_items": {
-                  "type": "integer"
-                },
-                "time_steps": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                }
-              },
-              "required": [
-                "attribute_name",
-                "attribute_id",
-                "nb_items",
-                "time_steps"
-              ],
-              "additionalProperties": false
+              "title": "AttributeInfo"
             }
           }
         },
@@ -2718,25 +1471,17 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         },
         "component_ids": {
           "type": "array",
           "items": {
-            "title": "GeodeId",
-            "type": "string",
-            "minLength": 36,
-            "maxLength": 36
+            "title": "GeodeId"
           },
           "minItems": 1
         },
         "attribute_name": {
-          "title": "AttributeName",
-          "type": "string",
-          "minLength": 1
+          "title": "AttributeName"
         }
       },
       "required": [
@@ -2781,18 +1526,12 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         },
         "component_ids": {
           "type": "array",
           "items": {
-            "title": "GeodeId",
-            "type": "string",
-            "minLength": 36,
-            "maxLength": 36
+            "title": "GeodeId"
           },
           "minItems": 1
         }
@@ -2808,34 +1547,7 @@
           "attributes": {
             "type": "array",
             "items": {
-              "title": "AttributeInfo",
-              "type": "object",
-              "properties": {
-                "attribute_name": {
-                  "title": "AttributeName",
-                  "type": "string",
-                  "minLength": 1
-                },
-                "attribute_id": {
-                  "type": "string"
-                },
-                "nb_items": {
-                  "type": "integer"
-                },
-                "time_steps": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                }
-              },
-              "required": [
-                "attribute_name",
-                "attribute_id",
-                "nb_items",
-                "time_steps"
-              ],
-              "additionalProperties": false
+              "title": "AttributeInfo"
             }
           }
         },
@@ -2854,25 +1566,17 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         },
         "component_ids": {
           "type": "array",
           "items": {
-            "title": "GeodeId",
-            "type": "string",
-            "minLength": 36,
-            "maxLength": 36
+            "title": "GeodeId"
           },
           "minItems": 1
         },
         "attribute_name": {
-          "title": "AttributeName",
-          "type": "string",
-          "minLength": 1
+          "title": "AttributeName"
         }
       },
       "required": [
@@ -2917,18 +1621,12 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         },
         "component_ids": {
           "type": "array",
           "items": {
-            "title": "GeodeId",
-            "type": "string",
-            "minLength": 36,
-            "maxLength": 36
+            "title": "GeodeId"
           },
           "minItems": 1
         }
@@ -2944,34 +1642,7 @@
           "attributes": {
             "type": "array",
             "items": {
-              "title": "AttributeInfo",
-              "type": "object",
-              "properties": {
-                "attribute_name": {
-                  "title": "AttributeName",
-                  "type": "string",
-                  "minLength": 1
-                },
-                "attribute_id": {
-                  "type": "string"
-                },
-                "nb_items": {
-                  "type": "integer"
-                },
-                "time_steps": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                }
-              },
-              "required": [
-                "attribute_name",
-                "attribute_id",
-                "nb_items",
-                "time_steps"
-              ],
-              "additionalProperties": false
+              "title": "AttributeInfo"
             }
           }
         },
@@ -2990,25 +1661,17 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         },
         "component_ids": {
           "type": "array",
           "items": {
-            "title": "GeodeId",
-            "type": "string",
-            "minLength": 36,
-            "maxLength": 36
+            "title": "GeodeId"
           },
           "minItems": 1
         },
         "attribute_name": {
-          "title": "AttributeName",
-          "type": "string",
-          "minLength": 1
+          "title": "AttributeName"
         }
       },
       "required": [
@@ -3053,18 +1716,12 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         },
         "component_ids": {
           "type": "array",
           "items": {
-            "title": "GeodeId",
-            "type": "string",
-            "minLength": 36,
-            "maxLength": 36
+            "title": "GeodeId"
           },
           "minItems": 1
         }
@@ -3080,34 +1737,7 @@
           "attributes": {
             "type": "array",
             "items": {
-              "title": "AttributeInfo",
-              "type": "object",
-              "properties": {
-                "attribute_name": {
-                  "title": "AttributeName",
-                  "type": "string",
-                  "minLength": 1
-                },
-                "attribute_id": {
-                  "type": "string"
-                },
-                "nb_items": {
-                  "type": "integer"
-                },
-                "time_steps": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                }
-              },
-              "required": [
-                "attribute_name",
-                "attribute_id",
-                "nb_items",
-                "time_steps"
-              ],
-              "additionalProperties": false
+              "title": "AttributeInfo"
             }
           }
         },
@@ -3126,25 +1756,17 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         },
         "component_ids": {
           "type": "array",
           "items": {
-            "title": "GeodeId",
-            "type": "string",
-            "minLength": 36,
-            "maxLength": 36
+            "title": "GeodeId"
           },
           "minItems": 1
         },
         "attribute_name": {
-          "title": "AttributeName",
-          "type": "string",
-          "minLength": 1
+          "title": "AttributeName"
         }
       },
       "required": [
@@ -3189,18 +1811,12 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         },
         "component_ids": {
           "type": "array",
           "items": {
-            "title": "GeodeId",
-            "type": "string",
-            "minLength": 36,
-            "maxLength": 36
+            "title": "GeodeId"
           },
           "minItems": 1
         }
@@ -3216,34 +1832,7 @@
           "attributes": {
             "type": "array",
             "items": {
-              "title": "AttributeInfo",
-              "type": "object",
-              "properties": {
-                "attribute_name": {
-                  "title": "AttributeName",
-                  "type": "string",
-                  "minLength": 1
-                },
-                "attribute_id": {
-                  "type": "string"
-                },
-                "nb_items": {
-                  "type": "integer"
-                },
-                "time_steps": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                }
-              },
-              "required": [
-                "attribute_name",
-                "attribute_id",
-                "nb_items",
-                "time_steps"
-              ],
-              "additionalProperties": false
+              "title": "AttributeInfo"
             }
           }
         },
@@ -3308,10 +1897,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         }
       },
       "required": [
@@ -3327,10 +1913,7 @@
               "type": "object",
               "properties": {
                 "id": {
-                  "title": "GeodeId",
-                  "type": "string",
-                  "minLength": 36,
-                  "maxLength": 36
+                  "title": "GeodeId"
                 },
                 "name": {
                   "type": "string"
@@ -3349,10 +1932,7 @@
               "type": "object",
               "properties": {
                 "id": {
-                  "title": "GeodeId",
-                  "type": "string",
-                  "minLength": 36,
-                  "maxLength": 36
+                  "title": "GeodeId"
                 },
                 "name": {
                   "type": "string"
@@ -3382,41 +1962,10 @@
       "type": "object",
       "properties": {
         "geode_object_type": {
-          "title": "GeodeObjectType",
-          "type": "string",
-          "enum": [
-            "VertexSet",
-            "Graph",
-            "PointSet2D",
-            "PointSet3D",
-            "EdgedCurve2D",
-            "EdgedCurve3D",
-            "RasterImage2D",
-            "PolygonalSurface2D",
-            "PolygonalSurface3D",
-            "TriangulatedSurface2D",
-            "TriangulatedSurface3D",
-            "RegularGrid2D",
-            "LightRegularGrid2D",
-            "RasterImage3D",
-            "PolyhedralSolid3D",
-            "TetrahedralSolid3D",
-            "HybridSolid3D",
-            "RegularGrid3D",
-            "LightRegularGrid3D",
-            "BRep",
-            "Section",
-            "StructuralModel",
-            "CrossSection",
-            "ImplicitStructuralModel",
-            "ImplicitCrossSection",
-            "HorizonStack3D"
-          ]
+          "title": "GeodeObjectType"
         },
         "filename": {
-          "title": "Filename",
-          "type": "string",
-          "minLength": 1
+          "title": "Filename"
         }
       },
       "required": [
@@ -3452,36 +2001,7 @@
       "type": "object",
       "properties": {
         "geode_object_type": {
-          "title": "GeodeObjectType",
-          "type": "string",
-          "enum": [
-            "VertexSet",
-            "Graph",
-            "PointSet2D",
-            "PointSet3D",
-            "EdgedCurve2D",
-            "EdgedCurve3D",
-            "RasterImage2D",
-            "PolygonalSurface2D",
-            "PolygonalSurface3D",
-            "TriangulatedSurface2D",
-            "TriangulatedSurface3D",
-            "RegularGrid2D",
-            "LightRegularGrid2D",
-            "RasterImage3D",
-            "PolyhedralSolid3D",
-            "TetrahedralSolid3D",
-            "HybridSolid3D",
-            "RegularGrid3D",
-            "LightRegularGrid3D",
-            "BRep",
-            "Section",
-            "StructuralModel",
-            "CrossSection",
-            "ImplicitStructuralModel",
-            "ImplicitCrossSection",
-            "HorizonStack3D"
-          ]
+          "title": "GeodeObjectType"
         }
       },
       "required": [
@@ -3494,71 +2014,13 @@
           "parents": {
             "type": "array",
             "items": {
-              "title": "GeodeObjectType",
-              "type": "string",
-              "enum": [
-                "VertexSet",
-                "Graph",
-                "PointSet2D",
-                "PointSet3D",
-                "EdgedCurve2D",
-                "EdgedCurve3D",
-                "RasterImage2D",
-                "PolygonalSurface2D",
-                "PolygonalSurface3D",
-                "TriangulatedSurface2D",
-                "TriangulatedSurface3D",
-                "RegularGrid2D",
-                "LightRegularGrid2D",
-                "RasterImage3D",
-                "PolyhedralSolid3D",
-                "TetrahedralSolid3D",
-                "HybridSolid3D",
-                "RegularGrid3D",
-                "LightRegularGrid3D",
-                "BRep",
-                "Section",
-                "StructuralModel",
-                "CrossSection",
-                "ImplicitStructuralModel",
-                "ImplicitCrossSection",
-                "HorizonStack3D"
-              ]
+              "title": "GeodeObjectType"
             }
           },
           "children": {
             "type": "array",
             "items": {
-              "title": "GeodeObjectType",
-              "type": "string",
-              "enum": [
-                "VertexSet",
-                "Graph",
-                "PointSet2D",
-                "PointSet3D",
-                "EdgedCurve2D",
-                "EdgedCurve3D",
-                "RasterImage2D",
-                "PolygonalSurface2D",
-                "PolygonalSurface3D",
-                "TriangulatedSurface2D",
-                "TriangulatedSurface3D",
-                "RegularGrid2D",
-                "LightRegularGrid2D",
-                "RasterImage3D",
-                "PolyhedralSolid3D",
-                "TetrahedralSolid3D",
-                "HybridSolid3D",
-                "RegularGrid3D",
-                "LightRegularGrid3D",
-                "BRep",
-                "Section",
-                "StructuralModel",
-                "CrossSection",
-                "ImplicitStructuralModel",
-                "ImplicitCrossSection",
-                "HorizonStack3D"
-              ]
+              "title": "GeodeObjectType"
             }
           }
         },
@@ -3581,9 +2043,7 @@
           "type": "object"
         },
         "filename": {
-          "title": "Filename",
-          "type": "string",
-          "minLength": 1
+          "title": "Filename"
         }
       },
       "required": [
@@ -3604,15 +2064,10 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         },
         "attribute_name": {
-          "title": "AttributeName",
-          "type": "string",
-          "minLength": 1
+          "title": "AttributeName"
         }
       },
       "required": [
@@ -3656,10 +2111,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         }
       },
       "required": [
@@ -3672,34 +2124,7 @@
           "attributes": {
             "type": "array",
             "items": {
-              "title": "AttributeInfo",
-              "type": "object",
-              "properties": {
-                "attribute_name": {
-                  "title": "AttributeName",
-                  "type": "string",
-                  "minLength": 1
-                },
-                "attribute_id": {
-                  "type": "string"
-                },
-                "nb_items": {
-                  "type": "integer"
-                },
-                "time_steps": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                }
-              },
-              "required": [
-                "attribute_name",
-                "attribute_id",
-                "nb_items",
-                "time_steps"
-              ],
-              "additionalProperties": false
+              "title": "AttributeInfo"
             }
           }
         },
@@ -3718,41 +2143,10 @@
       "type": "object",
       "properties": {
         "geode_object_type": {
-          "title": "GeodeObjectType",
-          "type": "string",
-          "enum": [
-            "VertexSet",
-            "Graph",
-            "PointSet2D",
-            "PointSet3D",
-            "EdgedCurve2D",
-            "EdgedCurve3D",
-            "RasterImage2D",
-            "PolygonalSurface2D",
-            "PolygonalSurface3D",
-            "TriangulatedSurface2D",
-            "TriangulatedSurface3D",
-            "RegularGrid2D",
-            "LightRegularGrid2D",
-            "RasterImage3D",
-            "PolyhedralSolid3D",
-            "TetrahedralSolid3D",
-            "HybridSolid3D",
-            "RegularGrid3D",
-            "LightRegularGrid3D",
-            "BRep",
-            "Section",
-            "StructuralModel",
-            "CrossSection",
-            "ImplicitStructuralModel",
-            "ImplicitCrossSection",
-            "HorizonStack3D"
-          ]
+          "title": "GeodeObjectType"
         },
         "filename": {
-          "title": "Filename",
-          "type": "string",
-          "minLength": 1
+          "title": "Filename"
         }
       },
       "required": [
@@ -3796,15 +2190,10 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         },
         "attribute_name": {
-          "title": "AttributeName",
-          "type": "string",
-          "minLength": 1
+          "title": "AttributeName"
         }
       },
       "required": [
@@ -3848,10 +2237,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         }
       },
       "required": [
@@ -3864,34 +2250,7 @@
           "attributes": {
             "type": "array",
             "items": {
-              "title": "AttributeInfo",
-              "type": "object",
-              "properties": {
-                "attribute_name": {
-                  "title": "AttributeName",
-                  "type": "string",
-                  "minLength": 1
-                },
-                "attribute_id": {
-                  "type": "string"
-                },
-                "nb_items": {
-                  "type": "integer"
-                },
-                "time_steps": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                }
-              },
-              "required": [
-                "attribute_name",
-                "attribute_id",
-                "nb_items",
-                "time_steps"
-              ],
-              "additionalProperties": false
+              "title": "AttributeInfo"
             }
           }
         },
@@ -3910,15 +2269,10 @@
       "type": "object",
       "properties": {
         "id": {
-          "title": "DataId",
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 32
+          "title": "DataId"
         },
         "filename": {
-          "title": "Filename",
-          "type": "string",
-          "minLength": 1
+          "title": "Filename"
         }
       },
       "required": [
@@ -3942,9 +2296,7 @@
       "type": "object",
       "properties": {
         "filename": {
-          "title": "Filename",
-          "type": "string",
-          "minLength": 1
+          "title": "Filename"
         }
       },
       "required": [
@@ -3980,36 +2332,7 @@
           "objects_to_load": {
             "type": "array",
             "items": {
-              "title": "GeodeObjectType",
-              "type": "string",
-              "enum": [
-                "VertexSet",
-                "Graph",
-                "PointSet2D",
-                "PointSet3D",
-                "EdgedCurve2D",
-                "EdgedCurve3D",
-                "RasterImage2D",
-                "PolygonalSurface2D",
-                "PolygonalSurface3D",
-                "TriangulatedSurface2D",
-                "TriangulatedSurface3D",
-                "RegularGrid2D",
-                "LightRegularGrid2D",
-                "RasterImage3D",
-                "PolyhedralSolid3D",
-                "TetrahedralSolid3D",
-                "HybridSolid3D",
-                "RegularGrid3D",
-                "LightRegularGrid3D",
-                "BRep",
-                "Section",
-                "StructuralModel",
-                "CrossSection",
-                "ImplicitStructuralModel",
-                "ImplicitCrossSection",
-                "HorizonStack3D"
-              ]
+              "title": "GeodeObjectType"
             }
           }
         },

@@ -1,11 +1,10 @@
-from opengeodeweb_microservice.schema_types import DataId
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
-from typing import Optional, List
+from typing import Any, Optional, List
 from dataclasses_json import DataClassJsonMixin
 from opengeodeweb_microservice.schemas import print_dataclass
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Any, List, Optional
 
 
 @dataclass
@@ -15,30 +14,10 @@ class AssignGeographic(DataClassJsonMixin):
 
     authority: str
     code: str
-    id: DataId
+    id: Any
     name: str
-    linked_ids: Optional[List[DataId]] = None
+    linked_ids: Optional[List[Any]] = None
     only_plausible: Optional[bool] = None
-
-
-@dataclass
-class AssignGeographicResponseCRS(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    authority: str
-    code: str
-    name: str
-
-
-@dataclass
-class LinkedCRS(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    authority: str
-    code: str
-    name: str
 
 
 @dataclass
@@ -46,8 +25,8 @@ class Linked(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    id: DataId
-    crs: Optional[LinkedCRS] = None
+    id: Any
+    crs: Any
     implausible: Optional[bool] = None
 
 
@@ -56,7 +35,7 @@ class AssignGeographicResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    crs: Optional[AssignGeographicResponseCRS] = None
+    crs: Any
     implausible: Optional[bool] = None
     linked: Optional[List[Linked]] = None
 

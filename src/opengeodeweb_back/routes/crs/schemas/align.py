@@ -1,10 +1,10 @@
-from opengeodeweb_microservice.schema_types import DataId
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
+from typing import Any, Optional, List
 from dataclasses_json import DataClassJsonMixin
 from opengeodeweb_microservice.schemas import print_dataclass
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import Optional, Any, List
 
 
 @dataclass
@@ -33,31 +33,11 @@ class Align(DataClassJsonMixin):
 
     authority: str
     code: str
-    id: DataId
+    id: Any
     name: str
     source_points: List[SourcePoint]
     target_points: List[TargetPoint]
-    linked_ids: Optional[List[DataId]] = None
-
-
-@dataclass
-class AlignResponseCRS(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    authority: str
-    code: str
-    name: str
-
-
-@dataclass
-class LinkedCRS(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    authority: str
-    code: str
-    name: str
+    linked_ids: Optional[List[Any]] = None
 
 
 @dataclass
@@ -65,9 +45,9 @@ class Linked(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    id: DataId
+    id: Any
     binary_light_viewable: Optional[str] = None
-    crs: Optional[LinkedCRS] = None
+    crs: Any
 
 
 @dataclass
@@ -76,7 +56,7 @@ class AlignResponse(DataClassJsonMixin):
         print_dataclass(self)
 
     binary_light_viewable: Optional[str] = None
-    crs: Optional[AlignResponseCRS] = None
+    crs: Any
     linked: Optional[List[Linked]] = None
 
 
