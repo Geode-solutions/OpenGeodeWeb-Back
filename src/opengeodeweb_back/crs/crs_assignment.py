@@ -88,9 +88,14 @@ def assign_all(
     for target_id, _, target_object in targets:
         if target_id in assigned:
             _assign(target_object, authority, code)
+    # Local import: utils_functions imports the crs modules
+    from opengeodeweb_back.utils_functions import wait_native_saved  # noqa: PLC0415
+
     # Assigning only relabels the coordinates: the viewables are unchanged
     for target_id, target_data, target_object in targets:
         if target_id in assigned:
+            # A background save of the same data, started meanwhile, must not write with it
+            wait_native_saved(target_id)
             target_object.save(geode_functions.data_file_path(target_id, target_data.native_file))
     entries: dict[str, dict[str, Any]] = {}
     for target_id, _, target_object in targets:

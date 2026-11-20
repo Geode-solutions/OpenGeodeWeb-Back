@@ -5,7 +5,6 @@ import contextlib
 import logging
 import math
 import os
-import shutil
 import sqlite3
 import tempfile
 import time
@@ -296,6 +295,7 @@ def apply_time_series(
     _check_time_series_extension(params.filename)
     if data.geode_object_type != GeodeBRep.geode_object_type():
         flask.abort(400, f"{data.geode_object_type} is not a BRep: time series cannot be applied")
+    utils_functions.wait_native_saved(params.id)
     geode_object = GeodeBRep.load_one(geode_functions.data_file_path(params.id, data.native_file))
     # Applied in memory first: if OpenGeode fails, nothing is written.
     geode_object.load_time_series(geode_functions.upload_file_path(params.filename))
@@ -840,6 +840,7 @@ def export_project() -> flask.Response:
         flask.abort(400, "Requested filename must end with .vease")
     export_vease_path = Path(project_folder) / filename
 
+    utils_functions.wait_all_native_saved()
     with get_session() as session:
         rows = session.query(Data.id, Data.native_file).all()
     # Basemaps are rebuilt from the project style: neither their rows nor their tiles are exported
@@ -888,7 +889,7 @@ def _reset_data_folder(data_folder_path: Path) -> None:
         if data_folder_path.exists():
             for item in data_folder_path.iterdir():
                 if item.is_dir() and not item.is_symlink():
-                    shutil.rmtree(item)
+                    utils_functions.remove_data_folder(item.name, item)
                 else:
                     item.unlink()
         else:

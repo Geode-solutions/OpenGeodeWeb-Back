@@ -2,7 +2,6 @@ from __future__ import annotations
 
 # Standard library imports
 import logging
-import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -83,7 +82,7 @@ def _save_tiles(data_id: str, tiles: basemap_tiles.TileRange, images: Images) ->
             )
     except OSError:
         # The request rolls the data row back: its folder must not stay behind
-        shutil.rmtree(data_folder, ignore_errors=True)
+        utils_functions.remove_data_folder(data_id, data_folder, ignore_errors=True)
         raise
 
 
@@ -132,5 +131,5 @@ def delete(params: schemas.Delete) -> schemas.DeleteResponse:
     if not basemap_tiles.is_basemap(params.id):
         flask.abort(400, f"Data {params.id} is not a basemap")
     get_session().delete(data)
-    shutil.rmtree(geode_functions.data_file_path(params.id))
+    utils_functions.remove_data_folder(params.id)
     return schemas.DeleteResponse(id=params.id)
