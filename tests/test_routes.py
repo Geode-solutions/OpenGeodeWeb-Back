@@ -683,6 +683,17 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
     client.application.config["DATA_FOLDER_PATH"] = original_data_folder
 
 
+def test_ping_while_project_database_is_closed(client: FlaskClient) -> None:
+    # import_project closes the database while it replaces the project files,
+    # the client keeps pinging meanwhile
+    connection.close_database()
+    try:
+        response = client.post("/opengeodeweb_back/ping", json={})
+        assert response.status_code == 200
+    finally:
+        connection.init_database(Path(os.environ["TEST_DB_PATH"]))
+
+
 def test_save_viewable_workflow_from_object(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/create/point_set"
     point_data = {
