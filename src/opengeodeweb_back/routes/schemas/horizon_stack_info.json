@@ -6,9 +6,7 @@
   "type": "object",
   "properties": {
     "id": {
-      "type": "string",
-      "minLength": 32,
-      "maxLength": 32
+      "title": "DataId"
     }
   },
   "required": [
@@ -24,9 +22,7 @@
           "type": "object",
           "properties": {
             "id": {
-              "type": "string",
-              "minLength": 36,
-              "maxLength": 36
+              "title": "GeodeId"
             },
             "name": {
               "type": "string"
@@ -45,9 +41,7 @@
           "type": "object",
           "properties": {
             "id": {
-              "type": "string",
-              "minLength": 36,
-              "maxLength": 36
+              "title": "GeodeId"
             },
             "name": {
               "type": "string"

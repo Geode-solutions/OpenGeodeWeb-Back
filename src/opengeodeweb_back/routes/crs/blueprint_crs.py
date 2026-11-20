@@ -20,6 +20,7 @@ from opengeodeweb_back.crs.crs_functions import (
     load_crs_object,
 )
 from opengeodeweb_back.routes.crs import schemas
+from opengeodeweb_back.schema_types import CRS
 from opengeodeweb_back.typed_route import typed_route
 
 if TYPE_CHECKING:
@@ -59,7 +60,7 @@ def _saved_response(data_id: str, data: Data, geode_object: CrsGeodeObject) -> d
 def geographic_list(params: schemas.GeographicList) -> schemas.GeographicListResponse:
     geode_object = geode_functions.geode_object_from_string(params.geode_object_type)
     crs_list = [
-        schemas.geographic_list.CRSList(name=info.name, code=info.code, authority=info.authority)
+        CRS(name=info.name, code=info.code, authority=info.authority)
         for info in geographic_coordinate_systems(geode_object.is_3d()).values()
     ]
     return schemas.GeographicListResponse(crs_list=crs_list)
@@ -73,9 +74,7 @@ def active(params: schemas.Active) -> schemas.ActiveResponse:
     crs_manager = geode_object.crs_manager()
     info = geographic_info(crs_manager)
     crs_info = (
-        None
-        if info is None
-        else schemas.active.CRSInfo(authority=info.authority, code=info.code, name=info.name)
+        None if info is None else CRS(authority=info.authority, code=info.code, name=info.name)
     )
     return schemas.ActiveResponse(
         crs_name=crs_manager.active_coordinate_reference_system_name(),

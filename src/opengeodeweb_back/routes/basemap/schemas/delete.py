@@ -1,3 +1,4 @@
+from opengeodeweb_microservice.schema_types import DataId
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from dataclasses_json import DataClassJsonMixin
@@ -10,7 +11,7 @@ class Delete(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    id: str
+    id: DataId
 
 
 @dataclass
@@ -18,7 +19,7 @@ class DeleteResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    id: str
+    id: DataId
 
 
 delete_route = Route(

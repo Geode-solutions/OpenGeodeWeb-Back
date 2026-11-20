@@ -19,7 +19,10 @@
   "files": [
     "opengeodeweb_back_schemas.json",
     "opengeodeweb_back_typed_schemas.js",
-    "opengeodeweb_back_typed_schemas.d.ts"
+    "opengeodeweb_back_typed_schemas.d.ts",
+    "src/opengeodeweb_back/schema_types.json",
+    "src/opengeodeweb_back/schema_types.d.ts",
+    "src/opengeodeweb_back/schema_types.py"
   ],
   "exports": {
     "./opengeodeweb_back_schemas.json": {
@@ -29,6 +32,9 @@
     "./opengeodeweb_back_typed_schemas.js": {
       "types": "./opengeodeweb_back_typed_schemas.d.ts",
       "default": "./opengeodeweb_back_typed_schemas.js"
+    },
+    "./schema_types": {
+      "types": "./src/opengeodeweb_back/schema_types.d.ts"
     }
   },
   "publishConfig": {

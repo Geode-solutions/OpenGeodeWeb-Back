@@ -45,6 +45,7 @@ from opengeodeweb_back.routes import schemas
 from opengeodeweb_back.typed_route import parse_params, raw_route, typed_route
 
 if TYPE_CHECKING:
+    from opengeodeweb_microservice.database.data_types import GeodeObjectType
     from werkzeug.datastructures import FileStorage
 
 
@@ -1001,8 +1002,8 @@ def geode_object_inheritance(
     subclass_classes = get_all_subclasses(target_class)
 
     # Filter GeodeObjectType to only include registered related objects, excluding target
-    parents: list[str] = []
-    children: list[str] = []
+    parents: list[GeodeObjectType] = []
+    children: list[GeodeObjectType] = []
     for geode_object_type_str, geode_class in geode_objects.items():
         if geode_class == target_class:
             continue

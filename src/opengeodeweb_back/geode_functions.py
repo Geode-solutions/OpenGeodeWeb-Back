@@ -88,7 +88,7 @@ def geode_object_output_extensions(
     return results
 
 
-def objects_to_load(allowed: dict[str, AllowedObject]) -> list[str]:
+def objects_to_load(allowed: dict[str, AllowedObject]) -> list[GeodeObjectType]:
     """Pick the one type to load per content family so the whole file is loaded.
 
     Per family: keep loadable candidates, then highest is_loadable, then highest
@@ -100,7 +100,7 @@ def objects_to_load(allowed: dict[str, AllowedObject]) -> list[str]:
             families.setdefault(allowed_object.loadable_family, []).append(
                 (object_type, allowed_object)
             )
-    winners: list[str] = []
+    winners: list[GeodeObjectType] = []
     for candidates in families.values():
         best_loadable = max(candidate.is_loadable for _, candidate in candidates)
         best = [c for c in candidates if c[1].is_loadable == best_loadable]
@@ -108,5 +108,5 @@ def objects_to_load(allowed: dict[str, AllowedObject]) -> list[str]:
         best = [c for c in best if c[1].object_priority == best_priority]
         if len(best) != 1:
             return []
-        winners.append(best[0][0])
+        winners.append(geode_object_type(best[0][0]))
     return winners

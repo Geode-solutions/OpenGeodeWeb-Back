@@ -9,8 +9,7 @@
       "type": "object"
     },
     "filename": {
-      "type": "string",
-      "minLength": 1
+      "title": "Filename"
     }
   },
   "required": [

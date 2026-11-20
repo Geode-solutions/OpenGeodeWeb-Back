@@ -1,3 +1,5 @@
+from opengeodeweb_microservice.schema_types import DataId
+from opengeodeweb_back.schema_types import AttributeInfo, AttributeName
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from typing import List
@@ -11,18 +13,7 @@ class VertexAttributeNames(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    id: str
-
-
-@dataclass
-class Attribute(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    attribute_id: str
-    attribute_name: str
-    nb_items: int
-    time_steps: List[float]
+    id: DataId
 
 
 @dataclass
@@ -30,7 +21,7 @@ class VertexAttributeNamesResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    attributes: List[Attribute]
+    attributes: List[AttributeInfo]
 
 
 vertex_attribute_names_route = Route(

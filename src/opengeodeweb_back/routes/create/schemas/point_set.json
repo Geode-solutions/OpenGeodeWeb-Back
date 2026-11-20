@@ -12,24 +12,7 @@
     "points": {
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "x": {
-            "type": "number"
-          },
-          "y": {
-            "type": "number"
-          },
-          "z": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "x",
-          "y",
-          "z"
-        ],
-        "additionalProperties": false
+        "title": "Point3D"
       },
       "minItems": 1
     }
@@ -46,21 +29,19 @@
         "type": "string"
       },
       "id": {
-        "type": "string",
-        "minLength": 32,
-        "maxLength": 32
+        "title": "DataId"
       },
       "name": {
         "type": "string"
       },
       "viewer_object_type": {
-        "type": "string"
+        "title": "ViewerObjectType"
       },
       "is_viewable": {
         "type": "boolean"
       },
       "geode_object_type": {
-        "type": "string"
+        "title": "GeodeObjectType"
       },
       "viewable_file": {
         "type": "string"
@@ -74,116 +55,20 @@
       "mesh_components": {
         "type": "array",
         "items": {
-          "type": "object",
-          "properties": {
-            "viewer_id": {
-              "type": "integer"
-            },
-            "geode_id": {
-              "type": "string",
-              "minLength": 36,
-              "maxLength": 36
-            },
-            "name": {
-              "type": "string"
-            },
-            "type": {
-              "type": "string"
-            },
-            "boundaries": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 36,
-                "maxLength": 36
-              }
-            },
-            "internals": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 36,
-                "maxLength": 36
-              }
-            },
-            "is_active": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "viewer_id",
-            "geode_id",
-            "name",
-            "type",
-            "boundaries",
-            "internals",
-            "is_active"
-          ],
-          "additionalProperties": false
+          "title": "MeshComponent"
         }
       },
       "collection_components": {
         "type": "array",
         "items": {
-          "type": "object",
-          "properties": {
-            "geode_id": {
-              "type": "string",
-              "minLength": 36,
-              "maxLength": 36
-            },
-            "name": {
-              "type": "string"
-            },
-            "type": {
-              "type": "string"
-            },
-            "items": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "minLength": 36,
-                "maxLength": 36
-              }
-            },
-            "is_active": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "geode_id",
-            "name",
-            "type",
-            "items",
-            "is_active"
-          ],
-          "additionalProperties": false
+          "title": "CollectionComponent"
         }
       },
       "geode_id": {
-        "type": "string",
-        "minLength": 36,
-        "maxLength": 36
+        "title": "GeodeId"
       },
       "crs": {
-        "type": "object",
-        "properties": {
-          "authority": {
-            "type": "string"
-          },
-          "code": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "authority",
-          "code",
-          "name"
-        ],
-        "additionalProperties": false
+        "title": "CRS"
       }
     },
     "required": [
