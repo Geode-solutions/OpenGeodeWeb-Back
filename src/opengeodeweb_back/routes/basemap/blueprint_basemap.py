@@ -2,7 +2,6 @@ from __future__ import annotations
 
 # Standard library imports
 import logging
-import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -23,6 +22,7 @@ if TYPE_CHECKING:
     from opengeodeweb_back.geode_objects.geode_triangulated_surface3d import (
         GeodeTriangulatedSurface3D,
     )
+    from opengeodeweb_back.schema_types import CRS
 
 routes = flask.Blueprint("basemap", __name__, url_prefix="/basemap")
 logger = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ def padded(bounds: tuple[float, float, float, float]) -> tuple[float, float, flo
     )
 
 
-def _crs(params: schemas.CRSParams) -> og_geosciences.GeographicCoordinateSystemInfo:
+def _crs(params: CRS) -> og_geosciences.GeographicCoordinateSystemInfo:
     key = f"{params.authority}:{params.code}"
     # The basemap is a 3D mesh: only list the CRS a 3D object accepts
     crs = geographic_coordinate_systems(True).get(key)  # noqa: FBT003
@@ -83,7 +83,7 @@ def _save_tiles(data_id: str, tiles: basemap_tiles.TileRange, images: Images) ->
             )
     except OSError:
         # The request rolls the data row back: its folder must not stay behind
-        shutil.rmtree(data_folder, ignore_errors=True)
+        utils_functions.remove_data_folder(data_id, data_folder, ignore_errors=True)
         raise
 
 
@@ -132,5 +132,5 @@ def delete(params: schemas.Delete) -> schemas.DeleteResponse:
     if not basemap_tiles.is_basemap(params.id):
         flask.abort(400, f"Data {params.id} is not a basemap")
     get_session().delete(data)
-    shutil.rmtree(geode_functions.data_file_path(params.id))
+    utils_functions.remove_data_folder(params.id)
     return schemas.DeleteResponse(id=params.id)

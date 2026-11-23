@@ -6,22 +6,17 @@
   "type": "object",
   "properties": {
     "id": {
-      "type": "string",
-      "minLength": 32,
-      "maxLength": 32
+      "title": "DataId"
     },
     "component_ids": {
       "type": "array",
       "items": {
-        "type": "string",
-        "minLength": 36,
-        "maxLength": 36
+        "title": "GeodeId"
       },
       "minItems": 1
     },
     "attribute_name": {
-      "type": "string",
-      "minLength": 1
+      "title": "AttributeName"
     }
   },
   "required": [

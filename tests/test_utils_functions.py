@@ -241,6 +241,8 @@ def test_generate_files_from_object(
         assert data.light_viewable_file.endswith(".vtp")
 
         data_path = Path(app.config["DATA_FOLDER_PATH"]) / result["id"]
+        # The native file is saved in background
+        utils_functions.wait_native_saved(result["id"])
         assert (data_path / result["native_file"]).exists()
         assert (data_path / result["viewable_file"]).exists()
         assert (data_path / data.light_viewable_file).exists()
@@ -354,13 +356,15 @@ def test_generate_files_from_mixed_file_gives_distinct_geode_ids(
     app = client.application
     with app.app_context():
         [surface] = utils_functions.generate_files_from_file(
-            GeodeTriangulatedSurface3D.geode_object_type(), "mixed_polygons_polyhedra.vtu"
+            GeodeTriangulatedSurface3D.geode_object_type(),
+            "mixed_polygons_polyhedra.vtu",
         )
         [solid] = utils_functions.generate_files_from_file(
             GeodeTetrahedralSolid3D.geode_object_type(), "mixed_polygons_polyhedra.vtu"
         )
         [surface_again] = utils_functions.generate_files_from_file(
-            GeodeTriangulatedSurface3D.geode_object_type(), "mixed_polygons_polyhedra.vtu"
+            GeodeTriangulatedSurface3D.geode_object_type(),
+            "mixed_polygons_polyhedra.vtu",
         )
     # Each content family of one file is a distinct object
     assert surface["geode_id"] != solid["geode_id"]

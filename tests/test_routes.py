@@ -516,6 +516,10 @@ def test_geode_object_inheritance(client: FlaskClient) -> None:
     # Parent
     assert "VertexSet" in parents
 
+    # Not a GeodeObjectType: rejected by the enum of the schema
+    response = client.post(route, json={"geode_object_type": "NotAGeodeObject"})
+    assert response.status_code == 400
+
     # Test all params
     def get_full_data() -> test_utils.JsonData:
         return {"geode_object_type": "BRep"}

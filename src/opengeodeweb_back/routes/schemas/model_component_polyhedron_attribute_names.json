@@ -6,16 +6,12 @@
   "type": "object",
   "properties": {
     "id": {
-      "type": "string",
-      "minLength": 32,
-      "maxLength": 32
+      "title": "DataId"
     },
     "component_ids": {
       "type": "array",
       "items": {
-        "type": "string",
-        "minLength": 36,
-        "maxLength": 36
+        "title": "GeodeId"
       },
       "minItems": 1
     }
@@ -31,31 +27,7 @@
       "attributes": {
         "type": "array",
         "items": {
-          "type": "object",
-          "properties": {
-            "attribute_name": {
-              "type": "string"
-            },
-            "attribute_id": {
-              "type": "string"
-            },
-            "nb_items": {
-              "type": "integer"
-            },
-            "time_steps": {
-              "type": "array",
-              "items": {
-                "type": "number"
-              }
-            }
-          },
-          "required": [
-            "attribute_name",
-            "attribute_id",
-            "nb_items",
-            "time_steps"
-          ],
-          "additionalProperties": false
+          "title": "AttributeInfo"
         }
       }
     },

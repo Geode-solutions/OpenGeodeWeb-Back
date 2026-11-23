@@ -1,3 +1,6 @@
+from opengeodeweb_microservice.schema_types import DataId, GeodeId
+from opengeodeweb_microservice.database.data_types import GeodeObjectType, ViewerObjectType
+from opengeodeweb_back.schema_types import CRS
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
 from dataclasses_json import DataClassJsonMixin
@@ -18,16 +21,6 @@ class Bounds(DataClassJsonMixin):
     y_min: float
 
 
-@dataclass
-class CRSParams(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    authority: str
-    code: str
-    name: str
-
-
 class Map(Enum):
     PLAN = "plan"
     ROUTES = "routes"
@@ -40,7 +33,7 @@ class Build(DataClassJsonMixin):
         print_dataclass(self)
 
     bounds: Bounds
-    crs: CRSParams
+    crs: CRS
     maps: List[Map]
     z: float
     margin: Optional[bool] = None
@@ -56,16 +49,6 @@ class MeshBounds(DataClassJsonMixin):
     x_min: float
     y_max: float
     y_min: float
-
-
-@dataclass
-class CRS(DataClassJsonMixin):
-    def __post_init__(self) -> None:
-        print_dataclass(self)
-
-    authority: str
-    code: str
-    name: str
 
 
 @dataclass
@@ -85,15 +68,15 @@ class BuildResponse(DataClassJsonMixin):
     attribution: str
     bounds: MeshBounds
     columns: int
-    geode_id: str
-    geode_object_type: str
-    id: str
+    geode_id: GeodeId
+    geode_object_type: GeodeObjectType
+    id: DataId
     is_viewable: bool
     maps: List[MapElement]
     name: str
     native_file: str
     rows: int
-    viewer_object_type: str
+    viewer_object_type: ViewerObjectType
     zoom: int
     binary_light_viewable: Optional[str] = None
     crs: Optional[CRS] = None
@@ -107,4 +90,4 @@ build_route = Route(
     response=BuildResponse,
 )
 
-__all__ = ["Bounds", "CRSParams", "Build", "BuildResponse", "build_route"]
+__all__ = ["Bounds", "CRS", "Build", "BuildResponse", "build_route"]

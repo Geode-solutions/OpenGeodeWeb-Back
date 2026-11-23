@@ -6,16 +6,12 @@
   "type": "object",
   "properties": {
     "id": {
-      "type": "string",
-      "minLength": 32,
-      "maxLength": 32
+      "title": "DataId"
     },
     "linked_ids": {
       "type": "array",
       "items": {
-        "type": "string",
-        "minLength": 32,
-        "maxLength": 32
+        "title": "DataId"
       },
       "uniqueItems": true
     },
@@ -46,24 +42,7 @@
     "type": "object",
     "properties": {
       "crs": {
-        "type": "object",
-        "properties": {
-          "authority": {
-            "type": "string"
-          },
-          "code": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "authority",
-          "code",
-          "name"
-        ],
-        "additionalProperties": false
+        "title": "CRS"
       },
       "implausible": {
         "type": "boolean"
@@ -74,27 +53,10 @@
           "type": "object",
           "properties": {
             "id": {
-              "type": "string"
+              "title": "DataId"
             },
             "crs": {
-              "type": "object",
-              "properties": {
-                "authority": {
-                  "type": "string"
-                },
-                "code": {
-                  "type": "string"
-                },
-                "name": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "authority",
-                "code",
-                "name"
-              ],
-              "additionalProperties": false
+              "title": "CRS"
             },
             "implausible": {
               "type": "boolean"

@@ -38,10 +38,14 @@ def geode_object_from_string(value: str) -> type[GeodeObject]:
 
 
 def load_geode_object(data_id: str) -> GeodeObject:
+    # Local import: utils_functions imports this module
+    from .utils_functions import wait_native_saved  # noqa: PLC0415
+
     data = Data.get(data_id)
     if not data:
         flask.abort(404, f"Data with id {data_id} not found")
 
+    wait_native_saved(data_id)
     file_absolute_path = data_file_path(data_id, data.native_file)
     logger.debug(
         "Loading file: %s (exists: %s)",
@@ -88,7 +92,7 @@ def geode_object_output_extensions(
     return results
 
 
-def objects_to_load(allowed: dict[str, AllowedObject]) -> list[str]:
+def objects_to_load(allowed: dict[str, AllowedObject]) -> list[GeodeObjectType]:
     """Pick the one type to load per content family so the whole file is loaded.
 
     Per family: keep loadable candidates, then highest is_loadable, then highest
@@ -100,7 +104,7 @@ def objects_to_load(allowed: dict[str, AllowedObject]) -> list[str]:
             families.setdefault(allowed_object.loadable_family, []).append(
                 (object_type, allowed_object)
             )
-    winners: list[str] = []
+    winners: list[GeodeObjectType] = []
     for candidates in families.values():
         best_loadable = max(candidate.is_loadable for _, candidate in candidates)
         best = [c for c in candidates if c[1].is_loadable == best_loadable]
@@ -108,5 +112,5 @@ def objects_to_load(allowed: dict[str, AllowedObject]) -> list[str]:
         best = [c for c in best if c[1].object_priority == best_priority]
         if len(best) != 1:
             return []
-        winners.append(best[0][0])
+        winners.append(geode_object_type(best[0][0]))
     return winners

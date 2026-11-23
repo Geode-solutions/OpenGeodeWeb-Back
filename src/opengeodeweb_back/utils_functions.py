@@ -10,7 +10,8 @@ import threading
 import time
 import uuid
 import zipfile
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import Future, ThreadPoolExecutor, wait
+from dataclasses import dataclass, field
 from importlib import metadata
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -36,6 +37,11 @@ from .geode_objects.geode_model import GeodeModel
 from .geode_objects.geode_vertex_set import GeodeVertexSet
 
 logger = logging.getLogger(__name__)
+
+# Native files are saved in background: the viewer only needs the viewables.
+# Several files can be imported at once, hence the default pool size.
+_native_executor = ThreadPoolExecutor(thread_name_prefix="native_save")
+_native_saves_lock = threading.Lock()
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -315,18 +321,150 @@ def model_components(data_id: str, model: GeodeModel, viewable_file: str | None)
     }
 
 
+@dataclass
+class _NativeSave:
+    """A background native save. The object is kept until it is saved, to retry a failure."""
+
+    future: Future[list[str]]
+    geode_object: GeodeObject
+    native_path: str
+    # Held by a synchronous retry: a later save of the same data waits for it
+    retry_lock: threading.Lock = field(default_factory=threading.Lock)
+    retried: bool = False
+
+
+_native_saves: dict[str, _NativeSave] = {}
+
+
+def _save_native_in_background(geode_object: GeodeObject, data_id: str, native_path: str) -> None:
+    """Save the native file without blocking the request.
+
+    The task only uses the captured geode object: no app context nor DB session.
+    The Werkzeug debug reloader may kill a save mid-write (dev only).
+    """
+
+    def save_native(previous: _NativeSave | None) -> list[str]:
+        if previous is not None:
+            # A re-save of the same data supersedes the previous one, whatever its outcome,
+            # but never writes the same file at the same time. No deadlock: FIFO order puts
+            # the previous save ahead in the queue or running.
+            wait([previous.future])
+            with previous.retry_lock:
+                pass
+        return geode_object.save(native_path)
+
+    # One critical section: two re-saves of the same data cannot chain on the same previous
+    with _native_saves_lock:
+        previous = _native_saves.get(data_id)
+        future = _native_executor.submit(save_native, previous)
+        _native_saves[data_id] = _NativeSave(future, geode_object, native_path)
+    # Outside the lock: the callback takes it, and runs here if the save is already done
+    future.add_done_callback(lambda done: _forget_native_save(data_id, done))
+
+
+def _forget_native_save(data_id: str, future: Future[list[str]]) -> None:
+    """Drop a successful save from the registry; failed ones stay to be retried."""
+    if future.cancelled() or future.exception() is not None:
+        return
+    with _native_saves_lock:
+        entry = _native_saves.get(data_id)
+        if entry is not None and entry.future is future:
+            del _native_saves[data_id]
+
+
+def _drop_native_save(data_id: str, entry: _NativeSave) -> None:
+    with _native_saves_lock:
+        if _native_saves.get(data_id) is entry:
+            del _native_saves[data_id]
+
+
+def discard_native_save(data_id: str) -> None:
+    """Wait for the native save of data_id, if any, and forget it whatever its outcome."""
+    with _native_saves_lock:
+        entry = _native_saves.get(data_id)
+    if entry is None:
+        return
+    try:
+        entry.future.result()
+    except Exception:
+        logger.warning("Discarded failed native save of %s", data_id, exc_info=True)
+    # A retry running on another thread must not write in a folder being removed,
+    # and none may start once the entry is dropped
+    with entry.retry_lock:
+        _drop_native_save(data_id, entry)
+
+
+def remove_data_folder(
+    data_id: str, folder: str | Path | None = None, *, ignore_errors: bool = False
+) -> None:
+    """Remove the folder of data_id once its native save is done (by default its data folder)."""
+    discard_native_save(data_id)
+    if folder is None:
+        folder = geode_functions.data_file_path(data_id)
+    shutil.rmtree(folder, ignore_errors=ignore_errors)
+
+
+def _settle_native_save(data_id: str, entry: _NativeSave) -> Exception | None:
+    """Wait for entry; on failure, retry its save once on this thread. None once saved."""
+    try:
+        entry.future.result()
+    except Exception as error:
+        with entry.retry_lock:
+            with _native_saves_lock:
+                superseded = _native_saves.get(data_id) is not entry
+            if not entry.retried and not superseded:
+                logger.warning("Native save of %s failed, retrying", data_id, exc_info=error)
+                try:
+                    entry.geode_object.save(entry.native_path)
+                except Exception as retry_error:
+                    logger.exception("Native file of %s could not be saved", data_id)
+                    return retry_error
+                entry.retried = True
+    _drop_native_save(data_id, entry)
+    return None
+
+
+def _ensure_native_saved(data_id: str) -> Exception | None:
+    """Wait until data_id has no pending save. The error of a save that failed twice, if any."""
+    while True:
+        with _native_saves_lock:
+            entry = _native_saves.get(data_id)
+        if entry is None:
+            return None
+        # A superseded entry is not dropped: the loop then waits for the newer save
+        error = _settle_native_save(data_id, entry)
+        if error is not None:
+            return error
+
+
+def wait_native_saved(data_id: str) -> None:
+    """Wait for the background native save of data_id, if any, retrying a failure once."""
+    error = _ensure_native_saved(data_id)
+    if error is not None:
+        # The failed save stays registered: a later call retries it again
+        flask.abort(500, f"Native file of {data_id} could not be saved: {error}")
+
+
+def wait_all_native_saved() -> None:
+    """Wait for every pending background native save, retrying each failure once.
+
+    Aborts once, naming every data whose native file could not be saved.
+    """
+    with _native_saves_lock:
+        pending = list(_native_saves)
+    errors = {data_id: _ensure_native_saved(data_id) for data_id in pending}
+    failed = [f"{data_id} ({error})" for data_id, error in errors.items() if error]
+    if failed:
+        flask.abort(500, f"Native files could not be saved: {', '.join(failed)}")
+
+
 def save_all_viewables_and_return_info(
     geode_object: GeodeObject,
     data: Data,
     data_path: str,
 ) -> dict[str, Any]:
     with ThreadPoolExecutor() as executor:
-        tasks: list[tuple[Callable[[str], Any], str]] = [
-            (
-                geode_object.save,
-                str(Path(data_path) / ("native." + geode_object.native_extension())),
-            )
-        ]
+        tasks: list[tuple[Callable[[str], Any], str]] = []
         if geode_object.is_viewable():
             tasks.extend(
                 [
@@ -339,10 +477,9 @@ def save_all_viewables_and_return_info(
             )
 
         results = list(executor.map(lambda args: args[0](args[1]), tasks))
-        native_files = results[0]
         if geode_object.is_viewable():
-            viewable_path = results[1]
-            light_path = results[2]
+            viewable_path = results[0]
+            light_path = results[1]
             binary_light_viewable = Path(light_path).read_bytes()
             binary_light_viewable_str = base64.b64encode(binary_light_viewable).decode("ascii")
             data.viewable_file = Path(viewable_path).name
@@ -352,7 +489,7 @@ def save_all_viewables_and_return_info(
             data.viewable_file = None
             data.light_viewable_file = None
 
-        data.native_file = Path(native_files[0]).name
+        data.native_file = f"native.{geode_object.native_extension()}"
 
         name = geode_object.identifier.name()
         if not name:
@@ -377,6 +514,7 @@ def save_all_viewables_and_return_info(
         crs = active_crs(geode_object)
         if crs is not None:
             response["crs"] = crs
+        _save_native_in_background(geode_object, data.id, str(Path(data_path) / data.native_file))
         return response
 
 
@@ -438,7 +576,7 @@ def _remove_created_data(created: list[Data]) -> None:
     session = get_session()
     for data in created:
         session.delete(data)
-        shutil.rmtree(geode_functions.data_file_path(data.id), ignore_errors=True)
+        remove_data_folder(data.id, ignore_errors=True)
     session.flush()
 
 

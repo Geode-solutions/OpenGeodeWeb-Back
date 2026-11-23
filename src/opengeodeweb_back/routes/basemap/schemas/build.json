@@ -43,34 +43,21 @@
       "additionalProperties": false
     },
     "crs": {
-      "title": "CRSParams",
-      "type": "object",
-      "properties": {
-        "authority": {
-          "type": "string",
-          "minLength": 1
-        },
-        "code": {
-          "type": "string",
-          "minLength": 1
-        },
-        "name": {
-          "type": "string",
-          "minLength": 1
-        }
-      },
-      "required": [
-        "authority",
-        "code",
-        "name"
-      ],
-      "additionalProperties": false
+      "title": "CRS"
     },
     "z": {
       "type": "number"
     },
-    "margin": { "type": "boolean", "default": true },
-    "max_pixels": { "type": "integer", "minimum": 256, "maximum": 4096, "default": 2048 }
+    "margin": {
+      "type": "boolean",
+      "default": true
+    },
+    "max_pixels": {
+      "type": "integer",
+      "minimum": 256,
+      "maximum": 4096,
+      "default": 2048
+    }
   },
   "required": [
     "maps",
@@ -86,21 +73,19 @@
         "type": "string"
       },
       "id": {
-        "type": "string",
-        "minLength": 32,
-        "maxLength": 32
+        "title": "DataId"
       },
       "name": {
         "type": "string"
       },
       "viewer_object_type": {
-        "type": "string"
+        "title": "ViewerObjectType"
       },
       "is_viewable": {
         "type": "boolean"
       },
       "geode_object_type": {
-        "type": "string"
+        "title": "GeodeObjectType"
       },
       "viewable_file": {
         "type": "string"
@@ -112,29 +97,10 @@
         "type": "integer"
       },
       "geode_id": {
-        "type": "string",
-        "minLength": 36,
-        "maxLength": 36
+        "title": "GeodeId"
       },
       "crs": {
-        "type": "object",
-        "properties": {
-          "authority": {
-            "type": "string"
-          },
-          "code": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "authority",
-          "code",
-          "name"
-        ],
-        "additionalProperties": false
+        "title": "CRS"
       },
       "columns": {
         "type": "integer",
@@ -147,17 +113,33 @@
       "attribution": {
         "type": "string"
       },
-      "zoom": { "type": "integer", "minimum": 0 },
+      "zoom": {
+        "type": "integer",
+        "minimum": 0
+      },
       "bounds": {
         "title": "MeshBounds",
         "type": "object",
         "properties": {
-          "x_min": { "type": "number" },
-          "y_min": { "type": "number" },
-          "x_max": { "type": "number" },
-          "y_max": { "type": "number" }
+          "x_min": {
+            "type": "number"
+          },
+          "y_min": {
+            "type": "number"
+          },
+          "x_max": {
+            "type": "number"
+          },
+          "y_max": {
+            "type": "number"
+          }
         },
-        "required": ["x_min", "y_min", "x_max", "y_max"],
+        "required": [
+          "x_min",
+          "y_min",
+          "x_max",
+          "y_max"
+        ],
         "additionalProperties": false
       },
       "maps": {
