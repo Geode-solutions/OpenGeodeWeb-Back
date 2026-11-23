@@ -574,6 +574,43 @@ def test_vertical_crs_not_offered(client: FlaskClient) -> None:
     assert response.status_code == 400
 
 
+NZTM_NZVD = {
+    "authority": "EPSG",
+    "code": "2193+7839",
+    "name": "NZGD2000 / New Zealand Transverse Mercator 2000 + NZVD2016 height",
+}
+
+
+def test_assign_compound_crs(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/crs/assign_geographic"
+    # Pukekohe model centre: NZTM metres, NZVD2016 heights
+    point_set_id = _create_point_set(client, [{"x": 1765750, "y": 5887250, "z": 100}])
+    response = client.post(route, json={"id": point_set_id, **NZTM_NZVD})
+    assert response.status_code == 200
+    assert response.get_json()["crs"] == NZTM_NZVD
+    assert response.get_json()["implausible"] is False
+    # A 2D data has no heights: it takes the horizontal part
+    [point_set_2d] = test_utils.check_save_viewable_file(client, "PointSet2D", "test.og_pts2d")
+    response = client.post(route, json={"id": point_set_2d["id"], **NZTM_NZVD})
+    assert response.get_json()["crs"]["code"] == "2193"
+
+
+def test_assign_invalid_compound_crs(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/crs/assign_geographic"
+    point_set_id = _create_point_set(client)
+    # Unknown vertical, horizontal part already with heights, malformed, parts swapped
+    for code in ("2193+9999", "9528+7839", "2193+", "+7839", "2193+7839+5720", "7839+2193"):
+        response = client.post(
+            route, json={"id": point_set_id, "authority": "EPSG", "code": code, "name": "x"}
+        )
+        assert response.status_code == 400, code
+    # Both parts come from the authority of the request
+    response = client.post(
+        route, json={"id": point_set_id, "authority": "ESRI", "code": "2193+7839", "name": "x"}
+    )
+    assert response.status_code == 400
+
+
 def test_assign_only_rewrites_the_native_file(client: FlaskClient) -> None:
     [point_set] = test_utils.check_save_viewable_file(client, "PointSet3D", "test.og_pts3d")
     point_set_id = point_set["id"]

@@ -13,7 +13,7 @@ from opengeodeweb_microservice.database.connection import get_session
 # Local application imports
 from opengeodeweb_back import geode_functions, utils_functions
 from opengeodeweb_back.basemap import basemap_mesh, basemap_providers, basemap_tiles
-from opengeodeweb_back.crs.crs_functions import geographic_coordinate_systems
+from opengeodeweb_back.crs.crs_functions import resolve_geographic_info
 from opengeodeweb_back.routes.basemap import schemas
 from opengeodeweb_back.typed_route import typed_route
 
@@ -52,7 +52,7 @@ def padded(bounds: tuple[float, float, float, float]) -> tuple[float, float, flo
 def _crs(params: CRS) -> og_geosciences.GeographicCoordinateSystemInfo:
     key = f"{params.authority}:{params.code}"
     # The basemap is a 3D mesh: only list the CRS a 3D object accepts
-    crs = geographic_coordinate_systems(True).get(key)  # noqa: FBT003
+    crs = resolve_geographic_info(True, params.authority, params.code)  # noqa: FBT003
     if crs is None:
         flask.abort(400, f"Unknown CRS {key}")
     return crs

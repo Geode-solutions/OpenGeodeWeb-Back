@@ -103,7 +103,7 @@ def known_geographic_info(
     geode_object: CrsGeodeObject, authority: str, code: str
 ) -> og_geosciences.GeographicCoordinateSystemInfo | None:
     """The listed CRS for authority:code, None when PROJ does not know it."""
-    return geographic_coordinate_systems(geode_object.is_3d()).get(f"{authority}:{code}")
+    return resolve_geographic_info(geode_object.is_3d(), authority, code)
 
 
 def geographic_info(
@@ -197,6 +197,66 @@ def vertical_coordinate_systems() -> frozenset[str]:
     return frozenset(f"{authority}:{code}" for authority, code in rows)
 
 
+@functools.cache
+def compoundable_coordinate_systems() -> frozenset[str]:
+    """CRS without heights, which a vertical CRS can complete, as "AUTHORITY:CODE"."""
+    rows = (
+        _query_proj_database(
+            "SELECT auth_name, code FROM projected_crs UNION "
+            "SELECT auth_name, code FROM geodetic_crs WHERE type = 'geographic 2D'",
+            (),
+        )
+        or []
+    )
+    return frozenset(f"{authority}:{code}" for authority, code in rows)
+
+
+@functools.cache
+def _vertical_name(authority: str, code: str) -> str | None:
+    rows = _query_proj_database(
+        "SELECT name FROM vertical_crs WHERE auth_name = ? AND code = ?", (authority, code)
+    )
+    return str(rows[0][0]) if rows else None
+
+
+def horizontal_code(code: str) -> str:
+    """The X/Y part of a compound "A+B" code, the code itself otherwise."""
+    return code.split("+", 1)[0]
+
+
+def resolve_geographic_info(
+    is_3d: bool,  # noqa: FBT001 positional like geographic_coordinate_systems
+    authority: str,
+    code: str,
+) -> og_geosciences.GeographicCoordinateSystemInfo | None:
+    """The CRS for authority:code, None when it is not known.
+
+    "A+B" composes a listed CRS without heights (A) with a vertical CRS (B): PROJ crashes on an
+    unknown CRS, so each part is checked first. A 2D data has no heights: it gets A.
+    """
+    listed = geographic_coordinate_systems(is_3d)
+    if "+" not in code:
+        return listed.get(f"{authority}:{code}")
+    parts = code.split("+")
+    compound_part_count = 2
+    if len(parts) != compound_part_count or not all(parts):
+        return None
+    horizontal, vertical = parts
+    horizontal_info = listed.get(f"{authority}:{horizontal}")
+    vertical_name = _vertical_name(authority, vertical)
+    if (
+        horizontal_info is None
+        or vertical_name is None
+        or f"{authority}:{horizontal}" not in compoundable_coordinate_systems()
+    ):
+        return None
+    if not is_3d:
+        return horizontal_info
+    return og_geosciences.GeographicCoordinateSystemInfo(
+        authority, code, f"{horizontal_info.name} + {vertical_name}"
+    )
+
+
 def _overlaps(
     latitudes: tuple[float, float],
     longitudes: tuple[float, float],
@@ -237,7 +297,8 @@ def coordinates_implausible(
         abs(value) <= MAX_LONGITUDE for value in longitudes
     ):
         return True
-    areas = area_of_use(info.authority, info.code)
+    # Heights do not place the data: only the X/Y part has an area of use
+    areas = area_of_use(info.authority, horizontal_code(info.code))
     if not areas:
         return False
     latitude_range = (min(latitudes), max(latitudes))
