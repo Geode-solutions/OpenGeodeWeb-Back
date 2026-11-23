@@ -94,7 +94,9 @@ def geographic_coordinate_systems(
         if is_3d
         else og_geosciences.GeographicCoordinateSystem2D.geographic_coordinate_systems()
     )
-    return {info.authority_code(): info for info in infos}
+    # A height-only CRS cannot place X and Y: converting them fails afterwards
+    vertical = vertical_coordinate_systems()
+    return {info.authority_code(): info for info in infos if info.authority_code() not in vertical}
 
 
 def known_geographic_info(
@@ -188,6 +190,13 @@ def area_of_use(authority: str, code: str) -> list[tuple[float, float, float, fl
     return [(float(s), float(n), float(w), float(e)) for s, n, w, e in rows]
 
 
+@functools.cache
+def vertical_coordinate_systems() -> frozenset[str]:
+    """Height or depth only CRS PROJ knows, as "AUTHORITY:CODE"."""
+    rows = _query_proj_database("SELECT auth_name, code FROM vertical_crs", ()) or []
+    return frozenset(f"{authority}:{code}" for authority, code in rows)
+
+
 def _overlaps(
     latitudes: tuple[float, float],
     longitudes: tuple[float, float],
@@ -206,7 +215,8 @@ def coordinates_implausible(
     geode_object: CrsGeodeObject, info: og_geosciences.GeographicCoordinateSystemInfo
 ) -> bool:
     """Whether the data XY extent, read in info, misses the area where info is used."""
-    boxes = [mesh.bounding_box() for mesh in geode_object.crs_meshes()]
+    # Empty meshes, like blocks of a model built from surfaces, have no bounding box
+    boxes = [mesh.bounding_box() for mesh in geode_object.crs_meshes() if mesh.nb_vertices() > 0]
     # Without mesh, the infinite bounds below mark the data as implausible
     bounds = (
         min((box.min().value(0) for box in boxes), default=math.inf),
