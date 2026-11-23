@@ -325,6 +325,14 @@ def load_crs_object(data_id: str) -> tuple[Data, CrsGeodeObject]:
     return data, geode_object
 
 
+def supports_crs(data_id: str) -> bool:
+    """Whether the data type can hold a CRS, read from its type without loading the data."""
+    data = geode_functions.get_data_info(data_id)
+    return issubclass(
+        geode_functions.geode_object_from_string(data.geode_object_type), CRS_GEODE_OBJECTS
+    )
+
+
 def linked_objects(
     data_id: str, linked_ids: list[str] | None
 ) -> list[tuple[str, Data, CrsGeodeObject]]:
