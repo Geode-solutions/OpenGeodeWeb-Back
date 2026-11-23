@@ -48,6 +48,7 @@ class Linked(DataClassJsonMixin):
     id: DataId
     binary_light_viewable: Optional[str] = None
     crs: Optional[LinkedCRS] = None
+    heights_unchanged: Optional[bool] = None
 
 
 @dataclass
@@ -57,6 +58,7 @@ class ConvertGeographicResponse(DataClassJsonMixin):
 
     binary_light_viewable: Optional[str] = None
     crs: Optional[ConvertGeographicResponseCRS] = None
+    heights_unchanged: Optional[bool] = None
     linked: Optional[List[Linked]] = None
 
 

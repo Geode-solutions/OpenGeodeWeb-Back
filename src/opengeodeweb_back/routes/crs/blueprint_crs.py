@@ -124,13 +124,25 @@ def convert_geographic(params: schemas.ConvertGeographic) -> schemas.ConvertGeog
         data, geode_object = load_crs_object(params.id)
         linked = linked_objects(params.id, params.linked_ids)
         # Every data is converted in memory before any file is written
-        crs_assignment.convert(geode_object, params.authority, params.code)
-        for _, _, linked_object in linked:
-            crs_assignment.convert(linked_object, params.authority, params.code)
-    response = _saved_response(params.id, data, geode_object)
+        unchanged: set[str] = set()
+        for data_id, converted_object in [
+            (params.id, geode_object),
+            *((linked_id, linked_object) for linked_id, _, linked_object in linked),
+        ]:
+            if crs_assignment.convert(converted_object, params.authority, params.code):
+                unchanged.add(data_id)
+
+    def converted(data_id: str, data: Data, converted_object: CrsGeodeObject) -> dict[str, Any]:
+        entry = _saved_response(data_id, data, converted_object)
+        # Only said when true: the front warns that these heights kept their values
+        if data_id in unchanged:
+            entry["heights_unchanged"] = True
+        return entry
+
+    response = converted(params.id, data, geode_object)
     if linked:
         response["linked"] = [
-            {"id": linked_id, **_saved_response(linked_id, linked_data, linked_object)}
+            {"id": linked_id, **converted(linked_id, linked_data, linked_object)}
             for linked_id, linked_data, linked_object in linked
         ]
     return schemas.ConvertGeographicResponse.from_dict(response)

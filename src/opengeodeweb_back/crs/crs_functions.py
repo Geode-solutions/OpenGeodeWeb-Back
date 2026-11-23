@@ -241,6 +241,49 @@ def horizontal_parts() -> dict[str, str]:
 
 
 @functools.cache
+def _registered_heights() -> dict[str, str]:
+    """Vertical part of each registered compound CRS, both as "AUTHORITY:CODE"."""
+    rows = (
+        _query_proj_database(
+            "SELECT auth_name, code, vertical_crs_auth_name, vertical_crs_code FROM compound_crs",
+            (),
+        )
+        or []
+    )
+    return {
+        f"{authority}:{code}": f"{v_authority}:{v_code}"
+        for authority, code, v_authority, v_code in rows
+    }
+
+
+@functools.cache
+def _geographic_3d() -> frozenset[str]:
+    rows = (
+        _query_proj_database(
+            "SELECT auth_name, code FROM geodetic_crs WHERE type = 'geographic 3D'", ()
+        )
+        or []
+    )
+    return frozenset(f"{authority}:{code}" for authority, code in rows)
+
+
+# Geographic 3D CRS carry heights above the ellipsoid, without a vertical CRS
+ELLIPSOIDAL_HEIGHTS = "ellipsoidal"
+
+
+def heights_datum(info: og_geosciences.GeographicCoordinateSystemInfo) -> str | None:
+    """What the heights of a CRS are measured from, None when it does not say."""
+    if "+" in info.code:
+        return f"{info.authority}:{info.code.split('+', 1)[1]}"
+    key = info.authority_code()
+    if key in _registered_heights():
+        return _registered_heights()[key]
+    if key in _geographic_3d():
+        return ELLIPSOIDAL_HEIGHTS
+    return None
+
+
+@functools.cache
 def _vertical_name(authority: str, code: str) -> str | None:
     rows = _query_proj_database(
         "SELECT name FROM vertical_crs WHERE auth_name = ? AND code = ?", (authority, code)

@@ -18,6 +18,7 @@ from opengeodeweb_back.crs.crs_functions import (
     coordinate_system,
     coordinates_implausible,
     geographic_info,
+    heights_datum,
     known_info,
 )
 
@@ -101,11 +102,31 @@ def assign_all(
     return entries
 
 
-def convert(geode_object: CrsGeodeObject, authority: str, code: str) -> None:
-    if geographic_info(geode_object.crs_manager()) is None:
+def _sample_height(geode_object: CrsGeodeObject) -> float | None:
+    for mesh in geode_object.crs_meshes():
+        if mesh.nb_vertices() > 0:
+            return float(mesh.point(0).value(2))
+    return None
+
+
+def convert(geode_object: CrsGeodeObject, authority: str, code: str) -> bool:
+    """Convert to the CRS. True when the heights changed datum but kept their values.
+
+    PROJ has no geoid grid: a change of vertical datum usually leaves the heights as they are.
+    The heights are compared, as PROJ still applies the offsets that need no grid.
+    """
+    source = geographic_info(geode_object.crs_manager())
+    if source is None:
         msg = "Assign a geographic CRS before converting"
         raise CrsError(msg)
     info = known_info(geode_object, authority, code)
+    source_heights = heights_datum(source)
+    datum_changed = (
+        geode_object.is_3d()
+        and source_heights is not None
+        and source_heights != heights_datum(info)
+    )
+    height_before = _sample_height(geode_object) if datum_changed else None
     prepare_crs_name(geode_object, info.authority_code())
     try:
         geode_object.convert_crs(info.authority_code(), info)
@@ -115,3 +136,4 @@ def convert(geode_object: CrsGeodeObject, authority: str, code: str) -> None:
         logger.exception("Conversion to %s failed", info.authority_code())
         msg = f"Coordinates cannot be converted to {info.authority_code()}: {error}"
         raise CrsError(msg) from error
+    return height_before is not None and _sample_height(geode_object) == height_before

@@ -172,12 +172,14 @@ export interface CRSConvertGeographicParams {
 export interface CRSConvertGeographicResponse {
     binary_light_viewable?: string;
     crs?:                   CRS;
+    heights_unchanged?:     boolean;
     linked?:                CRSConvertGeographicResponseLinked[];
 }
 
 export interface CRSConvertGeographicResponseLinked {
     binary_light_viewable?: string;
     crs?:                   CRS;
+    heights_unchanged?:     boolean;
     id:                     DataId;
 }
 

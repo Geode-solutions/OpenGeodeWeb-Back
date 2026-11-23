@@ -136,6 +136,8 @@ def test_convert_geographic(client: FlaskClient) -> None:
     # The front rebuilds its local actor from the new light viewable
     assert type(response.get_json()["binary_light_viewable"]) is str
     assert response.get_json()["crs"] == UTM
+    # Neither CRS has heights: nothing to report
+    assert "heights_unchanged" not in response.get_json()
     response = client.post(active_route, json={"id": point_set_id})
     assert response.get_json() == {"crs_name": "EPSG:32631", "crs_info": UTM}
     assert _first_point(client, point_set_id) != lambert_point
@@ -599,6 +601,26 @@ def test_assign_compound_crs(client: FlaskClient) -> None:
     [point_set_2d] = test_utils.check_save_viewable_file(client, "PointSet2D", "test.og_pts2d")
     response = client.post(route, json={"id": point_set_2d["id"], **NZTM_NZVD})
     assert response.get_json()["crs"]["code"] == "2193"
+
+
+def test_convert_reports_heights_unchanged(client: FlaskClient) -> None:
+    assign_route = "/opengeodeweb_back/crs/assign_geographic"
+    convert_route = "/opengeodeweb_back/crs/convert_geographic"
+    point_set_id = _create_point_set(client, [{"x": 1765750, "y": 5887250, "z": 100}])
+    client.post(assign_route, json={"id": point_set_id, **NZTM_NZVD})
+    nztm = {
+        "authority": "EPSG",
+        "code": "2193",
+        "name": "NZGD2000 / New Zealand Transverse Mercator 2000",
+    }
+    # Same X/Y, the NZVD2016 heights lose their datum: PROJ leaves them as they are
+    response = client.post(convert_route, json={"id": point_set_id, **nztm})
+    assert response.status_code == 200
+    assert response.get_json()["heights_unchanged"] is True
+    # Back to the compound: the source heights had no datum, nothing to report
+    response = client.post(convert_route, json={"id": point_set_id, **NZTM_NZVD})
+    assert response.status_code == 200
+    assert "heights_unchanged" not in response.get_json()
 
 
 def test_assign_invalid_compound_crs(client: FlaskClient) -> None:
