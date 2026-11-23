@@ -107,7 +107,7 @@ def known_geographic_info(
 
 
 def geographic_info(
-    crs_manager: og.CoordinateReferenceSystemManager2D | og.CoordinateReferenceSystemManager3D,
+    crs_manager: (og.CoordinateReferenceSystemManager2D | og.CoordinateReferenceSystemManager3D),
 ) -> og_geosciences.GeographicCoordinateSystemInfo | None:
     crs = crs_manager.active_coordinate_reference_system()
     if isinstance(
@@ -292,7 +292,8 @@ def _frames(mesh: Mesh) -> tuple[og.CoordinateSystem2D, og.CoordinateSystem2D] |
         crs: og.CoordinateReferenceSystem2D | og.CoordinateReferenceSystem3D,
     ) -> og.CoordinateSystem2D:
         return og.CoordinateSystem2D(
-            og.Point2D(_xy(crs, 0)), [og.Point2D(_xy(crs, first)), og.Point2D(_xy(crs, second))]
+            og.Point2D(_xy(crs, 0)),
+            [og.Point2D(_xy(crs, first)), og.Point2D(_xy(crs, second))],
         )
 
     return frame(active), frame(original)
@@ -320,7 +321,11 @@ def coordinate_system(points: list[og.Point2D]) -> og.CoordinateSystem2D:
 
 
 def load_crs_object(data_id: str) -> tuple[Data, CrsGeodeObject]:
+    # Local import: utils_functions imports this module
+    from opengeodeweb_back.utils_functions import wait_native_saved  # noqa: PLC0415
+
     data = geode_functions.get_data_info(data_id)
+    wait_native_saved(data_id)
     geode_object = geode_functions.geode_object_from_string(data.geode_object_type).load_one(
         geode_functions.data_file_path(data_id, data.native_file)
     )
