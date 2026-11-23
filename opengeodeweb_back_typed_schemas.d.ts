@@ -155,7 +155,10 @@ export interface CRSGeographicListParams {
 }
 
 export interface CRSGeographicListResponse {
-    crs_list: CRS[];
+    compoundable:     string[];
+    crs_list:         CRS[];
+    horizontal_parts: { [key: string]: string };
+    vertical_list:    CRS[];
 }
 
 export interface CRSConvertGeographicParams {

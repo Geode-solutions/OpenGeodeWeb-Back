@@ -1399,10 +1399,52 @@
                 ],
                 "additionalProperties": false
               }
+            },
+            "vertical_list": {
+              "type": "array",
+              "items": {
+                "title": "CRS",
+                "type": "object",
+                "properties": {
+                  "authority": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "code": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "authority",
+                  "code",
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "compoundable": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "horizontal_parts": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
             }
           },
           "required": [
-            "crs_list"
+            "crs_list",
+            "vertical_list",
+            "compoundable",
+            "horizontal_parts"
           ],
           "additionalProperties": false
         }

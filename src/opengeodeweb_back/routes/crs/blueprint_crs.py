@@ -13,11 +13,14 @@ from opengeodeweb_back.crs import crs_alignment, crs_assignment
 from opengeodeweb_back.crs.crs_functions import (
     CRS_GEODE_OBJECTS,
     CrsError,
+    compoundable_coordinate_systems,
     geographic_coordinate_systems,
     geographic_info,
+    horizontal_parts,
     known_info,
     linked_objects,
     load_crs_object,
+    vertical_coordinate_system_list,
 )
 from opengeodeweb_back.routes.crs import schemas
 from opengeodeweb_back.schema_types import CRS
@@ -59,11 +62,27 @@ def _saved_response(data_id: str, data: Data, geode_object: CrsGeodeObject) -> d
 @typed_route(routes, schemas.geographic_list_route)
 def geographic_list(params: schemas.GeographicList) -> schemas.GeographicListResponse:
     geode_object = geode_functions.geode_object_from_string(params.geode_object_type)
-    crs_list = [
-        CRS(name=info.name, code=info.code, authority=info.authority)
-        for info in geographic_coordinate_systems(geode_object.is_3d()).values()
-    ]
-    return schemas.GeographicListResponse(crs_list=crs_list)
+    listed = geographic_coordinate_systems(geode_object.is_3d())
+    # Sent for every dimension: the front keeps one list for all its dialogs, and the back
+    # Ignores the heights of a 2D data
+    return schemas.GeographicListResponse.from_dict(
+        {
+            "crs_list": [
+                {"authority": info.authority, "code": info.code, "name": info.name}
+                for info in listed.values()
+            ],
+            "vertical_list": [
+                {"authority": authority, "code": code, "name": name}
+                for authority, code, name in vertical_coordinate_system_list()
+            ],
+            "compoundable": sorted(compoundable_coordinate_systems().intersection(listed)),
+            "horizontal_parts": {
+                compound: horizontal
+                for compound, horizontal in horizontal_parts().items()
+                if compound in listed
+            },
+        }
+    )
 
 
 @typed_route(routes, schemas.active_route)

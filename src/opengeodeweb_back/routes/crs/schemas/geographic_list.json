@@ -21,10 +21,31 @@
         "items": {
           "title": "CRS"
         }
+      },
+      "vertical_list": {
+        "type": "array",
+        "items": {
+          "title": "CRS"
+        }
+      },
+      "compoundable": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "horizontal_parts": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
       }
     },
     "required": [
-      "crs_list"
+      "crs_list",
+      "vertical_list",
+      "compoundable",
+      "horizontal_parts"
     ],
     "additionalProperties": false
   }

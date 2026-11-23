@@ -212,6 +212,35 @@ def compoundable_coordinate_systems() -> frozenset[str]:
 
 
 @functools.cache
+def vertical_coordinate_system_list() -> list[tuple[str, str, str]]:
+    """(authority, code, name) of the vertical CRS offered to complete a CRS with heights."""
+    rows = (
+        _query_proj_database(
+            "SELECT auth_name, code, name FROM vertical_crs WHERE deprecated = 0 "
+            "ORDER BY auth_name, name",
+            (),
+        )
+        or []
+    )
+    return [(str(authority), str(code), str(name)) for authority, code, name in rows]
+
+
+@functools.cache
+def horizontal_parts() -> dict[str, str]:
+    """X/Y part of each registered compound CRS, both as "AUTHORITY:CODE"."""
+    rows = (
+        _query_proj_database(
+            "SELECT auth_name, code, horiz_crs_auth_name, horiz_crs_code FROM compound_crs", ()
+        )
+        or []
+    )
+    return {
+        f"{authority}:{code}": f"{h_authority}:{h_code}"
+        for authority, code, h_authority, h_code in rows
+    }
+
+
+@functools.cache
 def _vertical_name(authority: str, code: str) -> str | None:
     rows = _query_proj_database(
         "SELECT name FROM vertical_crs WHERE auth_name = ? AND code = ?", (authority, code)

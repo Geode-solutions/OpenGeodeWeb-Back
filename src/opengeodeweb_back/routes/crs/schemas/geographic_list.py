@@ -1,8 +1,7 @@
 from opengeodeweb_microservice.database.data_types import GeodeObjectType
-from opengeodeweb_back.schema_types import CRS
 from pathlib import Path
 from opengeodeweb_microservice.schemas import Route, load_schema
-from typing import List
+from typing import List, Dict
 from dataclasses_json import DataClassJsonMixin
 from opengeodeweb_microservice.schemas import print_dataclass
 from dataclasses import dataclass
@@ -17,11 +16,34 @@ class GeographicList(DataClassJsonMixin):
 
 
 @dataclass
+class CRSListElement(DataClassJsonMixin):
+    def __post_init__(self) -> None:
+        print_dataclass(self)
+
+    authority: str
+    code: str
+    name: str
+
+
+@dataclass
+class VerticalListElement(DataClassJsonMixin):
+    def __post_init__(self) -> None:
+        print_dataclass(self)
+
+    authority: str
+    code: str
+    name: str
+
+
+@dataclass
 class GeographicListResponse(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
-    crs_list: List[CRS]
+    compoundable: List[str]
+    crs_list: List[CRSListElement]
+    horizontal_parts: Dict[str, str]
+    vertical_list: List[VerticalListElement]
 
 
 geographic_list_route = Route(

@@ -40,6 +40,12 @@ def test_geographic_list(client: FlaskClient) -> None:
     assert type(crs_list) is list
     for crs in crs_list:
         assert type(crs) is dict
+    # What the CRS selector needs to compose heights, and to compare compound CRS
+    body = response.get_json()
+    assert {"authority": "EPSG", "code": "7839", "name": "NZVD2016 height"} in body["vertical_list"]
+    assert "EPSG:2193" in body["compoundable"]
+    assert "EPSG:9528" not in body["compoundable"]
+    assert body["horizontal_parts"]["EPSG:5698"] == "EPSG:2154"
 
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
