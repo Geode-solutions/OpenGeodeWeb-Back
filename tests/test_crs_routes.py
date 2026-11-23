@@ -558,6 +558,22 @@ def test_unknown_crs(client: FlaskClient) -> None:
     assert response.status_code == 400
 
 
+def test_vertical_crs_not_offered(client: FlaskClient) -> None:
+    # A height-only CRS cannot place X and Y
+    vertical = {"authority": "EPSG", "code": "7839", "name": "NZVD2016 height"}
+    response = client.post(
+        "/opengeodeweb_back/crs/geographic_list", json={"geode_object_type": "PointSet3D"}
+    )
+    codes = {(crs["authority"], crs["code"]) for crs in response.get_json()["crs_list"]}
+    assert ("EPSG", "7839") not in codes
+    assert ("EPSG", "2193") in codes
+    [point_set] = test_utils.check_save_viewable_file(client, "PointSet3D", "test.og_pts3d")
+    response = client.post(
+        "/opengeodeweb_back/crs/assign_geographic", json={"id": point_set["id"], **vertical}
+    )
+    assert response.status_code == 400
+
+
 def test_assign_only_rewrites_the_native_file(client: FlaskClient) -> None:
     [point_set] = test_utils.check_save_viewable_file(client, "PointSet3D", "test.og_pts3d")
     point_set_id = point_set["id"]

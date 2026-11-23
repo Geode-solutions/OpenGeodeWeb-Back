@@ -94,7 +94,9 @@ def geographic_coordinate_systems(
         if is_3d
         else og_geosciences.GeographicCoordinateSystem2D.geographic_coordinate_systems()
     )
-    return {info.authority_code(): info for info in infos}
+    # A height-only CRS cannot place X and Y: converting them fails afterwards
+    vertical = vertical_coordinate_systems()
+    return {info.authority_code(): info for info in infos if info.authority_code() not in vertical}
 
 
 def known_geographic_info(
@@ -186,6 +188,13 @@ def area_of_use(authority: str, code: str) -> list[tuple[float, float, float, fl
     """Extents where PROJ declares the CRS usable, empty when unknown."""
     rows = _query_proj_database(AREA_OF_USE_QUERY, (authority, code)) or []
     return [(float(s), float(n), float(w), float(e)) for s, n, w, e in rows]
+
+
+@functools.cache
+def vertical_coordinate_systems() -> frozenset[str]:
+    """Height or depth only CRS PROJ knows, as "AUTHORITY:CODE"."""
+    rows = _query_proj_database("SELECT auth_name, code FROM vertical_crs", ()) or []
+    return frozenset(f"{authority}:{code}" for authority, code in rows)
 
 
 def _overlaps(
