@@ -17,7 +17,7 @@ from opengeodeweb_microservice.database.connection import init_database
 from opengeodeweb_back.app import create_app, register_ogw_back_blueprints
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
+    from collections.abc import Callable, Generator
 
     from flask.ctx import AppContext
     from flask.testing import FlaskClient
@@ -68,6 +68,16 @@ def client() -> FlaskClient:
 def app_context() -> Generator[AppContext]:
     with app.app_context() as ctx:
         yield ctx
+
+
+@pytest.fixture
+def closed_database() -> Generator[Callable[[], None]]:
+    # import_project closes the database while it replaces the project files.
+    # Yields a function reopening it; it is reopened at teardown anyway, even if the test fails
+    db_path = Path(os.environ["TEST_DB_PATH"])
+    connection.close_database()
+    yield lambda: init_database(db_path)
+    init_database(db_path)
 
 
 @pytest.fixture

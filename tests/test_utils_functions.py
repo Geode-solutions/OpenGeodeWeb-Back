@@ -2,8 +2,10 @@ from __future__ import annotations
 
 # Standard library imports
 import base64
+import os
 import re
 import shutil
+import sqlite3
 import uuid
 import zipfile
 from pathlib import Path
@@ -32,6 +34,8 @@ from opengeodeweb_back.geode_objects.geode_triangulated_surface3d import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from flask.testing import FlaskClient
 
     from opengeodeweb_back.geode_objects.geode_object import GeodeObject
@@ -75,6 +79,27 @@ def test_teardown_request() -> None:
     utils_functions.teardown_request(flask.current_app)
     assert flask.current_app.config.get("REQUEST_COUNTER") == 0
     assert flask.current_app.config.get("LAST_REQUEST_TIME", 0) >= last_request_time
+
+
+@pytest.mark.usefixtures("app_context")
+def test_teardown_commits_a_session_opened_after_the_database_reopened(
+    closed_database: Callable[[], None],
+) -> None:
+    # A request started while import_project had the database closed, then the route used it
+    utils_functions.before_request(flask.current_app)
+    closed_database()
+    data = Data.create(
+        geode_id="teardown_test",
+        geode_object_type=GeodePolygonalSurface3D.geode_object_type(),
+        viewer_object_type=GeodePolygonalSurface3D.viewer_object_type(),
+        viewer_elements_type=GeodePolygonalSurface3D.viewer_elements_type(),
+    )
+    data_id = data.id
+    utils_functions.teardown_request(flask.current_app)
+    with sqlite3.connect(os.environ["TEST_DB_PATH"]) as raw_connection:
+        row = raw_connection.execute("SELECT id FROM datas WHERE id = ?", (data_id,)).fetchone()
+        raw_connection.execute("DELETE FROM datas WHERE id = ?", (data_id,))
+    assert row is not None
 
 
 def test_versions() -> None:
