@@ -206,7 +206,8 @@ def coordinates_implausible(
     geode_object: CrsGeodeObject, info: og_geosciences.GeographicCoordinateSystemInfo
 ) -> bool:
     """Whether the data XY extent, read in info, misses the area where info is used."""
-    boxes = [mesh.bounding_box() for mesh in geode_object.crs_meshes()]
+    # Empty meshes, like blocks of a model built from surfaces, have no bounding box
+    boxes = [mesh.bounding_box() for mesh in geode_object.crs_meshes() if mesh.nb_vertices() > 0]
     # Without mesh, the infinite bounds below mark the data as implausible
     bounds = (
         min((box.min().value(0) for box in boxes), default=math.inf),

@@ -635,6 +635,16 @@ def test_assign_only_plausible(client: FlaskClient) -> None:
     assert _active_crs(client, plausible_id) == LAMBERT
 
 
+def test_assign_geographic_model_without_block_meshes(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/crs/assign_geographic"
+    # Models built from surfaces often keep their blocks without mesh
+    [brep] = test_utils.check_save_viewable_file(client, "BRep", "corbi.og_brep")
+    response = client.post(route, json={"id": brep["id"], **LAMBERT})
+    assert response.status_code == 200
+    assert response.get_json()["crs"] == LAMBERT
+    assert _active_crs(client, brep["id"]) == LAMBERT
+
+
 def test_assign_linked(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/crs/assign_geographic"
     point_set_id = _create_point_set(client)
