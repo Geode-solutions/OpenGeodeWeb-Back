@@ -1608,6 +1608,9 @@
             "implausible": {
               "type": "boolean"
             },
+            "unsupported": {
+              "type": "boolean"
+            },
             "linked": {
               "type": "array",
               "items": {

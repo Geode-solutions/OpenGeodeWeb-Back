@@ -101,8 +101,10 @@ def test_crs_errors(client: FlaskClient) -> None:
     grid_id = grid["id"]
     response = client.post(active_route, json={"id": grid_id})
     assert response.status_code == 400
+    # Assigning leaves a data that cannot hold a CRS as it is, like a linked one
     response = client.post(assign_route, json={"id": grid_id, **LAMBERT})
-    assert response.status_code == 400
+    assert response.status_code == 200
+    assert response.get_json() == {"unsupported": True}
 
 
 def _first_point(client: FlaskClient, data_id: str) -> list[float]:
@@ -701,3 +703,8 @@ def test_assign_linked_skips_data_without_crs_support(client: FlaskClient) -> No
     assert response.get_json()["crs"] == LAMBERT
     assert response.get_json()["linked"] == [{"id": grid["id"], "unsupported": True}]
     assert _active_crs(client, point_set_id) == LAMBERT
+    # Whichever comes first: the grid as the main data does not keep the others out
+    other_id = _create_point_set(client, [{"x": 650000, "y": 6860000, "z": 0}])
+    response = client.post(route, json={"id": grid["id"], "linked_ids": [other_id], **LAMBERT})
+    assert response.get_json()["unsupported"] is True
+    assert response.get_json()["linked"] == [{"id": other_id, "crs": LAMBERT, "implausible": False}]

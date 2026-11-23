@@ -85,26 +85,29 @@ def active(params: schemas.Active) -> schemas.ActiveResponse:
 
 @typed_route(routes, schemas.assign_geographic_route)
 def assign_geographic(params: schemas.AssignGeographic) -> schemas.AssignGeographicResponse:
+    linked_ids = params.linked_ids or []
     with _bad_request():
-        data, geode_object = load_crs_object(params.id)
-        # Linked data that cannot hold a CRS, like grids, are left out instead of failing the batch
-        linked_ids = params.linked_ids or []
-        unsupported = [linked_id for linked_id in linked_ids if not supports_crs(linked_id)]
-        linked = linked_objects(
-            params.id, [linked_id for linked_id in linked_ids if linked_id not in unsupported]
+        if params.id in linked_ids:
+            msg = "The data cannot also be linked to itself"
+            raise CrsError(msg)
+        # Data that cannot hold a CRS, like grids, are left as they are instead of failing the batch
+        unsupported = {data_id for data_id in [params.id, *linked_ids] if not supports_crs(data_id)}
+        targets = [
+            (data_id, *load_crs_object(data_id))
+            for data_id in [params.id, *linked_ids]
+            if data_id not in unsupported
+        ]
+        entries = (
+            crs_assignment.assign_all(
+                targets, params.authority, params.code, only_plausible=bool(params.only_plausible)
+            )
+            if targets
+            else {}
         )
-        entries = crs_assignment.assign_all(
-            [(params.id, data, geode_object), *linked],
-            params.authority,
-            params.code,
-            only_plausible=bool(params.only_plausible),
-        )
+    entries.update({data_id: {"unsupported": True} for data_id in unsupported})
     response = entries[params.id]
     if linked_ids:
-        response["linked"] = [
-            *({"id": linked_id, **entries[linked_id]} for linked_id, _, _ in linked),
-            *({"id": linked_id, "unsupported": True} for linked_id in unsupported),
-        ]
+        response["linked"] = [{"id": linked_id, **entries[linked_id]} for linked_id in linked_ids]
     return schemas.AssignGeographicResponse.from_dict(response)
 
 

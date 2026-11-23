@@ -60,6 +60,7 @@ class AssignGeographicResponse(DataClassJsonMixin):
     crs: Optional[AssignGeographicResponseCRS] = None
     implausible: Optional[bool] = None
     linked: Optional[List[Linked]] = None
+    unsupported: Optional[bool] = None
 
 
 assign_geographic_route = Route(
