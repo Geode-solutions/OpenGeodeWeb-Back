@@ -14,7 +14,6 @@ from typing import TYPE_CHECKING
 # Third party imports
 import flask
 import pytest
-from opengeodeweb_microservice.database import connection
 from opengeodeweb_microservice.database.connection import get_session
 from opengeodeweb_microservice.database.data import Data
 from werkzeug.exceptions import HTTPException
@@ -35,6 +34,8 @@ from opengeodeweb_back.geode_objects.geode_triangulated_surface3d import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from flask.testing import FlaskClient
 
     from opengeodeweb_back.geode_objects.geode_object import GeodeObject
@@ -81,12 +82,12 @@ def test_teardown_request() -> None:
 
 
 @pytest.mark.usefixtures("app_context")
-def test_teardown_commits_a_session_opened_after_the_database_reopened() -> None:
+def test_teardown_commits_a_session_opened_after_the_database_reopened(
+    closed_database: Callable[[], None],
+) -> None:
     # A request started while import_project had the database closed, then the route used it
-    db_path = Path(os.environ["TEST_DB_PATH"])
-    connection.close_database()
     utils_functions.before_request(flask.current_app)
-    connection.init_database(db_path)
+    closed_database()
     data = Data.create(
         geode_id="teardown_test",
         geode_object_type=GeodePolygonalSurface3D.geode_object_type(),
@@ -95,8 +96,9 @@ def test_teardown_commits_a_session_opened_after_the_database_reopened() -> None
     )
     data_id = data.id
     utils_functions.teardown_request(flask.current_app)
-    with sqlite3.connect(db_path) as reader:
-        row = reader.execute("SELECT id FROM datas WHERE id = ?", (data_id,)).fetchone()
+    with sqlite3.connect(os.environ["TEST_DB_PATH"]) as raw_connection:
+        row = raw_connection.execute("SELECT id FROM datas WHERE id = ?", (data_id,)).fetchone()
+        raw_connection.execute("DELETE FROM datas WHERE id = ?", (data_id,))
     assert row is not None
 
 
