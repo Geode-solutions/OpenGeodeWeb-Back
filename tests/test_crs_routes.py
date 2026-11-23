@@ -607,6 +607,17 @@ def test_proj_finds_its_database() -> None:
     assert (Path(os.environ["PROJ_DATA"]) / "proj.db").is_file()
 
 
+def test_assign_crs_without_area_of_use(client: FlaskClient) -> None:
+    # proj.db gives some CRS an extent without bounds: the check must not fail on them
+    sad69 = {"authority": "EPSG", "code": "29118", "name": "SAD69 / UTM zone 18N"}
+    point_set_id = _create_point_set(client, [{"x": 500000, "y": 100000, "z": 0}])
+    response = client.post(
+        "/opengeodeweb_back/crs/assign_geographic", json={"id": point_set_id, **sad69}
+    )
+    assert response.status_code == 200
+    assert response.get_json()["crs"] == sad69
+
+
 def test_assign_geographic_plausibility(client: FlaskClient) -> None:
     route = "/opengeodeweb_back/crs/assign_geographic"
     for point, implausible in (
