@@ -46,6 +46,9 @@ def test_geographic_list(client: FlaskClient) -> None:
     assert "EPSG:2193" in body["compoundable"]
     assert "EPSG:9528" not in body["compoundable"]
     assert body["horizontal_parts"]["EPSG:5698"] == "EPSG:2154"
+    # Only EPSG pairs can be composed
+    assert all(code.startswith("EPSG:") for code in body["compoundable"])
+    assert all(crs["authority"] == "EPSG" for crs in body["vertical_list"])
 
     # Test all params
     test_utils.test_route_wrong_params(client, route, get_full_data)
@@ -601,6 +604,15 @@ def test_assign_compound_crs(client: FlaskClient) -> None:
     [point_set_2d] = test_utils.check_save_viewable_file(client, "PointSet2D", "test.og_pts2d")
     response = client.post(route, json={"id": point_set_2d["id"], **NZTM_NZVD})
     assert response.get_json()["crs"]["code"] == "2193"
+    # Already in it: assigning or converting to the compound again changes nothing
+    response = client.post(route, json={"id": point_set_2d["id"], **NZTM_NZVD})
+    assert response.status_code == 200
+    assert response.get_json()["crs"]["code"] == "2193"
+    response = client.post(
+        "/opengeodeweb_back/crs/convert_geographic", json={"id": point_set_2d["id"], **NZTM_NZVD}
+    )
+    assert response.status_code == 200
+    assert response.get_json()["crs"]["code"] == "2193"
 
 
 def test_convert_reports_heights_unchanged(client: FlaskClient) -> None:
@@ -632,9 +644,10 @@ def test_assign_invalid_compound_crs(client: FlaskClient) -> None:
             route, json={"id": point_set_id, "authority": "EPSG", "code": code, "name": "x"}
         )
         assert response.status_code == 400, code
-    # Both parts come from the authority of the request
+    # PROJ only reads compound codes of EPSG: an ESRI pair could never be converted afterwards
     response = client.post(
-        route, json={"id": point_set_id, "authority": "ESRI", "code": "2193+7839", "name": "x"}
+        route,
+        json={"id": point_set_id, "authority": "ESRI", "code": "103699+115876", "name": "x"},
     )
     assert response.status_code == 400
 

@@ -202,8 +202,9 @@ def compoundable_coordinate_systems() -> frozenset[str]:
     """CRS without heights, which a vertical CRS can complete, as "AUTHORITY:CODE"."""
     rows = (
         _query_proj_database(
-            "SELECT auth_name, code FROM projected_crs UNION "
-            "SELECT auth_name, code FROM geodetic_crs WHERE type = 'geographic 2D'",
+            "SELECT auth_name, code FROM projected_crs WHERE auth_name = 'EPSG' UNION "
+            "SELECT auth_name, code FROM geodetic_crs "
+            "WHERE auth_name = 'EPSG' AND type = 'geographic 2D'",
             (),
         )
         or []
@@ -216,7 +217,8 @@ def vertical_coordinate_system_list() -> list[tuple[str, str, str]]:
     """(authority, code, name) of the vertical CRS offered to complete a CRS with heights."""
     rows = (
         _query_proj_database(
-            "SELECT auth_name, code, name FROM vertical_crs WHERE deprecated = 0 "
+            "SELECT auth_name, code, name FROM vertical_crs "
+            "WHERE auth_name = 'EPSG' AND deprecated = 0 "
             "ORDER BY auth_name, name",
             (),
         )
@@ -291,6 +293,10 @@ def _vertical_name(authority: str, code: str) -> str | None:
     return str(rows[0][0]) if rows else None
 
 
+# PROJ only reads "AUTHORITY:A+B" codes for EPSG: another authority could not be converted
+COMPOUND_AUTHORITY = "EPSG"
+
+
 def horizontal_code(code: str) -> str:
     """The X/Y part of a compound "A+B" code, the code itself otherwise."""
     return code.split("+", 1)[0]
@@ -311,7 +317,7 @@ def resolve_geographic_info(
         return listed.get(f"{authority}:{code}")
     parts = code.split("+")
     compound_part_count = 2
-    if len(parts) != compound_part_count or not all(parts):
+    if authority != COMPOUND_AUTHORITY or len(parts) != compound_part_count or not all(parts):
         return None
     horizontal, vertical = parts
     horizontal_info = listed.get(f"{authority}:{horizontal}")

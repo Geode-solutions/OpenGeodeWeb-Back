@@ -54,10 +54,26 @@ def _keep_original_coordinates(geode_object: CrsGeodeObject) -> None:
     geode_object.create_crs("assigned", identity, identity)
 
 
+def _already_in(
+    geode_object: CrsGeodeObject,
+    info: og_geosciences.GeographicCoordinateSystemInfo,
+    code: str,
+) -> bool:
+    """A 2D data asked "A+B" while in A: it has no heights, so there is nothing to change."""
+    active = geographic_info(geode_object.crs_manager())
+    return (
+        info.code != code
+        and active is not None
+        and active.authority_code() == info.authority_code()
+    )
+
+
 def _assign(
     geode_object: CrsGeodeObject, authority: str, code: str
 ) -> og_geosciences.GeographicCoordinateSystemInfo:
     info = known_info(geode_object, authority, code)
+    if _already_in(geode_object, info, code):
+        return info
     prepare_crs_name(geode_object, info.authority_code())
     _keep_original_coordinates(geode_object)
     geode_object.assign_crs(info.authority_code(), info)
@@ -120,6 +136,8 @@ def convert(geode_object: CrsGeodeObject, authority: str, code: str) -> bool:
         msg = "Assign a geographic CRS before converting"
         raise CrsError(msg)
     info = known_info(geode_object, authority, code)
+    if _already_in(geode_object, info, code):
+        return False
     source_heights = heights_datum(source)
     datum_changed = (
         geode_object.is_3d()
