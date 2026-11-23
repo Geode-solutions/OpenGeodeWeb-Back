@@ -47,6 +47,9 @@
       "implausible": {
         "type": "boolean"
       },
+      "unsupported": {
+        "type": "boolean"
+      },
       "linked": {
         "type": "array",
         "items": {
@@ -59,6 +62,9 @@
               "title": "CRS"
             },
             "implausible": {
+              "type": "boolean"
+            },
+            "unsupported": {
               "type": "boolean"
             }
           },
