@@ -1608,6 +1608,9 @@
             "implausible": {
               "type": "boolean"
             },
+            "unsupported": {
+              "type": "boolean"
+            },
             "linked": {
               "type": "array",
               "items": {
@@ -1644,6 +1647,9 @@
                     "additionalProperties": false
                   },
                   "implausible": {
+                    "type": "boolean"
+                  },
+                  "unsupported": {
                     "type": "boolean"
                   }
                 },
