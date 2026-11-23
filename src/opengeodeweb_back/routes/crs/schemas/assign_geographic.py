@@ -49,6 +49,7 @@ class Linked(DataClassJsonMixin):
     id: DataId
     crs: Optional[LinkedCRS] = None
     implausible: Optional[bool] = None
+    unsupported: Optional[bool] = None
 
 
 @dataclass

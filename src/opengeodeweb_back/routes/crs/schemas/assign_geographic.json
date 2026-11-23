@@ -60,6 +60,9 @@
             },
             "implausible": {
               "type": "boolean"
+            },
+            "unsupported": {
+              "type": "boolean"
             }
           },
           "required": [

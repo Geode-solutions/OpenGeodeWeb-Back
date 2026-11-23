@@ -197,6 +197,7 @@ export interface CRSAssignGeographicResponseLinked {
     crs?:         CRS;
     id:           DataId;
     implausible?: boolean;
+    unsupported?: boolean;
 }
 
 export interface CRSAlignParams {

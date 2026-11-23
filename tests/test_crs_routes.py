@@ -689,3 +689,15 @@ def test_assign_and_convert_linked_errors(client: FlaskClient) -> None:
     )
     assert response.status_code == 400
     assert _active_crs(client, point_set_id) == LAMBERT
+
+
+def test_assign_linked_skips_data_without_crs_support(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/crs/assign_geographic"
+    point_set_id = _create_point_set(client, [{"x": 650000, "y": 6860000, "z": 0}])
+    # A grid cannot hold a CRS: a batch of mixed data is assigned without it
+    [grid] = test_utils.check_save_viewable_file(client, "LightRegularGrid3D", "test.og_lrgd3d")
+    response = client.post(route, json={"id": point_set_id, "linked_ids": [grid["id"]], **LAMBERT})
+    assert response.status_code == 200
+    assert response.get_json()["crs"] == LAMBERT
+    assert response.get_json()["linked"] == [{"id": grid["id"], "unsupported": True}]
+    assert _active_crs(client, point_set_id) == LAMBERT
