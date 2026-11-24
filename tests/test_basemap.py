@@ -198,6 +198,18 @@ def test_bounds_to_3857_paris() -> None:
     assert 6_200_000 < y_min < y_max < 6_300_000
 
 
+def test_bounds_to_3857_north_east_crs() -> None:
+    # EPSG:2193 declares its axes north, east: x/y must still be read as east, north
+    nztm = og_geosciences.GeographicCoordinateSystemInfo(
+        "EPSG", "2193", "NZGD2000 / New Zealand Transverse Mercator 2000"
+    )
+    pukekohe = (1_751_000.0, 5_874_000.0, 1_781_000.0, 5_900_000.0)
+    x_min, y_min, x_max, y_max = basemap_mesh.bounds_to_3857(pukekohe, nztm)
+    # Pukekohe is around 174.9 E, 37.2 S: x ~ 19 470 km, y ~ -4 460 km in Web Mercator
+    assert 19_400_000 < x_min < x_max < 19_500_000
+    assert -4_500_000 < y_min < y_max < -4_420_000
+
+
 def test_bounds_already_in_web_mercator() -> None:
     bounds = (260_000.0, 6_250_000.0, 265_000.0, 6_255_000.0)
     assert basemap_mesh.bounds_to_3857(bounds, basemap_mesh.WEB_MERCATOR) == bounds

@@ -187,7 +187,10 @@ def _query_proj_database(query: str, parameters: tuple[str, ...]) -> list[tuple[
 def area_of_use(authority: str, code: str) -> list[tuple[float, float, float, float]]:
     """Extents where PROJ declares the CRS usable, empty when unknown."""
     rows = _query_proj_database(AREA_OF_USE_QUERY, (authority, code)) or []
-    return [(float(s), float(n), float(w), float(e)) for s, n, w, e in rows]
+    # Some extents of proj.db have no bounds: they say nothing about where the CRS is used
+    return [
+        (float(s), float(n), float(w), float(e)) for s, n, w, e in rows if None not in (s, n, w, e)
+    ]
 
 
 @functools.cache
