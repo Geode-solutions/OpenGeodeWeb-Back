@@ -2,6 +2,7 @@ from __future__ import annotations
 
 # Standard library imports
 import base64
+import contextlib
 import hashlib
 import logging
 import shutil
@@ -21,7 +22,10 @@ import fastjsonschema  # type: ignore[import-untyped]
 import flask
 import opengeode as og
 from defusedxml.ElementTree import parse
-from opengeodeweb_microservice.database.connection import get_session
+from opengeodeweb_microservice.database.connection import (
+    DatabaseNotInitializedError,
+    get_session,
+)
 from opengeodeweb_microservice.database.data import Data
 from opengeodeweb_microservice.schemas import ErrorResponse, SchemaDict
 
@@ -68,19 +72,21 @@ def update_last_request_time(current_app: flask.Flask) -> None:
 
 
 def terminate_session(exception: BaseException | None) -> None:
-    session = flask.g.pop("session", None)
-    if session is None:
-        return
-    if exception is None:
-        session.commit()
-    else:
-        session.rollback()
-    session.close()
+    # The database is closed while import_project replaces the project files, and may be
+    # reopened during the request: the session to end is the one of the current database
+    with contextlib.suppress(DatabaseNotInitializedError):
+        session = get_session()
+        if exception is None:
+            session.commit()
+        else:
+            session.rollback()
+        session.close()
 
 
 def before_request(current_app: flask.Flask) -> None:
+    # No session here: requests that do not use the database (ping) must answer while
+    # import_project has it closed, the others fail on their own get_session()
     increment_request_counter(current_app)
-    flask.g.session = get_session()
     flask.g.start_time = time.perf_counter()
 
 

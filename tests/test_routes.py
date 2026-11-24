@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 
 # Third party imports
 import opengeode as og
+import pytest
 from opengeodeweb_microservice.database import connection
 from opengeodeweb_microservice.database.connection import get_session
 
@@ -37,7 +38,6 @@ from opengeodeweb_back.geode_objects.geode_triangulated_surface3d import (
 from opengeodeweb_back.routes.blueprint_routes import extract_valid_attribute_values
 
 if TYPE_CHECKING:
-    import pytest
     from flask.testing import FlaskClient
     from werkzeug.test import TestResponse
 
@@ -685,6 +685,13 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
         connection.init_database(Path(test_db_path), create_tables=True)
 
     client.application.config["DATA_FOLDER_PATH"] = original_data_folder
+
+
+@pytest.mark.usefixtures("closed_database")
+def test_ping_while_project_database_is_closed(client: FlaskClient) -> None:
+    # The client keeps pinging while import_project has the database closed
+    response = client.post("/opengeodeweb_back/ping", json={})
+    assert response.status_code == 200
 
 
 def test_save_viewable_workflow_from_object(client: FlaskClient) -> None:
