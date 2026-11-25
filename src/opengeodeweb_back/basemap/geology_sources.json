@@ -547,5 +547,1541 @@
     "attribution": "1:1,000,000 Geological Map of Japan, 3rd ed. (© Geological Survey of Japan, AIST)",
     "status": "to_check",
     "notes": "Technically OK: WMTS REST template from https://ows.gsj.jp/tilemap/geologicmap/wmts/1.0.0/WMTSCapabilities.xml, TileMatrixSet EPSG900913 = Google grid 256 px, TileMatrix ids are zero-padded '00'..'18' but unpadded z works too (z=5 and z=05 return identical bytes). Tiles served to z17 at the test site (z18 fully transparent). Tiles are slightly translucent (alpha ~214-255). Outside coverage: 256x256 fully transparent PNG. to_check because the sibling WMS (https://ows.gsj.jp/ows/GSJ_Combined_Bedrock_and_Superficial_Geology_and_Age/wms) GetCapabilities AccessConstraints says 'available for free download for your personal, teaching, research or non-commercial use' (legacy OneGeology wording), contradicting the GSJ site-wide licence; ask GSJ (publish@gsj.jp) which applies. Redundant with geology_gsj_200k for display anyway."
+  },
+  {
+    "id": "geology_swisstopo_ga25",
+    "name": "Geological Atlas of Switzerland 1:25 000 (GA25)",
+    "provider": "swisstopo (Federal Office of Topography)",
+    "area": [
+      5.140242,
+      45.398181,
+      11.47757,
+      48.230651
+    ],
+    "level": "N3",
+    "source_scale": 25000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wmts",
+    "url": "https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.geologie-geologischer_atlas/default/current/3857/{z}/{x}/{y}.png",
+    "layers": "ch.swisstopo.geologie-geologischer_atlas",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "opendata.swiss 'Open use. Must provide the source.' (terms_by) https://opendata.swiss/terms-of-use#terms_by ; swisstopo OGD terms https://www.swisstopo.admin.ch/en/terms-of-use-free-geodata-and-geoservices ; FSDI general terms (fair use) https://www.geo.admin.ch/en/general-terms-of-use-fsdi",
+    "attribution": "© swisstopo",
+    "status": "verified"
+  },
+  {
+    "id": "geology_swisstopo_swissgeocover2d",
+    "name": "swissGEOCOVER2D geological vector datasets 1:25 000 (bedrock + unconsolidated + surfaces + lines + tectonic lines)",
+    "provider": "swisstopo (Federal Office of Topography)",
+    "area": [
+      5.140242,
+      45.398181,
+      11.47757,
+      48.230651
+    ],
+    "level": "N3",
+    "source_scale": 25000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://wms.geo.admin.ch/",
+    "layers": "ch.swisstopo.geologie-swissgeocover2d_bedrock,ch.swisstopo.geologie-swissgeocover2d_unconsolidated,ch.swisstopo.geologie-swissgeocover2d_surfaces,ch.swisstopo.geologie-swissgeocover2d_lines,ch.swisstopo.geologie-swissgeocover2d_tecto_lines",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "opendata.swiss 'Open use. Must provide the source.' (terms_by) https://opendata.swiss/terms-of-use#terms_by (datasets geologische-vektordatensatze-geocover-bedrock / -unconsolidated-deposits / -geological-surfaces / -tectonic-lines) ; swisstopo OGD terms https://www.swisstopo.admin.ch/en/terms-of-use-free-geodata-and-geoservices",
+    "attribution": "© swisstopo",
+    "status": "verified"
+  },
+  {
+    "id": "geology_swisstopo_geocover_legacy",
+    "name": "GeoCover - Vector Datasets (legacy WMTS)",
+    "provider": "swisstopo (Federal Office of Topography)",
+    "area": [
+      5.140242,
+      45.398181,
+      11.47757,
+      48.230651
+    ],
+    "level": "N3",
+    "source_scale": 25000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wmts",
+    "url": "https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.geologie-geocover/default/current/3857/{z}/{x}/{y}.png",
+    "layers": "ch.swisstopo.geologie-geocover",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 16,
+    "empty_tile": "transparent",
+    "licence": "geocat.ch 2467ab13-e794-4c13-8c55-59fe276398c5: 'Freie Nutzung. Quellenangabe ist Pflicht.' NonCommercialAllowed-CommercialAllowed-ReferenceRequired",
+    "attribution": "© swisstopo",
+    "status": "to_check",
+    "notes": "Licence is fine and tiles work: z7-z16, 0.2 s. It is not verified because the swisstopo legend says the layer leaves map.geo.admin.ch on 16 December 2026 and the WMTS may follow. Use geology_swisstopo_swissgeocover2d instead. TileMatrixSet 3857_16: z17 and above return HTTP 400 'Unsupported zoom level'."
+  },
+  {
+    "id": "geology_swisstopo_gk500",
+    "name": "Geological Map of Switzerland 1:500 000 (GK500-Geol)",
+    "provider": "swisstopo (Federal Office of Topography)",
+    "area": [
+      5.140242,
+      45.398181,
+      11.47757,
+      48.230651
+    ],
+    "level": "N2",
+    "source_scale": 500000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wmts",
+    "url": "https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.geologie-geologische_karte/default/current/3857/{z}/{x}/{y}.png",
+    "layers": "ch.swisstopo.geologie-geologische_karte",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "opendata.swiss 'Open use' (terms_open) for dataset 'GeoMaps 500 Raster' https://opendata.swiss/terms-of-use#terms_open ; swisstopo OGD terms https://www.swisstopo.admin.ch/en/terms-of-use-free-geodata-and-geoservices",
+    "attribution": "© swisstopo",
+    "status": "verified"
+  },
+  {
+    "id": "geology_sgids_gm50",
+    "name": "Geologická mapa SR 1:50 000 (Geological Map of the Slovak Republic 1:50 000)",
+    "provider": "ŠGÚDŠ - State Geological Institute of Dionýz Štúr",
+    "area": [
+      16.6,
+      47.5,
+      22.8,
+      49.9
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://ags.geology.sk/arcgis/services/WebServices/GM50/MapServer/WMSServer",
+    "layers": "0,1",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Creative Commons BY 4.0 International (https://www.geology.sk/service-sharing/?lang=en ; https://creativecommons.org/licenses/by/4.0/)",
+    "attribution": "© State Geological Institute of Dionýz Štúr (ŠGÚDŠ) - Geological map of Slovakia 1:50 000",
+    "status": "to_check",
+    "notes": "Licence incertaine : CC BY 4.0 affiché pour les téléchargements, les services ne citent que « copyright ŠGÚDŠ ». Exclu tant que le ŠGÚDŠ ne confirme pas."
+  },
+  {
+    "id": "geology_sgids_gm200",
+    "name": "Prehľadná geologická mapa SR 1:200 000 (Overview Geological Map of the Slovak Republic)",
+    "provider": "ŠGÚDŠ - State Geological Institute of Dionýz Štúr",
+    "area": [
+      16.6,
+      47.5,
+      22.8,
+      49.9
+    ],
+    "level": "N2",
+    "source_scale": 200000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://ags.geology.sk/arcgis/services/WebServices/GM200/MapServer/WMSServer",
+    "layers": "0,1",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 16,
+    "empty_tile": "transparent",
+    "licence": "Creative Commons BY 4.0 International (https://www.geology.sk/service-sharing/?lang=en ; https://creativecommons.org/licenses/by/4.0/)",
+    "attribution": "© State Geological Institute of Dionýz Štúr (ŠGÚDŠ) - BEZÁK, V. et al.: Comprehensive geological map of the Slovak Republic 1:200 000, 2008",
+    "status": "to_check",
+    "notes": "Même doute de licence que geology_sgids_gm50."
+  },
+  {
+    "id": "geology_sgids_gm500",
+    "name": "Geologická mapa Západných Karpát a priľahlých území 1:500 000 (Geological map of the Western Carpathians and adjacent areas)",
+    "provider": "ŠGÚDŠ - State Geological Institute of Dionýz Štúr",
+    "area": [
+      15.423519,
+      47.261998,
+      23.118449,
+      50.496025
+    ],
+    "level": "N1",
+    "source_scale": 500000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "wms",
+    "url": "https://ags.geology.sk/arcgis/services/WebServices/GM500/MapServer/WMSServer",
+    "layers": "0,1",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 14,
+    "empty_tile": "transparent",
+    "licence": "Creative Commons BY 4.0 International (https://www.geology.sk/service-sharing/?lang=en ; https://creativecommons.org/licenses/by/4.0/)",
+    "attribution": "© State Geological Institute of Dionýz Štúr (ŠGÚDŠ) - LEXA, J. et al.: Geological map of the Western Carpathians and adjacent areas 1:500 000, 2008",
+    "status": "to_check",
+    "notes": "Même doute de licence que geology_sgids_gm50."
+  },
+  {
+    "id": "geology_bgr_guek250",
+    "name": "Geologische Übersichtskarte der Bundesrepublik Deutschland 1:250 000 (GÜK250)",
+    "provider": "BGR - Bundesanstalt für Geowissenschaften und Rohstoffe",
+    "area": [
+      5.562778,
+      47.141228,
+      15.575523,
+      55.08509
+    ],
+    "level": "N2",
+    "source_scale": 250000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://services.bgr.de/wms/geologie/guek250/",
+    "layers": "1,2",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "EPSG:4326"
+    ],
+    "max_zoom": 14,
+    "empty_tile": "transparent",
+    "licence": "Contradictory: BGR General Standard Terms and Conditions https://www.bgr.bund.de/AGB_en (capabilities AccessConstraints) vs GeoNutzV https://sg.geodatenzentrum.de/web_public/gdz/lizenz/geonutzv.pdf (metadata record)",
+    "attribution": "Datenquelle: GÜK250 (WMS), (c) BGR, Hannover, 2019",
+    "status": "to_check",
+    "notes": "LICENCE CONFLICT. The capabilities and the metadata useConstraints point to the BGR AGB/GSTC. GSTC Art. 3(1) says: 'The rights which are not transferred include in particular the right to make accessible to the public'. Art. 3(5) says: 'All other use not expressly specified above, requires special written agreement'. The same CSW record (0f2e1b5b-...) also says the data may be used under GeoNutzV. GeoNutzV §2(1) allows 'kommerzieller und nicht kommerzieller Nutzung'. That is a contradiction, so ask BGR. Technically OK. Server scale limits: Min 1:34,124, Max 1:545,979, so it draws only at about z11-z14; z8 and z10 return empty transparent tiles. Layer 1 = Basislayer_Genese, 2 = Überlagerungslayer_Genese (also 4/5 Petrographie, 7/8 Stratigraphie). 0.2-0.35 s per tile."
+  },
+  {
+    "id": "geology_bgr_gk1000",
+    "name": "Geologische Karte der Bundesrepublik Deutschland 1:1 000 000 (GK1000, INSPIRE)",
+    "provider": "BGR - Bundesanstalt für Geowissenschaften und Rohstoffe",
+    "area": [
+      5.384608,
+      47.066883,
+      15.745689,
+      55.17185
+    ],
+    "level": "N1",
+    "source_scale": 1000000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "wms",
+    "url": "https://services.bgr.de/wms/inspire_ge/gk1000/",
+    "layers": "1",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "EPSG:4326"
+    ],
+    "max_zoom": 12,
+    "empty_tile": "transparent",
+    "licence": "Contradictory: BGR General Standard Terms and Conditions https://www.bgr.bund.de/AGB_en vs GeoNutzV (metadata record 1C60DDA9-...)",
+    "attribution": "GK1000-INSPIRE, (c) BGR Hannover, 2016",
+    "status": "to_check",
+    "notes": "Same AGB vs GeoNutzV conflict as geology_bgr_guek250. The INSPIRE service is used because it has no scale limits; z6-z8 draw. The classic https://services.bgr.de/wms/geologie/gk1000/ draws only at about z9-z10 (Min 1:472,470, Max 1:1,889,881). Slow at small scale: z6 9.6 s, z7 7.6 s (app timeout 10 s); z8 0.33 s. Layer 1 = GE.GeologicUnit.AgeOfRocks."
+  },
+  {
+    "id": "geology_hgi_gk300",
+    "name": "Geološka karta Republike Hrvatske 1:300 000 (INSPIRE WMS)",
+    "provider": "HGI-CGS - Hrvatski geološki institut",
+    "area": [
+      13.48984458,
+      42.38732698,
+      19.44725221,
+      46.55502178
+    ],
+    "level": "N2",
+    "source_scale": 300000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://transformiraj.nipp.hr/ows/services/org.2.abf7ddc6-7578-4070-a9db-c291a42e55c6_wms",
+    "layers": "GE.GeologicUnit.AgeOfRocks",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "EPSG:4326"
+    ],
+    "max_zoom": 14,
+    "empty_tile": "transparent",
+    "licence": "Unknown: capabilities Fees 'conditionsUnknown', AccessConstraints 'otherRestrictions'; dataset metadata 'conditions to access and use unknown' (INSPIRE ConditionsApplyingToAccessAndUse/conditionsUnknown)",
+    "attribution": "© Hrvatski geološki institut (HGI-CGS)",
+    "status": "to_check",
+    "notes": "No licence is stated anywhere, and data.gov.hr has license_id null for both packages. The service runs on the national NIPP transformation platform (transformiraj.nipp.hr, Državna geodetska uprava), but its abstract says HGI operates and maintains it. The old HGI link http://webgis.hgi-cgs.hr/gk300/ is dead (NXDOMAIN). Technically OK: z7-z13 draw, 0.14-0.6 s; mid-ocean gives a transparent tile."
+  },
+  {
+    "id": "geology_ngu_n50",
+    "name": "Norway bedrock 1:50 000 (Berggrunn N50, main rock types)",
+    "provider": "NGU - Geological Survey of Norway",
+    "area": [
+      -2.56007,
+      57.0881,
+      33.0201,
+      71.8912
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://geo.ngu.no/mapserver/BerggrunnWMS3",
+    "layers": "Berggrunn_lokal_hovedbergarter_fullzoom",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Norsk lisens for offentlige data (NLOD) 1.0 - https://data.norge.no/nlod/no/1.0 (Geonorge metadata of Berggrunn WMS3, uuid 51243d4e-e86e-474b-baf8-b7ccfb59fe8e)",
+    "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Norges geologiske undersøkelse (NGU)",
+    "status": "verified"
+  },
+  {
+    "id": "geology_ngu_n250",
+    "name": "Norway bedrock 1:250 000 (Berggrunn N250, main rock types)",
+    "provider": "NGU - Geological Survey of Norway",
+    "area": [
+      -2.56007,
+      57.0881,
+      33.0201,
+      71.8912
+    ],
+    "level": "N2",
+    "source_scale": 250000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://geo.ngu.no/mapserver/BerggrunnWMS3",
+    "layers": "Berggrunn_regional_hovedbergarter",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Norsk lisens for offentlige data (NLOD) 1.0 - https://data.norge.no/nlod/no/1.0 (Geonorge metadata of Berggrunn WMS3, uuid 51243d4e-e86e-474b-baf8-b7ccfb59fe8e)",
+    "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Norges geologiske undersøkelse (NGU)",
+    "status": "verified"
+  },
+  {
+    "id": "geology_ngu_n1350",
+    "name": "Norway bedrock 1:1 350 000 (Berggrunn N1350, main rock types)",
+    "provider": "NGU - Geological Survey of Norway",
+    "area": [
+      -2.56007,
+      57.0881,
+      33.0201,
+      71.8912
+    ],
+    "level": "N1",
+    "source_scale": 1350000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "wms",
+    "url": "https://geo.ngu.no/mapserver/BerggrunnWMS3",
+    "layers": "Berggrunn_nasjonal_hovedbergarter",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Norsk lisens for offentlige data (NLOD) 1.0 - https://data.norge.no/nlod/no/1.0 (Geonorge metadata of Berggrunn WMS3, uuid 51243d4e-e86e-474b-baf8-b7ccfb59fe8e)",
+    "attribution": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Norges geologiske undersøkelse (NGU)",
+    "status": "verified"
+  },
+  {
+    "id": "geology_gtk_200k",
+    "name": "Bedrock of Finland 1:200 000 (lithological units)",
+    "provider": "GTK - Geological Survey of Finland",
+    "area": [
+      15.619292,
+      59.352464,
+      33.107505,
+      70.094874
+    ],
+    "level": "N2",
+    "source_scale": 200000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://gtkdata.gtk.fi/arcgis/services/Rajapinnat/GTK_Kalliopera_WMS/MapServer/WMSServer",
+    "layers": "Litologiset_yksik%C3%B6t_200k25132",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "GTK Open Licence (CC BY 4.0) - https://www.gtk.fi/en/open-licence/ ; product licence type from https://www.gtk.fi/app/uploads/2026/11/gtk_paikkatietoaineistot_hinnasto_price_list_for_digital_data_products_2026_11_23.pdf",
+    "attribution": "Bedrock of Finland 1:200 000 © Geological Survey of Finland (GTK), CC BY 4.0",
+    "status": "verified"
+  },
+  {
+    "id": "geology_gtk_1m",
+    "name": "Bedrock of Finland 1:1 000 000 (rock associations)",
+    "provider": "GTK - Geological Survey of Finland",
+    "area": [
+      15.619292,
+      59.352464,
+      33.107505,
+      70.094874
+    ],
+    "level": "N1",
+    "source_scale": 1000000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "wms",
+    "url": "https://gtkdata.gtk.fi/arcgis/services/Rajapinnat/GTK_Kalliopera_WMS/MapServer/WMSServer",
+    "layers": "kalliopera_1m_kivilajiseurueet",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "GTK Open Licence (CC BY 4.0) - https://www.gtk.fi/en/open-licence/ ; product licence type from https://www.gtk.fi/app/uploads/2026/11/gtk_paikkatietoaineistot_hinnasto_price_list_for_digital_data_products_2026_11_23.pdf",
+    "attribution": "Bedrock of Finland 1:1 000 000 © Geological Survey of Finland (GTK), CC BY 4.0",
+    "status": "verified"
+  },
+  {
+    "id": "geology_sgu_50k_250k",
+    "name": "Sweden bedrock 1:50 000-1:250 000 (geological units)",
+    "provider": "SGU - Geological Survey of Sweden",
+    "area": [
+      8.643886,
+      55.164931,
+      25.48694,
+      69.14879
+    ],
+    "level": "N2",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://maps3.sgu.se/geoserver/wms",
+    "layers": "berg:SE.GOV.SGU.BERG.GEOLOGISK_ENHET.YTA.50K",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Creative Commons Zero (CC0 1.0) - https://www.sgu.se/en/products/geological-data/about-sgus-geological-data/license-terms-for-sgus-geological-data/",
+    "attribution": "Geological Survey of Sweden (SGU), CC0",
+    "status": "verified"
+  },
+  {
+    "id": "geology_sgu_1m",
+    "name": "Sweden bedrock 1:1 000 000 (lithology)",
+    "provider": "SGU - Geological Survey of Sweden",
+    "area": [
+      10.030101,
+      54.980461,
+      24.219509,
+      69.061768
+    ],
+    "level": "N1",
+    "source_scale": 1000000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "wms",
+    "url": "https://maps3.sgu.se/geoserver/wms",
+    "layers": "inspire:GE.GeologicUnit.SGU.Bedrock_1M.Lithology.Polygon",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Creative Commons Zero (CC0 1.0) - https://www.sgu.se/en/products/geological-data/about-sgus-geological-data/license-terms-for-sgus-geological-data/",
+    "attribution": "Geological Survey of Sweden (SGU), CC0",
+    "status": "verified"
+  },
+  {
+    "id": "geology_gsi_100k",
+    "name": "Ireland bedrock geology 1:100 000",
+    "provider": "GSI - Geological Survey Ireland",
+    "area": [
+      -10.902858,
+      51.399901,
+      -5.875165,
+      55.449228
+    ],
+    "level": "N3",
+    "source_scale": 100000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://gsi.geodata.gov.ie/server/services/Bedrock/IE_GSI_Bedrock_Geology_Datasets_100K_IE26_ITM/MapServer/WMSServer",
+    "layers": "IE_GSI_Bedrock_Geology_100K_IE26_ITM",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 14,
+    "empty_tile": "transparent",
+    "licence": "CC BY 4.0 - https://creativecommons.org/licenses/by/4.0/ (WMS AccessConstraints + https://gsi.ie/data-and-maps/ \"GSI Data Licence Agreement\")",
+    "attribution": "Contains Irish Public Sector Data (Geological Survey Ireland) licensed under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence",
+    "status": "verified"
+  },
+  {
+    "id": "geology_spw_wallonie_25k",
+    "name": "Geological map of Wallonia 1:25 000 (lithostratigraphic units)",
+    "provider": "SPW - Service géologique de Wallonie",
+    "area": [
+      3.175739,
+      49.488512,
+      6.23113,
+      50.824268
+    ],
+    "level": "N3",
+    "source_scale": 25000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://geoservices.wallonie.be/arcgis/services/SOL_SOUS_SOL/CARTE_GEOLOGIQUE_SIMPLE/MapServer/WMSServer",
+    "layers": "2",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 16,
+    "empty_tile": "transparent",
+    "licence": "CC BY 4.0 (data, Metawal record 5bb1c85c-abe1-46b3-9af6-489ab95cd0cb https://geodata.wallonie.be/id/5bb1c85c-abe1-46b3-9af6-489ab95cd0cb) + SPW visualisation-service conditions v1.1 https://geoportail.wallonie.be/files/documents/ConditionsSPW/LicServicesSPW.pdf",
+    "attribution": "Source : Service public de Wallonie (SPW) - Carte géologique de Wallonie (CGEOL_SIMPLE), CC BY 4.0",
+    "status": "verified"
+  },
+  {
+    "id": "geology_spw_wallonie_n2",
+    "name": "Geological map of Wallonia (small-scale view)",
+    "provider": "SPW - Service géologique de Wallonie",
+    "area": [
+      3.175734,
+      49.488512,
+      6.23113,
+      50.824476
+    ],
+    "level": "N2",
+    "source_scale": 25000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://geoservices.wallonie.be/arcgis/services/SOL_SOUS_SOL/CARTE_GEOLOGIQUE_SIMPLE/MapServer/WMSServer",
+    "layers": "1,2",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 16,
+    "empty_tile": "transparent",
+    "licence": "CC BY 4.0 (data, Metawal record 5bb1c85c-abe1-46b3-9af6-489ab95cd0cb https://geodata.wallonie.be/id/5bb1c85c-abe1-46b3-9af6-489ab95cd0cb) + SPW visualisation-service conditions v1.1 https://geoportail.wallonie.be/files/documents/ConditionsSPW/LicServicesSPW.pdf",
+    "attribution": "Source : Service public de Wallonie (SPW) - Carte géologique de Wallonie (CGEOL_SIMPLE), CC BY 4.0",
+    "status": "verified"
+  },
+  {
+    "id": "geology_dov_tertiair_50k",
+    "name": "Flanders Tertiary geological map 1:50 000",
+    "provider": "Departement Omgeving (Vlaamse overheid) - Databank Ondergrond Vlaanderen (DOV)",
+    "area": [
+      2.528904,
+      50.673935,
+      5.935354,
+      51.504963
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://www.dov.vlaanderen.be/geoserver/wms",
+    "layers": "neo_paleo:tertiair_50k",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Modellicentie voor gratis hergebruik (Flemish free re-use model licence, CC BY compatible) - https://www.vlaanderen.be/digitaal-vlaanderen/onze-oplossingen/open-data/voorwaarden-voor-het-hergebruik-van-overheidsinformatie/modellicentie-gratis-hergebruik ; metadata https://metadata.vlaanderen.be/srv/api/records/E965C068-A1BE-43C3-AD0B-34BC44FE1D2C",
+    "attribution": "Bron: Dept Omgeving",
+    "status": "to_check",
+    "notes": "Licence ouverte, mais carte du Tertiaire sous la couverture quaternaire, pas de la géologie de surface : incohérente à la frontière wallonne."
+  },
+  {
+    "id": "geology_geosphere_geofast_50k",
+    "name": "Austria GEOFAST geological maps 1:50 000",
+    "provider": "GeoSphere Austria",
+    "area": [
+      9.830706,
+      46.496621,
+      17.08705,
+      49.02196
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://gis.geosphere.at/images/services/geologie/karte_geofast_50/ImageServer/WMSServer",
+    "layers": "0",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 17,
+    "empty_tile": "transparent",
+    "licence": "CC BY 4.0 - https://creativecommons.org/licenses/by/4.0/ (WMS AccessConstraints and REST copyrightText \"©GeoSphere Austria / CC BY 4.0\"); printed GEOFAST sheets credit the topographic base \"© BEV - Bundesamtes für Eich- und Vermessungswesen CC BY 4.0\"",
+    "attribution": "© GeoSphere Austria, CC BY 4.0; Topografie © BEV, CC BY 4.0",
+    "status": "verified"
+  },
+  {
+    "id": "geology_geosphere_500k",
+    "name": "Geological map of Austria 1:500 000",
+    "provider": "GeoSphere Austria",
+    "area": [
+      9.530807,
+      46.372306,
+      17.160717,
+      49.020709
+    ],
+    "level": "N1",
+    "source_scale": 500000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "wms",
+    "url": "https://gis.geosphere.at/maps/services/geologie/karte_500/MapServer/WMSServer",
+    "layers": "0",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "CC BY 4.0 (WMS AccessConstraints \"©GeoSphere Austria / CC BY 4.0\")",
+    "attribution": "© GeoSphere Austria, CC BY 4.0",
+    "status": "to_check",
+    "notes": "to_check: technical only. Capabilities fetched OK (layer 0 \"Geologische Einheiten\"), but every GetMap returned HTTP 500 then 503 (\"No server is available\") - the whole /maps/ instance was down. Retest; licence text itself is fine."
+  },
+  {
+    "id": "geology_lneg_50k",
+    "name": "Geological map of Portugal 1:50 000 (raster mosaic)",
+    "provider": "LNEG - Laboratório Nacional de Energia e Geologia",
+    "area": [
+      -9.68237,
+      36.943011,
+      -6.196717,
+      42.189552
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://sig.lneg.pt/server/services/CGP50k/MapServer/WMSServer",
+    "layers": "2",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "unclear - see notes",
+    "attribution": "LNEG - Carta Geológica de Portugal 1:50 000",
+    "status": "to_check",
+    "notes": "to_check: dataset metadata (EGDI/dados.gov.pt) says CC BY 4.0, but the LNEG geoPortal Legal Notice (https://geoportal.lneg.pt/en/legal_notice/) states \"its use for commercial or offensive purposes is prohibited\". Contradiction -> do not ship until LNEG confirms in writing. WMS AccessConstraints empty. Tech: layer \"2\" (Image of mosaic group \"Geologia\", MaxScaleDenominator 1.89M) draws at z13 Lisbon in 0.57 s; scanned sheets with topography; coverage = published sheets only."
+  },
+  {
+    "id": "geology_lneg_500k",
+    "name": "Geological map of Portugal 1:500 000",
+    "provider": "LNEG - Laboratório Nacional de Energia e Geologia",
+    "area": [
+      -9.569808,
+      36.942051,
+      -6.168756,
+      42.157365
+    ],
+    "level": "N2",
+    "source_scale": 500000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://sig.lneg.pt/server/services/CGP500k/MapServer/WMSServer",
+    "layers": "2",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "unclear - see notes",
+    "attribution": "LNEG - Carta Geológica de Portugal 1:500 000",
+    "status": "to_check",
+    "notes": "to_check: dataset metadata (EGDI/dados.gov.pt) says CC BY 4.0, but the LNEG geoPortal Legal Notice (https://geoportal.lneg.pt/en/legal_notice/) states \"its use for commercial or offensive purposes is prohibited\". Contradiction -> do not ship until LNEG confirms in writing. WMS AccessConstraints empty. Tech: layer \"2\" Geologia do Continente, z9 OK 0.75 s."
+  },
+  {
+    "id": "geology_lneg_1m",
+    "name": "Geological map of Portugal 1:1 000 000",
+    "provider": "LNEG - Laboratório Nacional de Energia e Geologia",
+    "area": [
+      -9.575005,
+      36.948019,
+      -6.172037,
+      42.15433
+    ],
+    "level": "N1",
+    "source_scale": 1000000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "wms",
+    "url": "https://sig.lneg.pt/server/services/CGP1M/MapServer/WMSServer",
+    "layers": "Unidades_Geológicas421",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "unclear - see notes",
+    "attribution": "LNEG - Carta Geológica de Portugal 1:1 000 000",
+    "status": "to_check",
+    "notes": "to_check: dataset metadata (EGDI/dados.gov.pt) says CC BY 4.0, but the LNEG geoPortal Legal Notice (https://geoportal.lneg.pt/en/legal_notice/) states \"its use for commercial or offensive purposes is prohibited\". Contradiction -> do not ship until LNEG confirms in writing. WMS AccessConstraints empty. Tech: layer name has non-ASCII \"ó\" (URL-encode); z7 OK 0.65 s. Islands (Azores/Madeira) are separate layers of the same service."
+  },
+  {
+    "id": "geology_ispra_carg_50k",
+    "name": "Italy CARG geological map 1:50 000 (geological units)",
+    "provider": "ISPRA - Servizio Geologico d'Italia",
+    "area": [
+      6.626458,
+      37.198892,
+      18.665947,
+      47.199204
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://sinacloud.isprambiente.it/arcgisgeo/services/geo/SGI_ISPRA_Geologia25k/MapServer/WMSServer",
+    "layers": "0",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "unclear - see notes",
+    "attribution": "Servizio Geologico d'Italia - ISPRA",
+    "status": "to_check",
+    "notes": "to_check: ISPRA geo services carry no licence in capabilities; the sibling ISPRA raster service (sgi2 geo_100k_italia) AccessConstraints say \"L'uso dei dati per altri fini che non siano la semplice visualizzazione e' soggetto alla legge e deve esserne richiesto l'uso al Servizio Geologico d'Italia\", while the ISPRA site copyright page says CC BY 4.0 unless stated otherwise. Contradiction -> ask ISPRA. Tech: layer \"0\" Unità geologiche (CARG database rendered at 1:25k), MaxScaleDenominator 236235 -> z12+; partial coverage (only CARG sheets loaded: Florence z13 transparent, L'Aquila and Bergamo OK). ~0.6 s/tile."
+  },
+  {
+    "id": "geology_ispra_100k",
+    "name": "Italy geological map 1:100 000 (geological units)",
+    "provider": "ISPRA - Servizio Geologico d'Italia",
+    "area": [
+      6.455743,
+      35.215271,
+      19.614583,
+      47.137533
+    ],
+    "level": "N2",
+    "source_scale": 100000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://sinacloud.isprambiente.it/arcgisgeo/services/servizi/geologica100k/MapServer/WMSServer",
+    "layers": "0",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "unclear - see notes",
+    "attribution": "Servizio Geologico d'Italia - ISPRA",
+    "status": "to_check",
+    "notes": "to_check: ISPRA geo services carry no licence in capabilities; the sibling ISPRA raster service (sgi2 geo_100k_italia) AccessConstraints say \"L'uso dei dati per altri fini che non siano la semplice visualizzazione e' soggetto alla legge e deve esserne richiesto l'uso al Servizio Geologico d'Italia\", while the ISPRA site copyright page says CC BY 4.0 unless stated otherwise. Contradiction -> ask ISPRA. Tech: MaxScaleDenominator 472470 -> transparent at z10, draws z11+; first z11 tile took 11.9 s (cold cache) then 0.5 s at z12 - risky vs 10 s timeout."
+  },
+  {
+    "id": "geology_cgs_geocr50",
+    "name": "Geological map of the Czech Republic 1:50 000 (GEOCR50)",
+    "provider": "ČGS - Czech Geological Survey",
+    "area": [
+      11.939305,
+      48.23201,
+      18.957832,
+      51.354768
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://mapy.geology.cz/arcgis/services/Geologie/geologicka_mapa50/MapServer/WMSServer",
+    "layers": "0",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "WMS AccessConstraints \"CC BY 4.0\" - unconfirmed, see notes",
+    "attribution": "(CC BY 4.0) Czech Geological Survey",
+    "status": "to_check",
+    "notes": "to_check: WMS AccessConstraints of geologicka_mapa50 say \"CC BY 4.0\", but the CGS copyright page (https://cgs.gov.cz/en/copyright) says website material needs written permission and grants CC BY 4.0 explicitly only for INSPIRE dataset downloads; the GEOCR50 dataset metadata (EGDI) says \"Copyright (All Rights Reserved)\" and refers to a licence agreement; CGS sells GEOCR50 data under a price list. Ask data@geology.cz. Tech: no EPSG:3857 -> CRS:84; layer 0 \"Horniny GeoČR50\" draws z13 Prague 0.32 s; no max-scale limit."
+  },
+  {
+    "id": "geology_cgs_500k",
+    "name": "Geological map of the Czech Republic 1:500 000",
+    "provider": "ČGS - Czech Geological Survey",
+    "area": [
+      11.939436,
+      48.23201,
+      18.957832,
+      51.354281
+    ],
+    "level": "N1",
+    "source_scale": 500000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "wms",
+    "url": "https://mapy.geology.cz/arcgis/services/Geologie/geologicka_mapa500/MapServer/WMSServer",
+    "layers": "0",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "WMS AccessConstraints \"Copyright\" - not an open licence",
+    "attribution": "Czech Geological Survey",
+    "status": "to_check",
+    "notes": "to_check: AccessConstraints just \"Copyright\"; same CGS licence ambiguity as geology_cgs_geocr50. Tech: layer 0 \"Horniny\", z8 OK 0.41 s, CRS:84."
+  },
+  {
+    "id": "geology_pgi_smgp_50k",
+    "name": "Detailed Geological Map of Poland 1:50 000 (SMGP)",
+    "provider": "PIG-PIB - Polish Geological Institute",
+    "area": [
+      13.875912,
+      48.960363,
+      24.644569,
+      55.00204
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://cbdgmapa.pgi.gov.pl/arcgis/services/kartografia/smgp50k/MapServer/WMSServer",
+    "layers": "0",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "no explicit licence - see notes",
+    "attribution": "Państwowy Instytut Geologiczny - PIB",
+    "status": "to_check",
+    "notes": "to_check: WMS AccessConstraints empty; PIG-PIB metadata of SMGP sheets only use the INSPIRE codelist values \"Brak ograniczeń w publicznym dostępie\" / \"Brak warunków dostępu i użytkowania\" (noConditionsApply) - no named licence, nothing explicit on commercial redistribution or caching; geological information in Poland is governed by the Geological and Mining Law. Ask PIG-PIB for an explicit licence. Tech: layer 0 \"SMGP50k - wydzielenia geologiczne\", MaxScaleDenominator 94494 -> z13+ only (z12 transparent); Tatra/Zakopane z13 OK 0.53 s."
+  },
+  {
+    "id": "geology_pgi_mgp_500k",
+    "name": "Geological Map of Poland 1:500 000 (Quaternary)",
+    "provider": "PIG-PIB - Polish Geological Institute",
+    "area": [
+      13.756915,
+      49.048429,
+      24.776311,
+      55.923228
+    ],
+    "level": "N2",
+    "source_scale": 500000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://cbdgmapa.pgi.gov.pl/arcgis/services/kartografia/mgp500k_2022/MapServer/WMSServer",
+    "layers": "11",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 13,
+    "empty_tile": "transparent",
+    "licence": "no explicit licence - see notes",
+    "attribution": "Państwowy Instytut Geologiczny - PIB",
+    "status": "to_check",
+    "notes": "to_check: WMS AccessConstraints empty; PIG-PIB metadata of SMGP sheets only use the INSPIRE codelist values \"Brak ograniczeń w publicznym dostępie\" / \"Brak warunków dostępu i użytkowania\" (noConditionsApply) - no named licence, nothing explicit on commercial redistribution or caching; geological information in Poland is governed by the Geological and Mining Law. Ask PIG-PIB for an explicit licence. Tech: layer 11 \"MGP500k - wydzielenia geologiczne czwartorzędu\" (surface Quaternary; layer 1 = sub-Cenozoic), MinScaleDenominator 94494 -> transparent from z13; z9 OK 0.46 s."
+  },
+  {
+    "id": "geology_geus_25k",
+    "name": "Denmark surface geology (jordartskort) 1:25 000",
+    "provider": "GEUS - Geological Survey of Denmark and Greenland",
+    "area": [
+      8.015796,
+      54.443147,
+      15.576004,
+      57.761365
+    ],
+    "level": "N3",
+    "source_scale": 25000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://data.geus.dk/arcgis/services/Denmark/Jordartskort_25000/MapServer/WMSServer",
+    "layers": "Jordartskort",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "GEUS terms for free data 2014-06-20 (not open)",
+    "attribution": "GEUS",
+    "status": "to_check",
+    "notes": "to_check (likely excluded): WMS AccessConstraints empty; GEUS terms for free data (https://data.geus.dk/geusmap/terms_20140620.pdf) grant use \"til eget brug\" only and say \"Kunden har ikke ret til at kopiere, offentliggøre, videresælge, udlåne eller udleje eksemplarer af hele eller dele af Dataleverancen ... med mindre GEUS giver forudgående skriftligt samtykke\". Not compatible with tile caching/redistribution. Tech: no EPSG:3857; z13 Aarhus area 0.31 s but only 35% opaque (coverage gaps / water)."
+  },
+  {
+    "id": "geology_geus_200k",
+    "name": "Denmark surface geology (jordartskort) 1:200 000",
+    "provider": "GEUS - Geological Survey of Denmark and Greenland",
+    "area": [
+      8.015044,
+      54.442878,
+      15.579855,
+      57.761269
+    ],
+    "level": "N2",
+    "source_scale": 200000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://data.geus.dk/arcgis/services/Denmark/Jordartskort_200000/MapServer/WMSServer",
+    "layers": "Jordart_200000",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "GEUS terms for free data 2014-06-20 (not open)",
+    "attribution": "GEUS",
+    "status": "to_check",
+    "notes": "to_check (likely excluded): WMS AccessConstraints empty; GEUS terms for free data (https://data.geus.dk/geusmap/terms_20140620.pdf) grant use \"til eget brug\" only and say \"Kunden har ikke ret til at kopiere, offentliggøre, videresælge, udlåne eller udleje eksemplarer af hele eller dele af Dataleverancen ... med mindre GEUS giver forudgående skriftligt samtykke\". Not compatible with tile caching/redistribution. Tech: z9 OK 0.42 s."
+  },
+  {
+    "id": "geology_gsc_canada_5m",
+    "name": "Geological map of Canada (1860A)",
+    "provider": "Natural Resources Canada – Geological Survey of Canada",
+    "area": [
+      -177.062,
+      32.806,
+      -8.758,
+      84.11
+    ],
+    "level": "N1",
+    "source_scale": 5000000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "wms",
+    "url": "https://maps-cartes.services.geo.ca/server_serveur/services/NRCan/geological_map_canada_wheeler_en/MapServer/WMSServer",
+    "layers": "0",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Open Government Licence – Canada, https://open.canada.ca/en/open-government-licence-canada",
+    "attribution": "Geological Survey of Canada, Natural Resources Canada (Wheeler et al. 1996, Map 1860A). Contains information licensed under the Open Government Licence – Canada.",
+    "status": "verified"
+  },
+  {
+    "id": "geology_gsc_cgmc_250k",
+    "name": "Canada Geological Map Compilation (lithology)",
+    "provider": "Natural Resources Canada – Geological Survey of Canada",
+    "area": [
+      -173.455,
+      35.838,
+      -12.017,
+      83.775
+    ],
+    "level": "N2",
+    "source_scale": 250000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://maps-cartes.services.geo.ca/server_serveur/services/NRCan/cdn_geol_compil_en/MapServer/WMSServer",
+    "layers": "0",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Open Government Licence – Canada, https://open.canada.ca/en/open-government-licence-canada",
+    "attribution": "Canada Geological Map Compilation, Geological Survey of Canada, Natural Resources Canada. Contains information licensed under the Open Government Licence – Canada.",
+    "status": "to_check",
+    "notes": "Technically OK, and the open.canada.ca record d4f80bd3-17e3-a7e8-4bfe-d22a430678d5 says OGL-Canada, 'unrestricted'. to_check because CGMC is a derivative of provincial survey maps (record: 'sourced from provincial, territorial, and other geological survey organizations'). OGL-Canada excludes 'third party rights the Information Provider is not authorized to license'. The Ontario source's own terms forbid commercial use and 'the creation of value-added products'. Confirm with NRCan that CGMC is cleared for commercial reuse. Raster layer with about 250 m pixels (blocky from z12), 35 generalized lithology classes, source scales 1:30k to 1:5M. EPSG:3857 works but is not advertised."
+  },
+  {
+    "id": "geology_ogs_ontario_250k",
+    "name": "Bedrock geology of Ontario 1:250 000 (MRD126)",
+    "provider": "Ontario Geological Survey",
+    "area": [
+      -95.154,
+      41.677,
+      -74.32,
+      56.859
+    ],
+    "level": "N2",
+    "source_scale": 250000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://ws.lioservices.lrc.gov.on.ca/arcgis2/services/GeologyOntario/GeologyOntario_Map/MapServer/WMSServer",
+    "layers": "3",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Ministry Terms of Use, http://www.geologyontario.mndm.gov.on.ca/terms_of_use.html (NOT an open licence)",
+    "attribution": "Ontario Geological Survey, © King's Printer for Ontario",
+    "status": "to_check",
+    "notes": "REJECT unless written permission is obtained. data.ontario.ca lists licence 'ministry-tou', not OGL-Ontario. The terms say: 'Any substantial reproduction of the Content or any commercial use of all or part of the Content is prohibited without the prior written permission of the Ministry... Commercial use includes commercial distribution of the Content ... and the creation of value-added products using the Content.' Technically OK: WMS 1.3.0, layer 3 'Bedrock Geology', MaxScaleDenominator 18.9M, fast (~0.5 s)."
+  },
+  {
+    "id": "geology_bcgs_bc_50k",
+    "name": "British Columbia Digital Geology – Bedrock Geology",
+    "provider": "British Columbia Geological Survey",
+    "area": [
+      -139.178,
+      47.604,
+      -110.353,
+      60.594
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://openmaps.gov.bc.ca/geo/pub/WHSE_MINERAL_TENURE.GEOL_BEDROCK_UNIT_POLY_SVW/ows",
+    "layers": "pub:WHSE_MINERAL_TENURE.GEOL_BEDROCK_UNIT_POLY_SVW",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Open Government Licence – British Columbia, https://www2.gov.bc.ca/gov/content/data/policy-standards/data-policies/open-data/open-government-licence-bc",
+    "attribution": "British Columbia Geological Survey. Contains information licensed under the Open Government Licence – British Columbia.",
+    "status": "verified"
+  },
+  {
+    "id": "geology_mrnf_quebec_regional",
+    "name": "SIGEOM – Géologie régionale du Québec",
+    "provider": "Ministère des Ressources naturelles et des Forêts du Québec (SIGEOM)",
+    "area": [
+      -85.0,
+      40.0,
+      -50.0,
+      65.0
+    ],
+    "level": "N2",
+    "source_scale": 250000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://servicesvectoriels.atlas.gouv.qc.ca/IDS_SGM_WMS/service.svc/get",
+    "layers": "SGM:Geologie_regionale",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Licence du gouvernement ouvert – Québec = CC BY 4.0, https://creativecommons.org/licenses/by/4.0/deed.fr",
+    "attribution": "Ministère des Ressources naturelles et des Forêts du Québec (SIGEOM)",
+    "status": "to_check",
+    "notes": "The licence is fine. Capabilities AccessConstraints: 'Licence du gouvernement ouvert - Québec (https://creativecommons.org/licenses/by/4.0/deed.fr)', Fees 'Données ouvertes'. Données Québec datasets are cc-by. BLOCKER: the service supports only WMS 1.1.1. VERSION=1.3.0 returns ServiceException 'Value 1.3.0 provided for a parameter version is invalid'. WMS 1.1.1 GetMap with SRS=EPSG:3857 renders correctly near Rouyn-Noranda (lon -79.0, lat 48.24) at z8 and z13. Capabilities take ~50 s. The source scale of 'Géologie régionale' (1:250k assumed) is not stated in the capabilities. N1 alternative: 'SGM:Geologie_generale' at 1:2M."
+  },
+  {
+    "id": "geology_sgb_brazil_1m",
+    "name": "Carta Geológica do Brasil ao Milionésimo – Unidades Litoestratigráficas",
+    "provider": "Serviço Geológico do Brasil (SGB/CPRM)",
+    "area": [
+      -73.992,
+      -33.751,
+      -34.79,
+      5.283
+    ],
+    "level": "N1",
+    "source_scale": 1000000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "wms",
+    "url": "https://geoservicos.sgb.gov.br/geoserver/ows",
+    "layers": "geosgb:litoestratigrafia_1m",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "unknown",
+    "attribution": "Serviço Geológico do Brasil – SGB/CPRM",
+    "status": "to_check",
+    "notes": "No licence text found. Capabilities give Fees NONE and AccessConstraints NONE, which is not a licence. No terms page found on sgb.gov.br or geosgb. The service itself works: GeoServer WMS 1.3.0. Response time is ~10 s at z5 (at the app's 10 s limit), ~3-6 s at z6 and ~1 s from z8. Other layers: litoestratigrafia_250k/100k/50k/25k, patchy coverage (transparent at Quadrilátero Ferrífero z8-z12)."
+  },
+  {
+    "id": "geology_sgc_colombia_500k",
+    "name": "Atlas Geológico de Colombia 2023 – Unidades Cronoestratigráficas",
+    "provider": "Servicio Geológico Colombiano",
+    "area": [
+      -84.764,
+      -6.989,
+      -60.892,
+      16.167
+    ],
+    "level": "N2",
+    "source_scale": 500000,
+    "min_scale": 0,
+    "max_scale": 1000000,
+    "protocol": "wms",
+    "url": "https://srvags.sgc.gov.co/arcgis/services/Mapa_Geologico_Colombia/Mapa_Geologico_Colombia_V2023/MapServer/WMSServer",
+    "layers": "3",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "SGC Términos generales y condiciones para el uso de la información, https://www2.sgc.gov.co/sgc/mapas/Documents/CondGenTermLicUso.pdf (restrictive)",
+    "attribution": "Servicio Geológico Colombiano",
+    "status": "to_check",
+    "notes": "Licence contradicts commercial use. SGC general terms grant a non-exclusive, non-transferable use licence for a specific purpose. They also say the licensee shall not commercialize or exchange the data without written authorization from SGC (read in web search summary; PDF not fetched directly). Technically OK: ArcGIS WMS 1.3.0, WMS layer '3' = 'Unidades Cronoestratigráficas', 1:500k, GetMap 1-2 s. EPSG:3857 works but is not advertised. Test site Bogotá (lon -74.07, lat 4.6), good tile z9/150/249."
+  },
+  {
+    "id": "geology_gsnsw_seamless",
+    "name": "NSW Seamless Geology",
+    "provider": "Geological Survey of New South Wales (DPIRD)",
+    "area": [
+      140.96,
+      -37.57,
+      159.26,
+      -28.07
+    ],
+    "level": "N2",
+    "source_scale": 100000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://gs-seamless.geoscience.nsw.gov.au/geoserver/ows",
+    "layers": "geology:nsw_surface_no_hillshade",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Creative Commons Attribution 3.0 Australia (data.gov.au record 'NSW Seamless Geology', license_url http://creativecommons.org/licenses/by/3.0/au/); Data.NSW record: 'cc-by Creative Commons Attribution'; WMS AccessConstraints 'none', Fees 'none'",
+    "attribution": "NSW Seamless Geology © Geological Survey of New South Wales, Department of Primary Industries and Regional Development, CC BY 3.0 AU",
+    "status": "verified"
+  },
+  {
+    "id": "geology_gsq_detailed_100k",
+    "name": "Queensland detailed surface geology 1:100k",
+    "provider": "Geological Survey of Queensland",
+    "area": [
+      137.995,
+      -29.5,
+      153.639,
+      -9.0
+    ],
+    "level": "N2",
+    "source_scale": 100000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://spatial-gis.information.qld.gov.au/arcgis/services/GeoscientificInformation/GeologyDetailed/MapServer/WMSServer",
+    "layers": "Detailed_surface_geology47720,Detailed_faults_and_shear_zones17471",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Creative Commons Attribution 4.0 International (WMS AccessConstraints: 'This service is free to use and is licensed under a Creative Commons - Attribution 4.0 International licence.'; data.qld.gov.au 'Queensland geology detailed web map service' = CC-BY-4.0, https://creativecommons.org/licenses/by/4.0/)",
+    "attribution": "© State of Queensland (Department of Natural Resources and Mines, Manufacturing and Regional and Rural Development) 2026",
+    "status": "verified"
+  },
+  {
+    "id": "geology_gsv_seamless_50k",
+    "name": "Victoria Seamless Geology 1:50k",
+    "provider": "Geological Survey of Victoria (DEECA)",
+    "area": [
+      140.97,
+      -38.86,
+      149.5,
+      -35.93
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://opendata.maps.vic.gov.au/geoserver/wms",
+    "layers": "open-data-platform:sg_geological_unit_50k",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "DataVic: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/); BUT ISO metadata useLimitation contradicts it",
+    "attribution": "Seamless Geology © State of Victoria (Geological Survey of Victoria), CC BY 4.0",
+    "status": "to_check",
+    "notes": "TO_CHECK: Metashare ISO record b16d9cce-8613-5e05-acc0-1aa60d37a2ab has MD_LegalConstraints 'Creative Commons CC-BY-4.0' but also useLimitation: 'The data is subject to Crown copyright (State of Victoria) and interested parties are required to enter into a licence agreement. Subject to licence conditions'. Ask GSV/DataVic to confirm CC BY 4.0 applies to WMS tile caching. Technically fine: tiles at Ballarat z10-16 1.2-2.6 s; z6 20 s and z8 15 s (only relevant if shown below N3 range). Default style sg_geology_stratigraphy; alternative style open-data-platform:sg_geology_age. Outside Victoria: transparent 1784-byte PNG."
+  },
+  {
+    "id": "geology_gsv_seamless_250k",
+    "name": "Victoria Seamless Geology 1:250k",
+    "provider": "Geological Survey of Victoria (DEECA)",
+    "area": [
+      140.96,
+      -39.16,
+      149.98,
+      -33.98
+    ],
+    "level": "N2",
+    "source_scale": 250000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://opendata.maps.vic.gov.au/geoserver/wms",
+    "layers": "open-data-platform:sg_geological_unit_250k",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "DataVic: Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/); BUT ISO metadata useLimitation contradicts it",
+    "attribution": "Seamless Geology © State of Victoria (Geological Survey of Victoria), CC BY 4.0",
+    "status": "to_check",
+    "notes": "TO_CHECK: same contradiction as the 1:50k layer (ISO record d6f410a9-57a4-5414-9c22-0360328a02ef: 'subject to Crown copyright (State of Victoria) and interested parties are required to enter into a licence agreement. Subject to licence conditions'). Tiles at Ballarat z8-12: 1.5-4 s, opaque, thousands of colours."
+  },
+  {
+    "id": "geology_gns_qmap_250k",
+    "name": "QMAP Geological Map of New Zealand 1:250k",
+    "provider": "GNS Science",
+    "area": [
+      166.18,
+      -49.54,
+      180.0,
+      -31.93
+    ],
+    "level": "N2",
+    "source_scale": 250000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://maps.gns.cri.nz/geology/wms",
+    "layers": "NZL_GNS_250K_seamless_qmap_geological_map_current_view",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Conflicting: WMS AccessConstraints = CC BY 3.0 NZ; GNS 'using our geological maps' page = CC BY 4.0 'unless stated otherwise'; GNS Data Portal Terms (data.gns.cri.nz/mapservice/Content/Terms_1.html) = personal, non-transferable licence forbidding sublicensing/redistribution",
+    "attribution": "QMAP Geological Map of New Zealand 1:250 000 © GNS Science",
+    "status": "to_check",
+    "notes": "TO_CHECK: capabilities say 'Copyright GNS Science 2014. These map data are released free under the Creative Commons Attribution 3.0 New Zealand (CC-BY 3.0) Licence', but the GNS Science Data Portal Terms of Access and Use grant 'a personal, non -exclusive, non-assignable, non-transferable licence' and 'You may not: transfer or sublicense the Products publish or provide copies of all or any substantial part of any of the Products to any other parties, without prior written permission from GNS Science; or on-sell the Products'. Ask GNS which applies to maps.gns.cri.nz WMS tiles. Technically fine: Wellington z12-18 and Pukekohe z11 1.1-1.7 s; z5 15 s, z7 7 s (below N2 range). bbox spans the antimeridian in caps (Chatham Is.); area here excludes Chathams. This is the 2013-era seamless QMAP; the 4th edition (2023) is on gis.gns.cri.nz ArcGIS WMS but without EPSG:3857 (CRS:84/EPSG:4326 only) and with topographic layers credited to LINZ/NIWA."
+  },
+  {
+    "id": "geology_gswa_500k",
+    "name": "Western Australia interpreted bedrock geology 1:500k",
+    "provider": "Geological Survey of Western Australia (DEMIRS) via SLIP",
+    "area": [
+      112.92,
+      -35.19,
+      129.0,
+      -13.69
+    ],
+    "level": "N2",
+    "source_scale": 500000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://public-services.slip.wa.gov.au/public/services/SLIP_Public_Services/Geology_and_Soils_Map/MapServer/WMSServer",
+    "layers": "16",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Conflicting: data.wa.gov.au DMIRS-016 = CC BY 4.0; SLIP service copyrightText = 'SLIP Transaction - Personal Use Licence' (non-commercial)",
+    "attribution": "1:500 000 State interpreted bedrock geology (DMIRS-016) © Geological Survey of Western Australia",
+    "status": "to_check",
+    "notes": "TO_CHECK: the MapServer copyrightText says 'by opening, viewing or using this data, you agree to only use this data for your personal and non-commercial use. You are not permitted to, in any form, reproduce, distribute, commercialise or create derivative works of this data without the data custodians prior written permission.' This contradicts the CC BY 4.0 catalogue record -> do not ship until DEMIRS/Landgate confirm. Interpreted BEDROCK (not surface) geology. Technically fine: Kalgoorlie z6-12 0.4-1.5 s. Layer 18 = '1:100 000 Interpreted Bedrock Geology (DMIRS-038)' (MaxScaleDenominator 1889880, partial coverage) is the N3-ish companion, same licence issue. GSWA's own geossdi.dmp.wa.gov.au answers with a bot/login proxy page."
+  },
+  {
+    "id": "geology_gssa_geologic_units",
+    "name": "South Australia geologic units (GeoSciML portrayal)",
+    "provider": "Geological Survey of South Australia (Department for Energy and Mining)",
+    "area": [
+      128.5,
+      -44.5,
+      141.5,
+      -25.5
+    ],
+    "level": "N2",
+    "source_scale": 100000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://sarigdata.pir.sa.gov.au/geoserver/ows",
+    "layers": "gsmlp:GeologicUnitView",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Creative Commons Attribution 4.0 International (WMS AccessConstraints: 'This product is released under the Creative Commons Attribution 4.0 International Public License (CC BY 4.0)'; GSSA data services page: 'GSSA data services are open government services and licenced under Creative Commons')",
+    "attribution": "© Department for Energy and Mining, South Australia (Geological Survey of South Australia), CC BY 4.0",
+    "status": "to_check",
+    "notes": "TO_CHECK (performance, not licence): every GetMap took 31-34 s (z6-z14, two separate runs) -> exceeds the app's 10 s per-tile budget. z6/z8 returned fully transparent (likely scale-dependent rendering); z10-14 near Port Augusta (138.60,-32.50) opaque with 800-3000 colours. Source scale of the underlying compilation not stated in caps (100000 is a guess -> confirm). Licence text itself looks clean. Alternative services.sarig.sa.gov.au/vector/geology/wms has time-slice solid geology and 7M surface geology only; its GetCapabilities took 29 s."
+  },
+  {
+    "id": "geology_mrt_tas_25k",
+    "name": "Tasmania geological polygons 1:25k",
+    "provider": "Mineral Resources Tasmania via theLIST",
+    "area": [
+      143.52,
+      -43.9,
+      148.87,
+      -39.29
+    ],
+    "level": "N3",
+    "source_scale": 25000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://services.thelist.tas.gov.au/arcgis/services/Public/GeologicalAndSoils/MapServer/WMSServer",
+    "layers": "Geological_Polygons_25K3024,Geological_Lines_25K57378",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Not stated: WMS Fees/AccessConstraints empty, MapServer copyrightText empty; no licence text found",
+    "attribution": "Mineral Resources Tasmania, theLIST © State of Tasmania",
+    "status": "to_check",
+    "notes": "TO_CHECK: (1) no licence text found anywhere on the service; (2) the default style renders polygon OUTLINES only (no unit colour fill, 4-10 colours per tile, ~45% opaque) -> not usable as a colour geology basemap. Scale-limited: 25K polygons MaxScaleDenominator 330729 (z11+), 250K polygons 500000 (z11+). Tested at Queenstown (145.55,-42.08) z11-16, 1.1-2.1 s."
+  },
+  {
+    "id": "geology_kigam_50k",
+    "name": "Korea geological map 1:50k",
+    "provider": "Korea Institute of Geoscience and Mineral Resources (KIGAM)",
+    "area": [
+      124.61,
+      33.11,
+      131.87,
+      38.61
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://data.kigam.re.kr/mgeo/geoserver/wms",
+    "layers": "geoOpen:L_50K_Geology_Map",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Unknown: WMS AccessConstraints 'NONE', Fees 'NONE'; no KOGL type found for the dataset",
+    "attribution": "Korea Institute of Geoscience and Mineral Resources (KIGAM)",
+    "status": "to_check",
+    "notes": "TO_CHECK: KIGAM's documented route is the 'Geo Big Data Open Platform' Open API, issued per applicant after approval (affiliation, domain, purpose). The open GeoServer endpoint answers without a key but no licence (KOGL type 1 vs 2/4) was found; commercial use unconfirmed. Not all 1:50k sheets published (gaps). Tiles at Gyeongju (129.21,35.84) z10-14: 3.6-6.7 s (close to the 10 s budget); GetCapabilities 13 s. Ocean: transparent 1784-byte PNG."
+  },
+  {
+    "id": "geology_kigam_250k",
+    "name": "Korea geological map 1:250k",
+    "provider": "Korea Institute of Geoscience and Mineral Resources (KIGAM)",
+    "area": [
+      124.58,
+      33.0,
+      131.87,
+      39.0
+    ],
+    "level": "N2",
+    "source_scale": 250000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://data.kigam.re.kr/mgeo/geoserver/wms",
+    "layers": "geoOpen:L_250K_Geology_Map",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Unknown: WMS AccessConstraints 'NONE', Fees 'NONE'; no KOGL type found for the dataset",
+    "attribution": "Korea Institute of Geoscience and Mineral Resources (KIGAM)",
+    "status": "to_check",
+    "notes": "TO_CHECK: same licence gap as the 1:50k layer. Tiles at Gyeongju z9 12.3 s (over budget), z11 4.4 s."
   }
 ]
