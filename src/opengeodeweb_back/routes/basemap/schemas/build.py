@@ -22,6 +22,7 @@ class Bounds(DataClassJsonMixin):
 
 
 class Map(Enum):
+    GEOLOGY = "geology"
     PLAN = "plan"
     ROUTES = "routes"
     SATELLITE = "satellite"

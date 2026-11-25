@@ -89,6 +89,13 @@ _GEOLOGY = _geology_sources()
 SOURCES.update(_GEOLOGY)
 # The fallback order of the geology map, the most detailed first
 GEOLOGY_SOURCES: tuple[str, ...] = tuple(_GEOLOGY)
+# Under the roads: they stay readable over the geology. One layer filled tile by tile
+MAPS = {
+    "satellite": MAPS["satellite"],
+    "plan": MAPS["plan"],
+    "geology": (GEOLOGY_SOURCES,),
+    "routes": MAPS["routes"],
+}
 
 
 def url_template(source: str) -> str:
