@@ -358,3 +358,34 @@ def test_layers_without_scale_windows_keep_one_source_per_mosaic(
         basemap_providers.Source("https://b.test/{z}/{x}/{y}.png", 15, "b"),
     )
     assert list(basemap_tiles.fetch_layers([("first", "second")], WHOLE_WORLD)) == ["first"]
+
+
+# A tile with data of every shipped geology source, z/x/y in Web Mercator
+KNOWN_TILES = {
+    "geology_brgm_50k": (13, 4164, 2922),
+    "geology_brgm_250k": (10, 518, 352),
+    "geology_brgm_1m": (8, 129, 88),
+    "geology_bgs_50k": (13, 4055, 2657),
+    "geology_bgs_625k": (8, 126, 83),
+    "geology_igme_geode_50k": (13, 4018, 3185),
+    "geology_igme_1m": (7, 62, 49),
+    "geology_usgs_sgmc": (12, 850, 1554),
+    "geology_usgs_alaska": (10, 91, 267),
+    "geology_usgs_hawaii": (10, 70, 455),
+    "geology_usgs_puerto_rico": (10, 322, 459),
+    "geology_ga_1m": (10, 921, 627),
+    "geology_gsj_200k": (10, 907, 402),
+}
+
+
+@pytest.mark.network
+@pytest.mark.parametrize("source", basemap_providers.GEOLOGY_SOURCES)
+def test_shipped_source_serves_a_tile(
+    source: str, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(tmp_path))
+    monkeypatch.delenv("BASEMAP_TILE_URL", raising=False)
+    z, x, y = KNOWN_TILES[source]
+    content = basemap_tiles.fetch_tiles(source, basemap_tiles.TileRange(z, x, x, y, y))[(x, y)]
+    assert content is not None
+    assert not basemap_tiles.is_empty(content, "transparent")

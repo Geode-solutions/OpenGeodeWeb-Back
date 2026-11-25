@@ -3,7 +3,12 @@
     "id": "geology_brgm_50k",
     "name": "BRGM 1/50 000",
     "provider": "BRGM via Géoplateforme",
-    "area": [-12.2064, 40.681, 11.894, 52.1672],
+    "area": [
+      -12.2064,
+      40.681,
+      11.894,
+      52.1672
+    ],
     "level": "N3",
     "source_scale": 50000,
     "min_scale": 0,
@@ -13,7 +18,9 @@
     "layers": "BRGM_SCAN_D_GEOL50",
     "styles": "normal",
     "format": "image/jpeg",
-    "supported_crs": ["EPSG:3857"],
+    "supported_crs": [
+      "EPSG:3857"
+    ],
     "max_zoom": 15,
     "empty_tile": "#ffffff",
     "licence": "Licence Ouverte Etalab 2.0",
@@ -24,17 +31,24 @@
     "id": "geology_brgm_250k",
     "name": "BRGM 1/250 000",
     "provider": "BRGM via Géoplateforme",
-    "area": [-6.20495, 41.9671, 12.2874, 51.2917],
+    "area": [
+      -6.20495,
+      41.9671,
+      12.2874,
+      51.2917
+    ],
     "level": "N2",
     "source_scale": 250000,
-    "min_scale": 80000,
+    "min_scale": 0,
     "max_scale": 400000,
     "protocol": "wmts",
     "url": "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=BRGM_SCAN_F_GEOL250&STYLE=normal&TILEMATRIXSET=PM_0_14&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/jpeg",
     "layers": "BRGM_SCAN_F_GEOL250",
     "styles": "normal",
     "format": "image/jpeg",
-    "supported_crs": ["EPSG:3857"],
+    "supported_crs": [
+      "EPSG:3857"
+    ],
     "max_zoom": 14,
     "empty_tile": "#ffffff",
     "licence": "Licence Ouverte Etalab 2.0",
@@ -45,21 +59,490 @@
     "id": "geology_brgm_1m",
     "name": "BRGM 1/1 000 000",
     "provider": "BRGM via Géoplateforme",
-    "area": [-5.86764, 41.1701, 11.0789, 51.1419],
+    "area": [
+      -5.86764,
+      41.1701,
+      11.0789,
+      51.1419
+    ],
     "level": "N1",
     "source_scale": 1000000,
-    "min_scale": 400000,
+    "min_scale": 0,
     "max_scale": 100000000,
     "protocol": "wmts",
     "url": "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=BRGM_SCAN_F_GEOL1M&STYLE=normal&TILEMATRIXSET=PM_0_11&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/jpeg",
     "layers": "BRGM_SCAN_F_GEOL1M",
     "styles": "normal",
     "format": "image/jpeg",
-    "supported_crs": ["EPSG:3857"],
+    "supported_crs": [
+      "EPSG:3857"
+    ],
     "max_zoom": 11,
     "empty_tile": "#ffffff",
     "licence": "Licence Ouverte Etalab 2.0",
     "attribution": "© BRGM",
     "status": "verified"
+  },
+  {
+    "id": "geology_egdi_1m",
+    "name": "EGDI 1/1 000 000 (Europe)",
+    "provider": "EuroGeoSurveys (EGDI), service hosted by Geological Survey of Slovenia (GeoZS)",
+    "area": [
+      -56.296504,
+      24.931501,
+      53.104653,
+      72.1479
+    ],
+    "level": "N1",
+    "source_scale": 1000000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "wms",
+    "url": "https://geoserver.geo-zs.si/egdi-surface-geology/gsmlp/wms",
+    "layers": "GeologicUnitView_Lithology",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "empty_tile": "transparent",
+    "licence": "Creative Commons BY 4.0 (https://creativecommons.org/licenses/by/4.0/), per EGDI metadata record 5729ffdf-2558-48fc-a5d2-645a0a010855",
+    "attribution": "EGDI 1:1M Surface Geology © EuroGeoSurveys and the European geological surveys, CC BY 4.0; Malta: Continental Shelf Department, Ministry for Transport and Infrastructure",
+    "status": "to_check",
+    "notes": "Vérifié (CC BY 4.0, pas de données en Croatie) ; en attente de la décision : repli européen ou retrait."
+  },
+  {
+    "id": "geology_bgs_625k",
+    "name": "BGS 1/625 000",
+    "provider": "British Geological Survey",
+    "area": [
+      -8.648463,
+      49.863792,
+      1.767673,
+      60.861176
+    ],
+    "level": "N1",
+    "source_scale": 625000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "wms",
+    "url": "https://ogc.bgs.ac.uk/cgi-bin/BGS_Bedrock_and_Superficial_Geology/wms",
+    "layers": "GBR_BGS_625k_BLS",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "empty_tile": "transparent",
+    "licence": "Open Government Licence v3.0 (https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/)",
+    "attribution": "Contains British Geological Survey materials © UKRI 2026",
+    "status": "verified"
+  },
+  {
+    "id": "geology_bgs_50k",
+    "name": "BGS 1/50 000",
+    "provider": "British Geological Survey",
+    "area": [
+      -8.344021,
+      49.846369,
+      2.697705,
+      60.866269
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://map.bgs.ac.uk/arcgis/services/BGS_Detailed_Geology/MapServer/WMSServer",
+    "layers": "BGS.50k.Bedrock,BGS.50k.Superficial.deposits",
+    "styles": ",",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "empty_tile": "transparent",
+    "licence": "Open Government Licence v3.0 (https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/)",
+    "attribution": "Contains British Geological Survey materials © UKRI 2026",
+    "status": "verified"
+  },
+  {
+    "id": "geology_igme_1m",
+    "name": "IGME 1/1 000 000 (Spain)",
+    "provider": "Instituto Geológico y Minero de España (IGME-CSIC)",
+    "area": [
+      -22.719066,
+      26.602222,
+      6.256604,
+      44.659923
+    ],
+    "level": "N1",
+    "source_scale": 1000000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "wms",
+    "url": "https://mapas.igme.es/gis/services/Cartografia_Geologica/IGME_Geologico_1M/MapServer/WMSServer",
+    "layers": "0,2",
+    "styles": ",",
+    "format": "image/png",
+    "supported_crs": [
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "empty_tile": "transparent",
+    "licence": "Licencia de uso IGME 2022 (free licence for commercial and non-commercial use), https://info.igme.es/media/Pdfs/LicUsoIGME_GENERICA_EN_2022.pdf",
+    "attribution": "Origen de los datos: © CN Instituto Geológico y Minero de España (IGME)",
+    "status": "verified"
+  },
+  {
+    "id": "geology_igme_geode_50k",
+    "name": "IGME GEODE 1/50 000 (Spain)",
+    "provider": "Instituto Geológico y Minero de España (IGME-CSIC)",
+    "area": [
+      -18.161186,
+      27.637739,
+      4.327781,
+      43.792384
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://mapas.igme.es/gis/services/Cartografia_Geologica/IGME_Geode_50/MapServer/WMSServer",
+    "layers": "1,2",
+    "styles": ",",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "empty_tile": "transparent",
+    "licence": "Licencia de uso IGME 2022 (free licence for commercial and non-commercial use), https://info.igme.es/media/Pdfs/LicUsoIGME_GENERICA_EN_2022.pdf",
+    "attribution": "Origen de los datos: © CN Instituto Geológico y Minero de España (IGME)",
+    "status": "verified"
+  },
+  {
+    "id": "geology_igme_magna_50k",
+    "name": "IGME MAGNA 1/50 000 (Spain)",
+    "provider": "Instituto Geológico y Minero de España (IGME-CSIC)",
+    "area": [
+      -18.208334,
+      27.608334,
+      4.331386,
+      43.833319
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://mapas.igme.es/gis/services/Cartografia_Geologica/IGME_MAGNA_50/MapServer/WMSServer",
+    "layers": "0,2",
+    "styles": ",",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "empty_tile": "transparent",
+    "licence": "Licencia de uso IGME 2022, https://info.igme.es/media/Pdfs/LicUsoIGME_GENERICA_EN_2022.pdf, plus service AccessConstraints",
+    "attribution": "Origen de los datos: © CN Instituto Geológico y Minero de España (IGME)",
+    "status": "to_check",
+    "notes": "Technically OK (tile tests pass). Licence unclear: capabilities AccessConstraints say 'No está permitido implementar un servicio de valor añadido no gratuito sin establecer contacto con el IGME' (a paid value-added service needs contacting IGME), which narrows the generic licence. Redundant with GEODE 50k (same data, seamless); keep GEODE unless IGME confirms in writing."
+  },
+  {
+    "id": "geology_igme_200k",
+    "name": "IGME 1/200 000 (Spain)",
+    "provider": "Instituto Geológico y Minero de España (IGME-CSIC)",
+    "area": [
+      -10.086399,
+      35.804852,
+      4.90577,
+      44.134668
+    ],
+    "level": "N2",
+    "source_scale": 200000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://mapas.igme.es/gis/services/Cartografia_Geologica/IGME_Geologico_200/MapServer/WMSServer",
+    "layers": "0,2",
+    "styles": ",",
+    "format": "image/png",
+    "supported_crs": [
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "empty_tile": "transparent",
+    "licence": "Licencia de uso IGME 2022 (free licence for commercial and non-commercial use), https://info.igme.es/media/Pdfs/LicUsoIGME_GENERICA_EN_2022.pdf",
+    "attribution": "Origen de los datos: © CN Instituto Geológico y Minero de España (IGME)",
+    "status": "to_check",
+    "notes": "Licence OK. Coverage is a patchwork of published sheets only (layer 9 'Límite hojas disponibles'): Sierra Nevada/Granada, Madrid and Zaragoza tiles are empty; Pozoblanco and León tiles render. A partial N2 would leave holes inside the declared area. Use only if the registry can tolerate holes, or derive area from the sheet-limit layer. No EPSG:3857 in capabilities (CRS:84 used)."
+  },
+  {
+    "id": "geology_usgs_sgmc",
+    "name": "USGS State Geologic Map Compilation (SGMC)",
+    "provider": "U.S. Geological Survey",
+    "area": [
+      -129.57,
+      22.4,
+      -64.98,
+      50.78
+    ],
+    "level": "N1",
+    "source_scale": 500000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "wmts",
+    "url": "https://mrdata.usgs.gov/mapcache/wmts/1.0.0/sgmc2/default/GoogleMapsCompatible/{z}/{y}/{x}.png",
+    "layers": "sgmc2",
+    "styles": "default",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "U.S. Public Domain: \"USGS-authored or produced data and information are considered to be in the U.S. Public Domain.\" (https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits). Data release metadata (doi:10.5066/F7WH2N65) use constraint: \"Acknowledgment of the U.S. Geological Survey would be appreciated in products derived from these data. User specifically agrees not to misrepresent the data, nor to imply that changes made were approved or endorsed by the U.S. Geological Survey.\" No restriction on commercial use or caching.",
+    "attribution": "Geology: U.S. Geological Survey, State Geologic Map Compilation (Horton et al., 2017)",
+    "status": "verified"
+  },
+  {
+    "id": "geology_usgs_alaska",
+    "name": "USGS Geologic Map of Alaska (SIM 3340)",
+    "provider": "U.S. Geological Survey",
+    "area": [
+      -180.0,
+      51.0,
+      -129.0,
+      72.0
+    ],
+    "level": "N1",
+    "source_scale": 1584000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "wmts",
+    "url": "https://mrdata.usgs.gov/mapcache/wmts/1.0.0/sim3340/default/GoogleMapsCompatible/{z}/{y}/{x}.png",
+    "layers": "sim3340",
+    "styles": "default",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "U.S. Public Domain: \"USGS-authored or produced data and information are considered to be in the U.S. Public Domain.\" (https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits). WMS capabilities: Fees none, AccessConstraints none. No restriction on commercial use or caching.",
+    "attribution": "Geology: U.S. Geological Survey, Geologic Map of Alaska (Wilson et al., 2015, SIM 3340)",
+    "status": "verified"
+  },
+  {
+    "id": "geology_usgs_hawaii",
+    "name": "USGS Geologic Map of the State of Hawaii",
+    "provider": "U.S. Geological Survey",
+    "area": [
+      -160.25,
+      18.9,
+      -154.8,
+      22.24
+    ],
+    "level": "N2",
+    "source_scale": 100000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wmts",
+    "url": "https://mrdata.usgs.gov/mapcache/wmts/1.0.0/higeol/default/GoogleMapsCompatible/{z}/{y}/{x}.png",
+    "layers": "higeol",
+    "styles": "default",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "U.S. Public Domain: \"USGS-authored or produced data and information are considered to be in the U.S. Public Domain.\" (https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits). WMS capabilities (services/hi): Fees none, AccessConstraints none. No restriction on commercial use or caching.",
+    "attribution": "Geology: U.S. Geological Survey, Geologic Map of the State of Hawai'i (Sherrod et al., 2007, OFR 2007-1089)",
+    "status": "verified"
+  },
+  {
+    "id": "geology_usgs_puerto_rico",
+    "name": "USGS Geology of Puerto Rico (OFR 98-38)",
+    "provider": "U.S. Geological Survey",
+    "area": [
+      -67.3,
+      17.9,
+      -65.5,
+      18.6
+    ],
+    "level": "N2",
+    "source_scale": 100000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wmts",
+    "url": "https://mrdata.usgs.gov/mapcache/wmts/1.0.0/prgeol/default/GoogleMapsCompatible/{z}/{y}/{x}.png",
+    "layers": "prgeol",
+    "styles": "default",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "U.S. Public Domain: \"USGS-authored or produced data and information are considered to be in the U.S. Public Domain.\" (https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits). WMS capabilities (services/pr): Fees none, AccessConstraints none. No restriction on commercial use or caching.",
+    "attribution": "Geology: U.S. Geological Survey, Open-File Report 98-38 (Bawiec, 1998)",
+    "status": "verified"
+  },
+  {
+    "id": "geology_ga_1m",
+    "name": "Geoscience Australia 1/1 000 000",
+    "provider": "Geoscience Australia",
+    "area": [
+      72.577237,
+      -54.777736,
+      167.998035,
+      -9.17848
+    ],
+    "level": "N1",
+    "source_scale": 1000000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "xyz",
+    "url": "https://services.ga.gov.au/gis/rest/services/GA_Surface_Geology/MapServer/tile/{z}/{y}/{x}",
+    "layers": null,
+    "styles": null,
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 14,
+    "empty_tile": "transparent",
+    "licence": "Creative Commons Attribution 4.0 International (CC BY 4.0), https://creativecommons.org/licenses/by/4.0/legalcode ; GA copyright notice https://www.ga.gov.au/copyright",
+    "attribution": "© Commonwealth of Australia (Geoscience Australia) 2016, CC BY 4.0",
+    "status": "verified"
+  },
+  {
+    "id": "geology_ga_1m_wms",
+    "name": "Geoscience Australia 1/1 000 000 (WMS)",
+    "provider": "Geoscience Australia",
+    "area": [
+      72.577237,
+      -54.777736,
+      167.998035,
+      -9.17848
+    ],
+    "level": "N1",
+    "source_scale": 1000000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "wms",
+    "url": "https://services.ga.gov.au/gis/services/GA_Surface_Geology/MapServer/WMSServer",
+    "layers": "AUS_GA_2500k_GUPoly_Lithostratigraphy,AUS_GA_2500k_Contacts,AUS_GA_2500k_Faults,AUS_GA_1M_GUPoly_Lithostratigraphy,AUS_GA_1M_Contacts,AUS_GA_1M_Faults",
+    "styles": ",,,,,",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 18,
+    "empty_tile": "transparent",
+    "licence": "Creative Commons Attribution 4.0 International (CC BY 4.0), https://creativecommons.org/licenses/by/4.0/legalcode (WMS AccessConstraints + https://www.ga.gov.au/copyright)",
+    "attribution": "© Commonwealth of Australia (Geoscience Australia) 2016, CC BY 4.0",
+    "status": "to_check",
+    "notes": "Doublon WMS de geology_ga_1m (tuiles), gardé comme repli possible : non chargé."
+  },
+  {
+    "id": "geology_gsj_200k",
+    "name": "GSJ 1/200 000",
+    "provider": "Geological Survey of Japan, AIST",
+    "area": [
+      122.924639,
+      20.412746,
+      153.997258,
+      45.567699
+    ],
+    "level": "N2",
+    "source_scale": 200000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "xyz",
+    "url": "https://gbank.gsj.jp/seamless/v2/api/1.3.1/tiles/{z}/{y}/{x}.png",
+    "layers": null,
+    "styles": null,
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 13,
+    "empty_tile": "transparent",
+    "licence": "Public Data License / Government of Japan Standard Terms of Use (version 2.0), compatible with CC BY 4.0; commercial use allowed. https://www.gsj.jp/license/license.html , https://gbank.gsj.jp/seamless/agreement.html",
+    "attribution": "Seamless Digital Geological Map of Japan V2 1:200,000 (© Geological Survey of Japan, AIST), https://gbank.gsj.jp/seamless/",
+    "status": "verified"
+  },
+  {
+    "id": "geology_gsj_200k_wms",
+    "name": "GSJ 1/200 000 (WMS)",
+    "provider": "Geological Survey of Japan, AIST",
+    "area": [
+      122.924639,
+      20.412746,
+      153.997258,
+      45.567699
+    ],
+    "level": "N2",
+    "source_scale": 200000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://ows.gsj.jp/ows/seamlessv2",
+    "layers": "seamlessV2_poly,seamlessV2_line",
+    "styles": ",",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "EPSG:4326"
+    ],
+    "max_zoom": 13,
+    "empty_tile": "transparent",
+    "licence": "Public Data License / Government of Japan Standard Terms of Use (version 2.0), compatible with CC BY 4.0; commercial use allowed. https://www.gsj.jp/license/license.html , https://gbank.gsj.jp/owscontents/license.html",
+    "attribution": "Seamless Digital Geological Map of Japan V2 1:200,000 (© Geological Survey of Japan, AIST), https://gbank.gsj.jp/seamless/",
+    "status": "to_check",
+    "notes": "Doublon WMS de geology_gsj_200k (tuiles), gardé comme repli possible : non chargé."
+  },
+  {
+    "id": "geology_gsj_1m",
+    "name": "GSJ 1/1 000 000",
+    "provider": "Geological Survey of Japan, AIST",
+    "area": [
+      122.943,
+      20.4539,
+      153.994,
+      45.5541
+    ],
+    "level": "N1",
+    "source_scale": 1000000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "xyz",
+    "url": "https://ows.gsj.jp/tilemap/geologicmap/wmts/1.0.0/JPN_GSJ_1M_Combined_BLT_SLT_BA/default/EPSG900913/{z}/{y}/{x}.png",
+    "layers": null,
+    "styles": null,
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 17,
+    "empty_tile": "transparent",
+    "licence": "Unclear: GSJ site licence (Government of Japan Standard Terms of Use 2.0, commercial OK, https://www.gsj.jp/license/license.html) vs WMS capabilities AccessConstraints 'personal, teaching, research or non-commercial use'",
+    "attribution": "1:1,000,000 Geological Map of Japan, 3rd ed. (© Geological Survey of Japan, AIST)",
+    "status": "to_check",
+    "notes": "Technically OK: WMTS REST template from https://ows.gsj.jp/tilemap/geologicmap/wmts/1.0.0/WMTSCapabilities.xml, TileMatrixSet EPSG900913 = Google grid 256 px, TileMatrix ids are zero-padded '00'..'18' but unpadded z works too (z=5 and z=05 return identical bytes). Tiles served to z17 at the test site (z18 fully transparent). Tiles are slightly translucent (alpha ~214-255). Outside coverage: 256x256 fully transparent PNG. to_check because the sibling WMS (https://ows.gsj.jp/ows/GSJ_Combined_Bedrock_and_Superficial_Geology_and_Age/wms) GetCapabilities AccessConstraints says 'available for free download for your personal, teaching, research or non-commercial use' (legacy OneGeology wording), contradicting the GSJ site-wide licence; ask GSJ (publish@gsj.jp) which applies. Redundant with geology_gsj_200k for display anyway."
   }
 ]
