@@ -140,7 +140,8 @@
     "empty_tile": "transparent",
     "licence": "Open Government Licence v3.0 (https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/)",
     "attribution": "Contains British Geological Survey materials © UKRI 2026",
-    "status": "verified"
+    "status": "to_check",
+    "notes": "Licence incertaine : l'ancien texte des capabilities interdit de « set up a service selling on this material » sans licence, la page actuelle dit OGL v3. Exclu tant que le BGS ne confirme pas."
   },
   {
     "id": "geology_bgs_50k",
@@ -169,7 +170,8 @@
     "empty_tile": "transparent",
     "licence": "Open Government Licence v3.0 (https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/)",
     "attribution": "Contains British Geological Survey materials © UKRI 2026",
-    "status": "verified"
+    "status": "to_check",
+    "notes": "Licence incertaine : une ancienne fiche de métadonnées BGS dit « personal, non-commercial use only », les capabilities disent OGL v3. Exclu tant que le BGS ne confirme pas."
   },
   {
     "id": "geology_igme_1m",
@@ -197,7 +199,8 @@
     "empty_tile": "transparent",
     "licence": "Licencia de uso IGME 2022 (free licence for commercial and non-commercial use), https://info.igme.es/media/Pdfs/LicUsoIGME_GENERICA_EN_2022.pdf",
     "attribution": "Origen de los datos: © CN Instituto Geológico y Minero de España (IGME)",
-    "status": "verified"
+    "status": "to_check",
+    "notes": "Licence incertaine : la licence IGME 2022 autorise l'usage commercial, mais exige que les produits dérivés « ne remplacent pas ceux offerts par l'IGME ». Exclu tant que l'IGME ne confirme pas."
   },
   {
     "id": "geology_igme_geode_50k",
@@ -226,7 +229,8 @@
     "empty_tile": "transparent",
     "licence": "Licencia de uso IGME 2022 (free licence for commercial and non-commercial use), https://info.igme.es/media/Pdfs/LicUsoIGME_GENERICA_EN_2022.pdf",
     "attribution": "Origen de los datos: © CN Instituto Geológico y Minero de España (IGME)",
-    "status": "verified"
+    "status": "to_check",
+    "notes": "Licence incertaine : même clause IGME (« ne pas remplacer les produits de l'IGME »). Exclu tant que l'IGME ne confirme pas."
   },
   {
     "id": "geology_igme_magna_50k",
