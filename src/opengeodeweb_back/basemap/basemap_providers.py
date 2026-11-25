@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 # Standard library imports
+import math
 import os
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
@@ -18,6 +19,17 @@ class Source:
     url_template: str
     max_zoom: int
     attribution: str
+    # Scale window where the source is used, in scale denominators: geology sources only
+    min_scale: float = 0.0
+    max_scale: float = math.inf
+    # Scale of the data, geology sources only: the most detailed source is tried first
+    source_scale: float | None = None
+    # Web Mercator extent the source covers, None for the whole world
+    area_3857: tuple[float, float, float, float] | None = None
+    # How the server says it has no data: a 404, a transparent tile or a plain colour tile
+    empty_tile: str = "404"
+    # WMS only: the CRS of the GetMap bounding box
+    wms_crs: str | None = None
 
 
 _GEOPLATEFORME = (
@@ -64,6 +76,19 @@ MAPS: dict[str, tuple[tuple[str, ...], ...]] = {
     # Transparent: both sources would draw the same roads twice, EOX outside France
     "routes": (("ign_roads", "eox_overlay"),),
 }
+
+
+def _geology_sources() -> dict[str, Source]:
+    # Imported here: the registry builds Source objects of this module
+    from opengeodeweb_back.basemap import geology_registry  # noqa: PLC0415
+
+    return geology_registry.load()
+
+
+_GEOLOGY = _geology_sources()
+SOURCES.update(_GEOLOGY)
+# The fallback order of the geology map, the most detailed first
+GEOLOGY_SOURCES: tuple[str, ...] = tuple(_GEOLOGY)
 
 
 def url_template(source: str) -> str:
