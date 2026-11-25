@@ -19,6 +19,9 @@ PROTOCOLS = ("wmts", "xyz", "wms", "export")
 COLOUR = re.compile(r"#[0-9a-f]{6}")
 # Web Mercator first: its tiles fall on the tile grid. Else longitude first, then latitude first
 WMS_CRS_PREFERENCE = ("EPSG:3857", "CRS:84", "EPSG:4326")
+# WMS 1.1.1 has no CRS:84, and older servers name Web Mercator EPSG:900913
+WMS_1_1_1_CRS_PREFERENCE = ("EPSG:3857", "EPSG:900913", "EPSG:4326")
+WMS_VERSIONS = ("1.3.0", "1.1.1")
 # No tile grid caps a WMS: past this zoom its tiles are enlarged
 WMS_MAX_ZOOM = 18
 # Web Mercator stops short of the poles
@@ -84,22 +87,37 @@ def _check(entry: dict[str, Any]) -> None:
 
 
 def _wms(entry: dict[str, Any]) -> tuple[str, str]:
-    """The GetMap template of a WMS entry, with its {bbox}, and the CRS it asks."""
-    supported = entry.get("supported_crs") or []
-    crs = next((crs for crs in WMS_CRS_PREFERENCE if crs in supported), None)
-    if crs is None:
-        msg = (
-            f"Geology source {entry['id']}: the WMS serves none of {', '.join(WMS_CRS_PREFERENCE)}"
-        )
+    """The GetMap template of a WMS entry, with its {bbox}, and the CRS its bbox is written in."""
+    version = entry.get("wms_version", "1.3.0")
+    if version not in WMS_VERSIONS:
+        msg = f"Geology source {entry['id']}: unknown WMS version {version}"
         raise RegistryError(msg)
+    preference = WMS_CRS_PREFERENCE if version == "1.3.0" else WMS_1_1_1_CRS_PREFERENCE
+    supported = entry.get("supported_crs") or []
+    crs = next((crs for crs in preference if crs in supported), None)
+    if crs is None:
+        msg = f"Geology source {entry['id']}: the WMS serves none of {', '.join(preference)}"
+        raise RegistryError(msg)
+    # WMS 1.1.1 names the CRS parameter SRS
+    crs_parameter = "CRS" if version == "1.3.0" else "SRS"
     query = (
-        "SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap"
-        f"&LAYERS={entry['layers']}&STYLES={entry.get('styles') or ''}&CRS={crs}"
+        f"SERVICE=WMS&VERSION={version}&REQUEST=GetMap"
+        f"&LAYERS={entry['layers']}&STYLES={entry.get('styles') or ''}&{crs_parameter}={crs}"
         "&BBOX={bbox}&WIDTH=256&HEIGHT=256"
         f"&FORMAT={entry['format']}&TRANSPARENT=TRUE"
     )
     separator = "&" if "?" in entry["url"] else "?"
-    return f"{entry['url']}{separator}{query}", crs
+    return f"{entry['url']}{separator}{query}", _bbox_crs(crs, version)
+
+
+def _bbox_crs(crs: str, version: str) -> str:
+    """How the tile bbox is written: Web Mercator, longitude first, or latitude first."""
+    if crs == "EPSG:900913":
+        return "EPSG:3857"
+    # Only WMS 1.3.0 follows the latitude first axis order of EPSG:4326
+    if crs == "EPSG:4326" and version == "1.1.1":
+        return "CRS:84"
+    return crs
 
 
 def _url(entry: dict[str, Any]) -> tuple[str, str | None]:

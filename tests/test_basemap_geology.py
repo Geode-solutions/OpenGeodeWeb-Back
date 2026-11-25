@@ -125,6 +125,22 @@ def test_wms_source_without_web_mercator_asks_crs84(tmp_path: Path) -> None:
         geology_registry.load(_registry(tmp_path, entry))
 
 
+def test_wms_1_1_1_source_asks_srs(tmp_path: Path) -> None:
+    entry = {**WMS_ENTRY, "wms_version": "1.1.1", "supported_crs": ["EPSG:900913"]}
+    wms = geology_registry.load(_registry(tmp_path, entry))["geology_wms"]
+    assert "VERSION=1.1.1&REQUEST=GetMap" in wms.url_template
+    assert "&SRS=EPSG:900913&BBOX={bbox}" in wms.url_template
+    # The old name of Web Mercator: same bounding box
+    assert wms.wms_crs == "EPSG:3857"
+    entry = {**entry, "supported_crs": ["EPSG:4326"]}
+    wms = geology_registry.load(_registry(tmp_path, entry))["geology_wms"]
+    assert "&SRS=EPSG:4326&BBOX={bbox}" in wms.url_template
+    # WMS 1.1.1 reads EPSG:4326 longitude first, like CRS:84
+    assert wms.wms_crs == "CRS:84"
+    with pytest.raises(geology_registry.RegistryError, match="geology_wms"):
+        geology_registry.load(_registry(tmp_path, {**entry, "wms_version": "1.0.0"}))
+
+
 def test_tile_bbox_in_the_wms_crs(monkeypatch: pytest.MonkeyPatch) -> None:
     half = basemap_tiles.HALF_WORLD
     mercator = basemap_providers.Source("u", 15, "a", wms_crs="EPSG:3857")
@@ -388,6 +404,7 @@ KNOWN_TILES = {
     "geology_geosphere_geofast_50k": (13, 4355, 2872),
     "geology_gsc_canada_5m": (8, 70, 90),
     "geology_bcgs_bc_50k": (12, 678, 1377),
+    "geology_mrnf_quebec_regional": (13, 2298, 2841),
     "geology_gsnsw_seamless": (10, 936, 612),
     "geology_gsq_detailed_100k": (10, 928, 570),
 }
