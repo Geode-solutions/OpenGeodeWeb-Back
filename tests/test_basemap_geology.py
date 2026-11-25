@@ -365,6 +365,7 @@ KNOWN_TILES = {
     "geology_brgm_50k": (13, 4164, 2922),
     "geology_brgm_250k": (10, 518, 352),
     "geology_brgm_1m": (8, 129, 88),
+    "geology_egdi_1m": (7, 67, 42),
     "geology_usgs_sgmc": (12, 850, 1554),
     "geology_usgs_alaska": (10, 91, 267),
     "geology_usgs_hawaii": (10, 70, 455),

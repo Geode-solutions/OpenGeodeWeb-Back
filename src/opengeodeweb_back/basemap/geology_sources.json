@@ -110,8 +110,7 @@
     "empty_tile": "transparent",
     "licence": "Creative Commons BY 4.0 (https://creativecommons.org/licenses/by/4.0/), per EGDI metadata record 5729ffdf-2558-48fc-a5d2-645a0a010855",
     "attribution": "EGDI 1:1M Surface Geology © EuroGeoSurveys and the European geological surveys, CC BY 4.0; Malta: Continental Shelf Department, Ministry for Transport and Infrastructure",
-    "status": "to_check",
-    "notes": "Vérifié (CC BY 4.0, pas de données en Croatie) ; en attente de la décision : repli européen ou retrait."
+    "status": "verified"
   },
   {
     "id": "geology_bgs_625k",
