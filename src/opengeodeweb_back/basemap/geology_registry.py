@@ -107,7 +107,7 @@ def _url(entry: dict[str, Any]) -> tuple[str, str | None]:
     if entry["protocol"] == "wms":
         return _wms(entry)
     if entry["protocol"] == "export":
-        # An ArcGIS MapServer export: a full template, asked in Web Mercator
+        # A map server export: a full template, asked in Web Mercator
         if "{bbox}" not in entry["url"]:
             msg = f"Geology source {entry['id']}: an export url needs a {{bbox}}"
             raise RegistryError(msg)

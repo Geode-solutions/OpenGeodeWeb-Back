@@ -5,6 +5,7 @@ import contextlib
 import hashlib
 import http.client
 import io
+import logging
 import math
 import os
 import ssl
@@ -23,7 +24,7 @@ from typing import TYPE_CHECKING
 # Third party imports
 import certifi
 import opengeode_geosciences as og_geosciences
-from PIL import Image
+from PIL import Image, ImageChops
 
 # Local application imports
 from opengeodeweb_back import geode_functions
@@ -38,12 +39,20 @@ from opengeodeweb_back.crs.crs_functions import convert_xy_corners
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
+logger = logging.getLogger(__name__)
+
 # Folder of a basemap data holding its tiles: only basemaps have one
 TILES_FOLDER = "tiles"
 HALF_WORLD = 20037508.342789244
 DEFAULT_MAX_PIXELS = 2048
 PNG_SIGNATURE = b"\x89PNG"
 JPEG_QUALITY = 90
+# Levels a JPEG may blur a plain colour by
+JPEG_TOLERANCE = 3
+TOO_MANY_REQUESTS_RETRIES = 2
+MAX_RETRY_WAIT_SECONDS = 5.0
+# One warning per source and per minute: a broken server must not flood the log
+WARNING_INTERVAL_SECONDS = 60.0
 # Cached in place of a tile the server does not have, so it is not asked again
 MISSING_TILE = b"missing"
 FETCH_WORKERS = 8
@@ -59,6 +68,7 @@ SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
 
 _HOST_LIMITS: dict[str, threading.Semaphore] = {}
 _HOST_LIMITS_LOCK = threading.Lock()
+_LAST_WARNINGS: dict[str, float] = {}
 
 
 def _host_limit(url: str) -> threading.Semaphore:
@@ -188,6 +198,57 @@ def _write_cache(cached: Path, content: bytes) -> None:
             Path(temporary).unlink()
 
 
+def is_empty(content: bytes, empty_tile: str) -> bool:
+    """Whether a served tile is the image the server sends where it has no data."""
+    if empty_tile == "404":
+        return False
+    try:
+        with Image.open(io.BytesIO(content)) as image:
+            if empty_tile == "transparent":
+                # No bounding box: every pixel has a zero alpha
+                return image.convert("RGBA").getchannel("A").getbbox() is None
+            rgb = image.convert("RGB")
+    except OSError:  # UnidentifiedImageError included
+        return False
+    colour = tuple(int(empty_tile[i : i + 2], 16) for i in (1, 3, 5))
+    difference = ImageChops.difference(rgb, Image.new("RGB", rgb.size, colour))
+    # JPEG blurs a plain colour by a few levels: only larger differences count
+    beyond = difference.point(lambda level: 255 if level > JPEG_TOLERANCE else 0)
+    return beyond.getbbox() is None
+
+
+def _warn_failure(source: str, reason: str) -> None:
+    now = time.monotonic()
+    with _HOST_LIMITS_LOCK:
+        if now - _LAST_WARNINGS.get(source, -math.inf) < WARNING_INTERVAL_SECONDS:
+            return
+        _LAST_WARNINGS[source] = now
+    logger.warning("Basemap source %s failed (%s): the next source is used", source, reason)
+
+
+def _retry_wait(error: urllib.error.HTTPError) -> float:
+    try:
+        wait_seconds = float(error.headers.get("Retry-After", "1"))
+    except ValueError:  # an HTTP date: wait the most
+        wait_seconds = MAX_RETRY_WAIT_SECONDS
+    return min(max(wait_seconds, 0.0), MAX_RETRY_WAIT_SECONDS)
+
+
+def _download(url: str) -> bytes:
+    # Open tile servers ask every application to name itself
+    request = urllib.request.Request(  # noqa: S310 URL from the source table or the environment
+        url, headers={"User-Agent": USER_AGENT}
+    )
+    with (
+        _host_limit(url),
+        urllib.request.urlopen(  # noqa: S310
+            request, timeout=FETCH_TIMEOUT_SECONDS, context=SSL_CONTEXT
+        ) as response,
+    ):
+        content: bytes = response.read()
+    return content
+
+
 def _fetch_tile(source: str, z: int, x: int, y: int, bbox: str) -> bytes | None:
     # The template hash keeps tiles of an overridden URL apart
     template = url_template(source)
@@ -196,29 +257,32 @@ def _fetch_tile(source: str, z: int, x: int, y: int, bbox: str) -> bytes | None:
     cached_content = _read_cache(cached)
     if cached_content is not None:
         return None if cached_content == MISSING_TILE else cached_content
-    # Open tile servers ask every application to name itself
     url = template.format(z=z, x=x, y=y, bbox=bbox)
-    request = urllib.request.Request(  # noqa: S310 URL from the source table or the environment
-        url, headers={"User-Agent": USER_AGENT}
-    )
-    try:
-        with (
-            _host_limit(url),
-            urllib.request.urlopen(  # noqa: S310
-                request, timeout=FETCH_TIMEOUT_SECONDS, context=SSL_CONTEXT
-            ) as response,
-        ):
-            content: bytes = response.read()
-    except urllib.error.HTTPError as error:
-        error.close()
-        # Outside its area (the IGN outside France) a server answers 404: unlike a timeout or a
-        # network error, asking again would give the same answer
-        if error.code == HTTPStatus.NOT_FOUND:
-            _write_cache(cached, MISSING_TILE)
-        return None
-    except DOWNLOAD_ERRORS:
-        return None
+    content = b""
+    for attempt in range(TOO_MANY_REQUESTS_RETRIES + 1):
+        try:
+            content = _download(url)
+            break
+        except urllib.error.HTTPError as error:
+            error.close()
+            if error.code == HTTPStatus.TOO_MANY_REQUESTS and attempt < TOO_MANY_REQUESTS_RETRIES:
+                time.sleep(_retry_wait(error))
+                continue
+            # Outside its area (the IGN outside France) a server answers 404: unlike a timeout or a
+            # network error, asking again would give the same answer
+            if error.code == HTTPStatus.NOT_FOUND:
+                _write_cache(cached, MISSING_TILE)
+            else:
+                _warn_failure(source, f"HTTP {error.code}")
+            return None
+        except DOWNLOAD_ERRORS as error:
+            _warn_failure(source, type(error).__name__)
+            return None
     if not _is_image(content):
+        return None
+    # Where a server has no data it may send a plain tile instead of a 404: missing as well
+    if is_empty(content, SOURCES[source].empty_tile):
+        _write_cache(cached, MISSING_TILE)
         return None
     _write_cache(cached, content)
     return content

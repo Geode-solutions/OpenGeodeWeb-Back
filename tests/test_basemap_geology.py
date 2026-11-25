@@ -1,12 +1,17 @@
 from __future__ import annotations
 
 # Standard library imports
+import io
 import json
 import math
-from typing import TYPE_CHECKING
+import urllib.error
+import urllib.request
+from email.message import Message
+from typing import TYPE_CHECKING, Self
 
 # Third party imports
 import pytest
+from PIL import Image
 
 # Local application imports
 from opengeodeweb_back.basemap import basemap_providers, basemap_tiles, geology_registry
@@ -149,3 +154,101 @@ def test_export_source_keeps_its_template(tmp_path: Path) -> None:
     without_bbox = {**entry, "url": "https://maps.test/MapServer/export?f=image"}
     with pytest.raises(geology_registry.RegistryError, match="geology_export"):
         geology_registry.load(_registry(tmp_path, without_bbox))
+
+
+WHOLE_WORLD = basemap_tiles.TileRange(1, 0, 1, 0, 1)
+
+
+def _image(mode: str, colour: tuple[int, ...], image_format: str) -> bytes:
+    output = io.BytesIO()
+    Image.new(mode, (256, 256), colour).save(output, format=image_format)
+    return output.getvalue()
+
+
+def test_empty_tiles() -> None:
+    white = _image("RGB", (255, 255, 255), "JPEG")
+    clear = _image("RGBA", (0, 0, 0, 0), "PNG")
+    coloured = _image("RGB", (200, 120, 40), "PNG")
+    # The Géoplateforme answers a plain white JPEG outside its maps
+    assert basemap_tiles.is_empty(white, "#ffffff")
+    assert not basemap_tiles.is_empty(coloured, "#ffffff")
+    assert basemap_tiles.is_empty(clear, "transparent")
+    assert not basemap_tiles.is_empty(coloured, "transparent")
+    # A 404 source never reads its tiles
+    assert not basemap_tiles.is_empty(white, "404")
+
+
+class _Answer:
+    def __init__(self, content: bytes) -> None:
+        self.content = content
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(self, *_args: object) -> None:
+        pass
+
+    def read(self) -> bytes:
+        return self.content
+
+
+def _source(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, **fields: object) -> None:
+    monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(tmp_path))
+    monkeypatch.delenv("BASEMAP_TILE_URL", raising=False)
+    source = basemap_providers.Source("https://tiles.test/{z}/{x}/{y}.png", 15, "a", **fields)
+    monkeypatch.setitem(basemap_providers.SOURCES, "geology_t", source)
+
+
+def test_empty_tile_is_missing_and_not_asked_again(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _source(monkeypatch, tmp_path, empty_tile="#ffffff")
+    white = _image("RGB", (255, 255, 255), "JPEG")
+    calls: list[str] = []
+
+    def answer(request: urllib.request.Request, **_kwargs: object) -> _Answer:
+        calls.append(request.full_url)
+        return _Answer(white)
+
+    monkeypatch.setattr(urllib.request, "urlopen", answer)
+    assert not any(basemap_tiles.fetch_tiles("geology_t", WHOLE_WORLD).values())
+    basemap_tiles.fetch_tiles("geology_t", WHOLE_WORLD)
+    assert len(calls) == 4
+
+
+def _too_many_requests(url: str) -> urllib.error.HTTPError:
+    headers = Message()
+    headers["Retry-After"] = "0"
+    return urllib.error.HTTPError(url, 429, "Too Many Requests", headers, io.BytesIO())
+
+
+def test_too_many_requests_waits_then_retries(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _source(monkeypatch, tmp_path)
+    tile = _image("RGB", (200, 120, 40), "PNG")
+    refused: set[str] = set()
+
+    def once_refused(request: urllib.request.Request, **_kwargs: object) -> _Answer:
+        if request.full_url not in refused:
+            refused.add(request.full_url)
+            raise _too_many_requests(request.full_url)
+        return _Answer(tile)
+
+    monkeypatch.setattr(urllib.request, "urlopen", once_refused)
+    assert all(basemap_tiles.fetch_tiles("geology_t", WHOLE_WORLD).values())
+
+
+def test_persistent_too_many_requests_is_a_missing_tile(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    _source(monkeypatch, tmp_path)
+
+    def always_refused(request: urllib.request.Request, **_kwargs: object) -> _Answer:
+        raise _too_many_requests(request.full_url)
+
+    monkeypatch.setattr(urllib.request, "urlopen", always_refused)
+    assert not any(basemap_tiles.fetch_tiles("geology_t", WHOLE_WORLD).values())
+    # Not cached: the server may answer later
+    assert not any(path.is_file() for path in tmp_path.rglob("*"))
+    assert "geology_t" in caplog.text
