@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING
 
 # Third party imports
 import certifi
+import opengeode_geosciences as og_geosciences
 from PIL import Image
 
 # Local application imports
@@ -32,6 +33,7 @@ from opengeodeweb_back.basemap.basemap_providers import (
     USER_AGENT,
     url_template,
 )
+from opengeodeweb_back.crs.crs_functions import convert_xy_corners
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -127,6 +129,29 @@ def tile_range(
     return best
 
 
+WGS84 = og_geosciences.GeographicCoordinateSystemInfo("EPSG", "4326", "WGS 84")
+WEB_MERCATOR = og_geosciences.GeographicCoordinateSystemInfo(
+    "EPSG", "3857", "WGS 84 / Pseudo-Mercator"
+)
+
+
+def tile_bbox(source: str, z: int, x: int, y: int) -> str:
+    """BBOX of a GetMap covering tile z/x/y, in the CRS of the source WMS."""
+    bounds = TileRange(z, x, x, y, y).bounds_3857()
+    crs = SOURCES[source].wms_crs
+    if crs is None or crs == "EPSG:3857":
+        return ",".join(str(value) for value in bounds)
+    # The CRS API converts the corners: no projection written here
+    corners = convert_xy_corners(bounds, WEB_MERCATOR, WGS84)
+    lons = [lon for lon, _ in corners]
+    lats = [lat for _, lat in corners]
+    lon_lat = (min(lons), min(lats), max(lons), max(lats))
+    # WMS 1.3.0 reads EPSG:4326 latitude first
+    if crs == "EPSG:4326":
+        lon_lat = (lon_lat[1], lon_lat[0], lon_lat[3], lon_lat[2])
+    return ",".join(str(value) for value in lon_lat)
+
+
 def _cache_folder() -> Path:
     default = Path(tempfile.gettempdir()) / "opengeodeweb_basemap_cache"
     return Path(os.environ.get("BASEMAP_CACHE_FOLDER", str(default)))
@@ -163,7 +188,7 @@ def _write_cache(cached: Path, content: bytes) -> None:
             Path(temporary).unlink()
 
 
-def _fetch_tile(source: str, z: int, x: int, y: int) -> bytes | None:
+def _fetch_tile(source: str, z: int, x: int, y: int, bbox: str) -> bytes | None:
     # The template hash keeps tiles of an overridden URL apart
     template = url_template(source)
     template_hash = hashlib.sha256(template.encode()).hexdigest()[:12]
@@ -172,7 +197,7 @@ def _fetch_tile(source: str, z: int, x: int, y: int) -> bytes | None:
     if cached_content is not None:
         return None if cached_content == MISSING_TILE else cached_content
     # Open tile servers ask every application to name itself
-    url = template.format(z=z, x=x, y=y)
+    url = template.format(z=z, x=x, y=y, bbox=bbox)
     request = urllib.request.Request(  # noqa: S310 URL from the source table or the environment
         url, headers={"User-Agent": USER_AGENT}
     )
@@ -248,7 +273,11 @@ def _source_tiles(
     children: dict[tuple[int, int], list[tuple[int, int]]] = {}
     for x, y in tiles.tiles():
         children.setdefault((x >> depth, y >> depth), []).append((x, y))
-    futures = {parent: downloads.submit(_fetch_tile, source, z, *parent) for parent in children}
+    # PROJ runs through OpenGeode: the bounding boxes are converted here, not in the downloads
+    futures = {
+        parent: downloads.submit(_fetch_tile, source, z, *parent, tile_bbox(source, z, *parent))
+        for parent in children
+    }
     done, _ = wait(futures.values(), timeout=max(0.0, deadline - time.monotonic()))
     images: dict[tuple[int, int], bytes | None] = {}
     for parent, future in futures.items():

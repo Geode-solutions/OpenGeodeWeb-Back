@@ -15,8 +15,12 @@ from opengeodeweb_back.crs.crs_functions import convert_xy_corners
 
 REGISTRY_PATH = Path(__file__).parent / "geology_sources.json"
 ID_PREFIX = "geology_"
-PROTOCOLS = ("wmts", "xyz", "wms")
+PROTOCOLS = ("wmts", "xyz", "wms", "export")
 COLOUR = re.compile(r"#[0-9a-f]{6}")
+# Web Mercator first: its tiles fall on the tile grid. Else longitude first, then latitude first
+WMS_CRS_PREFERENCE = ("EPSG:3857", "CRS:84", "EPSG:4326")
+# No tile grid caps a WMS: past this zoom its tiles are enlarged
+WMS_MAX_ZOOM = 18
 # Web Mercator stops short of the poles
 MAX_LATITUDE = 85.05
 REQUIRED = (
@@ -75,18 +79,55 @@ def _check(entry: dict[str, Any]) -> None:
     if entry["min_scale"] >= entry["max_scale"]:
         msg = f"Geology source {name}: min_scale must be below max_scale"
         raise RegistryError(msg)
+    # A WMS without a usable CRS or an export without {bbox} is rejected, even unverified
+    _url(entry)
+
+
+def _wms(entry: dict[str, Any]) -> tuple[str, str]:
+    """The GetMap template of a WMS entry, with its {bbox}, and the CRS it asks."""
+    supported = entry.get("supported_crs") or []
+    crs = next((crs for crs in WMS_CRS_PREFERENCE if crs in supported), None)
+    if crs is None:
+        msg = (
+            f"Geology source {entry['id']}: the WMS serves none of {', '.join(WMS_CRS_PREFERENCE)}"
+        )
+        raise RegistryError(msg)
+    query = (
+        "SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap"
+        f"&LAYERS={entry['layers']}&STYLES={entry.get('styles') or ''}&CRS={crs}"
+        "&BBOX={bbox}&WIDTH=256&HEIGHT=256"
+        f"&FORMAT={entry['format']}&TRANSPARENT=TRUE"
+    )
+    separator = "&" if "?" in entry["url"] else "?"
+    return f"{entry['url']}{separator}{query}", crs
+
+
+def _url(entry: dict[str, Any]) -> tuple[str, str | None]:
+    """The tile URL template of an entry, and the CRS of its {bbox} when it has one."""
+    if entry["protocol"] == "wms":
+        return _wms(entry)
+    if entry["protocol"] == "export":
+        # An ArcGIS MapServer export: a full template, asked in Web Mercator
+        if "{bbox}" not in entry["url"]:
+            msg = f"Geology source {entry['id']}: an export url needs a {{bbox}}"
+            raise RegistryError(msg)
+        return entry["url"], "EPSG:3857"
+    return entry["url"], None
 
 
 def _source(entry: dict[str, Any]) -> Source:
+    url_template, wms_crs = _url(entry)
+    bbox_protocol = entry["protocol"] in ("wms", "export")
     return Source(
-        url_template=entry["url"],
-        max_zoom=entry.get("max_zoom") or 0,
+        url_template=url_template,
+        max_zoom=entry.get("max_zoom") or (WMS_MAX_ZOOM if bbox_protocol else 0),
         attribution=entry["attribution"],
         min_scale=entry["min_scale"],
         max_scale=entry["max_scale"],
         source_scale=entry["source_scale"],
         area_3857=_area_3857(entry.get("area")),
         empty_tile=entry.get("empty_tile", "404"),
+        wms_crs=wms_crs,
     )
 
 
