@@ -10,18 +10,18 @@ import opengeode as og
 import opengeode_inspector as og_inspector
 
 # Local application imports
-from .geode_mesh import GeodeMesh
+from .geode_image import GeodeImage
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from opengeodeweb_microservice.database.data_types import (
-        GeodeMeshType,
+        GeodeImageType,
         ViewerElementsType,
     )
 
 
-class GeodeRasterImage3D(GeodeMesh):
+class GeodeRasterImage3D(GeodeImage):
     raster_image: og.RasterImage3D
 
     def __init__(self, raster_image: og.RasterImage3D) -> None:
@@ -30,7 +30,7 @@ class GeodeRasterImage3D(GeodeMesh):
 
     @override
     @classmethod
-    def geode_object_type(cls) -> GeodeMeshType:
+    def geode_object_type(cls) -> GeodeImageType:
         return "RasterImage3D"
 
     @override
@@ -111,10 +111,6 @@ class GeodeRasterImage3D(GeodeMesh):
     @override
     def validate(self) -> og_inspector.ObjectValidity:
         return og_inspector.ObjectValidity()
-
-    @override
-    def vertex_attribute_manager(self) -> og.AttributeManager:
-        return og.AttributeManager()
 
     @override
     @classmethod

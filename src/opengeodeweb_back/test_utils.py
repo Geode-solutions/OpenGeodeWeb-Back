@@ -114,8 +114,8 @@ def check_save_viewable_file(
         _check(type(item["viewable_file"]) is str, "viewable_file is not a string")
         _check(type(item.get("id")) is str, "id is not a string")
         _check(
-            item["viewer_object_type"] in ["model", "mesh"],
-            "viewer_object_type is not model or mesh",
+            item["viewer_object_type"] in ["image", "mesh", "model"],
+            "viewer_object_type is not image, mesh or model",
         )
         _check(type(item["binary_light_viewable"]) is str, "binary_light_viewable is not a string")
 
