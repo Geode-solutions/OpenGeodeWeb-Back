@@ -44,6 +44,10 @@ logger = logging.getLogger(__name__)
 # Folder of a basemap data holding its tiles: only basemaps have one
 TILES_FOLDER = "tiles"
 HALF_WORLD = 20037508.342789244
+# Radius of the Web Mercator sphere: HALF_WORLD = pi * EARTH_RADIUS
+EARTH_RADIUS = 6_378_137.0
+# Scale denominator of a zoom 0 tile at the equator, for 0.28 mm screen pixels (OGC)
+EQUATOR_SCALE_AT_ZOOM_0 = 559_082_264.0
 DEFAULT_MAX_PIXELS = 2048
 PNG_SIGNATURE = b"\x89PNG"
 JPEG_QUALITY = 90
@@ -106,6 +110,25 @@ class TileRange:
             for x in range(self.x_min, self.x_max + 1)
             for y in range(self.y_min, self.y_max + 1)
         ]
+
+
+def tile_scale(z: int, y: int) -> float:
+    """Scale denominator at the centre of tile row y: finer away from the equator."""
+    center_y = HALF_WORLD - (y + 0.5) * _tile_span(z)
+    # Web Mercator stretches the ground by 1 / cos(latitude) = cosh(y / R)
+    return EQUATOR_SCALE_AT_ZOOM_0 / (1 << z) / math.cosh(center_y / EARTH_RADIUS)
+
+
+def eligible(source: str, z: int, tile: tuple[int, int]) -> bool:
+    """Whether the scale window and the area of a source hold the tile."""
+    settings = SOURCES[source]
+    if not settings.min_scale <= tile_scale(z, tile[1]) < settings.max_scale:
+        return False
+    if settings.area_3857 is None:
+        return True
+    x_min, y_min, x_max, y_max = TileRange(z, tile[0], tile[0], tile[1], tile[1]).bounds_3857()
+    area_x_min, area_y_min, area_x_max, area_y_max = settings.area_3857
+    return x_min < area_x_max and area_x_min < x_max and y_min < area_y_max and area_y_min < y_max
 
 
 def _range_at(bounds_3857: tuple[float, float, float, float], z: int) -> TileRange:
@@ -329,13 +352,17 @@ def _downloads(workers: int) -> Iterator[ThreadPoolExecutor]:
 
 
 def _source_tiles(
-    source: str, tiles: TileRange, downloads: ThreadPoolExecutor, deadline: float
+    source: str,
+    tiles: TileRange,
+    downloads: ThreadPoolExecutor,
+    deadline: float,
+    wanted: list[tuple[int, int]] | None = None,
 ) -> dict[tuple[int, int], bytes | None]:
     # Past its max zoom a source has no tile: its parent tiles are enlarged instead
     depth = max(0, tiles.z - SOURCES[source].max_zoom)
     z = tiles.z - depth
     children: dict[tuple[int, int], list[tuple[int, int]]] = {}
-    for x, y in tiles.tiles():
+    for x, y in wanted or tiles.tiles():
         children.setdefault((x >> depth, y >> depth), []).append((x, y))
     # PROJ runs through OpenGeode: the bounding boxes are converted here, not in the downloads
     futures = {
@@ -369,10 +396,37 @@ def _first_served(
     return None
 
 
+def _each_tile_served(
+    layer: tuple[str, ...], tiles: TileRange, downloads: ThreadPoolExecutor, deadline: float
+) -> dict[str, dict[tuple[int, int], bytes | None]]:
+    """Each tile from the first source serving it, the sources in the layer order."""
+    missing = set(tiles.tiles())
+    served: dict[str, dict[tuple[int, int], bytes | None]] = {}
+    for source in layer:
+        wanted = sorted(tile for tile in missing if eligible(source, tiles.z, tile))
+        if not wanted:
+            continue
+        images = _source_tiles(source, tiles, downloads, deadline, wanted)
+        found: dict[tuple[int, int], bytes | None] = {
+            tile: content for tile, content in images.items() if content is not None
+        }
+        if found:
+            served[source] = found
+            missing -= found.keys()
+        if not missing:
+            break
+    return served
+
+
+def _filled_tile_by_tile(layer: tuple[str, ...]) -> bool:
+    # Geology sources have a scale window: each tile takes its own source
+    return any(math.isfinite(SOURCES[source].max_scale) for source in layer)
+
+
 def fetch_layers(
     layers: list[tuple[str, ...]], tiles: TileRange
 ) -> dict[str, dict[tuple[int, int], bytes | None]]:
-    """The tiles of the first source serving any in each layer, by source.
+    """The tiles of each layer by source: the first source serving any, or tile by tile.
 
     Every layer at once: the slowest server sets the wait, not the sum of them.
     """
@@ -381,10 +435,18 @@ def fetch_layers(
         _downloads(FETCH_WORKERS * max(1, len(layers))) as downloads,
         ThreadPoolExecutor(max(1, len(layers))) as executor,
     ):
-        served = executor.map(
-            lambda layer: _first_served(layer, tiles, downloads, deadline), layers
-        )
-        return dict(item for item in served if item is not None)
+
+        def fetch(layer: tuple[str, ...]) -> dict[str, dict[tuple[int, int], bytes | None]]:
+            if _filled_tile_by_tile(layer):
+                return _each_tile_served(layer, tiles, downloads, deadline)
+            first = _first_served(layer, tiles, downloads, deadline)
+            return {} if first is None else dict([first])
+
+        return {
+            source: images
+            for served in executor.map(fetch, layers)
+            for source, images in served.items()
+        }
 
 
 def _extension(content: bytes) -> str:

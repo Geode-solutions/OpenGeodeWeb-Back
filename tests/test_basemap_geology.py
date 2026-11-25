@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 # Standard library imports
+import dataclasses
 import io
 import json
 import math
@@ -252,3 +253,108 @@ def test_persistent_too_many_requests_is_a_missing_tile(
     # Not cached: the server may answer later
     assert not any(path.is_file() for path in tmp_path.rglob("*"))
     assert "geology_t" in caplog.text
+
+
+HALF = basemap_tiles.HALF_WORLD
+
+
+def test_tile_scale_follows_zoom_and_latitude() -> None:
+    # At the equator, zoom 9 is about 1/1 000 000
+    assert basemap_tiles.tile_scale(9, 255) == pytest.approx(1_091_958, rel=0.01)
+    # One zoom more halves the scale
+    assert basemap_tiles.tile_scale(10, 511) == pytest.approx(545_979, rel=0.01)
+    # At 60° north the ground is twice as small on the screen
+    assert basemap_tiles.tile_scale(9, 148) == pytest.approx(1_091_958 / 2, rel=0.02)
+
+
+def _two_sources(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(tmp_path))
+    monkeypatch.delenv("BASEMAP_TILE_URL", raising=False)
+    # A detailed national source on the west half of the world, then a coarse continental one
+    national = basemap_providers.Source(
+        "https://national.test/{z}/{x}/{y}.png",
+        15,
+        "© National",
+        min_scale=0,
+        max_scale=1e12,
+        source_scale=50_000,
+        area_3857=(-HALF, -HALF, 0.0, HALF),
+        empty_tile="transparent",
+    )
+    continental = basemap_providers.Source(
+        "https://continental.test/{z}/{x}/{y}.png",
+        15,
+        "© Continental",
+        min_scale=0,
+        max_scale=1e12,
+        source_scale=1_000_000,
+        empty_tile="transparent",
+    )
+    monkeypatch.setitem(basemap_providers.SOURCES, "geology_national", national)
+    monkeypatch.setitem(basemap_providers.SOURCES, "geology_continental", continental)
+    tile = _image("RGB", (200, 120, 40), "PNG")
+    monkeypatch.setattr(urllib.request, "urlopen", lambda *_a, **_k: _Answer(tile))
+
+
+def test_each_tile_takes_the_first_source_serving_it(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _two_sources(monkeypatch, tmp_path)
+    images = basemap_tiles.fetch_layers([("geology_national", "geology_continental")], WHOLE_WORLD)
+    # The west column from the national source, the east one from the continental source
+    assert sorted(images["geology_national"]) == [(0, 0), (0, 1)]
+    assert sorted(images["geology_continental"]) == [(1, 0), (1, 1)]
+
+
+def test_a_failing_source_leaves_its_tiles_to_the_next(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _two_sources(monkeypatch, tmp_path)
+    tile = _image("RGB", (200, 120, 40), "PNG")
+
+    def national_down(request: urllib.request.Request, **_kwargs: object) -> _Answer:
+        if "national" in request.full_url:
+            raise TimeoutError
+        return _Answer(tile)
+
+    monkeypatch.setattr(urllib.request, "urlopen", national_down)
+    images = basemap_tiles.fetch_layers([("geology_national", "geology_continental")], WHOLE_WORLD)
+    assert list(images) == ["geology_continental"]
+    assert len(images["geology_continental"]) == 4
+
+
+def test_out_of_scale_source_is_not_asked(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    _two_sources(monkeypatch, tmp_path)
+    detailed = basemap_providers.SOURCES["geology_national"]
+    monkeypatch.setitem(
+        basemap_providers.SOURCES,
+        "geology_national",
+        dataclasses.replace(detailed, max_scale=80_000),
+    )
+    # A whole world view is far coarser than 1/80 000: the continental source alone fills it
+    images = basemap_tiles.fetch_layers([("geology_national", "geology_continental")], WHOLE_WORLD)
+    assert list(images) == ["geology_continental"]
+
+
+def test_tiles_without_a_source_stay_empty(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    _two_sources(monkeypatch, tmp_path)
+    # No world fallback: the east column is left out, and the Viewer shows it transparent
+    images = basemap_tiles.fetch_layers([("geology_national",)], WHOLE_WORLD)
+    assert sorted(images["geology_national"]) == [(0, 0), (0, 1)]
+
+
+def test_layers_without_scale_windows_keep_one_source_per_mosaic(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _two_sources(monkeypatch, tmp_path)
+    monkeypatch.setitem(
+        basemap_providers.SOURCES,
+        "first",
+        basemap_providers.Source("https://a.test/{z}/{x}/{y}.png", 15, "a"),
+    )
+    monkeypatch.setitem(
+        basemap_providers.SOURCES,
+        "second",
+        basemap_providers.Source("https://b.test/{z}/{x}/{y}.png", 15, "b"),
+    )
+    assert list(basemap_tiles.fetch_layers([("first", "second")], WHOLE_WORLD)) == ["first"]
