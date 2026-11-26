@@ -3,6 +3,7 @@ from __future__ import annotations
 # Standard library imports
 import contextlib
 import json
+import math
 import os
 import shutil
 import sqlite3
@@ -38,6 +39,8 @@ from opengeodeweb_back.geode_objects.geode_triangulated_surface3d import (
 from opengeodeweb_back.routes.blueprint_routes import extract_valid_attribute_values
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from flask.testing import FlaskClient
     from werkzeug.test import TestResponse
 
@@ -1068,4 +1071,111 @@ def test_apply_time_series_errors(client: FlaskClient) -> None:
     [point_set] = test_utils.check_save_viewable_file(client, "PointSet3D", "test.og_pts3d")
     point_set_id = point_set["id"]
     response = client.post(route, json={"id": point_set_id, "filename": filename})
+    assert response.status_code == 400
+
+
+PHYSICAL_PROPERTIES_FILE = "cube_physical_properties.og_brep"
+POROSITY = 0.25
+
+
+def _write_physical_properties_brep(path: Path) -> None:
+    """cube.og_brep with a porosity on its Block and a displacement on two of its Surfaces.
+
+    The displacement attribute is named "displacement", not like the physical property, and
+    its x and z components are free (NaN).
+    """
+    [brep] = og.load_brep(str(path.parent / "cube.og_brep"))
+    builder = og.BRepBuilder(brep)
+
+    porosity_id = og.uuid()
+    porosity_values = og.AttributeValuesDouble()
+    porosity_values.default_value = POROSITY
+    for block in brep.blocks():
+        block.mesh().polyhedron_attribute_manager().create_attribute_variable_double(
+            "porosity", porosity_id, porosity_values, og.AttributeProperties()
+        )
+    builder.set_physical_property(
+        og.PhysicalPropertyName.porosity, og.Block3D.component_type_static(), porosity_id
+    )
+
+    displacement_id = og.uuid()
+    displacement_values = og.AttributeValuesArrayDouble3()
+    displacement_values.default_value = [math.nan, 0.0, math.nan]
+    for surface in list(brep.surfaces())[:2]:
+        surface.mesh().polygon_attribute_manager().create_attribute_variable_arraydouble3(
+            "displacement", displacement_id, displacement_values, og.AttributeProperties()
+        )
+    builder.set_physical_property(
+        og.PhysicalPropertyName.boundary_displacement,
+        og.Surface3D.component_type_static(),
+        displacement_id,
+    )
+    og.save_brep(brep, str(path))
+
+
+@pytest.fixture
+def physical_properties_brep() -> Generator[str]:
+    path = data_dir / PHYSICAL_PROPERTIES_FILE
+    _write_physical_properties_brep(path)
+    yield PHYSICAL_PROPERTIES_FILE
+    path.unlink(missing_ok=True)
+
+
+def test_model_physical_properties(client: FlaskClient, physical_properties_brep: str) -> None:
+    route = "/opengeodeweb_back/model_physical_properties"
+    [model] = test_utils.check_save_viewable_file(client, "BRep", physical_properties_brep)
+    model_id: str = model["id"]
+    block_ids = [
+        component["geode_id"]
+        for component in model["mesh_components"]
+        if component["type"] == "Block"
+    ]
+
+    response = client.post(route, json={"id": model_id})
+    assert response.status_code == 200
+    properties = {
+        physical_property["name"]: physical_property
+        for physical_property in response.get_json()["physical_properties"]
+    }
+    assert set(properties) == {"porosity", "boundary_displacement"}
+
+    porosity = properties["porosity"]
+    assert porosity["component_type"] == "Block"
+    assert porosity["element_type"] == "polyhedron"
+    assert porosity["attribute_name"] == "porosity"
+    assert porosity["nb_items"] == 1
+    assert [component["geode_id"] for component in porosity["components"]] == block_ids
+    for component in porosity["components"]:
+        assert component["min_values"] == [POROSITY]
+        assert component["max_values"] == [POROSITY]
+        assert component["no_data"] is False
+
+    displacement = properties["boundary_displacement"]
+    assert displacement["component_type"] == "Surface"
+    assert displacement["element_type"] == "polygon"
+    # The attribute keeps its own name, the front colors the model with it
+    assert displacement["attribute_name"] == "displacement"
+    assert displacement["nb_items"] == 3
+    assert len(displacement["components"]) == 2
+    for component in displacement["components"]:
+        # Free components have no value: null, as NaN is not JSON
+        assert component["min_values"] == [None, 0.0, None]
+        assert component["max_values"] == [None, 0.0, None]
+        assert component["no_data"] is True
+
+    def get_full_data() -> test_utils.JsonData:
+        return {"id": model_id}
+
+    test_utils.test_route_wrong_params(client, route, get_full_data)
+
+
+def test_model_physical_properties_without_any(client: FlaskClient) -> None:
+    route = "/opengeodeweb_back/model_physical_properties"
+    model_id, _ = _load_brep_components(client)
+    response = client.post(route, json={"id": model_id})
+    assert response.status_code == 200
+    assert response.get_json()["physical_properties"] == []
+
+    [point_set] = test_utils.check_save_viewable_file(client, "PointSet3D", "test.og_pts3d")
+    response = client.post(route, json={"id": point_set["id"]})
     assert response.status_code == 400
