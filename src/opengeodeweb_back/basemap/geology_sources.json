@@ -1084,6 +1084,122 @@
     "status": "verified"
   },
   {
+    "id": "geology_egt_estonia_50k",
+    "name": "Estonian geological base map 1:50 000 (Quaternary cover)",
+    "provider": "Geological Survey of Estonia (since 2025) / Estonian Land and Spatial Development Board",
+    "area": [
+      21.7,
+      57.5,
+      28.25,
+      59.75
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://teenus.maaamet.ee/ows/wms-geoloogia",
+    "layers": "geol_pinnakate_pinnakatteeh_stratgen",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "EPSG:4326"
+    ],
+    "max_zoom": 16,
+    "empty_tile": "transparent",
+    "licence": "Republic of Estonia Land and Spatial Development Board open data licence 01.01.2025 (https://geoportaal.maaruum.ee/opendata-licence): 'use the data for commercial or non-commercial purposes and redistribute data', with a reference naming the licensor, the data title and its date; named in the geological base map metadata",
+    "attribution": "Geological base map 1:50 000: Republic of Estonia Land and Spatial Development Board",
+    "status": "verified",
+    "notes": "Layer 'Pinnakatte avamused (50k)' of the MapServer WMS (Quaternary deposits, the surface geology of Estonia). Mapped sheets only: unmapped areas are transparent. 0.4-0.5 s per tile. The bedrock layer geol_aluspohi_aluspohjaehitus_avamus also works but lies under the cover."
+  },
+  {
+    "id": "geology_egt_estonia_400k",
+    "name": "Estonian geological map 1:400 000 (Quaternary cover)",
+    "provider": "Geological Survey of Estonia (since 2025) / Estonian Land and Spatial Development Board",
+    "area": [
+      21.7,
+      57.5,
+      28.25,
+      59.75
+    ],
+    "level": "N2",
+    "source_scale": 400000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://teenus.maaamet.ee/ows/geoloogia400k",
+    "layers": "G400_PINNAKATE_K",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:4326"
+    ],
+    "max_zoom": 14,
+    "empty_tile": "transparent",
+    "licence": "Republic of Estonia Land and Spatial Development Board open data licence 01.01.2025 (https://geoportaal.maaruum.ee/opendata-licence): 'use the data for commercial or non-commercial purposes and redistribute data', with a reference naming the licensor, the data title and its date; named in the geological base map metadata",
+    "attribution": "Geological map 1:400 000: Republic of Estonia Land and Spatial Development Board",
+    "status": "verified",
+    "notes": "Layer 'Pinnakatte kaart' of the 1:400 000 WMS; the service has no Web Mercator, so tiles are asked in EPSG:4326. Whole country, 0.4-0.7 s per tile."
+  },
+  {
+    "id": "geology_gsni_10k",
+    "name": "GSNI 1:10 000 geology (bedrock and superficial)",
+    "provider": "Geological Survey of Northern Ireland",
+    "area": [
+      -8.2,
+      54.0,
+      -5.4,
+      55.4
+    ],
+    "level": "N3",
+    "source_scale": 10000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "export",
+    "url": "https://map.bgs.ac.uk/arcgis/rest/services/GeoIndex_GSNI/GSNI_Geology_Landsat_WMS/MapServer/export?bbox={bbox}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&layers=show:5,6&f=image",
+    "layers": "show:5,6",
+    "styles": null,
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "empty_tile": "transparent",
+    "licence": "Open Government Licence (https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/): 'The data is delivered under the terms of the Open Government Licence' (GSNI WMS page https://gsni.bgs.ac.uk/data-and-maps/wms-services.html)",
+    "attribution": "Contains Geological Survey of Northern Ireland materials © Crown Copyright 2026",
+    "status": "verified",
+    "notes": "ArcGIS MapServer GeoIndex_GSNI/GSNI_Geology_Landsat_WMS (hosted by the BGS), layers 5 'Superficial Geology (10k)' over 6 'Bedrock Geology (10k)', drawn from 1:250 000. Partial coverage (mapped areas only). Unlike the BGS Great Britain services (geology_bgs_*), the GSNI WMS page states the OGL without restriction."
+  },
+  {
+    "id": "geology_gsni_250k",
+    "name": "GSNI 1:250 000 geology (bedrock and superficial)",
+    "provider": "Geological Survey of Northern Ireland",
+    "area": [
+      -8.2,
+      54.0,
+      -5.4,
+      55.4
+    ],
+    "level": "N2",
+    "source_scale": 250000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "export",
+    "url": "https://map.bgs.ac.uk/arcgis/rest/services/GeoIndex_GSNI/GSNI_Geology_Landsat_WMS/MapServer/export?bbox={bbox}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&layers=show:9,10&f=image",
+    "layers": "show:9,10",
+    "styles": null,
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 15,
+    "empty_tile": "transparent",
+    "licence": "Open Government Licence (https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/): 'The data is delivered under the terms of the Open Government Licence' (GSNI WMS page https://gsni.bgs.ac.uk/data-and-maps/wms-services.html)",
+    "attribution": "Contains Geological Survey of Northern Ireland materials © Crown Copyright 2026",
+    "status": "verified",
+    "notes": "Same service, layers 9 'Superficial Geology (250k)' over 10 'Bedrock Geology (250k)': all of Northern Ireland. 0.2-0.6 s per tile."
+  },
+  {
     "id": "geology_gsi_100k",
     "name": "Ireland bedrock geology 1:100 000",
     "provider": "GSI - Geological Survey Ireland",
