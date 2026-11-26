@@ -408,6 +408,7 @@ KNOWN_TILES = {
     "geology_natt_iceland_100k_west": (12, 1809, 1072),
     "geology_natt_iceland_100k_east": (13, 3772, 2131),
     "geology_gsi_100k": (12, 1943, 1333),
+    "geology_sgl_luxembourg_350k": (12, 2117, 1396),
     "geology_spw_wallonie_25k": (13, 4206, 2761),
     "geology_spw_wallonie_n2": (11, 1051, 690),
     "geology_geosphere_geofast_50k": (13, 4355, 2872),

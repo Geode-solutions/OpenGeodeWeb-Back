@@ -198,6 +198,127 @@
     "styles": null
   },
   {
+    "id": "geology_sgl_luxembourg_harmonised",
+    "name": "Luxembourg harmonised geological map (detailed)",
+    "provider": "Service géologique de l'État (Administration des ponts et chaussées) via geoportail.lu",
+    "area": [
+      5.6,
+      49.38,
+      6.73,
+      50.29
+    ],
+    "level": "N3",
+    "source_scale": 25000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://wms.geoportail.lu/public_map_layers/service",
+    "layers": "2167",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "EPSG:4326"
+    ],
+    "max_zoom": 17,
+    "empty_tile": "transparent",
+    "licence": "CC0 per data.public.lu dataset 'Harmonised geological vector map (Carte géologique harmonisée vectorielle)' published by Administration des Ponts et Chaussées (licence cc-zero); geocatalogue.geoportail.lu record 542a0caa-4b33-4019-8ce7-b8541b436106 states only accessConstraints=copyright, no licence text",
+    "attribution": "Administration des ponts et chaussées, Service géologique de l'État du Luxembourg",
+    "status": "to_check",
+    "notes": "TO_CHECK: data.public.lu says CC0 (2018 automatic INSPIRE as-is page) but the geoportail metadata 542a0caa-4b33-4019-8ce7-b8541b436106 gives only accessConstraints 'copyright'. Layer 2167 'Carte géologique harmonisée' of the geoportail.lu public_map_layers WMS: seamless assembly of the detailed 1:25 000 maps, whole country, faults drawn in red. 0.1-2.4 s per tile."
+  },
+  {
+    "id": "geology_tno_netherlands_600k",
+    "name": "TNO geological map of the Netherlands 1:600 000",
+    "provider": "TNO Geological Survey of the Netherlands (GDN)",
+    "area": [
+      2.27,
+      50.72,
+      7.35,
+      55.78
+    ],
+    "level": "N2",
+    "source_scale": 600000,
+    "min_scale": 0,
+    "max_scale": 1000000,
+    "protocol": "wms",
+    "url": "https://www.gdngeoservices.nl/inspire/geoserver/geomap_as_is/ows",
+    "layers": "GKNederlandGeolVlak",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 16,
+    "empty_tile": "transparent",
+    "licence": "CC0 1.0: Nationaal Georegister record bf639059-05de-4ee1-b838-40e9556c25ff ('Geen beperkingen. Er zijn geen condities voor toegang en gebruik', anchor creativecommons.org/publicdomain/zero/1.0), WMS GetCapabilities AccessConstraints http://creativecommons.org/publicdomain/zero/1.0/deed, data.overheid.nl dataset 74999 licence CC0",
+    "attribution": "© TNO Geological Survey of the Netherlands (GDN)",
+    "status": "to_check",
+    "notes": "TO_CHECK: the dataset is CC0 everywhere (Nationaal Georegister bf639059-05de-4ee1-b838-40e9556c25ff, WMS AccessConstraints, data.overheid.nl 74999), but the dinoloket.nl / geologischedienst.nl disclaimer forbids copying 'information on this website' except for personal, non-commercial use. Ask TNO to confirm the CC0 covers the WMS. Layer GKNederlandGeolVlak of the 'Oppervlaktegeologie, Geologische kaart as-is' GeoServer WMS (formations and profile types at or near the surface, top ~5 m; 2021 map, mapping scale 1:600 000). Covers the land and the Dutch continental shelf. 0.5-2.4 s per tile. Fault and ice-margin lines are in the separate layer GKNederlandGeolLijn."
+  },
+  {
+    "id": "geology_lgt_lithuania_quaternary_200k",
+    "name": "Lithuanian Quaternary geological map 1:200 000",
+    "provider": "Lithuanian Geological Survey (LGT) via geoportal.lt",
+    "area": [
+      20.86,
+      53.86,
+      26.92,
+      56.46
+    ],
+    "level": "N2",
+    "source_scale": 200000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "wms_version": "1.1.1",
+    "url": "https://www.geoportal.lt/mapproxy/lgt_kvartero_geologinis/GetMap.ashx",
+    "layers": "Kvartero_geologinis",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:4326"
+    ],
+    "max_zoom": 16,
+    "empty_tile": "transparent",
+    "licence": "CC BY 4.0: data.gov.lt dataset 2642 published by Lietuvos geologijos tarnyba (Licencija: Creative Commons Attribution 4.0); WMS GetCapabilities says Fees '$10', AccessConstraints 'none'",
+    "attribution": "Lietuvos geologijos tarnyba (Lithuanian Geological Survey), CC BY 4.0",
+    "status": "to_check",
+    "notes": "TO_CHECK: licence CC BY 4.0 on data.gov.lt (dataset 2642, LGT), but the WMS GetCapabilities says Fees '$10' and the geoportal.lt service records name no licence; technically every tile carries a 'MapXtreme 2008 SDK Developer License' watermark (so no tile is ever empty) and the first request after idle takes 10-15 s. Every tile carries a 'MapXtreme 2008 © SDK Developer License' watermark. First request after idle takes 10-15 s (cold start), then 0.2-0.8 s. WMS 1.1.1, EPSG:4326 only."
+  },
+  {
+    "id": "geology_lgt_lithuania_prequaternary_200k",
+    "name": "Lithuanian pre-Quaternary geological map 1:200 000",
+    "provider": "Lithuanian Geological Survey (LGT) via geoportal.lt",
+    "area": [
+      20.86,
+      53.86,
+      26.92,
+      56.46
+    ],
+    "level": "N2",
+    "source_scale": 200000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "wms_version": "1.1.1",
+    "url": "https://www.geoportal.lt/mapproxy/lgt_prekvartero_geologinis/GetMap.ashx",
+    "layers": "pQ",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:4326"
+    ],
+    "max_zoom": 16,
+    "empty_tile": "transparent",
+    "licence": "CC BY 4.0: data.gov.lt dataset 2643",
+    "attribution": "Lietuvos geologijos tarnyba (Lithuanian Geological Survey), CC BY 4.0",
+    "status": "to_check",
+    "notes": "TO_CHECK: same licence question and watermark as geology_lgt_lithuania_quaternary_200k (data.gov.lt dataset 2643). x"
+  },
+  {
     "id": "geology_bgs_625k",
     "name": "BGS 1/625 000",
     "provider": "British Geological Survey",
@@ -1368,6 +1489,37 @@
     "licence": "CC BY 4.0 - https://creativecommons.org/licenses/by/4.0/ (WMS AccessConstraints + https://gsi.ie/data-and-maps/ \"GSI Data Licence Agreement\")",
     "attribution": "Contains Irish Public Sector Data (Geological Survey Ireland) licensed under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence",
     "status": "verified"
+  },
+  {
+    "id": "geology_sgl_luxembourg_350k",
+    "name": "Luxembourg surface geology 1:350 000 (INSPIRE)",
+    "provider": "Service géologique de l'État (Administration des ponts et chaussées) via geoportail.lu",
+    "area": [
+      5.71,
+      49.44,
+      6.56,
+      50.2
+    ],
+    "level": "N2",
+    "source_scale": 350000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://wms.inspire.geoportail.lu/geoserver/ge/wms",
+    "layers": "GE.surfaceGeology",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 16,
+    "empty_tile": "transparent",
+    "licence": "CC BY 4.0: INSPIRE metadata a1b2ebe7-0ad1-42b8-b209-919a472f2dc6 (catalog.inspire.geoportail.lu) 'Creative Commons Attribution 4.0 International (CC BY 4.0)'; data.public.lu dataset 5d00d7c40f7fb07999ed1c4d licence cc-by; WMS AccessConstraints 'No restrictions apply', Fees 'No fees apply.'",
+    "attribution": "Service géologique de l'État du Luxembourg, CC BY 4.0",
+    "status": "verified",
+    "notes": "INSPIRE GeologicUnit surfaceGeology layer (default style = INSPIRE lithology colours), whole country. 0.1-0.2 s per tile."
   },
   {
     "id": "geology_spw_wallonie_25k",
