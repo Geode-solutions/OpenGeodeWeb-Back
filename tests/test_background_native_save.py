@@ -228,11 +228,12 @@ def test_failed_native_save_aborts_load(
 
 
 def test_concurrent_imports_save_in_parallel(client: FlaskClient, native_save: NativeSave) -> None:
-    """(e) Two imports issued concurrently run their native saves in parallel."""
-    first = _import(client, native_save)
-    second = _import(client, native_save)
-    for import_call in (first, second):
-        assert import_call.result().status_code == 200
+    """(e) Two imports run their native saves in parallel."""
+    # One import after the other: each answers while its native save is blocked, so both saves
+    # are pending at once. Concurrent requests would write the SQLite database from two threads
+    # at once, which corrupts it on Windows CI
+    for _ in range(2):
+        assert _import(client, native_save).result().status_code == 200
     assert native_save.wait_entered(2), "both native saves should run at once"
     native_save.release.set()
     with client.application.app_context():
