@@ -1,0 +1,41 @@
+name: Geology sources
+
+# The geology map relies on dozens of survey servers: each night one real tile per shipped
+# source is fetched, so a server that moved or died is known before a user meets it
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 4 * * *
+
+permissions:
+  contents: read
+
+jobs:
+  network:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      # Actions pinned by commit: a moved tag cannot change what runs here
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.14"
+      - name: Install
+        run: |
+          pip install -r requirements.txt
+          pip install . pytest
+      - name: One tile per shipped geology source
+        run: pytest -m network tests/test_basemap_geology.py -rf
+      - name: Notify Slack
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          [ -n "$SLACK_WEBHOOK_URL" ] || exit 0
+          jq -n --arg url "$RUN_URL" \
+            '{text: ("Geology basemap: a survey server no longer serves its tiles. " + $url)}' \
+            | curl --fail --silent --show-error -X POST -H "Content-Type: application/json" \
+              --data @- "$SLACK_WEBHOOK_URL"
