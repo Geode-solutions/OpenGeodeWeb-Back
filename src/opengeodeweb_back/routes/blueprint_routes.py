@@ -783,6 +783,114 @@ def model_component_polyhedron_attribute_range(
     )
 
 
+def _element_attribute_managers(
+    mesh: og.VertexSet,
+) -> list[tuple[str, og.AttributeManager]]:
+    """Attribute managers of a component mesh, its elements before its vertices."""
+    managers: list[tuple[str, og.AttributeManager]] = []
+    for element_type in ("polyhedron", "polygon", "edge"):
+        method = getattr(mesh, f"{element_type}_attribute_manager", None)
+        if method is not None:
+            managers.append((element_type, method()))
+    managers.append(("vertex", mesh.vertex_attribute_manager()))
+    return managers
+
+
+def _physical_property_component(
+    component_id: og.uuid,
+    attribute_manager: og.AttributeManager,
+    attribute_id: og.uuid,
+    nb_items: int,
+) -> schemas.model_physical_properties.Component:
+    min_values: list[float | None] = []
+    max_values: list[float | None] = []
+    no_data = False
+    for item_index in range(nb_items):
+        values, has_nan = _extract_valid_values_from_attribute(
+            attribute_manager, attribute_id, item_index
+        )
+        no_data = no_data or has_nan
+        # An item without any value (e.g. a free displacement axis) is None: NaN is not JSON
+        min_values.append(min(values) if values else None)
+        max_values.append(max(values) if values else None)
+    return schemas.model_physical_properties.Component(
+        geode_id=component_id.string(),
+        min_values=min_values,
+        max_values=max_values,
+        no_data=no_data,
+    )
+
+
+def _physical_property(
+    model: GeodeBRep,
+    name: og.PhysicalPropertyName,
+) -> schemas.model_physical_properties.PhysicalProperty | None:
+    """The components carrying a physical property, with their value range per item.
+
+    The attribute is searched on the element managers first, then on the vertices: the
+    physical property only records the component type, not the mesh element.
+    """
+    info = model.brep.physical_property_info(name)
+    component_type = info.component_type.get()
+    attribute_id = info.attribute_id
+    element_type: str | None = None
+    attribute_name = ""
+    nb_items = 1
+    components: list[schemas.model_physical_properties.Component] = []
+    for registry_type, component_ids in model.mesh_components().items():
+        if registry_type.get() != component_type:
+            continue
+        for component_id in component_ids:
+            component = model.component(component_id)
+            if not isinstance(component, ComponentMesh):
+                continue
+            for element, attribute_manager in _element_attribute_managers(component.mesh()):
+                attribute = attribute_manager.find_generic_attribute(attribute_id)
+                if attribute is None:
+                    continue
+                if element_type is None:
+                    element_type = element
+                    attribute_name = attribute.name() or name.name
+                    nb_items = attribute.nb_items()
+                components.append(
+                    _physical_property_component(
+                        component_id, attribute_manager, attribute_id, nb_items
+                    )
+                )
+                break
+    if element_type is None:
+        return None
+    return schemas.model_physical_properties.PhysicalProperty(
+        name=name.name,
+        component_type=component_type,
+        attribute_id=attribute_id.string(),
+        attribute_name=attribute_name,
+        element_type=element_type,
+        nb_items=nb_items,
+        components=components,
+    )
+
+
+@typed_route(routes, schemas.model_physical_properties_route)
+def model_physical_properties(
+    params: schemas.ModelPhysicalProperties,
+) -> schemas.ModelPhysicalPropertiesResponse:
+    """Physical properties of a model and the values of the components carrying them."""
+    geode_object = geode_functions.load_geode_object(params.id)
+    if not isinstance(geode_object, GeodeModel):
+        flask.abort(400, f"{params.id} is not a GeodeModel")
+    physical_properties: list[schemas.model_physical_properties.PhysicalProperty] = []
+    # Only BReps (and the models built on them) carry physical properties
+    if isinstance(geode_object, GeodeBRep):
+        for name in og.PhysicalPropertyName:
+            if not geode_object.brep.has_physical_property(name):
+                continue
+            physical_property = _physical_property(geode_object, name)
+            if physical_property is not None:
+                physical_properties.append(physical_property)
+    return schemas.ModelPhysicalPropertiesResponse(physical_properties=physical_properties)
+
+
 @typed_route(routes, schemas.horizon_stack_info_route)
 def horizon_stack_info(params: schemas.HorizonStackInfo) -> schemas.HorizonStackInfoResponse:
     """Horizons and stratigraphic units of a horizon stack, top to bottom."""
