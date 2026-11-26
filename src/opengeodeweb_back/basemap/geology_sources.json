@@ -140,10 +140,12 @@
       "CRS:84",
       "EPSG:4326"
     ],
+    "max_zoom": 13,
     "empty_tile": "transparent",
     "licence": "Creative Commons BY 4.0 (https://creativecommons.org/licenses/by/4.0/), per EGDI metadata record 5729ffdf-2558-48fc-a5d2-645a0a010855",
     "attribution": "EGDI 1:1M Surface Geology © EuroGeoSurveys and the European geological surveys, CC BY 4.0; Malta: Continental Shelf Department, Ministry for Transport and Infrastructure",
-    "status": "verified"
+    "status": "verified",
+    "notes": "A 1:1 000 000 map: past zoom 13 the server draws no more detail. Capping the zoom halves the WMS requests to this slow server (about 0.5 to 3 s per tile, and 10 s timeouts under load, e.g. 3 of 24 tiles in Spain). No Croatian units: tiles over Croatia are empty."
   },
   {
     "id": "geology_bgs_625k",
