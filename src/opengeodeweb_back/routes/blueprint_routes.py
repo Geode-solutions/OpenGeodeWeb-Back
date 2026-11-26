@@ -45,7 +45,6 @@ from opengeodeweb_back.typed_route import parse_params, raw_route, typed_route
 
 if TYPE_CHECKING:
     from opengeodeweb_microservice.database.data_types import GeodeObjectType
-    from sqlalchemy.orm import Session
     from werkzeug.datastructures import FileStorage
 
 
@@ -917,24 +916,11 @@ def _open_project_database(project_folder: Path) -> list[Data]:
 
     try:
         with get_session() as session:
-            _refresh_viewer_types(session)
             return session.query(Data).all()
     except OperationalError:
         connection.init_database(database_root_path, create_tables=True)
         with get_session() as session:
-            _refresh_viewer_types(session)
             return session.query(Data).all()
-
-
-def _refresh_viewer_types(session: Session) -> None:
-    # Projects keep the viewer types of the version that saved them
-    for data in session.query(Data).all():
-        geode_object_class = geode_objects.get(data.geode_object_type)
-        if geode_object_class is None:
-            continue
-        data.viewer_object_type = geode_object_class.viewer_object_type()
-        data.viewer_elements_type = geode_object_class.viewer_elements_type()
-    session.commit()
 
 
 def _regenerate_missing_viewables(rows: list[Data]) -> None:

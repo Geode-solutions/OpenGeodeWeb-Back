@@ -715,63 +715,6 @@ def test_import_project_route(client: FlaskClient, tmp_path: Path) -> None:
     client.application.config["DATA_FOLDER_PATH"] = original_data_folder
 
 
-def test_import_project_refreshes_viewer_types(client: FlaskClient, tmp_path: Path) -> None:
-    # Projects saved before raster images became "image" viewer objects store them as "mesh"
-    rows = [
-        ("legacy_raster2d", "RasterImage2D", "mesh", "polygons"),
-        ("legacy_raster3d", "RasterImage3D", "mesh", "polyhedra"),
-        ("surface", "TriangulatedSurface3D", "mesh", "polygons"),
-        ("brep", "BRep", "model", "default"),
-    ]
-    project_db = tmp_path / "legacy_project.db"
-    with contextlib.closing(sqlite3.connect(project_db)) as legacy_connection:
-        legacy_connection.execute(
-            "CREATE TABLE datas (id TEXT PRIMARY KEY, geode_id TEXT, geode_object_type TEXT, "
-            "viewer_object_type TEXT, viewer_elements_type TEXT, native_file TEXT, "
-            "viewable_file TEXT, light_viewable_file TEXT)"
-        )
-        legacy_connection.executemany(
-            "INSERT INTO datas (id, geode_id, geode_object_type, viewer_object_type, "
-            "viewer_elements_type) VALUES (?, 'geode_id', ?, ?, ?)",
-            rows,
-        )
-        legacy_connection.commit()
-    vease = tmp_path / "legacy_project.vease"
-    with zipfile.ZipFile(vease, "w") as zip_archive:
-        zip_archive.writestr("snapshot.json", json.dumps({}))
-        zip_archive.write(project_db, "project.db")
-
-    original_data_folder = client.application.config["DATA_FOLDER_PATH"]
-    client.application.config["DATA_FOLDER_PATH"] = str(tmp_path / "project_data")
-    try:
-        with vease.open("rb") as file:
-            response = client.post(
-                "/opengeodeweb_back/import_project",
-                data={"file": (file, "legacy_project.vease")},
-                content_type="multipart/form-data",
-            )
-        assert response.status_code == 200
-        imported_db = tmp_path / "project_data" / "project.db"
-        with contextlib.closing(sqlite3.connect(imported_db)) as imported_connection:
-            types = {
-                row[0]: (row[1], row[2])
-                for row in imported_connection.execute(
-                    "SELECT id, viewer_object_type, viewer_elements_type FROM datas"
-                )
-            }
-    finally:
-        client.application.config["DATA_FOLDER_PATH"] = original_data_folder
-        connection.close_database()
-        connection.init_database(Path(os.environ["TEST_DB_PATH"]), create_tables=True)
-
-    assert types == {
-        "legacy_raster2d": ("image", "polygons"),
-        "legacy_raster3d": ("image", "polyhedra"),
-        "surface": ("mesh", "polygons"),
-        "brep": ("model", "default"),
-    }
-
-
 @pytest.mark.usefixtures("closed_database")
 def test_ping_while_project_database_is_closed(client: FlaskClient) -> None:
     # The client keeps pinging while import_project has the database closed
