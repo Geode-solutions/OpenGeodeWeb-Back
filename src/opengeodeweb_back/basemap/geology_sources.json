@@ -1,5 +1,36 @@
 [
   {
+    "id": "geology_brgm_charm50",
+    "name": "BRGM 1/50 000 harmonised (BD Charm-50)",
+    "provider": "BRGM",
+    "area": [
+      -5.50071,
+      41.2448,
+      11.0344,
+      51.1211
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "wms",
+    "url": "https://geoservices.brgm.fr/geologie",
+    "layers": "SCAN_H_GEOL50_SCAN",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 16,
+    "empty_tile": "transparent",
+    "licence": "Open data, no conditions apply to access and use (BRGM metadata record 94636790-8615-11dc-9e02-0050568151b7, geocatalogue.fr)",
+    "attribution": "© BRGM",
+    "status": "verified",
+    "notes": "Vectorised and harmonised 1:50 000 maps: continuous over metropolitan France, unlike the scanned sheets of geology_brgm_50k, which have gaps (e.g. 3.0E 45.5N). Listed before it so it is tried first. The layer renders from 1:9 000 to 1:251 000 (WMS ScaleDenominator): tiles are empty past zoom 16, so max_zoom is 16."
+  },
+  {
     "id": "geology_brgm_50k",
     "name": "BRGM 1/50 000",
     "provider": "BRGM via Géoplateforme",
@@ -25,7 +56,8 @@
     "empty_tile": "#ffffff",
     "licence": "Licence Ouverte Etalab 2.0",
     "attribution": "© BRGM",
-    "status": "verified"
+    "status": "verified",
+    "notes": "Scanned paper sheets (BD Scan-Géol-50): sheets missing from the scan leave white gaps (e.g. 3.0E 45.5N). Fallback behind geology_brgm_charm50."
   },
   {
     "id": "geology_brgm_250k",
@@ -53,7 +85,8 @@
     "empty_tile": "#ffffff",
     "licence": "Licence Ouverte Etalab 2.0",
     "attribution": "© BRGM",
-    "status": "verified"
+    "status": "verified",
+    "notes": "Few 1:250 000 sheets exist: the tiles are white (no data) over most of France, e.g. Clermont-Ferrand, Orléans and 3.0E 45.5N. There, the tiles fall back to geology_brgm_1m."
   },
   {
     "id": "geology_brgm_1m",

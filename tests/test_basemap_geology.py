@@ -378,6 +378,8 @@ def test_layers_without_scale_windows_keep_one_source_per_mosaic(
 
 # A tile with data of every shipped geology source, z/x/y in Web Mercator
 KNOWN_TILES = {
+    # 3.0E 45.5N: a gap of the scanned 1:50 000 sheets, served by the harmonised maps
+    "geology_brgm_charm50": (13, 4164, 2930),
     "geology_brgm_50k": (13, 4164, 2922),
     "geology_brgm_250k": (10, 518, 352),
     "geology_brgm_1m": (8, 129, 88),
