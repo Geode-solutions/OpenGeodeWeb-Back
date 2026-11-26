@@ -2001,6 +2001,122 @@
     "notes": "TO_CHECK, not tested: the downloadable version (DP ME 43) comes with its own licence agreement that the user must accept; no open licence is named on the ArcGIS service. Read that agreement, or find the copy on data.novascotia.ca and its licence, before verifying."
   },
   {
+    "id": "geology_ags_1m",
+    "name": "AGS Bedrock Geology of Alberta 1:1 000 000 (Map 600)",
+    "provider": "Alberta Geological Survey (Alberta Energy Regulator)",
+    "area": [
+      -120.0,
+      48.99,
+      -110.0,
+      60.0
+    ],
+    "level": "N1",
+    "source_scale": 1000000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "xyz",
+    "url": "https://tiles.arcgis.com/tiles/jQV6VMr2Loovu7GU/arcgis/rest/services/Bedrock_Geology_1M_Map_600_No_Labels_NEW/MapServer/tile/{z}/{y}/{x}",
+    "layers": null,
+    "styles": null,
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 12,
+    "empty_tile": "transparent",
+    "licence": "Open Government Licence - Alberta (https://open.alberta.ca/licence: 'licence to use the Information, including for commercial purposes'): service copyrightText 'Acknowledgement of the Alberta Energy Regulator/Alberta Geological Survey as the originator/source of this information is required as described in the Open Government License – Alberta'; AGS copyright statement https://ags.aer.ca/node/19655",
+    "attribution": "Contains information licensed under the Open Government Licence – Alberta. Source: Alberta Energy Regulator / Alberta Geological Survey",
+    "status": "verified",
+    "notes": "Cached ArcGIS Online tile service (Web Mercator, levels 0-12) of AGS Map 600, without labels. 0.4-0.6 s per tile; transparent PNG outside Alberta. Published in the AGS ArcGIS organisation but owned by a staff account and named _NEW: the URL may change. The detailed AGS polygons exist only as a FeatureServer."
+  },
+  {
+    "id": "geology_gsnl_nf_detailed",
+    "name": "GSNL Newfoundland detailed bedrock geology",
+    "provider": "Geological Survey of Newfoundland and Labrador",
+    "area": [
+      -59.42,
+      46.61,
+      -52.61,
+      52.02
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "export",
+    "url": "https://dnrmaps.gov.nl.ca/arcgis/rest/services/GeoAtlas/Bedrock_Geology_All/MapServer/export?bbox={bbox}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&f=image&layers=show:19",
+    "layers": "show:19",
+    "styles": null,
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 16,
+    "empty_tile": "transparent",
+    "licence": "Not stated for the GeoAtlas services; the GSNL disclaimer (https://www.gov.nl.ca/em/mines/geoscience/reports-maps/disclaimer/) says 'The purchaser agrees not to provide a digital reproduction or copy of this product to a third party'",
+    "attribution": "© Government of Newfoundland and Labrador, Geological Survey",
+    "status": "to_check",
+    "notes": "TO_CHECK: no licence named, and the GSNL disclaimer forbids giving digital copies to third parties. Ask GeoscienceOnline@gov.nl.ca. Technically fine: layer 19 'Newfoundland Detailed Bedrock Geology' (island only, scale assumed ~1:50k), 0.6-0.8 s per tile."
+  },
+  {
+    "id": "geology_gsnl_selab",
+    "name": "GSNL SE Labrador bedrock geology",
+    "provider": "Geological Survey of Newfoundland and Labrador",
+    "area": [
+      -60.5,
+      51.4,
+      -55.54,
+      55.22
+    ],
+    "level": "N2",
+    "source_scale": 100000,
+    "min_scale": 0,
+    "max_scale": 200000,
+    "protocol": "export",
+    "url": "https://dnrmaps.gov.nl.ca/arcgis/rest/services/GeoAtlas/Bedrock_Geology_All/MapServer/export?bbox={bbox}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&f=image&layers=show:16",
+    "layers": "show:16",
+    "styles": null,
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 15,
+    "empty_tile": "transparent",
+    "licence": "Not stated for the GeoAtlas services; the GSNL disclaimer (https://www.gov.nl.ca/em/mines/geoscience/reports-maps/disclaimer/) says 'The purchaser agrees not to provide a digital reproduction or copy of this product to a third party'",
+    "attribution": "© Government of Newfoundland and Labrador, Geological Survey",
+    "status": "to_check",
+    "notes": "TO_CHECK: same licence gap as geology_gsnl_nf_detailed. Layer 16, SE Labrador only, scale assumed."
+  },
+  {
+    "id": "geology_gsnl_1m",
+    "name": "GSNL Bedrock Geology 1:1 000 000",
+    "provider": "Geological Survey of Newfoundland and Labrador",
+    "area": [
+      -67.81,
+      46.61,
+      -52.61,
+      60.38
+    ],
+    "level": "N1",
+    "source_scale": 1000000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "export",
+    "url": "https://dnrmaps.gov.nl.ca/arcgis/rest/services/GeoAtlas/Bedrock_Geology_All/MapServer/export?bbox={bbox}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&f=image&layers=show:23",
+    "layers": "show:23",
+    "styles": null,
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 12,
+    "empty_tile": "transparent",
+    "licence": "Not stated for the GeoAtlas services; the GSNL disclaimer (https://www.gov.nl.ca/em/mines/geoscience/reports-maps/disclaimer/) says 'The purchaser agrees not to provide a digital reproduction or copy of this product to a third party'",
+    "attribution": "© Government of Newfoundland and Labrador, Geological Survey",
+    "status": "to_check",
+    "notes": "TO_CHECK: same licence gap. Layer 23, all of Newfoundland and Labrador, 0.6-1.8 s per tile."
+  },
+  {
     "id": "geology_gsc_canada_5m",
     "name": "Geological map of Canada (1860A)",
     "provider": "Natural Resources Canada – Geological Survey of Canada",
@@ -2331,6 +2447,65 @@
     "attribution": "Servicio Geológico Colombiano",
     "status": "to_check",
     "notes": "Licence contradicts commercial use. SGC general terms grant a non-exclusive, non-transferable use licence for a specific purpose. They also say the licensee shall not commercialize or exchange the data without written authorization from SGC (read in web search summary; PDF not fetched directly). Technically OK: ArcGIS WMS 1.3.0, WMS layer '3' = 'Unidades Cronoestratigráficas', 1:500k, GetMap 1-2 s. EPSG:3857 works but is not advertised. Test site Bogotá (lon -74.07, lat 4.6), good tile z9/150/249."
+  },
+  {
+    "id": "geology_ntgs_250k",
+    "name": "NTGS Geology 1:250 000 mosaic",
+    "provider": "Northern Territory Geological Survey",
+    "area": [
+      129.0,
+      -26.0,
+      138.0,
+      -10.833333
+    ],
+    "level": "N2",
+    "source_scale": 250000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://geoscience.nt.gov.au/erdas-iws/ogc/wms/GIWS_NT",
+    "layers": "NT_NT_Geology_250K_Mosaics.ecw",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:4326"
+    ],
+    "max_zoom": 13,
+    "empty_tile": "transparent",
+    "licence": "CC BY 4.0: GIWS_NT WMS GetCapabilities abstract 'all material in this publication is provided under a Creative Commons Attribution 4.0 International licence. You are free to re-use the work under the licence, on the condition that you attribute the Northern Territory of Australia (Northern Territory Geological Survey)'",
+    "attribution": "© Northern Territory of Australia (Northern Territory Geological Survey), CC BY 4.0",
+    "status": "verified",
+    "notes": "ERDAS APOLLO WMS 1.3.0 (Geophysical Image Web Server): raster mosaic of the scanned 1:250 000 geology sheets, the whole NT, printed map with labels and symbols. EPSG:4326 only. 1.1-2.6 s per tile, 40-200 KB tiles. About 20 m per pixel: max_zoom 13."
+  },
+  {
+    "id": "geology_ntgs_2500k",
+    "name": "NTGS Geology 1:2 500 000",
+    "provider": "Northern Territory Geological Survey",
+    "area": [
+      129.0,
+      -26.0,
+      138.0,
+      -10.833333
+    ],
+    "level": "N1",
+    "source_scale": 2500000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "wms",
+    "url": "https://strike.nt.gov.au/wms",
+    "layers": "Geology%202.5M",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 12,
+    "empty_tile": "transparent",
+    "licence": "CC BY 4.0: NTLIS metadata 2DBCB771210C06B6E040CD9B0F274EFE 'Northern Territory Geological Map (Interp) 2500K' ('all material in this publication is provided under a Creative Commons Attribution 4.0 International licence'); data.nt.gov.au licence cc-by",
+    "attribution": "© Northern Territory of Australia (Northern Territory Geological Survey), CC BY 4.0",
+    "status": "verified",
+    "notes": "STRIKE ArcGIS WMS 1.3.0, layer 'Geology 2.5M' (the space is URL-encoded in layers). Interpreted (solid) geology of the whole NT, no Web Mercator. About 1.5 s per tile. A 1:2.5M map: max_zoom 12."
   },
   {
     "id": "geology_gsnsw_seamless",

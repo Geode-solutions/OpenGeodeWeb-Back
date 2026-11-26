@@ -420,6 +420,9 @@ KNOWN_TILES = {
     "geology_segemar_250k": (10, 315, 608),
     "geology_segemar_2500k": (6, 19, 38),
     "geology_inegi_rocas": (8, 55, 111),
+    "geology_ntgs_250k": (11, 1785, 1162),
+    "geology_ntgs_2500k": (9, 446, 290),
+    "geology_ags_1m": (9, 91, 170),
     "geology_gsnsw_seamless": (10, 936, 612),
     "geology_gsq_detailed_100k": (10, 928, 570),
 }
