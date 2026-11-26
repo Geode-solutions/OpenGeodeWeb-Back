@@ -19,17 +19,27 @@ class Source:
     url_template: str
     max_zoom: int
     attribution: str
-    # Scale window where the source is used, in scale denominators: geology sources only
+    # A tile-by-tile layer asks a source only for the tiles of its scale window (in scale
+    # denominators) and of its Web Mercator area (None for the whole world)
     min_scale: float = 0.0
     max_scale: float = math.inf
-    # Scale of the data, geology sources only: the most detailed source is tried first
-    source_scale: float | None = None
-    # Web Mercator extent the source covers, None for the whole world
     area_3857: tuple[float, float, float, float] | None = None
+    # Scale of the data, None when unknown
+    source_scale: float | None = None
     # How the server says it has no data: a 404, a transparent tile or a plain colour tile
     empty_tile: str = "404"
-    # WMS only: the CRS of the GetMap bounding box
-    wms_crs: str | None = None
+    # Sources asked by bounding box (WMS, map server export): the CRS of their {bbox}
+    bbox_crs: str | None = None
+
+
+@dataclass(frozen=True)
+class Layer:
+    """The sources of one layer of a map, the preferred first."""
+
+    sources: tuple[str, ...]
+    # False: the first source serving any tile draws the whole layer, one style per mosaic.
+    # True: each tile takes the first source whose scale window and area hold it and that serves it
+    tile_by_tile: bool = False
 
 
 _GEOPLATEFORME = (
@@ -67,16 +77,6 @@ SOURCES: dict[str, Source] = {
     ),
 }
 
-# The layers of each map, from the bottom up. A layer draws the first of its sources serving a
-# tile: the next one is only fetched when it serves none
-MAPS: dict[str, tuple[tuple[str, ...], ...]] = {
-    # The IGN covers the world imagery or map where it has tiles (France)
-    "satellite": (("eox_s2cloudless_2016",), ("ign_orthophotos",)),
-    "plan": (("osm",), ("ign_plan",)),
-    # Transparent: both sources would draw the same roads twice, EOX outside France
-    "routes": (("ign_roads", "eox_overlay"),),
-}
-
 
 def _geology_sources() -> dict[str, Source]:
     # Imported here: the registry builds Source objects of this module
@@ -87,14 +87,18 @@ def _geology_sources() -> dict[str, Source]:
 
 _GEOLOGY = _geology_sources()
 SOURCES.update(_GEOLOGY)
-# The fallback order of the geology map, the most detailed first
+# The geology sources, the most detailed first
 GEOLOGY_SOURCES: tuple[str, ...] = tuple(_GEOLOGY)
-# Under the roads: they stay readable over the geology. One layer filled tile by tile
-MAPS = {
-    "satellite": MAPS["satellite"],
-    "plan": MAPS["plan"],
-    "geology": (GEOLOGY_SOURCES,),
-    "routes": MAPS["routes"],
+
+# The layers of each map, from the bottom up
+MAPS: dict[str, tuple[Layer, ...]] = {
+    # The IGN covers the world imagery or map where it has tiles (France)
+    "satellite": (Layer(("eox_s2cloudless_2016",)), Layer(("ign_orthophotos",))),
+    "plan": (Layer(("osm",)), Layer(("ign_plan",))),
+    # Under the roads, which stay readable over it. Each survey fills the tiles it serves
+    "geology": (Layer(GEOLOGY_SOURCES, tile_by_tile=True),),
+    # Transparent: both sources would draw the same roads twice, EOX outside France
+    "routes": (Layer(("ign_roads", "eox_overlay")),),
 }
 
 
@@ -117,7 +121,7 @@ def sorted_maps(maps: Iterable[str]) -> list[str]:
 def map_layers(maps: list[str], served: Container[str]) -> dict[str, list[str]]:
     """The served sources of each sorted map, from the bottom up: maps without any are left out."""
     layers = {
-        name: [source for layer in MAPS[name] for source in layer if source in served]
+        name: [source for layer in MAPS[name] for source in layer.sources if source in served]
         for name in maps
     }
     return {name: sources for name, sources in layers.items() if sources}

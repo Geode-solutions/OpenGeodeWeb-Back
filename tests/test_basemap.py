@@ -97,11 +97,16 @@ def test_fetch_and_save_tiles(tmp_path: Path) -> None:
 
 
 def test_fetch_layers_downloads_every_layer(local_tiles: Path) -> None:
-    images = basemap_tiles.fetch_layers([("ign_orthophotos",), ("ign_roads",)], WHOLE_WORLD)
+    images = basemap_tiles.fetch_layers(
+        [basemap_providers.Layer(("ign_orthophotos",)), basemap_providers.Layer(("ign_roads",))],
+        WHOLE_WORLD,
+    )
     assert list(images) == ["ign_orthophotos", "ign_roads"]
     assert all(all(source.values()) for source in images.values())
     # The next source of a layer is not fetched while the first one serves tiles
-    assert list(basemap_tiles.fetch_layers([("osm", "eox_overlay")], WHOLE_WORLD)) == ["osm"]
+    assert list(
+        basemap_tiles.fetch_layers([basemap_providers.Layer(("osm", "eox_overlay"))], WHOLE_WORLD)
+    ) == ["osm"]
     assert not (local_tiles / "eox_overlay").exists()
 
 
@@ -513,7 +518,7 @@ def test_requests_to_one_host_are_limited(monkeypatch: pytest.MonkeyPatch) -> No
     monkeypatch.setattr(urllib.request, "urlopen", slow)
     _serve(monkeypatch, Path("/nonexistent"), "https://tiles.example/{z}/{x}/{y}.png")
     sources = ["ign_orthophotos", "ign_roads", "osm"]
-    layers = [(source,) for source in sources]
+    layers = [basemap_providers.Layer((source,)) for source in sources]
     basemap_tiles.fetch_layers(layers, basemap_tiles.TileRange(4, 0, 3, 0, 3))
     assert peak["tiles.example"] == basemap_tiles.MAX_REQUESTS_PER_HOST
 

@@ -111,7 +111,7 @@ WMS_ENTRY = {
 
 def test_wms_source_asks_web_mercator_when_served(tmp_path: Path) -> None:
     wms = geology_registry.load(_registry(tmp_path, WMS_ENTRY))["geology_wms"]
-    assert wms.wms_crs == "EPSG:3857"
+    assert wms.bbox_crs == "EPSG:3857"
     assert wms.url_template.startswith("https://wms.test/geology?SERVICE=WMS&VERSION=1.3.0")
     assert "REQUEST=GetMap&LAYERS=GEOLOGY&STYLES=&CRS=EPSG:3857&BBOX={bbox}" in wms.url_template
     assert "WIDTH=256&HEIGHT=256&FORMAT=image/png&TRANSPARENT=TRUE" in wms.url_template
@@ -119,7 +119,7 @@ def test_wms_source_asks_web_mercator_when_served(tmp_path: Path) -> None:
 
 def test_wms_source_without_web_mercator_asks_crs84(tmp_path: Path) -> None:
     entry = {**WMS_ENTRY, "supported_crs": ["EPSG:4326", "CRS:84"]}
-    assert geology_registry.load(_registry(tmp_path, entry))["geology_wms"].wms_crs == "CRS:84"
+    assert geology_registry.load(_registry(tmp_path, entry))["geology_wms"].bbox_crs == "CRS:84"
     entry = {**WMS_ENTRY, "supported_crs": ["EPSG:2154"]}
     with pytest.raises(geology_registry.RegistryError, match="geology_wms"):
         geology_registry.load(_registry(tmp_path, entry))
@@ -131,21 +131,21 @@ def test_wms_1_1_1_source_asks_srs(tmp_path: Path) -> None:
     assert "VERSION=1.1.1&REQUEST=GetMap" in wms.url_template
     assert "&SRS=EPSG:900913&BBOX={bbox}" in wms.url_template
     # The old name of Web Mercator: same bounding box
-    assert wms.wms_crs == "EPSG:3857"
+    assert wms.bbox_crs == "EPSG:3857"
     entry = {**entry, "supported_crs": ["EPSG:4326"]}
     wms = geology_registry.load(_registry(tmp_path, entry))["geology_wms"]
     assert "&SRS=EPSG:4326&BBOX={bbox}" in wms.url_template
     # WMS 1.1.1 reads EPSG:4326 longitude first, like CRS:84
-    assert wms.wms_crs == "CRS:84"
+    assert wms.bbox_crs == "CRS:84"
     with pytest.raises(geology_registry.RegistryError, match="geology_wms"):
         geology_registry.load(_registry(tmp_path, {**entry, "wms_version": "1.0.0"}))
 
 
-def test_tile_bbox_in_the_wms_crs(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_tile_bbox_in_the_bbox_crs(monkeypatch: pytest.MonkeyPatch) -> None:
     half = basemap_tiles.HALF_WORLD
-    mercator = basemap_providers.Source("u", 15, "a", wms_crs="EPSG:3857")
-    degrees = basemap_providers.Source("u", 15, "a", wms_crs="CRS:84")
-    latitude_first = basemap_providers.Source("u", 15, "a", wms_crs="EPSG:4326")
+    mercator = basemap_providers.Source("u", 15, "a", bbox_crs="EPSG:3857")
+    degrees = basemap_providers.Source("u", 15, "a", bbox_crs="CRS:84")
+    latitude_first = basemap_providers.Source("u", 15, "a", bbox_crs="EPSG:4326")
     monkeypatch.setitem(basemap_providers.SOURCES, "geology_m", mercator)
     monkeypatch.setitem(basemap_providers.SOURCES, "geology_d", degrees)
     monkeypatch.setitem(basemap_providers.SOURCES, "geology_l", latitude_first)
@@ -167,7 +167,7 @@ def test_export_source_keeps_its_template(tmp_path: Path) -> None:
     template = "https://maps.test/server/rest/services/Geology/MapServer/export?bbox={bbox}&bboxSR=3857&size=256,256&f=image"
     entry = {**ENTRY, "id": "geology_export", "protocol": "export", "url": template}
     source = geology_registry.load(_registry(tmp_path, entry))["geology_export"]
-    assert (source.url_template, source.wms_crs) == (template, "EPSG:3857")
+    assert (source.url_template, source.bbox_crs) == (template, "EPSG:3857")
     without_bbox = {**entry, "url": "https://maps.test/MapServer/export?f=image"}
     with pytest.raises(geology_registry.RegistryError, match="geology_export"):
         geology_registry.load(_registry(tmp_path, without_bbox))
@@ -283,6 +283,11 @@ def test_tile_scale_follows_zoom_and_latitude() -> None:
     assert basemap_tiles.tile_scale(9, 148) == pytest.approx(1_091_958 / 2, rel=0.02)
 
 
+GEOLOGY_LAYER = basemap_providers.Layer(
+    ("geology_national", "geology_continental"), tile_by_tile=True
+)
+
+
 def _two_sources(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(tmp_path))
     monkeypatch.delenv("BASEMAP_TILE_URL", raising=False)
@@ -316,7 +321,7 @@ def test_each_tile_takes_the_first_source_serving_it(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     _two_sources(monkeypatch, tmp_path)
-    images = basemap_tiles.fetch_layers([("geology_national", "geology_continental")], WHOLE_WORLD)
+    images = basemap_tiles.fetch_layers([GEOLOGY_LAYER], WHOLE_WORLD)
     # The west column from the national source, the east one from the continental source
     assert sorted(images["geology_national"]) == [(0, 0), (0, 1)]
     assert sorted(images["geology_continental"]) == [(1, 0), (1, 1)]
@@ -334,7 +339,7 @@ def test_a_failing_source_leaves_its_tiles_to_the_next(
         return _Answer(tile)
 
     monkeypatch.setattr(urllib.request, "urlopen", national_down)
-    images = basemap_tiles.fetch_layers([("geology_national", "geology_continental")], WHOLE_WORLD)
+    images = basemap_tiles.fetch_layers([GEOLOGY_LAYER], WHOLE_WORLD)
     assert list(images) == ["geology_continental"]
     assert len(images["geology_continental"]) == 4
 
@@ -348,32 +353,38 @@ def test_out_of_scale_source_is_not_asked(monkeypatch: pytest.MonkeyPatch, tmp_p
         dataclasses.replace(detailed, max_scale=80_000),
     )
     # A whole world view is far coarser than 1/80 000: the continental source alone fills it
-    images = basemap_tiles.fetch_layers([("geology_national", "geology_continental")], WHOLE_WORLD)
+    images = basemap_tiles.fetch_layers([GEOLOGY_LAYER], WHOLE_WORLD)
     assert list(images) == ["geology_continental"]
 
 
 def test_tiles_without_a_source_stay_empty(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     _two_sources(monkeypatch, tmp_path)
     # No world fallback: the east column is left out, and the Viewer shows it transparent
-    images = basemap_tiles.fetch_layers([("geology_national",)], WHOLE_WORLD)
+    images = basemap_tiles.fetch_layers(
+        [basemap_providers.Layer(("geology_national",), tile_by_tile=True)], WHOLE_WORLD
+    )
     assert sorted(images["geology_national"]) == [(0, 0), (0, 1)]
 
 
-def test_layers_without_scale_windows_keep_one_source_per_mosaic(
+def test_a_layer_not_tile_by_tile_keeps_one_source_per_mosaic(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     _two_sources(monkeypatch, tmp_path)
-    monkeypatch.setitem(
-        basemap_providers.SOURCES,
-        "first",
-        basemap_providers.Source("https://a.test/{z}/{x}/{y}.png", 15, "a"),
+    # The same sources, but the layer does not declare a tile by tile fill
+    layer = dataclasses.replace(GEOLOGY_LAYER, tile_by_tile=False)
+    images = basemap_tiles.fetch_layers([layer], WHOLE_WORLD)
+    assert list(images) == ["geology_national"]
+
+
+def test_only_the_geology_map_is_filled_tile_by_tile() -> None:
+    (geology,) = basemap_providers.MAPS["geology"]
+    assert geology == basemap_providers.Layer(basemap_providers.GEOLOGY_SOURCES, tile_by_tile=True)
+    assert not any(
+        layer.tile_by_tile
+        for name, layers in basemap_providers.MAPS.items()
+        if name != "geology"
+        for layer in layers
     )
-    monkeypatch.setitem(
-        basemap_providers.SOURCES,
-        "second",
-        basemap_providers.Source("https://b.test/{z}/{x}/{y}.png", 15, "b"),
-    )
-    assert list(basemap_tiles.fetch_layers([("first", "second")], WHOLE_WORLD)) == ["first"]
 
 
 # A tile with data of every shipped geology source, z/x/y in Web Mercator

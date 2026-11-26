@@ -23,7 +23,6 @@ from typing import TYPE_CHECKING
 
 # Third party imports
 import certifi
-import opengeode_geosciences as og_geosciences
 from PIL import Image, ImageChops
 
 # Local application imports
@@ -34,10 +33,12 @@ from opengeodeweb_back.basemap.basemap_providers import (
     USER_AGENT,
     url_template,
 )
-from opengeodeweb_back.crs.crs_functions import convert_xy_corners
+from opengeodeweb_back.crs.crs_functions import WEB_MERCATOR, WGS84, convert_xy_corners
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
+
+    from opengeodeweb_back.basemap.basemap_providers import Layer
 
 logger = logging.getLogger(__name__)
 
@@ -162,16 +163,10 @@ def tile_range(
     return best
 
 
-WGS84 = og_geosciences.GeographicCoordinateSystemInfo("EPSG", "4326", "WGS 84")
-WEB_MERCATOR = og_geosciences.GeographicCoordinateSystemInfo(
-    "EPSG", "3857", "WGS 84 / Pseudo-Mercator"
-)
-
-
 def tile_bbox(source: str, z: int, x: int, y: int) -> str:
-    """BBOX of a GetMap covering tile z/x/y, in the CRS of the source WMS."""
+    """Bounding box of tile z/x/y in the {bbox} CRS of the source."""
     bounds = TileRange(z, x, x, y, y).bounds_3857()
-    crs = SOURCES[source].wms_crs
+    crs = SOURCES[source].bbox_crs
     if crs is None or crs == "EPSG:3857":
         return ",".join(str(value) for value in bounds)
     # The CRS API converts the corners: no projection written here
@@ -387,9 +382,9 @@ def fetch_tiles(source: str, tiles: TileRange) -> dict[tuple[int, int], bytes | 
 
 
 def _first_served(
-    layer: tuple[str, ...], tiles: TileRange, downloads: ThreadPoolExecutor, deadline: float
+    layer: Layer, tiles: TileRange, downloads: ThreadPoolExecutor, deadline: float
 ) -> tuple[str, dict[tuple[int, int], bytes | None]] | None:
-    for source in layer:
+    for source in layer.sources:
         images = _source_tiles(source, tiles, downloads, deadline)
         if any(images.values()):
             return source, images
@@ -397,12 +392,12 @@ def _first_served(
 
 
 def _each_tile_served(
-    layer: tuple[str, ...], tiles: TileRange, downloads: ThreadPoolExecutor, deadline: float
+    layer: Layer, tiles: TileRange, downloads: ThreadPoolExecutor, deadline: float
 ) -> dict[str, dict[tuple[int, int], bytes | None]]:
     """Each tile from the first source serving it, the sources in the layer order."""
     missing = set(tiles.tiles())
     served: dict[str, dict[tuple[int, int], bytes | None]] = {}
-    for source in layer:
+    for source in layer.sources:
         wanted = sorted(tile for tile in missing if eligible(source, tiles.z, tile))
         if not wanted:
             continue
@@ -418,13 +413,8 @@ def _each_tile_served(
     return served
 
 
-def _filled_tile_by_tile(layer: tuple[str, ...]) -> bool:
-    # Geology sources have a scale window: each tile takes its own source
-    return any(math.isfinite(SOURCES[source].max_scale) for source in layer)
-
-
 def fetch_layers(
-    layers: list[tuple[str, ...]], tiles: TileRange
+    layers: list[Layer], tiles: TileRange
 ) -> dict[str, dict[tuple[int, int], bytes | None]]:
     """The tiles of each layer by source: the first source serving any, or tile by tile.
 
@@ -436,8 +426,8 @@ def fetch_layers(
         ThreadPoolExecutor(max(1, len(layers))) as executor,
     ):
 
-        def fetch(layer: tuple[str, ...]) -> dict[str, dict[tuple[int, int], bytes | None]]:
-            if _filled_tile_by_tile(layer):
+        def fetch(layer: Layer) -> dict[str, dict[tuple[int, int], bytes | None]]:
+            if layer.tile_by_tile:
                 return _each_tile_served(layer, tiles, downloads, deadline)
             first = _first_served(layer, tiles, downloads, deadline)
             return {} if first is None else dict([first])

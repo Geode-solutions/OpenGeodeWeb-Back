@@ -103,7 +103,7 @@ def build(params: schemas.Build) -> schemas.BuildResponse:
     maps = basemap_providers.sorted_maps(map_.value for map_ in params.maps)
     fetched = [layer for name in maps for layer in basemap_providers.MAPS[name]]
     try:
-        tiles = _tile_range(params, crs, [source for layer in fetched for source in layer])
+        tiles = _tile_range(params, crs, [source for layer in fetched for source in layer.sources])
         images = basemap_tiles.fetch_layers(fetched, tiles)
         # Outside France the IGN sources have no tile: the others still make the map
         layers = basemap_providers.map_layers(maps, images)

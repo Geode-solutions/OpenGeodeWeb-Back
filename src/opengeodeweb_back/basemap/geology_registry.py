@@ -6,12 +6,9 @@ import re
 from pathlib import Path
 from typing import Any
 
-# Third party imports
-import opengeode_geosciences as og_geosciences
-
 # Local application imports
 from opengeodeweb_back.basemap.basemap_providers import Source
-from opengeodeweb_back.crs.crs_functions import convert_xy_corners
+from opengeodeweb_back.crs.crs_functions import WEB_MERCATOR, WGS84, convert_xy_corners
 
 REGISTRY_PATH = Path(__file__).parent / "geology_sources.json"
 ID_PREFIX = "geology_"
@@ -36,10 +33,6 @@ REQUIRED = (
     "min_scale",
     "max_scale",
     "source_scale",
-)
-WGS84 = og_geosciences.GeographicCoordinateSystemInfo("EPSG", "4326", "WGS 84")
-WEB_MERCATOR = og_geosciences.GeographicCoordinateSystemInfo(
-    "EPSG", "3857", "WGS 84 / Pseudo-Mercator"
 )
 
 
@@ -134,7 +127,7 @@ def _url(entry: dict[str, Any]) -> tuple[str, str | None]:
 
 
 def _source(entry: dict[str, Any]) -> Source:
-    url_template, wms_crs = _url(entry)
+    url_template, bbox_crs = _url(entry)
     bbox_protocol = entry["protocol"] in ("wms", "export")
     return Source(
         url_template=url_template,
@@ -145,7 +138,7 @@ def _source(entry: dict[str, Any]) -> Source:
         source_scale=entry["source_scale"],
         area_3857=_area_3857(entry.get("area")),
         empty_tile=entry.get("empty_tile", "404"),
-        wms_crs=wms_crs,
+        bbox_crs=bbox_crs,
     )
 
 
