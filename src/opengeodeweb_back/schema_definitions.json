@@ -113,6 +113,13 @@
     "minLength": 36,
     "maxLength": 36
   },
+  "GeodeImageType": {
+    "type": "string",
+    "enum": [
+      "RasterImage2D",
+      "RasterImage3D"
+    ]
+  },
   "GeodeMeshType": {
     "type": "string",
     "enum": [
@@ -122,14 +129,12 @@
       "PointSet3D",
       "EdgedCurve2D",
       "EdgedCurve3D",
-      "RasterImage2D",
       "PolygonalSurface2D",
       "PolygonalSurface3D",
       "TriangulatedSurface2D",
       "TriangulatedSurface3D",
       "RegularGrid2D",
       "LightRegularGrid2D",
-      "RasterImage3D",
       "PolyhedralSolid3D",
       "TetrahedralSolid3D",
       "HybridSolid3D",
@@ -152,20 +157,20 @@
   "GeodeObjectType": {
     "type": "string",
     "enum": [
+      "RasterImage2D",
+      "RasterImage3D",
       "VertexSet",
       "Graph",
       "PointSet2D",
       "PointSet3D",
       "EdgedCurve2D",
       "EdgedCurve3D",
-      "RasterImage2D",
       "PolygonalSurface2D",
       "PolygonalSurface3D",
       "TriangulatedSurface2D",
       "TriangulatedSurface3D",
       "RegularGrid2D",
       "LightRegularGrid2D",
-      "RasterImage3D",
       "PolyhedralSolid3D",
       "TetrahedralSolid3D",
       "HybridSolid3D",
@@ -190,7 +195,6 @@
   "GeodePolygonMeshType": {
     "type": "string",
     "enum": [
-      "RasterImage2D",
       "PolygonalSurface2D",
       "PolygonalSurface3D",
       "TriangulatedSurface2D",
@@ -202,7 +206,6 @@
   "GeodePolyhedronMeshType": {
     "type": "string",
     "enum": [
-      "RasterImage3D",
       "PolyhedralSolid3D",
       "TetrahedralSolid3D",
       "HybridSolid3D",
@@ -298,6 +301,7 @@
   "ViewerObjectType": {
     "type": "string",
     "enum": [
+      "image",
       "mesh",
       "model"
     ]
