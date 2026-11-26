@@ -22,10 +22,13 @@ from werkzeug.exceptions import HTTPException
 from opengeodeweb_back import geode_functions, utils_functions
 from opengeodeweb_back.geode_objects.geode_brep import GeodeBRep
 from opengeodeweb_back.geode_objects.geode_hybrid_solid3d import GeodeHybridSolid3D
+from opengeodeweb_back.geode_objects.geode_image import GeodeImage
+from opengeodeweb_back.geode_objects.geode_mesh import GeodeMesh
 from opengeodeweb_back.geode_objects.geode_polygonal_surface3d import (
     GeodePolygonalSurface3D,
 )
 from opengeodeweb_back.geode_objects.geode_raster_image2d import GeodeRasterImage2D
+from opengeodeweb_back.geode_objects.geode_raster_image3d import GeodeRasterImage3D
 from opengeodeweb_back.geode_objects.geode_tetrahedral_solid3d import (
     GeodeTetrahedralSolid3D,
 )
@@ -285,17 +288,32 @@ def test_generate_files_from_file_with_multi_dots(
     assert result["name"] == "cube.test"
 
 
+@pytest.mark.parametrize(
+    ("geode_object_class", "filename", "native_file"),
+    [
+        (GeodeRasterImage2D, "test.jpg", "native.og_img2d"),
+        (GeodeRasterImage2D, "test.og_img2d", "native.og_img2d"),
+        (GeodeRasterImage3D, "test.og_img3d", "native.og_img3d"),
+    ],
+)
 def test_generate_files_from_raster_image(
     client: FlaskClient,
+    geode_object_class: type[GeodeRasterImage2D | GeodeRasterImage3D],
+    filename: str,
+    native_file: str,
 ) -> None:
     # Raster images have no dedicated builder: naming them must still work
     app = client.application
     with app.app_context():
         [result] = utils_functions.generate_files_from_file(
-            GeodeRasterImage2D.geode_object_type(), "test.jpg"
+            geode_object_class.geode_object_type(), filename
         )
-    assert result["name"] == "test"
-    assert result["native_file"] == "native.og_img2d"
+    assert result["name"] == Path(filename).stem
+    assert result["native_file"] == native_file
+    assert result["viewable_file"].endswith(".vti")
+    assert result["viewer_object_type"] == "image"
+    assert issubclass(geode_object_class, GeodeImage)
+    assert not issubclass(geode_object_class, GeodeMesh)
 
 
 def test_generate_files_from_file_returns_geode_id(client: FlaskClient) -> None:
