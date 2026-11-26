@@ -2151,6 +2151,127 @@
     "wms_version": "1.1.1"
   },
   {
+    "id": "geology_segemar_250k",
+    "name": "SEGEMAR Unidades Geológicas 1:250 000",
+    "provider": "SEGEMAR (SIGAM)",
+    "area": [
+      -72.99,
+      -53.0,
+      -57.0,
+      -21.78
+    ],
+    "level": "N2",
+    "source_scale": 250000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://sigam.segemar.gov.ar/geoserver217/wms",
+    "layers": "sigam:e250K_UnidadGeologica",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "empty_tile": "transparent",
+    "licence": "CC BY 4.0, https://creativecommons.org/licenses/by/4.0/ (SIGAM site footer https://sigam.segemar.gov.ar/: 'Esta obra cuyo autor es SEGEMAR está bajo una Licencia Creative Commons Atribución 4.0 Internacional'; WMS AccessConstraints: 'Por licencia de Creative Commons Argentina, la explotación de la obra autorizada por la licencia, será necesario reconocer la autoría')",
+    "attribution": "© SEGEMAR, CC BY 4.0",
+    "status": "verified",
+    "notes": "Hojas geológicas 1:250 000 (Carta Geológica, Ley 24.224), layer sigam:e250K_UnidadGeologica on the GeoServer path 'geoserver217' (the plain /geoserver/ path returns HTTP 500). Unpublished sheets are transparent gaps. Draws up to z16, about 1 s per tile."
+  },
+  {
+    "id": "geology_segemar_2500k",
+    "name": "SEGEMAR Mapa Geológico de la República Argentina 1:2 500 000",
+    "provider": "SEGEMAR (SIGAM)",
+    "area": [
+      -73.57,
+      -55.06,
+      -53.5,
+      -21.78
+    ],
+    "level": "N1",
+    "source_scale": 2500000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "wms",
+    "url": "https://sigam.segemar.gov.ar/geoserver217/wms",
+    "layers": "sigam:e2.5M.UnidadesGeologicas",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84",
+      "EPSG:4326"
+    ],
+    "max_zoom": 11,
+    "empty_tile": "transparent",
+    "licence": "CC BY 4.0, https://creativecommons.org/licenses/by/4.0/ (SIGAM site footer https://sigam.segemar.gov.ar/: 'Esta obra cuyo autor es SEGEMAR está bajo una Licencia Creative Commons Atribución 4.0 Internacional'; WMS AccessConstraints: 'Por licencia de Creative Commons Argentina, la explotación de la obra autorizada por la licencia, será necesario reconocer la autoría')",
+    "attribution": "© SEGEMAR, CC BY 4.0",
+    "status": "verified",
+    "notes": "Continuous national map at 1:2 500 000; its polygons also reach the Chilean side up to the Pacific. Area cut at 53.5W (the capabilities box spans the South Atlantic). Asked up to zoom 11: no more detail past it. 1.2-1.8 s per tile. Same WMS also has provincial 1:750k layers (e750K.Prov*Geol), not added."
+  },
+  {
+    "id": "geology_inegi_rocas",
+    "name": "INEGI Geología (Rocas)",
+    "provider": "INEGI (Instituto Nacional de Estadística y Geografía)",
+    "area": [
+      -119.883,
+      13.4965,
+      -83.4961,
+      33.7243
+    ],
+    "level": "N2",
+    "source_scale": 250000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "wms",
+    "url": "https://gaia.inegi.org.mx/NLB/tunnel/wms/wms61",
+    "layers": "c413",
+    "styles": "",
+    "format": "image/png",
+    "wms_version": "1.1.1",
+    "supported_crs": [
+      "EPSG:3857",
+      "EPSG:900913",
+      "EPSG:4326"
+    ],
+    "empty_tile": "transparent",
+    "licence": "Términos de libre uso de la información del INEGI, https://www.inegi.org.mx/inegi/terminos.html: 'Puede explotar comercialmente la información, utilizándola como insumo para generar otros productos o servicios', with credit to INEGI; WMS Fees and AccessConstraints none",
+    "attribution": "Fuente: INEGI",
+    "status": "verified",
+    "notes": "Layer c413 'Rocas' of the Mapa Digital de México WMS (v6.1), national coverage. No layer abstract: source_scale 250000 is inferred from the polygon detail and from the INEGI 1:250 000 Continuo Nacional Geológico (made with the SGM), not confirmed. First tile up to 4.6 s, then 1.2-2.7 s. The SGM's own service (portal.sgm.gob.mx) answers 403 to direct clients."
+  },
+  {
+    "id": "geology_ingemmet_50k",
+    "name": "INGEMMET Mapa Geológico Integrado 1:50 000",
+    "provider": "INGEMMET (GEOCATMIN)",
+    "area": [
+      -81.5,
+      -18.35,
+      -68.83,
+      -2.98
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 80000,
+    "protocol": "xyz",
+    "url": "https://geocatmin.ingemmet.gob.pe/arcgis/rest/services/SERV_GEOLOGIA_50K_INTEGRADA/MapServer/tile/{z}/{y}/{x}",
+    "layers": null,
+    "styles": null,
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 16,
+    "empty_tile": "404",
+    "licence": "Unclear: the GEOCATMIN terms allow use and derived works with a reference to INGEMMET but name no commercial use; the INGEMMET repository publishes the national geological map under CC BY-NC-ND 4.0",
+    "attribution": "© INGEMMET",
+    "status": "to_check",
+    "notes": "TO_CHECK: (1) licence contradiction above, ask INGEMMET; (2) the server sends an incomplete TLS chain: the app's certifi context fails with CERTIFICATE_VERIFY_FAILED (works with curl / the Windows store). Integrated map of 1057 1:50 000 sheets (August 2025), cached Web Mercator tiles, 1.0-1.5 s per tile; no-geology areas return a 190-byte transparent PNG."
+  },
+  {
     "id": "geology_sgb_brazil_1m",
     "name": "Carta Geológica do Brasil ao Milionésimo – Unidades Litoestratigráficas",
     "provider": "Serviço Geológico do Brasil (SGB/CPRM)",

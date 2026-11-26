@@ -417,6 +417,9 @@ KNOWN_TILES = {
     "geology_gsc_canada_5m": (8, 70, 90),
     "geology_bcgs_bc_50k": (12, 678, 1377),
     "geology_mrnf_quebec_regional": (13, 2298, 2841),
+    "geology_segemar_250k": (10, 315, 608),
+    "geology_segemar_2500k": (6, 19, 38),
+    "geology_inegi_rocas": (8, 55, 111),
     "geology_gsnsw_seamless": (10, 936, 612),
     "geology_gsq_detailed_100k": (10, 928, 570),
 }
