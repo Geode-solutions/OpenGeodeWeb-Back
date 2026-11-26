@@ -1603,6 +1603,148 @@
     "notes": "to_check (likely excluded): WMS AccessConstraints empty; GEUS terms for free data (https://data.geus.dk/geusmap/terms_20140620.pdf) grant use \"til eget brug\" only and say \"Kunden har ikke ret til at kopiere, offentliggøre, videresælge, udlåne eller udleje eksemplarer af hele eller dele af Dataleverancen ... med mindre GEUS giver forudgående skriftligt samtykke\". Not compatible with tile caching/redistribution. Tech: z9 OK 0.42 s."
   },
   {
+    "id": "geology_ygs_yukon_bedrock",
+    "name": "Yukon bedrock geology compilation",
+    "provider": "Yukon Geological Survey",
+    "area": [
+      -141.01,
+      59.99,
+      -123.8,
+      69.65
+    ],
+    "level": "N2",
+    "source_scale": 250000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "xyz",
+    "url": "https://deptweb.gov.yk.ca/prod/rest/services/YGS_BedrockGeology/BedrockGeology_cache/MapServer/tile/{z}/{y}/{x}",
+    "layers": null,
+    "styles": null,
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 16,
+    "empty_tile": "transparent",
+    "licence": "Open Government Licence - Yukon (https://open.yukon.ca/data/open-government-licence-yukon): commercial or non-commercial reuse with attribution; licence of the 'Bedrock geology' dataset on open.yukon.ca and of the ArcGIS layer metadata",
+    "attribution": "Contains information licensed under the Open Government Licence - Yukon. Yukon Geological Survey",
+    "status": "verified",
+    "notes": "Compilation of the detailed maps and regional compilations of the YGS and the GSC, 1999-2023. Cached service BedrockGeology_cache (1:37M to 1:9 000, z0-z16); the other service Bedrock_Geology__Tiles stops at 1:1.1M (z8). Mixed cache: JPEG where full, transparent PNG outside the data. The general yukon.ca copyright page restricts commercial reuse of website material, but the dataset itself is published under the OGL - Yukon."
+  },
+  {
+    "id": "geology_sgs_saskatchewan_250k",
+    "name": "Saskatchewan bedrock geology 1:250 000",
+    "provider": "Saskatchewan Geological Survey (Ministry of Energy and Resources)",
+    "area": [
+      -110.01,
+      48.99,
+      -101.36,
+      60.01
+    ],
+    "level": "N2",
+    "source_scale": 250000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "export",
+    "url": "https://gis.saskatchewan.ca/arcgis/rest/services/Economy/Geology/MapServer/export?bbox={bbox}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&layers=show:10&f=image",
+    "layers": "show:10",
+    "styles": null,
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "empty_tile": "transparent",
+    "licence": "Government of Saskatchewan Standard Unrestricted Use Data Licence (Version 2.0), https://gisappl.saskatchewan.ca/Html5Ext/Resources/GOS_Standard_Unrestricted_Use_Data_Licence_v2.0.pdf: 'licence to use the Information, including for commercial purposes'; named in the service item licenseInfo",
+    "attribution": "Saskatchewan Geological Survey. Contains information licensed under the Government of Saskatchewan Standard Unrestricted Use Data Licence (Version 2.0)",
+    "status": "verified",
+    "notes": "ArcGIS MapServer Economy/Geology, layer 10 'Bedrock Geology 250K', exported in Web Mercator (the service CRS is EPSG:2957). 0.5-3 s per tile."
+  },
+  {
+    "id": "geology_sgs_saskatchewan_1m",
+    "name": "Saskatchewan bedrock geology 1:1 000 000",
+    "provider": "Saskatchewan Geological Survey (Ministry of Energy and Resources)",
+    "area": [
+      -110.01,
+      48.99,
+      -101.36,
+      60.01
+    ],
+    "level": "N1",
+    "source_scale": 1000000,
+    "min_scale": 0,
+    "max_scale": 100000000,
+    "protocol": "export",
+    "url": "https://gis.saskatchewan.ca/arcgis/rest/services/Economy/Geology/MapServer/export?bbox={bbox}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&layers=show:11&f=image",
+    "layers": "show:11",
+    "styles": null,
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "max_zoom": 13,
+    "empty_tile": "transparent",
+    "licence": "Government of Saskatchewan Standard Unrestricted Use Data Licence (Version 2.0), https://gisappl.saskatchewan.ca/Html5Ext/Resources/GOS_Standard_Unrestricted_Use_Data_Licence_v2.0.pdf: 'licence to use the Information, including for commercial purposes'; named in the service item licenseInfo",
+    "attribution": "Saskatchewan Geological Survey. Contains information licensed under the Government of Saskatchewan Standard Unrestricted Use Data Licence (Version 2.0)",
+    "status": "verified",
+    "notes": "Same service, layer 11 'Bedrock Geology 1M' (updated February 2021). Asked up to zoom 13: a 1:1 000 000 map draws no more detail."
+  },
+  {
+    "id": "geology_nbgs_bedrock",
+    "name": "New Brunswick bedrock geology",
+    "provider": "New Brunswick Dept. of Natural Resources and Energy Development",
+    "area": [
+      -69.06,
+      44.6,
+      -63.77,
+      48.07
+    ],
+    "level": "N2",
+    "source_scale": 250000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "export",
+    "url": "https://gis-erd-der.gnb.ca/server/rest/services/OpenData/NBGS_Bedrock_Geology/MapServer/export?bbox={bbox}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&f=image",
+    "layers": null,
+    "styles": null,
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "empty_tile": "transparent",
+    "licence": "Unstated for this dataset",
+    "attribution": "New Brunswick Dept. of Natural Resources and Energy Development",
+    "status": "to_check",
+    "notes": "TO_CHECK: technically fine (z7-z13, 0.5-1.3 s, real polygons). The service sits in the OpenData folder and New Brunswick has an Open Government Licence (OGL-Canada 2.0 based, https://www.gnb.ca/en/campaign/geonb/open-government-license.html), but neither the service item (licenseInfo empty) nor the geo.ca record (empty 'Use Limitations') names a licence for the bedrock geology. Ask the NBGS Geoscience Information Officer."
+  },
+  {
+    "id": "geology_nsdnr_bedrock",
+    "name": "Nova Scotia bedrock geology (ME 2000-1)",
+    "provider": "Nova Scotia Department of Natural Resources and Renewables",
+    "area": [
+      -66.4,
+      43.35,
+      -59.6,
+      47.1
+    ],
+    "level": "N2",
+    "source_scale": 500000,
+    "min_scale": 0,
+    "max_scale": 400000,
+    "protocol": "export",
+    "url": "https://dawson.novascotia.ca/arcgis/rest/services/Bedrock_Geologic_Units_p00001gb_UT83_Web_Map_MIL1/MapServer/export?bbox={bbox}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&f=image",
+    "layers": null,
+    "styles": null,
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857"
+    ],
+    "empty_tile": "transparent",
+    "licence": "Unclear: dataset licence agreement shipped with DP ME 43",
+    "attribution": "Nova Scotia Department of Natural Resources and Renewables",
+    "status": "to_check",
+    "notes": "TO_CHECK, not tested: the downloadable version (DP ME 43) comes with its own licence agreement that the user must accept; no open licence is named on the ArcGIS service. Read that agreement, or find the copy on data.novascotia.ca and its licence, before verifying."
+  },
+  {
     "id": "geology_gsc_canada_5m",
     "name": "Geological map of Canada (1860A)",
     "provider": "Natural Resources Canada – Geological Survey of Canada",
