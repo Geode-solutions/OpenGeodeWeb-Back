@@ -148,6 +148,56 @@
     "notes": "A 1:1 000 000 map: past zoom 13 the server draws no more detail. Capping the zoom halves the WMS requests to this slow server (about 0.5 to 3 s per tile, and 10 s timeouts under load, e.g. 3 of 24 tiles in Spain). No Croatian units: tiles over Croatia are empty."
   },
   {
+    "id": "geology_sztfh_hungary_100k",
+    "name": "Hungary surface geology 1:100 000",
+    "provider": "SZTFH",
+    "area": [
+      16.1,
+      45.7,
+      22.95,
+      48.6
+    ],
+    "level": "N3",
+    "source_scale": 100000,
+    "min_scale": 0,
+    "max_scale": 250000,
+    "protocol": "export",
+    "url": "https://map.hugeo.hu/arcgis/rest/services/fdt100/fdt100_foldtan/MapServer/export?bbox={bbox}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&layers=show:6,4,3&f=image",
+    "max_zoom": 15,
+    "empty_tile": "transparent",
+    "attribution": "© SZTFH, Magyarország földtani térképe 1:100 000 (Gyalog & Síkhegyi eds., 2005)",
+    "status": "to_check",
+    "licence": "Unclear: EGDI metadata 68ff6dfe-431c-4272-8659-67520a010e58 says 'no conditions apply', but the map.hugeo.hu terms ('Felhasználási feltételek') say the maps are SZTFH intellectual property and to contact SZTFH before any official use",
+    "notes": "TO_CHECK: technically fine. Layers 6 Földtan (units), 4 boundaries, 3 tectonics of fdt100/fdt100_foldtan; native EOV (EPSG:23700), the export reprojects to 3857 (the WMS offers no Web Mercator). First tile 4.3 s cold, then 0.3-1 s. The 1:500 000 service returns blank images. Ask SZTFH for written permission for commercial use.",
+    "layers": null,
+    "styles": null
+  },
+  {
+    "id": "geology_gsi_israel_50k",
+    "name": "Israel geology 1:50 000",
+    "provider": "GSI - Geological Survey of Israel",
+    "area": [
+      34.19,
+      29.48,
+      35.95,
+      33.34
+    ],
+    "level": "N3",
+    "source_scale": 50000,
+    "min_scale": 0,
+    "max_scale": 100000,
+    "protocol": "xyz",
+    "url": "https://egozi.gsi.gov.il/arcgis/rest/services/Hosted/map50000lb111126/MapServer/tile/{z}/{y}/{x}",
+    "max_zoom": 16,
+    "empty_tile": "404",
+    "attribution": "© Geological Survey of Israel",
+    "status": "to_check",
+    "licence": "Not stated: no licence on the service, the portal item or any reachable GSI page",
+    "notes": "TO_CHECK: technically fine. Seamless merged 1:50 000 map, cached PNG tiles in Web Mercator; geology draws from z12 to about z16 (z11 and coarser show only the sheet key-map grid). 0.3-0.6 s per tile. The service name carries a date (map50000lb111126), so the URL will likely change on republication; the older Geo50K services need a token. empty_tile not tested outside Israel. The 1:200 000 map is only a FeatureServer / VectorTileServer. Ask GSI for its terms.",
+    "layers": null,
+    "styles": null
+  },
+  {
     "id": "geology_bgs_625k",
     "name": "BGS 1/625 000",
     "provider": "British Geological Survey",
@@ -1198,6 +1248,96 @@
     "attribution": "Contains Geological Survey of Northern Ireland materials © Crown Copyright 2026",
     "status": "verified",
     "notes": "Same service, layers 9 'Superficial Geology (250k)' over 10 'Bedrock Geology (250k)': all of Northern Ireland. 0.2-0.6 s per tile."
+  },
+  {
+    "provider": "Náttúrufræðistofnun Íslands (Natural Science Institute of Iceland)",
+    "protocol": "wms",
+    "url": "https://gis.natt.is/geoserver/ows",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84"
+    ],
+    "empty_tile": "transparent",
+    "licence": "CC BY 4.0 - https://creativecommons.org/licenses/by/4.0/ (https://www.natt.is/en/resources/open-data: \"The open data of the Natural Science Institute of Iceland is published under the CC BY 4.0\"; dataset metadata gatt.natt.is useConstraints link to that page; WMS AccessConstraints = https://www.natt.is/en/resources/open-data, Fees = no)",
+    "status": "verified",
+    "min_scale": 0,
+    "id": "geology_natt_iceland_600k",
+    "name": "Iceland bedrock geology 1:600 000",
+    "area": [
+      -24.75,
+      63.21,
+      -13.19,
+      66.58
+    ],
+    "level": "N2",
+    "source_scale": 600000,
+    "max_scale": 1500000,
+    "layers": "ni:ni_j600v_berg_2_jardlog_2utg_fl",
+    "max_zoom": 13,
+    "attribution": "Náttúrufræðistofnun Íslands, Jarðfræðikort af Íslandi 1:600 000, Berggrunnur, 2. útgáfa, CC BY 4.0",
+    "notes": "Bedrock units of the 2nd edition national map (metadata record {005FFDAD-69A1-4385-B16F-FD31B960FE33}); boundaries/faults are separate layers not included. Draws at all zooms (tested z3-z15), ~0.2-0.6 s per tile. The layer NATT:jardlog_en listed in GetCapabilities returns LayerNotDefined."
+  },
+  {
+    "provider": "Náttúrufræðistofnun Íslands (Natural Science Institute of Iceland)",
+    "protocol": "wms",
+    "url": "https://gis.natt.is/geoserver/ows",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84"
+    ],
+    "empty_tile": "transparent",
+    "licence": "CC BY 4.0 - https://creativecommons.org/licenses/by/4.0/ (https://www.natt.is/en/resources/open-data: \"The open data of the Natural Science Institute of Iceland is published under the CC BY 4.0\"; dataset metadata gatt.natt.is useConstraints link to that page; WMS AccessConstraints = https://www.natt.is/en/resources/open-data, Fees = no)",
+    "status": "verified",
+    "min_scale": 0,
+    "id": "geology_natt_iceland_100k_west",
+    "name": "Iceland bedrock geology 1:100 000 - Western Volcanic Zone",
+    "area": [
+      -21.05,
+      64.19,
+      -19.63,
+      65.1
+    ],
+    "level": "N3",
+    "source_scale": 100000,
+    "max_scale": 250000,
+    "layers": "ni:ni_j100v_vesturgosbelti_berggrunnur_1utg_fl2",
+    "max_zoom": 16,
+    "attribution": "Náttúrufræðistofnun Íslands, Jarðfræðikort Vesturgosbelti 1:100 000 (berggrunnur), CC BY 4.0",
+    "notes": "Layer _fl2 (age-coloured, title 'berggrunnur aldurEN'): the sister layer ni:..._1utg_fl fails with a GeoServer style error (attribute 'jardmlandmberg' missing). Covers only the Western Volcanic Zone sheet (Þingvellir-Langjökull); glaciers are left blank (e.g. -20.3E 64.6N is Langjökull). ~0.2-0.4 s per tile. WMS on the shared Icelandic GeoServer (also ogc.gis.is); layer advertises EPSG:3057 and CRS:84, the root layer advertises EPSG:3857 which works."
+  },
+  {
+    "provider": "Náttúrufræðistofnun Íslands (Natural Science Institute of Iceland)",
+    "protocol": "wms",
+    "url": "https://gis.natt.is/geoserver/ows",
+    "styles": "",
+    "format": "image/png",
+    "supported_crs": [
+      "EPSG:3857",
+      "CRS:84"
+    ],
+    "empty_tile": "transparent",
+    "licence": "CC BY 4.0 - https://creativecommons.org/licenses/by/4.0/ (https://www.natt.is/en/resources/open-data: \"The open data of the Natural Science Institute of Iceland is published under the CC BY 4.0\"; dataset metadata gatt.natt.is useConstraints link to that page; WMS AccessConstraints = https://www.natt.is/en/resources/open-data, Fees = no)",
+    "status": "verified",
+    "min_scale": 0,
+    "id": "geology_natt_iceland_100k_east",
+    "name": "Iceland bedrock geology 1:100 000 - East Iceland",
+    "area": [
+      -14.78,
+      64.58,
+      -13.43,
+      65.41
+    ],
+    "level": "N3",
+    "source_scale": 100000,
+    "max_scale": 250000,
+    "layers": "ni:ni_j100v_austurland_berggrunnur_1utg_fl",
+    "max_zoom": 16,
+    "attribution": "Náttúrufræðistofnun Íslands, Jarðfræðikort Austurland 1:100 000 (berggrunnur), CC BY 4.0",
+    "notes": "Covers only the East Iceland (Austurland) sheet. ~0.2-0.4 s per tile. Same GeoServer as geology_natt_iceland_600k."
   },
   {
     "id": "geology_gsi_100k",
