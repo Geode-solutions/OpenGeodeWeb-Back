@@ -263,6 +263,34 @@ def test_save_viewable_file(client: FlaskClient) -> None:
     assert "crs" not in item
 
 
+@pytest.mark.parametrize(
+    ("geode_object_type", "filename", "viewer_elements_type"),
+    [
+        ("RasterImage2D", "test.og_img2d", "polygons"),
+        ("RasterImage3D", "test.og_img3d", "polyhedra"),
+    ],
+)
+def test_save_viewable_file_raster_image(
+    client: FlaskClient, geode_object_type: str, filename: str, viewer_elements_type: str
+) -> None:
+    [item] = test_utils.check_save_viewable_file(client, geode_object_type, filename)
+    assert item["viewer_object_type"] == "image"
+    assert item["geode_object_type"] == geode_object_type
+    assert item["viewable_file"].endswith(".vti")
+    with client.application.app_context():
+        data = Data.get(item["id"])
+        assert data is not None
+        assert data.viewer_object_type == "image"
+        assert data.viewer_elements_type == viewer_elements_type
+    for route, params in [
+        ("vertex_attribute_names", {"id": item["id"]}),
+        ("vertex_attribute_range", {"id": item["id"], "attribute_name": "Color"}),
+    ]:
+        response = client.post(f"/opengeodeweb_back/{route}", json=params)
+        assert response.status_code == 400, route
+        assert "is not a GeodeMesh" in response.get_json()["description"]
+
+
 def test_save_viewable_file_multi_object(client: FlaskClient) -> None:
     first_import = test_utils.check_save_viewable_file(
         client, "TriangulatedSurface3D", "two_surfaces.ts"
