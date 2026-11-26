@@ -78,9 +78,7 @@ def test_registry_loads_verified_sources_most_detailed_first(tmp_path: Path) -> 
         {"source_scale": None},
     ],
 )
-def test_invalid_registry_entry_names_the_entry(
-    tmp_path: Path, change: dict[str, object]
-) -> None:
+def test_invalid_registry_entry_names_the_entry(tmp_path: Path, change: dict[str, object]) -> None:
     with pytest.raises(geology_registry.RegistryError, match=r"geology_test|brgm"):
         geology_registry.load(_registry(tmp_path, {**ENTRY, **change}))
 
@@ -117,22 +115,14 @@ WMS_ENTRY = {
 def test_wms_source_asks_web_mercator_when_served(tmp_path: Path) -> None:
     wms = geology_registry.load(_registry(tmp_path, WMS_ENTRY))["geology_wms"]
     assert wms.bbox_crs == "EPSG:3857"
-    assert wms.url_template.startswith(
-        "https://wms.test/geology?SERVICE=WMS&VERSION=1.3.0"
-    )
-    assert (
-        "REQUEST=GetMap&LAYERS=GEOLOGY&STYLES=&CRS=EPSG:3857&BBOX={bbox}"
-        in wms.url_template
-    )
+    assert wms.url_template.startswith("https://wms.test/geology?SERVICE=WMS&VERSION=1.3.0")
+    assert "REQUEST=GetMap&LAYERS=GEOLOGY&STYLES=&CRS=EPSG:3857&BBOX={bbox}" in wms.url_template
     assert "WIDTH=256&HEIGHT=256&FORMAT=image/png&TRANSPARENT=TRUE" in wms.url_template
 
 
 def test_wms_source_without_web_mercator_asks_crs84(tmp_path: Path) -> None:
     entry = {**WMS_ENTRY, "supported_crs": ["EPSG:4326", "CRS:84"]}
-    assert (
-        geology_registry.load(_registry(tmp_path, entry))["geology_wms"].bbox_crs
-        == "CRS:84"
-    )
+    assert geology_registry.load(_registry(tmp_path, entry))["geology_wms"].bbox_crs == "CRS:84"
     entry = {**WMS_ENTRY, "supported_crs": ["EPSG:2154"]}
     with pytest.raises(geology_registry.RegistryError, match="geology_wms"):
         geology_registry.load(_registry(tmp_path, entry))
@@ -225,9 +215,7 @@ class _Answer:
 def _source(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, **fields: object) -> None:
     monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(tmp_path))
     monkeypatch.delenv("BASEMAP_TILE_URL", raising=False)
-    source = basemap_providers.Source(
-        "https://tiles.test/{z}/{x}/{y}.png", 15, "a", **fields
-    )
+    source = basemap_providers.Source("https://tiles.test/{z}/{x}/{y}.png", 15, "a", **fields)
     monkeypatch.setitem(basemap_providers.SOURCES, "geology_t", source)
 
 
@@ -287,16 +275,12 @@ def test_persistent_too_many_requests_is_a_missing_tile(
 
 
 def _one_tile(x: int) -> dict[tuple[int, int], bytes | None]:
-    return basemap_tiles.fetch_tiles(
-        "geology_t", basemap_tiles.TileRange(5, x, x, 0, 0)
-    )
+    return basemap_tiles.fetch_tiles("geology_t", basemap_tiles.TileRange(5, x, x, 0, 0))
 
 
 def _paused_clock(monkeypatch: pytest.MonkeyPatch) -> list[float]:
     now = [0.0]
-    monkeypatch.setattr(
-        basemap_tiles, "BREAKER", basemap_tiles.CircuitBreaker(lambda: now[0])
-    )
+    monkeypatch.setattr(basemap_tiles, "BREAKER", basemap_tiles.CircuitBreaker(lambda: now[0]))
     return now
 
 
@@ -347,9 +331,7 @@ def test_a_maintenance_page_counts_as_a_failure(
     assert len(calls) == basemap_tiles.BREAKER_FAILURES
 
 
-def test_a_tile_not_found_is_not_a_failure(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_a_tile_not_found_is_not_a_failure(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     _source(monkeypatch, tmp_path)
     _paused_clock(monkeypatch)
     calls: list[str] = []
@@ -358,9 +340,7 @@ def test_a_tile_not_found_is_not_a_failure(
         calls.append(request.full_url)
         # Every third request is a 404: the server is up, the failures are never in a row
         if len(calls) % basemap_tiles.BREAKER_FAILURES == 0:
-            raise urllib.error.HTTPError(
-                request.full_url, 404, "Not Found", Message(), None
-            )
+            raise urllib.error.HTTPError(request.full_url, 404, "Not Found", Message(), None)
         raise TimeoutError
 
     monkeypatch.setattr(urllib.request, "urlopen", flaky)
@@ -469,9 +449,7 @@ def test_a_failing_source_leaves_its_tiles_to_the_next(
     assert len(images["geology_continental"]) == 4
 
 
-def test_out_of_scale_source_is_not_asked(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_out_of_scale_source_is_not_asked(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     _two_sources(monkeypatch, tmp_path)
     detailed = basemap_providers.SOURCES["geology_national"]
     monkeypatch.setitem(
@@ -484,9 +462,7 @@ def test_out_of_scale_source_is_not_asked(
     assert list(images) == ["geology_continental"]
 
 
-def test_tiles_without_a_source_stay_empty(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_tiles_without_a_source_stay_empty(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     _two_sources(monkeypatch, tmp_path)
     # No world fallback: the east column is left out, and the Viewer shows it transparent
     images = basemap_tiles.fetch_layers(
@@ -507,9 +483,7 @@ def test_a_layer_not_tile_by_tile_keeps_one_source_per_mosaic(
 
 def test_only_the_geology_map_is_filled_tile_by_tile() -> None:
     (geology,) = basemap_providers.MAPS["geology"]
-    assert geology == basemap_providers.Layer(
-        basemap_providers.GEOLOGY_SOURCES, tile_by_tile=True
-    )
+    assert geology == basemap_providers.Layer(basemap_providers.GEOLOGY_SOURCES, tile_by_tile=True)
     assert not any(
         layer.tile_by_tile
         for name, layers in basemap_providers.MAPS.items()
@@ -579,8 +553,6 @@ def test_shipped_source_serves_a_tile(
     monkeypatch.setenv("BASEMAP_CACHE_FOLDER", str(tmp_path))
     monkeypatch.delenv("BASEMAP_TILE_URL", raising=False)
     z, x, y = KNOWN_TILES[source]
-    content = basemap_tiles.fetch_tiles(source, basemap_tiles.TileRange(z, x, x, y, y))[
-        (x, y)
-    ]
+    content = basemap_tiles.fetch_tiles(source, basemap_tiles.TileRange(z, x, x, y, y))[(x, y)]
     assert content is not None
     assert not basemap_tiles.is_empty(content, "transparent")
