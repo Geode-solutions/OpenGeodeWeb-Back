@@ -42,6 +42,32 @@ def test_every_listener_receives_each_event(client: FlaskClient) -> None:
     assert _chunk(second) == "event: health\ndata: {}\n\n"
 
 
+def test_stream_closes_once_server_timed_out(client: FlaskClient) -> None:
+    # A stream left open would keep the cloud instance (and its billing) alive until the
+    # Request timeout, long after the server stopped answering its health check
+    app = client.application
+    timeout_keys = ("MINUTES_BEFORE_TIMEOUT", "LAST_PING_TIME")
+    saved = {key: app.config[key] for key in timeout_keys if key in app.config}
+    app.config["EVENTS_KEEP_ALIVE_SECONDS"] = 0.1
+    app.config["MINUTES_BEFORE_TIMEOUT"] = "1"
+    app.config["LAST_PING_TIME"] = 0
+    finished = threading.Event()
+
+    def read_all() -> None:
+        for _ in client.get("/events").iter_encoded():
+            pass
+        finished.set()
+
+    try:
+        threading.Thread(target=read_all, daemon=True).start()
+        assert finished.wait(timeout=CHUNK_TIMEOUT_SECONDS)
+    finally:
+        app.config.pop("EVENTS_KEEP_ALIVE_SECONDS")
+        for key in timeout_keys:
+            app.config.pop(key, None)
+        app.config.update(saved)
+
+
 def test_idle_stream_sends_keep_alive(client: FlaskClient) -> None:
     app = client.application
     app.config["EVENTS_KEEP_ALIVE_SECONDS"] = 0.1
