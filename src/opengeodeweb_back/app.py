@@ -62,7 +62,7 @@ class _EventListeners:
             for listener in self._queues:
                 listener.put((event, data))
 
-    def stream(self, keep_alive_seconds: float) -> flask.Response:
+    def stream(self, app: flask.Flask, keep_alive_seconds: float) -> flask.Response:
         listener: queue.Queue[_Event] = queue.Queue()
         with self._lock:
             self._queues.add(listener)
@@ -72,17 +72,23 @@ class _EventListeners:
                 self._queues.discard(listener)
 
         response = flask.Response(
-            _stream_events(listener, keep_alive_seconds), mimetype="text/event-stream"
+            _stream_events(app, listener, keep_alive_seconds), mimetype="text/event-stream"
         )
         response.call_on_close(unregister)
         return response
 
 
-def _stream_events(listener: queue.Queue[_Event], keep_alive_seconds: float) -> Generator[str]:
+def _stream_events(
+    app: flask.Flask, listener: queue.Queue[_Event], keep_alive_seconds: float
+) -> Generator[str]:
     while True:
         try:
             event, data = listener.get(timeout=keep_alive_seconds)
         except queue.Empty:
+            # Once timed out, the server is about to be shut down: an open stream would keep
+            # The cloud instance alive (and billed) until the request timeout
+            if utils_functions.kill_task(app):
+                return
             # Comment line, ignored by EventSource: keeps proxies from closing the idle
             # Stream and lets a dropped connection be detected
             yield ": keep-alive\n\n"
@@ -115,7 +121,7 @@ def _register_event_stream(app: flask.Flask) -> None:
     @app.route("/events")
     def events() -> flask.Response:
         return listeners.stream(
-            flask.current_app.config.get("EVENTS_KEEP_ALIVE_SECONDS", EVENTS_KEEP_ALIVE_SECONDS)
+            app, app.config.get("EVENTS_KEEP_ALIVE_SECONDS", EVENTS_KEEP_ALIVE_SECONDS)
         )
 
 
