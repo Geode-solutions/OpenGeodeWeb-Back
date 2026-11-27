@@ -78,7 +78,8 @@ def typed_route[ParamsT: DataClassJsonMixin, ResponseT: DataClassJsonMixin](
                     f"expected {route.response.__name__}"
                 )
                 raise TypeError(msg)
-            payload = _drop_none(result.to_dict())
+            # encode_json turns the enums of the schemas into their values
+            payload = _drop_none(result.to_dict(encode_json=True))
             if flask.current_app.debug or flask.current_app.testing:
                 validate_response(payload)
             return flask.make_response(payload, 200)

@@ -376,6 +376,34 @@ export interface PingResponse {
     message: string;
 }
 
+export interface ModelPhysicalPropertiesParams {
+    id: DataId;
+}
+
+export interface ModelPhysicalPropertiesResponse {
+    physical_properties: PhysicalProperty[];
+}
+
+export interface PhysicalProperty {
+    attribute_id:   string;
+    attribute_name: string;
+    component_type: ComponentType;
+    components:     PhysicalPropertyComponent[];
+    element_type:   ElementType;
+    name:           string;
+    nb_items:       number;
+}
+
+export type ComponentType = "Corner" | "Line" | "Surface" | "Block";
+
+export interface PhysicalPropertyComponent {
+    geode_id:   GeodeId;
+    max_values: Array<number | null>;
+    min_values: Array<number | null>;
+}
+
+export type ElementType = "vertex" | "edge" | "polygon" | "polyhedron";
+
 export interface ModelComponentVertexAttributeRangeParams {
     attribute_name: AttributeName;
     component_ids:  GeodeId[];
@@ -641,6 +669,7 @@ export interface Schemas {
     readonly polygon_attribute_range: (typeof json)["opengeodeweb_back"]["polygon_attribute_range"] & TypedSchema<PolygonAttributeRangeParams, PolygonAttributeRangeResponse>;
     readonly polygon_attribute_names: (typeof json)["opengeodeweb_back"]["polygon_attribute_names"] & TypedSchema<PolygonAttributeNamesParams, PolygonAttributeNamesResponse>;
     readonly ping: (typeof json)["opengeodeweb_back"]["ping"] & TypedSchema<PingParams, PingResponse>;
+    readonly model_physical_properties: (typeof json)["opengeodeweb_back"]["model_physical_properties"] & TypedSchema<ModelPhysicalPropertiesParams, ModelPhysicalPropertiesResponse>;
     readonly model_component_vertex_attribute_range: (typeof json)["opengeodeweb_back"]["model_component_vertex_attribute_range"] & TypedSchema<ModelComponentVertexAttributeRangeParams, ModelComponentVertexAttributeRangeResponse>;
     readonly model_component_vertex_attribute_names: (typeof json)["opengeodeweb_back"]["model_component_vertex_attribute_names"] & TypedSchema<ModelComponentVertexAttributeNamesParams, ModelComponentVertexAttributeNamesResponse>;
     readonly model_component_polyhedron_attribute_range: (typeof json)["opengeodeweb_back"]["model_component_polyhedron_attribute_range"] & TypedSchema<ModelComponentPolyhedronAttributeRangeParams, ModelComponentPolyhedronAttributeRangeResponse>;

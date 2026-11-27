@@ -1,0 +1,111 @@
+{
+  "route": "/model_physical_properties",
+  "methods": [
+    "POST"
+  ],
+  "type": "object",
+  "properties": {
+    "id": {
+      "title": "DataId"
+    }
+  },
+  "required": [
+    "id"
+  ],
+  "additionalProperties": false,
+  "response": {
+    "type": "object",
+    "properties": {
+      "physical_properties": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "component_type": {
+              "type": "string",
+              "enum": [
+                "Corner",
+                "Line",
+                "Surface",
+                "Block"
+              ]
+            },
+            "attribute_id": {
+              "type": "string"
+            },
+            "attribute_name": {
+              "type": "string"
+            },
+            "element_type": {
+              "type": "string",
+              "enum": [
+                "vertex",
+                "edge",
+                "polygon",
+                "polyhedron"
+              ]
+            },
+            "nb_items": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "components": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "geode_id": {
+                    "title": "GeodeId"
+                  },
+                  "min_values": {
+                    "type": "array",
+                    "items": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    }
+                  },
+                  "max_values": {
+                    "type": "array",
+                    "items": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "geode_id",
+                  "min_values",
+                  "max_values"
+                ],
+                "additionalProperties": false,
+                "title": "PhysicalPropertyComponent"
+              }
+            }
+          },
+          "required": [
+            "name",
+            "component_type",
+            "attribute_id",
+            "attribute_name",
+            "element_type",
+            "nb_items",
+            "components"
+          ],
+          "additionalProperties": false,
+          "title": "PhysicalProperty"
+        }
+      }
+    },
+    "required": [
+      "physical_properties"
+    ],
+    "additionalProperties": false
+  }
+}

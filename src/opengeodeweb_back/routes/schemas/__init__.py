@@ -11,6 +11,7 @@ from .polyhedron_attribute_names import *
 from .polygon_attribute_range import *
 from .polygon_attribute_names import *
 from .ping import *
+from .model_physical_properties import *
 from .model_component_vertex_attribute_range import *
 from .model_component_vertex_attribute_names import *
 from .model_component_polyhedron_attribute_range import *
