@@ -387,19 +387,22 @@ export interface ModelPhysicalPropertiesResponse {
 export interface PhysicalProperty {
     attribute_id:   string;
     attribute_name: string;
-    component_type: string;
-    components:     Component[];
-    element_type:   string;
+    component_type: ComponentType;
+    components:     PhysicalPropertyComponent[];
+    element_type:   ElementType;
     name:           string;
     nb_items:       number;
 }
 
-export interface Component {
+export type ComponentType = "Corner" | "Line" | "Surface" | "Block";
+
+export interface PhysicalPropertyComponent {
     geode_id:   GeodeId;
     max_values: Array<number | null>;
     min_values: Array<number | null>;
-    no_data:    boolean;
 }
+
+export type ElementType = "vertex" | "edge" | "polygon" | "polyhedron";
 
 export interface ModelComponentVertexAttributeRangeParams {
     attribute_name: AttributeName;

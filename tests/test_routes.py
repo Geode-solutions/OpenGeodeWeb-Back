@@ -1176,7 +1176,6 @@ def test_model_physical_properties(client: FlaskClient, physical_properties_brep
     for component in porosity["components"]:
         assert component["min_values"] == [POROSITY]
         assert component["max_values"] == [POROSITY]
-        assert component["no_data"] is False
 
     displacement = properties["boundary_displacement"]
     assert displacement["component_type"] == "Surface"
@@ -1189,7 +1188,6 @@ def test_model_physical_properties(client: FlaskClient, physical_properties_brep
         # Free components have no value: null, as NaN is not JSON
         assert component["min_values"] == [None, 0.0, None]
         assert component["max_values"] == [None, 0.0, None]
-        assert component["no_data"] is True
 
     def get_full_data() -> test_utils.JsonData:
         return {"id": model_id}

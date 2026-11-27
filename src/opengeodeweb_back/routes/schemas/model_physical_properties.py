@@ -4,6 +4,7 @@ from opengeodeweb_microservice.schemas import Route, load_schema
 from typing import List, Optional
 from dataclasses_json import DataClassJsonMixin
 from opengeodeweb_microservice.schemas import print_dataclass
+from enum import Enum
 from dataclasses import dataclass
 
 
@@ -15,15 +16,28 @@ class ModelPhysicalProperties(DataClassJsonMixin):
     id: DataId
 
 
+class ComponentType(Enum):
+    BLOCK = "Block"
+    CORNER = "Corner"
+    LINE = "Line"
+    SURFACE = "Surface"
+
+
 @dataclass
-class Component(DataClassJsonMixin):
+class PhysicalPropertyComponent(DataClassJsonMixin):
     def __post_init__(self) -> None:
         print_dataclass(self)
 
     geode_id: GeodeId
     max_values: List[Optional[float]]
     min_values: List[Optional[float]]
-    no_data: bool
+
+
+class ElementType(Enum):
+    EDGE = "edge"
+    POLYGON = "polygon"
+    POLYHEDRON = "polyhedron"
+    VERTEX = "vertex"
 
 
 @dataclass
@@ -33,9 +47,9 @@ class PhysicalProperty(DataClassJsonMixin):
 
     attribute_id: str
     attribute_name: str
-    component_type: str
-    components: List[Component]
-    element_type: str
+    component_type: ComponentType
+    components: List[PhysicalPropertyComponent]
+    element_type: ElementType
     name: str
     nb_items: int
 

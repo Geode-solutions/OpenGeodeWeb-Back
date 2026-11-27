@@ -801,23 +801,20 @@ def _physical_property_component(
     attribute_manager: og.AttributeManager,
     attribute_id: og.uuid,
     nb_items: int,
-) -> schemas.model_physical_properties.Component:
+) -> schemas.model_physical_properties.PhysicalPropertyComponent:
     min_values: list[float | None] = []
     max_values: list[float | None] = []
-    no_data = False
     for item_index in range(nb_items):
-        values, has_nan = _extract_valid_values_from_attribute(
+        values, _ = _extract_valid_values_from_attribute(
             attribute_manager, attribute_id, item_index
         )
-        no_data = no_data or has_nan
         # An item without any value (e.g. a free displacement axis) is None: NaN is not JSON
         min_values.append(min(values) if values else None)
         max_values.append(max(values) if values else None)
-    return schemas.model_physical_properties.Component(
+    return schemas.model_physical_properties.PhysicalPropertyComponent(
         geode_id=component_id.string(),
         min_values=min_values,
         max_values=max_values,
-        no_data=no_data,
     )
 
 
@@ -836,7 +833,7 @@ def _physical_property(
     element_type: str | None = None
     attribute_name = ""
     nb_items = 1
-    components: list[schemas.model_physical_properties.Component] = []
+    components: list[schemas.model_physical_properties.PhysicalPropertyComponent] = []
     for registry_type, component_ids in model.mesh_components().items():
         if registry_type.get() != component_type:
             continue
@@ -862,10 +859,10 @@ def _physical_property(
         return None
     return schemas.model_physical_properties.PhysicalProperty(
         name=name.name,
-        component_type=component_type,
+        component_type=schemas.model_physical_properties.ComponentType(component_type),
         attribute_id=attribute_id.string(),
         attribute_name=attribute_name,
-        element_type=element_type,
+        element_type=schemas.model_physical_properties.ElementType(element_type),
         nb_items=nb_items,
         components=components,
     )

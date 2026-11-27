@@ -2752,7 +2752,13 @@
                   "type": "string"
                 },
                 "component_type": {
-                  "type": "string"
+                  "type": "string",
+                  "enum": [
+                    "Corner",
+                    "Line",
+                    "Surface",
+                    "Block"
+                  ]
                 },
                 "attribute_id": {
                   "type": "string"
@@ -2761,7 +2767,13 @@
                   "type": "string"
                 },
                 "element_type": {
-                  "type": "string"
+                  "type": "string",
+                  "enum": [
+                    "vertex",
+                    "edge",
+                    "polygon",
+                    "polyhedron"
+                  ]
                 },
                 "nb_items": {
                   "type": "integer",
@@ -2795,18 +2807,15 @@
                             "null"
                           ]
                         }
-                      },
-                      "no_data": {
-                        "type": "boolean"
                       }
                     },
                     "required": [
                       "geode_id",
                       "min_values",
-                      "max_values",
-                      "no_data"
+                      "max_values"
                     ],
-                    "additionalProperties": false
+                    "additionalProperties": false,
+                    "title": "PhysicalPropertyComponent"
                   }
                 }
               },
@@ -2819,7 +2828,8 @@
                 "nb_items",
                 "components"
               ],
-              "additionalProperties": false
+              "additionalProperties": false,
+              "title": "PhysicalProperty"
             }
           }
         },
