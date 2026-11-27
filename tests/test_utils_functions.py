@@ -365,6 +365,8 @@ def test_generate_files_from_non_native_file_twice_shares_geode_id(
         )
         # An unnamed single object takes the file stem
         assert first["name"] == "hat"
+        # The native file is saved in background
+        utils_functions.wait_native_saved(first["id"])
         native_path = geode_functions.data_file_path(first["id"], first["native_file"])
         reloaded = GeodePolygonalSurface3D.load_one(native_path)
         assert reloaded.identifier.id().string() == first["geode_id"]
@@ -428,6 +430,8 @@ def test_generate_files_from_multi_object_file(client: FlaskClient) -> None:
             data = Data.get(item["id"])
             assert data is not None
             assert data.geode_id == item["geode_id"]
+            # The native file is saved in background
+            utils_functions.wait_native_saved(item["id"])
             native_path = geode_functions.data_file_path(item["id"], item["native_file"])
             reloaded = GeodeTriangulatedSurface3D.load_one(native_path)
             assert reloaded.identifier.id().string() == item["geode_id"]
