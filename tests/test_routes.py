@@ -1110,7 +1110,8 @@ def _write_physical_properties_brep(path: Path) -> None:
     """cube.og_brep with a porosity on its Block and a displacement on two of its Surfaces.
 
     The displacement attribute is named "displacement", not like the physical property, and
-    its x and z components are free (NaN).
+    its x and z components are free (NaN). The last Surface also carries it, on its vertices
+    instead of its polygons: the route leaves it out.
     """
     [brep] = og.load_brep(str(path.parent / "cube.og_brep"))
     builder = og.BRepBuilder(brep)
@@ -1129,10 +1130,14 @@ def _write_physical_properties_brep(path: Path) -> None:
     displacement_id = og.uuid()
     displacement_values = og.AttributeValuesArrayDouble3()
     displacement_values.default_value = [math.nan, 0.0, math.nan]
-    for surface in list(brep.surfaces())[:2]:
+    surfaces = list(brep.surfaces())
+    for surface in surfaces[:2]:
         surface.mesh().polygon_attribute_manager().create_attribute_variable_arraydouble3(
             "displacement", displacement_id, displacement_values, og.AttributeProperties()
         )
+    surfaces[-1].mesh().vertex_attribute_manager().create_attribute_variable_arraydouble3(
+        "displacement", displacement_id, displacement_values, og.AttributeProperties()
+    )
     builder.set_physical_property(
         og.PhysicalPropertyName.boundary_displacement,
         og.Surface3D.component_type_static(),
@@ -1183,6 +1188,7 @@ def test_model_physical_properties(client: FlaskClient, physical_properties_brep
     # The attribute keeps its own name, the front colors the model with it
     assert displacement["attribute_name"] == "displacement"
     assert displacement["nb_items"] == 3
+    # The Surface carrying it on its vertices is left out: the property is on polygons
     assert len(displacement["components"]) == 2
     for component in displacement["components"]:
         # Free components have no value: null, as NaN is not JSON

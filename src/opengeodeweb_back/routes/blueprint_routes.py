@@ -825,7 +825,9 @@ def _physical_property(
     """The components carrying a physical property, with their value range per item.
 
     The attribute is searched on the element managers first, then on the vertices: the
-    physical property only records the component type, not the mesh element.
+    physical property only records the component type, not the mesh element. The first
+    component carrying it sets the element: the others are only read on that element, a
+    component carrying it on another one is left out.
     """
     info = model.brep.physical_property_info(name)
     component_type = info.component_type.get()
@@ -842,6 +844,8 @@ def _physical_property(
             if not isinstance(component, ComponentMesh):
                 continue
             for element, attribute_manager in _element_attribute_managers(component.mesh()):
+                if element_type is not None and element != element_type:
+                    continue
                 attribute = attribute_manager.find_generic_attribute(attribute_id)
                 if attribute is None:
                     continue
