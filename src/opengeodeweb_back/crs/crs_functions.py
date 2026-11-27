@@ -42,6 +42,9 @@ class CrsError(Exception):
 ORIGINAL_CRS = "points"
 # OpenGeode orders EPSG:4326 coordinates as (longitude, latitude), the usual GIS order
 WGS84 = og_geosciences.GeographicCoordinateSystemInfo("EPSG", "4326", "WGS 84")
+WEB_MERCATOR = og_geosciences.GeographicCoordinateSystemInfo(
+    "EPSG", "3857", "WGS 84 / Pseudo-Mercator"
+)
 MAX_LATITUDE = 90.0
 MAX_LONGITUDE = 180.0
 

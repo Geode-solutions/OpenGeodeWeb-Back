@@ -29,7 +29,7 @@ export interface Bounds {
     y_min: number;
 }
 
-export type Map = "satellite" | "plan" | "routes";
+export type Map = "satellite" | "plan" | "geology" | "routes";
 
 export interface BasemapBuildResponse {
     attribution:            string;

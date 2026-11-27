@@ -53,6 +53,7 @@
               "enum": [
                 "satellite",
                 "plan",
+                "geology",
                 "routes"
               ]
             }

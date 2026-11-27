@@ -97,11 +97,16 @@ def test_fetch_and_save_tiles(tmp_path: Path) -> None:
 
 
 def test_fetch_layers_downloads_every_layer(local_tiles: Path) -> None:
-    images = basemap_tiles.fetch_layers([("ign_orthophotos",), ("ign_roads",)], WHOLE_WORLD)
+    images = basemap_tiles.fetch_layers(
+        [basemap_providers.Layer(("ign_orthophotos",)), basemap_providers.Layer(("ign_roads",))],
+        WHOLE_WORLD,
+    )
     assert list(images) == ["ign_orthophotos", "ign_roads"]
     assert all(all(source.values()) for source in images.values())
     # The next source of a layer is not fetched while the first one serves tiles
-    assert list(basemap_tiles.fetch_layers([("osm", "eox_overlay")], WHOLE_WORLD)) == ["osm"]
+    assert list(
+        basemap_tiles.fetch_layers([basemap_providers.Layer(("osm", "eox_overlay"))], WHOLE_WORLD)
+    ) == ["osm"]
     assert not (local_tiles / "eox_overlay").exists()
 
 
@@ -366,6 +371,31 @@ def test_build_route_skips_sources_without_tiles(
     assert not (tiles_path / "ign_roads").exists()
 
 
+def test_build_route_geology_tile_by_tile(
+    client: FlaskClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    # Only the BRGM 1/50 000 serves tiles: Paris is far more detailed than its other maps
+    _serve(monkeypatch, tmp_path / "cache", (tmp_path / "none").as_uri() + "/{z}/{x}/{y}.png")
+    monkeypatch.setenv("BASEMAP_TILE_URL_EOX_S2CLOUDLESS_2016", ANY_TILE.as_uri())
+    monkeypatch.setenv("BASEMAP_TILE_URL_GEOLOGY_BRGM_50K", ANY_TILE.as_uri())
+    response = _build(client, maps=["satellite", "geology"])
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["maps"][-1] == {"map": "geology", "sources": ["geology_brgm_50k"]}
+    assert "© BRGM" in body["attribution"]
+
+
+def test_build_route_geology_outside_every_source(
+    client: FlaskClient, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    # No geological survey serves the zone: the geology map is left out, the satellite stays
+    _serve(monkeypatch, tmp_path / "cache", (tmp_path / "none").as_uri() + "/{z}/{x}/{y}.png")
+    monkeypatch.setenv("BASEMAP_TILE_URL_EOX_S2CLOUDLESS_2016", ANY_TILE.as_uri())
+    response = _build(client, maps=["satellite", "geology"])
+    assert response.status_code == 200
+    assert [entry["map"] for entry in response.get_json()["maps"]] == ["satellite"]
+
+
 def test_padding_is_in_metres() -> None:
     padded = blueprint_basemap.padded((5.0, 7.0, 5.0, 7.0))
     assert padded[2] - padded[0] >= 1_000.0
@@ -391,8 +421,13 @@ def test_url_template_from_the_source_table(monkeypatch: pytest.MonkeyPatch) -> 
 
 
 def test_maps_from_the_bottom_up() -> None:
-    # Whatever the requested order: satellite, plan, then routes
+    # Whatever the requested order: satellite, plan, geology, then routes
     assert basemap_providers.sorted_maps(["routes", "satellite"]) == ["satellite", "routes"]
+    assert basemap_providers.sorted_maps(["routes", "geology", "plan"]) == [
+        "plan",
+        "geology",
+        "routes",
+    ]
     assert basemap_providers.max_zoom(["eox_s2cloudless_2016", "ign_roads"]) == 18
     assert basemap_providers.max_zoom(["eox_overlay", "ign_orthophotos"]) == 19
 
@@ -483,7 +518,7 @@ def test_requests_to_one_host_are_limited(monkeypatch: pytest.MonkeyPatch) -> No
     monkeypatch.setattr(urllib.request, "urlopen", slow)
     _serve(monkeypatch, Path("/nonexistent"), "https://tiles.example/{z}/{x}/{y}.png")
     sources = ["ign_orthophotos", "ign_roads", "osm"]
-    layers = [(source,) for source in sources]
+    layers = [basemap_providers.Layer((source,)) for source in sources]
     basemap_tiles.fetch_layers(layers, basemap_tiles.TileRange(4, 0, 3, 0, 3))
     assert peak["tiles.example"] == basemap_tiles.MAX_REQUESTS_PER_HOST
 

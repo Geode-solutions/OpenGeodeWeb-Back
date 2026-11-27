@@ -6,24 +6,22 @@ from typing import TYPE_CHECKING
 
 # Third party imports
 import opengeode as og
-import opengeode_geosciences as og_geosciences
 
 # Local application imports
 from opengeodeweb_back.basemap.basemap_tiles import HALF_WORLD
-from opengeodeweb_back.crs.crs_functions import convert_xy_corners
+from opengeodeweb_back.crs.crs_functions import WEB_MERCATOR, convert_xy_corners
 from opengeodeweb_back.geode_objects.geode_triangulated_surface3d import (
     GeodeTriangulatedSurface3D,
 )
 
 if TYPE_CHECKING:
+    import opengeode_geosciences as og_geosciences
+
     from opengeodeweb_back.basemap.basemap_tiles import TileRange
 
 GRID_SIZE = 32
 MESH_NAME = "basemap"
 UV_ATTRIBUTE = "basemap_uv"
-WEB_MERCATOR = og_geosciences.GeographicCoordinateSystemInfo(
-    "EPSG", "3857", "WGS 84 / Pseudo-Mercator"
-)
 OUTSIDE_MESSAGE = "Area outside the map projection limits"
 
 

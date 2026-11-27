@@ -15,6 +15,7 @@ from opengeodeweb_microservice.database.connection import init_database
 
 # Local application imports
 from opengeodeweb_back.app import create_app, register_ogw_back_blueprints
+from opengeodeweb_back.basemap import basemap_tiles
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
@@ -83,3 +84,9 @@ def closed_database() -> Generator[Callable[[], None]]:
 @pytest.fixture
 def test_id() -> str:
     return TEST_ID
+
+
+@pytest.fixture(autouse=True)
+def fresh_circuit_breaker(monkeypatch: pytest.MonkeyPatch) -> None:
+    # A source paused by one test must not leave the next one without tiles
+    monkeypatch.setattr(basemap_tiles, "BREAKER", basemap_tiles.CircuitBreaker())

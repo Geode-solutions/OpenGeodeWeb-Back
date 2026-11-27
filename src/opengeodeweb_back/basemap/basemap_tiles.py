@@ -5,6 +5,7 @@ import contextlib
 import hashlib
 import http.client
 import io
+import logging
 import math
 import os
 import ssl
@@ -22,7 +23,7 @@ from typing import TYPE_CHECKING
 
 # Third party imports
 import certifi
-from PIL import Image
+from PIL import Image, ImageChops
 
 # Local application imports
 from opengeodeweb_back import geode_functions
@@ -32,16 +33,39 @@ from opengeodeweb_back.basemap.basemap_providers import (
     USER_AGENT,
     url_template,
 )
+from opengeodeweb_back.crs.crs_functions import WEB_MERCATOR, WGS84, convert_xy_corners
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Callable, Iterator
+    from concurrent.futures import Future
+
+    from opengeodeweb_back.basemap.basemap_providers import Layer
+
+logger = logging.getLogger(__name__)
 
 # Folder of a basemap data holding its tiles: only basemaps have one
 TILES_FOLDER = "tiles"
 HALF_WORLD = 20037508.342789244
+# Radius of the Web Mercator sphere: HALF_WORLD = pi * EARTH_RADIUS
+EARTH_RADIUS = 6_378_137.0
+# Scale denominator of a zoom 0 tile at the equator, for 0.28 mm screen pixels (OGC)
+EQUATOR_SCALE_AT_ZOOM_0 = 559_082_264.0
 DEFAULT_MAX_PIXELS = 2048
 PNG_SIGNATURE = b"\x89PNG"
 JPEG_QUALITY = 90
+# Levels a JPEG may blur a plain colour by
+JPEG_TOLERANCE = 3
+TOO_MANY_REQUESTS_RETRIES = 2
+MAX_RETRY_WAIT_SECONDS = 5.0
+# One warning per source and per minute: a broken server must not flood the log
+WARNING_INTERVAL_SECONDS = 60.0
+# A source failing this many times in a row is not asked for a while: a server down or under
+# maintenance would otherwise hold every build until the fetch deadline
+BREAKER_FAILURES = 3
+BREAKER_PAUSE_SECONDS = 120.0
+# Sources of a tile-by-tile layer asked at once: a source without data at a tile does not delay
+# the next one, at the cost of a few tiles also fetched from the next source
+PARALLEL_SOURCES = 2
 # Cached in place of a tile the server does not have, so it is not asked again
 MISSING_TILE = b"missing"
 FETCH_WORKERS = 8
@@ -57,6 +81,55 @@ SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
 
 _HOST_LIMITS: dict[str, threading.Semaphore] = {}
 _HOST_LIMITS_LOCK = threading.Lock()
+
+
+class CircuitBreaker:
+    """Failures of each source in a row: past BREAKER_FAILURES the source is paused."""
+
+    def __init__(self, clock: Callable[[], float] = time.monotonic) -> None:
+        self._clock = clock
+        self._lock = threading.Lock()
+        self._failures: dict[str, int] = {}
+        self._paused_until: dict[str, float] = {}
+        self._last_warnings: dict[str, float] = {}
+
+    def paused(self, source: str) -> bool:
+        with self._lock:
+            return self._clock() < self._paused_until.get(source, -math.inf)
+
+    def succeeded(self, source: str) -> None:
+        with self._lock:
+            self._failures.pop(source, None)
+
+    def failed(self, source: str, reason: str) -> None:
+        now = self._clock()
+        with self._lock:
+            failures = self._failures.get(source, 0) + 1
+            paused = failures >= BREAKER_FAILURES
+            if paused:
+                self._paused_until[source] = now + BREAKER_PAUSE_SECONDS
+                # Once the pause is over, a single failure pauses the source again
+                failures = BREAKER_FAILURES - 1
+            self._failures[source] = failures
+            warn = paused or (
+                now - self._last_warnings.get(source, -math.inf) >= WARNING_INTERVAL_SECONDS
+            )
+            if warn:
+                self._last_warnings[source] = now
+        if paused:
+            logger.warning(
+                "Basemap source %s paused for %d s after %d failures (%s)",
+                source,
+                BREAKER_PAUSE_SECONDS,
+                BREAKER_FAILURES,
+                reason,
+            )
+        elif warn:
+            logger.warning("Basemap source %s failed (%s): the next source is used", source, reason)
+
+
+# Shared by the builds of the process: a source down for one is down for all
+BREAKER = CircuitBreaker()
 
 
 def _host_limit(url: str) -> threading.Semaphore:
@@ -96,6 +169,25 @@ class TileRange:
         ]
 
 
+def tile_scale(z: int, y: int) -> float:
+    """Scale denominator at the centre of tile row y: finer away from the equator."""
+    center_y = HALF_WORLD - (y + 0.5) * _tile_span(z)
+    # Web Mercator stretches the ground by 1 / cos(latitude) = cosh(y / R)
+    return EQUATOR_SCALE_AT_ZOOM_0 / (1 << z) / math.cosh(center_y / EARTH_RADIUS)
+
+
+def eligible(source: str, z: int, tile: tuple[int, int]) -> bool:
+    """Whether the scale window and the area of a source hold the tile."""
+    settings = SOURCES[source]
+    if not settings.min_scale <= tile_scale(z, tile[1]) < settings.max_scale:
+        return False
+    if settings.area_3857 is None:
+        return True
+    x_min, y_min, x_max, y_max = TileRange(z, tile[0], tile[0], tile[1], tile[1]).bounds_3857()
+    area_x_min, area_y_min, area_x_max, area_y_max = settings.area_3857
+    return x_min < area_x_max and area_x_min < x_max and y_min < area_y_max and area_y_min < y_max
+
+
 def _range_at(bounds_3857: tuple[float, float, float, float], z: int) -> TileRange:
     span = _tile_span(z)
     last = (1 << z) - 1
@@ -125,6 +217,23 @@ def tile_range(
             break
         best = candidate
     return best
+
+
+def tile_bbox(source: str, z: int, x: int, y: int) -> str:
+    """Bounding box of tile z/x/y in the {bbox} CRS of the source."""
+    bounds = TileRange(z, x, x, y, y).bounds_3857()
+    crs = SOURCES[source].bbox_crs
+    if crs is None or crs == "EPSG:3857":
+        return ",".join(str(value) for value in bounds)
+    # The CRS API converts the corners: no projection written here
+    corners = convert_xy_corners(bounds, WEB_MERCATOR, WGS84)
+    lons = [lon for lon, _ in corners]
+    lats = [lat for _, lat in corners]
+    lon_lat = (min(lons), min(lats), max(lons), max(lats))
+    # WMS 1.3.0 reads EPSG:4326 latitude first
+    if crs == "EPSG:4326":
+        lon_lat = (lon_lat[1], lon_lat[0], lon_lat[3], lon_lat[2])
+    return ",".join(str(value) for value in lon_lat)
 
 
 def _cache_folder() -> Path:
@@ -163,7 +272,73 @@ def _write_cache(cached: Path, content: bytes) -> None:
             Path(temporary).unlink()
 
 
-def _fetch_tile(source: str, z: int, x: int, y: int) -> bytes | None:
+def is_empty(content: bytes, empty_tile: str) -> bool:
+    """Whether a served tile is the image the server sends where it has no data."""
+    if empty_tile == "404":
+        return False
+    try:
+        with Image.open(io.BytesIO(content)) as image:
+            if empty_tile == "transparent":
+                # No bounding box: every pixel has a zero alpha
+                return image.convert("RGBA").getchannel("A").getbbox() is None
+            rgb = image.convert("RGB")
+    except OSError:  # UnidentifiedImageError included
+        return False
+    colour = tuple(int(empty_tile[i : i + 2], 16) for i in (1, 3, 5))
+    difference = ImageChops.difference(rgb, Image.new("RGB", rgb.size, colour))
+    # JPEG blurs a plain colour by a few levels: only larger differences count
+    beyond = difference.point(lambda level: 255 if level > JPEG_TOLERANCE else 0)
+    return beyond.getbbox() is None
+
+
+def _retry_wait(error: urllib.error.HTTPError) -> float:
+    try:
+        wait_seconds = float(error.headers.get("Retry-After", "1"))
+    except ValueError:  # an HTTP date: wait the most
+        wait_seconds = MAX_RETRY_WAIT_SECONDS
+    return min(max(wait_seconds, 0.0), MAX_RETRY_WAIT_SECONDS)
+
+
+def _download(url: str) -> bytes:
+    # Open tile servers ask every application to name itself
+    request = urllib.request.Request(  # noqa: S310 URL from the source table or the environment
+        url, headers={"User-Agent": USER_AGENT}
+    )
+    with (
+        _host_limit(url),
+        urllib.request.urlopen(  # noqa: S310
+            request, timeout=FETCH_TIMEOUT_SECONDS, context=SSL_CONTEXT
+        ) as response,
+    ):
+        content: bytes = response.read()
+    return content
+
+
+def _download_tile(source: str, url: str, cached: Path) -> bytes | None:
+    """The server answer, None when it has no tile or failed: 429 retried, failures counted."""
+    for attempt in range(TOO_MANY_REQUESTS_RETRIES + 1):
+        try:
+            return _download(url)
+        except urllib.error.HTTPError as error:
+            error.close()
+            if error.code == HTTPStatus.TOO_MANY_REQUESTS and attempt < TOO_MANY_REQUESTS_RETRIES:
+                time.sleep(_retry_wait(error))
+                continue
+            # Outside its area (the IGN outside France) a server answers 404: unlike a timeout or a
+            # network error, asking again would give the same answer
+            if error.code == HTTPStatus.NOT_FOUND:
+                BREAKER.succeeded(source)
+                _write_cache(cached, MISSING_TILE)
+            else:
+                BREAKER.failed(source, f"HTTP {error.code}")
+            return None
+        except DOWNLOAD_ERRORS as error:
+            BREAKER.failed(source, type(error).__name__)
+            return None
+    return None
+
+
+def _fetch_tile(source: str, z: int, x: int, y: int, bbox: str) -> bytes | None:
     # The template hash keeps tiles of an overridden URL apart
     template = url_template(source)
     template_hash = hashlib.sha256(template.encode()).hexdigest()[:12]
@@ -171,29 +346,20 @@ def _fetch_tile(source: str, z: int, x: int, y: int) -> bytes | None:
     cached_content = _read_cache(cached)
     if cached_content is not None:
         return None if cached_content == MISSING_TILE else cached_content
-    # Open tile servers ask every application to name itself
-    url = template.format(z=z, x=x, y=y)
-    request = urllib.request.Request(  # noqa: S310 URL from the source table or the environment
-        url, headers={"User-Agent": USER_AGENT}
-    )
-    try:
-        with (
-            _host_limit(url),
-            urllib.request.urlopen(  # noqa: S310
-                request, timeout=FETCH_TIMEOUT_SECONDS, context=SSL_CONTEXT
-            ) as response,
-        ):
-            content: bytes = response.read()
-    except urllib.error.HTTPError as error:
-        error.close()
-        # Outside its area (the IGN outside France) a server answers 404: unlike a timeout or a
-        # network error, asking again would give the same answer
-        if error.code == HTTPStatus.NOT_FOUND:
-            _write_cache(cached, MISSING_TILE)
+    # A paused source still serves its cached tiles
+    if BREAKER.paused(source):
         return None
-    except DOWNLOAD_ERRORS:
+    content = _download_tile(source, template.format(z=z, x=x, y=y, bbox=bbox), cached)
+    if content is None:
         return None
+    # A maintenance or error page served as HTTP 200
     if not _is_image(content):
+        BREAKER.failed(source, "not an image")
+        return None
+    BREAKER.succeeded(source)
+    # Where a server has no data it may send a plain tile instead of a 404: missing as well
+    if is_empty(content, SOURCES[source].empty_tile):
+        _write_cache(cached, MISSING_TILE)
         return None
     _write_cache(cached, content)
     return content
@@ -239,26 +405,53 @@ def _downloads(workers: int) -> Iterator[ThreadPoolExecutor]:
         executor.shutdown(wait=False, cancel_futures=True)
 
 
-def _source_tiles(
-    source: str, tiles: TileRange, downloads: ThreadPoolExecutor, deadline: float
-) -> dict[tuple[int, int], bytes | None]:
+@dataclass(frozen=True)
+class _SourceRequest:
+    """The downloads of one source, started: the tiles of each parent and its future."""
+
+    source: str
+    depth: int
+    children: dict[tuple[int, int], list[tuple[int, int]]]
+    futures: dict[tuple[int, int], Future[bytes | None]]
+
+
+def _submit(
+    source: str,
+    tiles: TileRange,
+    downloads: ThreadPoolExecutor,
+    wanted: list[tuple[int, int]] | None = None,
+) -> _SourceRequest:
     # Past its max zoom a source has no tile: its parent tiles are enlarged instead
     depth = max(0, tiles.z - SOURCES[source].max_zoom)
     z = tiles.z - depth
     children: dict[tuple[int, int], list[tuple[int, int]]] = {}
-    for x, y in tiles.tiles():
+    for x, y in wanted or tiles.tiles():
         children.setdefault((x >> depth, y >> depth), []).append((x, y))
-    futures = {parent: downloads.submit(_fetch_tile, source, z, *parent) for parent in children}
-    done, _ = wait(futures.values(), timeout=max(0.0, deadline - time.monotonic()))
+    # PROJ runs through OpenGeode: the bounding boxes are converted here, not in the downloads
+    futures = {
+        parent: downloads.submit(_fetch_tile, source, z, *parent, tile_bbox(source, z, *parent))
+        for parent in children
+    }
+    return _SourceRequest(source, depth, children, futures)
+
+
+def _collect(request: _SourceRequest, deadline: float) -> dict[tuple[int, int], bytes | None]:
+    done, _ = wait(request.futures.values(), timeout=max(0.0, deadline - time.monotonic()))
     images: dict[tuple[int, int], bytes | None] = {}
-    for parent, future in futures.items():
+    for parent, future in request.futures.items():
         # An unfinished tile counts as missing
         content = future.result() if future in done else None
-        if depth == 0:
+        if request.depth == 0:
             images[parent] = content
         else:
-            images |= _overzoomed(content, depth, children[parent])
+            images |= _overzoomed(content, request.depth, request.children[parent])
     return images
+
+
+def _source_tiles(
+    source: str, tiles: TileRange, downloads: ThreadPoolExecutor, deadline: float
+) -> dict[tuple[int, int], bytes | None]:
+    return _collect(_submit(source, tiles, downloads), deadline)
 
 
 def fetch_tiles(source: str, tiles: TileRange) -> dict[tuple[int, int], bytes | None]:
@@ -267,31 +460,70 @@ def fetch_tiles(source: str, tiles: TileRange) -> dict[tuple[int, int], bytes | 
 
 
 def _first_served(
-    layer: tuple[str, ...], tiles: TileRange, downloads: ThreadPoolExecutor, deadline: float
+    layer: Layer, tiles: TileRange, downloads: ThreadPoolExecutor, deadline: float
 ) -> tuple[str, dict[tuple[int, int], bytes | None]] | None:
-    for source in layer:
+    for source in layer.sources:
         images = _source_tiles(source, tiles, downloads, deadline)
         if any(images.values()):
             return source, images
     return None
 
 
-def fetch_layers(
-    layers: list[tuple[str, ...]], tiles: TileRange
+def _each_tile_served(
+    layer: Layer, tiles: TileRange, downloads: ThreadPoolExecutor, deadline: float
 ) -> dict[str, dict[tuple[int, int], bytes | None]]:
-    """The tiles of the first source serving any in each layer, by source.
+    """Each tile from the first source serving it, the sources in the layer order.
+
+    The sources are asked PARALLEL_SOURCES at a time: the wait is the slowest of a wave, not the
+    sum of its sources. Within a wave the earlier source still wins every tile it serves.
+    """
+    missing = set(tiles.tiles())
+    served: dict[str, dict[tuple[int, int], bytes | None]] = {}
+    pending = list(layer.sources)
+    while missing and pending:
+        wave: list[_SourceRequest] = []
+        while pending and len(wave) < PARALLEL_SOURCES:
+            source = pending.pop(0)
+            wanted = sorted(tile for tile in missing if eligible(source, tiles.z, tile))
+            if wanted:
+                wave.append(_submit(source, tiles, downloads, wanted))
+        for request in wave:
+            images = _collect(request, deadline)
+            found: dict[tuple[int, int], bytes | None] = {
+                tile: content
+                for tile, content in images.items()
+                if content is not None and tile in missing
+            }
+            if found:
+                served[request.source] = found
+                missing -= found.keys()
+    return served
+
+
+def fetch_layers(
+    layers: list[Layer], tiles: TileRange
+) -> dict[str, dict[tuple[int, int], bytes | None]]:
+    """The tiles of each layer by source: the first source serving any, or tile by tile.
 
     Every layer at once: the slowest server sets the wait, not the sum of them.
     """
     deadline = time.monotonic() + FETCH_DEADLINE_SECONDS
     with (
-        _downloads(FETCH_WORKERS * max(1, len(layers))) as downloads,
+        _downloads(FETCH_WORKERS * PARALLEL_SOURCES * max(1, len(layers))) as downloads,
         ThreadPoolExecutor(max(1, len(layers))) as executor,
     ):
-        served = executor.map(
-            lambda layer: _first_served(layer, tiles, downloads, deadline), layers
-        )
-        return dict(item for item in served if item is not None)
+
+        def fetch(layer: Layer) -> dict[str, dict[tuple[int, int], bytes | None]]:
+            if layer.tile_by_tile:
+                return _each_tile_served(layer, tiles, downloads, deadline)
+            first = _first_served(layer, tiles, downloads, deadline)
+            return {} if first is None else dict([first])
+
+        return {
+            source: images
+            for served in executor.map(fetch, layers)
+            for source, images in served.items()
+        }
 
 
 def _extension(content: bytes) -> str:
